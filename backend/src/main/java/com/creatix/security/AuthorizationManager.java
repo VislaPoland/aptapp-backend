@@ -1,8 +1,6 @@
 package com.creatix.security;
 
 import com.creatix.domain.entity.Account;
-import com.creatix.domain.entity.Gym;
-import com.creatix.domain.entity.Trainer;
 import com.creatix.domain.enums.Role;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,40 +15,8 @@ import java.util.Objects;
 @Component
 public class AuthorizationManager {
 
-    public void checkActive() {
-        if ( !(getCurrentAccount().isActive()) ) {
-            throw new SecurityException("Account is not activated");
-        }
-    }
-
-    public void checkSelf(Trainer trainer) {
-        checkSelf(trainer.getAccount());
-    }
-
-    public void checkSelf(Account account) {
-        if ( !isSelf(account) ) {
-            throw new SecurityException("Not owner of the account");
-        }
-    }
-
     public boolean isSelf(Account account) {
         return Objects.equals(account, getCurrentAccount());
-    }
-
-    public void checkManager(Gym gym) {
-        if ( !isManager(gym) ) {
-            throw new SecurityException("Not a gym manager");
-        }
-    }
-
-    public boolean isManager(Gym gym) {
-        return gym != null && Objects.equals(gym.getManager(), getCurrentAccount());
-    }
-
-    public void checkAdministrator() {
-        if ( !isAdministrator() ) {
-            throw new SecurityException();
-        }
     }
 
     public boolean isAdministrator() {
@@ -89,14 +55,4 @@ public class AuthorizationManager {
         return current;
     }
 
-    public void checkTrainer() {
-        if ( !isTrainer() ) {
-            throw new SecurityException("Not a trainer");
-        }
-    }
-
-    public boolean isTrainer() {
-        final Account account = getCurrentAccount();
-        return ((account.getRole() == Role.Trainer) && (account.getTrainer() != null));
-    }
 }

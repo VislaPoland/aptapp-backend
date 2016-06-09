@@ -2,23 +2,16 @@ package com.creatix.service;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.dto.AccountData;
 import com.creatix.domain.dto.LoginResponse;
-import com.creatix.domain.dto.ResetPasswordRequest;
 import com.creatix.domain.entity.Account;
-import com.creatix.domain.entity.Gym;
 import com.creatix.domain.enums.Role;
-import com.creatix.repository.AccountRepository;
-import com.creatix.repository.GymRepository;
 import com.creatix.security.AuthenticatedUserDetailsService;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.TokenUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,10 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Transactional
@@ -63,17 +54,6 @@ public class AccountService {
         result.setToken(token);
         final Account account = authorizationManager.getCurrentAccount();
         result.setId(account.getId());
-
-        if ( account.getRole() == Role.Trainer ) {
-            result.setAuth(mapper.toTrainerDto(account.getTrainer()));
-        }
-        else if ( account.getRole() == Role.GymManager ) {
-            final List<Gym> gyms = gymRepository.findByManager(account);
-            if ( (gyms != null) && (gyms.size() > 0) ) {
-                final Gym gym = gyms.get(0);
-                result.setAuth(mapper.toGymWithAccountDto(gym));
-            }
-        }
 
         return result;
     }

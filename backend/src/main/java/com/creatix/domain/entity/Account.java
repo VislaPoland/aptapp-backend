@@ -1,5 +1,6 @@
 package com.creatix.domain.entity;
 
+import com.creatix.domain.enums.Role;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
@@ -15,10 +16,6 @@ import java.util.Date;
 @EqualsAndHashCode(of = "id")
 @BatchSize(size = 80)
 public class Account {
-
-    public enum Role {
-        Administrator, Manager, Tenant
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

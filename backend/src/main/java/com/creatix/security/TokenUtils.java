@@ -1,22 +1,15 @@
 package com.creatix.security;
 
 import com.creatix.domain.entity.Account;
-import com.creatix.domain.entity.Gym;
-import com.creatix.domain.entity.Trainer;
-import com.creatix.domain.enums.Role;
-import com.creatix.payment.StripePaymentProcessor;
-import com.creatix.service.GymService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class TokenUtils {
@@ -116,19 +109,6 @@ public class TokenUtils {
             final AuthenticatedUserDetails auth = (AuthenticatedUserDetails) userDetails;
             final Account account = auth.getAccount();
             claims.setId(Long.toString(account.getId()));
-            if ( (account.getRole() == Role.Trainer) && (account.getTrainer() != null) ) {
-                final Trainer trainer = account.getTrainer();
-                claims.put("trainerId", trainer.getId());
-                claims.put("hasPaymentInfo", StringUtils.isNotBlank(trainer.getStripeCustomerId()));
-            }
-            else if ( account.getRole() == Role.GymManager ) {
-                final List<Gym> gyms = gymService.findGymsByManager(account);
-                if ( gyms.size() > 0 ) {
-                    final Gym gym = gyms.get(0);
-                    claims.put("gymId", gym.getId());
-                    claims.put("hasPaymentInfo", StringUtils.isNotBlank(gym.getStripeRecipientId()));
-                }
-            }
         }
         return this.generateToken(claims);
     }
