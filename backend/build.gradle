@@ -50,6 +50,7 @@ dependencies {
 	compile('org.hibernate:hibernate-core:5.2.0.Final')
 	compile('org.hibernate:hibernate-entitymanager:5.1.0.Final')
 	compile('org.hibernate:hibernate-validator:5.2.4.Final')
+	compile('org.springframework:spring-orm:4.3.0.RELEASE') // hibernate 5.2 support was added in spring-orm 4.3
 	compile('com.bedatadriven:jackson-datatype-jts:2.2')
 	compile('org.apache.commons:commons-lang3:3.4')
 	compile('io.springfox:springfox-swagger2:2.4.0')
