@@ -1,8 +1,8 @@
 package com.creatix;
 
+import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.entity.Account;
 import com.creatix.domain.enums.Role;
-import com.creatix.repository.AccountRepository;
 import com.creatix.security.AuthenticatedUserDetails;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +19,7 @@ public class TestUtils {
         SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(userDetails, userDetails.getAuthorities()));
     }
 
-    public static void login(long accountId, AccountRepository accountRepository) {
+    public static void login(long accountId, AccountDao accountRepository) {
         final Account account = accountRepository.findById(accountId);
         login(account);
     }
