@@ -4,7 +4,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.entity.Account;
-import com.creatix.domain.enums.Role;
+import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthenticatedUserDetailsService;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.TokenUtils;
@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Date;
-import java.util.List;
 
 @Service
 @Transactional
@@ -44,6 +43,39 @@ public class AccountService {
     private TokenUtils tokenUtils;
     @Autowired
     private Mapper mapper;
+
+    private static void validatePassword(String password) {
+        if (StringUtils.isBlank(password)) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+        if (password.length() < 6) {
+            throw new IllegalStateException("Password must be at least 6 characters long");
+        }
+    }
+
+    private static void setActionToken(Account account) {
+        if (account == null) {
+            throw new NullPointerException("Reference to account is null");
+        }
+
+        account.setActionToken(RandomStringUtils.randomAlphanumeric(64));
+        account.setActionTokenValidUntil(new DateTime().plusDays(1).toDate());
+    }
+
+    private static void checkTokenValidity(String token, Account account) {
+        if (StringUtils.isBlank(token)) {
+            throw new IllegalArgumentException("Token cannot be empty");
+        }
+        if (account.getActionTokenValidUntil() == null) {
+            throw new IllegalStateException("Missing token valid until");
+        }
+        if (!(StringUtils.equalsIgnoreCase(token, account.getActionToken()))) {
+            throw new SecurityException("Token mismatch");
+        }
+        if (account.getActionTokenValidUntil().before(new Date())) {
+            throw new SecurityException("Token has expired");
+        }
+    }
 
     public LoginResponse createLoginResponse(String email) {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
@@ -69,44 +101,29 @@ public class AccountService {
 
     public Account getAccount(long accountId) {
         final Account account = accountDao.findById(accountId);
-        if ( account == null ) {
+        if (account == null) {
             throw new EntityNotFoundException(String.format("Account id=%d not found", accountId));
         }
         return account;
     }
 
-
-
-    private static void validatePassword(String password) {
-        if ( StringUtils.isBlank(password) ) {
-            throw new IllegalArgumentException("Password cannot be empty");
-        }
-        if ( password.length() < 6 ) {
-            throw new IllegalStateException("Password must be at least 6 characters long");
-        }
+    public Account saveAccount(Account account) {
+        accountDao.persist(account);
+        return accountDao.findByEmail(account.getEmail());
     }
 
-    private static void setActionToken(Account account) {
-        if ( account == null ) {
-            throw new NullPointerException("Reference to account is null");
-        }
+    //TODO delete test
+    public Account createTestAccount() {
+        Account account = new Account();
+        account.setFirstName("John");
+        account.setLastName("Doe");
+        account.setCompanyName("Company name");
+        account.setPhone("123456789");
+        account.setEmail("john.doe@mail.com");
+        account.setPasswordHash(passwordEncoder.encode("password"));
+        account.setRole(AccountRole.Maintenance);
+        account.setActive(true);
 
-        account.setActionToken(RandomStringUtils.randomAlphanumeric(64));
-        account.setActionTokenValidUntil(new DateTime().plusDays(1).toDate());
-    }
-
-    private static void checkTokenValidity(String token, Account account) {
-        if ( StringUtils.isBlank(token) ) {
-            throw new IllegalArgumentException("Token cannot be empty");
-        }
-        if ( account.getActionTokenValidUntil() == null ) {
-            throw new IllegalStateException("Missing token valid until");
-        }
-        if ( !(StringUtils.equalsIgnoreCase(token, account.getActionToken())) ) {
-            throw new SecurityException("Token mismatch");
-        }
-        if ( account.getActionTokenValidUntil().before(new Date()) ) {
-            throw new SecurityException("Token has expired");
-        }
+        return account;
     }
 }

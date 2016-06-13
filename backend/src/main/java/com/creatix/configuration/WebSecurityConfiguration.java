@@ -1,6 +1,9 @@
 package com.creatix.configuration;
 
-import com.creatix.security.*;
+import com.creatix.security.AuthenticationTokenFilter;
+import com.creatix.security.CorsFilter;
+import com.creatix.security.EntryPointUnauthorizedHandler;
+import com.creatix.security.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -83,7 +86,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
             .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/hello/world").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/verify-code").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/attempt").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/hello/world").permitAll()    //TODO remove
+                .antMatchers(HttpMethod.POST, "/api/users/create/test").permitAll() //TODO remove
                 .anyRequest().authenticated()
                 .and()
             .csrf()

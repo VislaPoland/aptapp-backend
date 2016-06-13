@@ -1,7 +1,7 @@
 package com.creatix.security;
 
 import com.creatix.domain.entity.Account;
-import com.creatix.domain.enums.Role;
+import com.creatix.domain.enums.AccountRole;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +20,7 @@ public class AuthorizationManager {
     }
 
     public boolean isAdministrator() {
-        return getCurrentAccount().getRole() == Role.Administrator;
+        return getCurrentAccount().getRole() == AccountRole.PropertyOwner;
     }
 
     public Account getCurrentAccount() throws SecurityException {

@@ -11,6 +11,6 @@ public class LoginResponse {
     private String token;
     @ApiModelProperty(value = "Authenticated account id", required = true)
     private long id;
-    @ApiModelProperty(value = "Authenticated trainer or gym", required = true)
+    @ApiModelProperty(value = "Authenticated user of APT. app", required = true)
     private Object auth;
 }

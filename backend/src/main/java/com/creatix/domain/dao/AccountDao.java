@@ -4,8 +4,6 @@ import com.creatix.domain.entity.Account;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Repository
 @Transactional
 public class AccountDao extends DaoBase<Account, Long> {

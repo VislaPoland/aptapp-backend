@@ -18,7 +18,7 @@ public class Mapper {
     }
 
 
-    public static AccountDto toAccountDto(Account account) {
+    public AccountDto toAccountDto(Account account) {
         if ( account == null ) {
             throw new NullPointerException();
         }

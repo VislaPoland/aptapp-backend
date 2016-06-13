@@ -18,10 +18,9 @@ public class AuthenticatedUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final Account account = this.accountDao.findByEmail(username);
 
-        if ( (account == null) || (account.getDeleteDate() != null) ) {
+        if ((account == null)) {
             throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
-        }
-        else {
+        } else {
             return new AuthenticatedUserDetails(account);
         }
     }
