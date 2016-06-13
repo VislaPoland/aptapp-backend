@@ -1,7 +1,6 @@
 package com.creatix.configuration;
 
 import com.creatix.security.AuthenticationTokenFilter;
-import com.creatix.security.CorsFilter;
 import com.creatix.security.EntryPointUnauthorizedHandler;
 import com.creatix.security.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,13 +67,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return authenticationTokenFilter;
     }
 
-    @Bean
-    public CorsFilter corsFilterBean() {
-        final CorsFilter corsFilter = new CorsFilter();
-        corsFilter.setTokenHeader(jwtProperties.getHeader());
-        return corsFilter;
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -95,7 +87,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // JWT authentication
         http
-            .addFilterBefore(corsFilterBean(), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
     }
 
