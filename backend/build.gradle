@@ -1,12 +1,12 @@
 buildscript {
 	ext {
-		springBootVersion = '1.4.0.M1'
+		springBootVersion = '1.4.0.M3'
 	}
 	repositories {
 		mavenCentral()
-		maven { url "https://repo.spring.io/snapshot" }
-		maven { url "https://repo.spring.io/milestone" }
-		maven { url 'http://repo.spring.io/plugins-release' }
+        maven { url 'https://repo.spring.io/snapshot' }
+        maven { url 'https://repo.spring.io/milestone' }
+        maven { url 'https://repo.spring.io/plugins-release' }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -31,6 +31,7 @@ repositories {
 	mavenCentral()
 	maven { url "https://repo.spring.io/snapshot" }
 	maven { url "https://repo.spring.io/milestone" }
+    maven { url 'https://repo.spring.io/libs-milestone' }
 }
 
 
@@ -44,25 +45,20 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-jetty')
 	compile('org.springframework.boot:spring-boot-starter-logging')
 	compile('org.springframework.boot:spring-boot-starter-mail')
-	compile('org.jinq:jinq-jpa:1.8.10')
-	compile('org.projectlombok:lombok')
+	compile('org.projectlombok:lombok:1.16.8')
 	compile('io.jsonwebtoken:jjwt:0.6.0')
-	compile('org.hibernate:hibernate-core:5.1.0.Final')
+	compile('org.hibernate:hibernate-core:5.2.0.Final')
 	compile('org.hibernate:hibernate-entitymanager:5.1.0.Final')
 	compile('org.hibernate:hibernate-validator:5.2.4.Final')
-	compile('org.hibernate:hibernate-spatial:5.1.0.Final')
-	compile('org.hibernate:hibernate-search-orm:5.5.2.Final')
+	compile('org.springframework:spring-orm:4.3.0.RELEASE') // hibernate 5.2 support was added in spring-orm 4.3
 	compile('com.bedatadriven:jackson-datatype-jts:2.2')
-	compile('org.apache.commons:commons-lang3:3.0')
-	compile('io.springfox:springfox-swagger2:2.3.1')
-	compile('joda-time:joda-time:2.9.2')
+	compile('org.apache.commons:commons-lang3:3.4')
+	compile('io.springfox:springfox-swagger2:2.4.0')
+	compile('joda-time:joda-time:2.9.4')
 	compile('ma.glasnost.orika:orika-core:1.4.6')
-	compile('com.stripe:stripe-java:1.45.0')
-	compile('com.google.maps:google-maps-services:0.1.11')
-	compile('commons-io:commons-io:2.4')
-	compile('com.cloudinary:cloudinary-http44:1.4.1')
+	compile('commons-io:commons-io:2.5')
 
-	runtime('io.springfox:springfox-swagger-ui:2.3.1')
+	runtime('io.springfox:springfox-swagger-ui:2.4.0')
 	runtime('org.postgresql:postgresql')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
