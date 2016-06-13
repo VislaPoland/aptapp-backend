@@ -6,7 +6,7 @@ import lombok.Data;
 
 @ApiModel("Authentication code request object")
 @Data
-public class VerificationCode {
+public class ActivationCode {
     @ApiModelProperty(value = "Authentication code", required = true)
     private String code;
 }

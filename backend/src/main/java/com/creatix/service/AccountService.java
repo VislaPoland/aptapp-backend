@@ -4,7 +4,6 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.entity.Account;
-import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthenticatedUserDetailsService;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.TokenUtils;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Calendar;
 import java.util.Date;
 
 @Service
@@ -107,23 +107,30 @@ public class AccountService {
         return account;
     }
 
+    public Account activateAccount(String activationCode) {
+        final Account account = accountDao.findByActionToken(activationCode);
+        if (account == null) {
+            throw new EntityNotFoundException(String.format("Activation code %s not found", activationCode));
+        }
+        if (account.isActive()) {
+            throw new SecurityException("Account already activated");
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(account.getActionTokenValidUntil());
+        cal.add(Calendar.DATE, 7);
+        if (account.getActionTokenValidUntil().after(cal.getTime())) {
+            throw new SecurityException("Activation code expired");
+        }
+
+        account.setActive(true);
+        accountDao.persist(account);
+
+        return account;
+    }
+
     public Account saveAccount(Account account) {
         accountDao.persist(account);
         return accountDao.findByEmail(account.getEmail());
-    }
-
-    //TODO delete test
-    public Account createTestAccount() {
-        Account account = new Account();
-        account.setFirstName("John");
-        account.setLastName("Doe");
-        account.setCompanyName("Company name");
-        account.setPhone("123456789");
-        account.setEmail("john.doe@mail.com");
-        account.setPasswordHash(passwordEncoder.encode("password"));
-        account.setRole(AccountRole.Maintenance);
-        account.setActive(true);
-
-        return account;
     }
 }

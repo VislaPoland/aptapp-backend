@@ -15,6 +15,7 @@ public class AccountDao extends DaoBase<Account, Long> {
     /**
      * Find account by email address. This method will return even deleted accounts
      * to prevent email name clash and user spoofing.
+     *
      * @param email unique email address to find account by
      * @return found account
      */
@@ -24,4 +25,9 @@ public class AccountDao extends DaoBase<Account, Long> {
                 .getSingleResult();
     }
 
+    public Account findByActionToken(String actionToken) {
+        return (Account) em.createQuery("FROM Account WHERE actionToken = :actionToken")
+                .setParameter("actionToken", actionToken)
+                .getSingleResult();
+    }
 }

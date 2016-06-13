@@ -88,8 +88,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/verify-code").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/attempt").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/hello/world").permitAll()    //TODO remove
-                .antMatchers(HttpMethod.POST, "/api/users/create/test").permitAll() //TODO remove
                 .anyRequest().authenticated()
                 .and()
             .csrf()

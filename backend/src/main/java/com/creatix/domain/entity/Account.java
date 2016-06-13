@@ -58,7 +58,7 @@ public class Account {
     @Column(nullable = false)
     private boolean active;
 
-    @Column(length = 128)
+    @Column(length = 128, unique = true)
     private String actionToken;
 
     @Temporal(TemporalType.TIMESTAMP)

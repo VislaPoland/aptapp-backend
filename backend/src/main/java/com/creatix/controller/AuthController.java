@@ -1,9 +1,8 @@
 package com.creatix.controller;
 
-import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.LoginRequest;
-import com.creatix.domain.dto.LoginResponse;
-import com.creatix.domain.dto.VerificationCode;
+import com.creatix.domain.Mapper;
+import com.creatix.domain.dto.*;
+import com.creatix.domain.entity.Account;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.service.AccountService;
 import io.swagger.annotations.ApiOperation;
@@ -29,15 +28,19 @@ public class AuthController {
     @Autowired
     private AuthorizationManager authorizationManager;
 
+    @Autowired
+    private Mapper mapper;
+
     @ApiOperation(value = "Verify authentication code")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized")
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(value = "/verify-code", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<Void> verifyCode(@RequestBody VerificationCode codeRequest) {
-        //TODO implement actual code check  (it will be unique for users)
-        return new DataResponse<>();
+    public DataResponse<AccountDto> verifyCode(@RequestBody ActivationCode codeRequest) {
+        Account activatedAccount = accountService.activateAccount(codeRequest.getCode());
+        return new DataResponse<>(mapper.toAccountDto(activatedAccount));
     }
 
     @ApiOperation(value = "Attempt to sign in")

@@ -24,13 +24,6 @@ public class AccountController {
     @Autowired
     private AuthorizationManager authorizationManager;
 
-    @RequestMapping(value = "/create/test", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createTestAccount() {
-        Account testAccount = accountService.createTestAccount();
-        testAccount = accountService.saveAccount(testAccount);
-        return new DataResponse<>(mapper.toAccountDto(testAccount));
-    }
-
     @RequestMapping(value = "/me/profile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> getSelfProfile() {
         Account account = authorizationManager.getCurrentAccount();
