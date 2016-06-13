@@ -3,6 +3,7 @@ package com.creatix.service;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dto.LoginResponse;
+import com.creatix.domain.dto.UpdateAccountDto;
 import com.creatix.domain.entity.Account;
 import com.creatix.security.AuthenticatedUserDetailsService;
 import com.creatix.security.AuthorizationManager;
@@ -99,7 +100,7 @@ public class AccountService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    public Account getAccount(long accountId) {
+    public Account getAccount(Long accountId) {
         final Account account = accountDao.findById(accountId);
         if (account == null) {
             throw new EntityNotFoundException(String.format("Account id=%d not found", accountId));
@@ -131,6 +132,16 @@ public class AccountService {
 
     public Account saveAccount(Account account) {
         accountDao.persist(account);
-        return accountDao.findByEmail(account.getEmail());
+        return accountDao.findByEmail(account.getPrimaryEmail());
+    }
+
+    public Account updateAccount(Account account, UpdateAccountDto accountDto) {
+        account.setSecondaryEmail(accountDto.getSecondaryEmail());
+        account.setSecondaryPhone(accountDto.getSecondaryPhone());
+        account.setPasswordHash(passwordEncoder.encode(accountDto.getPassword()));
+
+        accountDao.persist(account);
+
+        return account;
     }
 }

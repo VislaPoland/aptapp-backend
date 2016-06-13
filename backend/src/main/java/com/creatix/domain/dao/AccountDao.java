@@ -13,14 +13,14 @@ public class AccountDao extends DaoBase<Account, Long> {
     }
 
     /**
-     * Find account by email address. This method will return even deleted accounts
-     * to prevent email name clash and user spoofing.
+     * Find account by primaryEmail address. This method will return even deleted accounts
+     * to prevent primaryEmail name clash and user spoofing.
      *
-     * @param email unique email address to find account by
+     * @param email unique primaryEmail address to find account by
      * @return found account
      */
     public Account findByEmail(String email) {
-        return (Account) em.createQuery("FROM Account WHERE email = :email")
+        return (Account) em.createQuery("FROM Account WHERE primaryEmail = :email")
                 .setParameter("email", email)
                 .getSingleResult();
     }

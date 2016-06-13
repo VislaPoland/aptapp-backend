@@ -16,7 +16,7 @@ public class AuthenticatedUserDetails extends User {
     private final Account account;
 
     public AuthenticatedUserDetails(Account account) {
-        super(account.getEmail(), account.getPasswordHash(), createAuthorities(account));
+        super(account.getPrimaryEmail(), account.getPasswordHash(), createAuthorities(account));
         this.account = account;
     }
 

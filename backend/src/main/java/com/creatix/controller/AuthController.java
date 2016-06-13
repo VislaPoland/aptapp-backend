@@ -2,6 +2,7 @@ package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.*;
+import com.creatix.domain.dto.AccountDto;
 import com.creatix.domain.entity.Account;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.service.AccountService;
@@ -38,7 +39,7 @@ public class AuthController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(value = "/verify-code", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> verifyCode(@RequestBody ActivationCode codeRequest) {
+    public DataResponse<AccountDto> verifyCode(@RequestBody @Valid ActivationCode codeRequest) {
         Account activatedAccount = accountService.activateAccount(codeRequest.getCode());
         return new DataResponse<>(mapper.toAccountDto(activatedAccount));
     }

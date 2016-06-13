@@ -14,7 +14,7 @@ public class AccountDto {
     private String fullName;
 
     @ApiModelProperty(value = "Email address", required = true)
-    private String email;
+    private String primaryEmail;
 
     @ApiModelProperty(value = "Address", required = true)
     private AddressDto address;

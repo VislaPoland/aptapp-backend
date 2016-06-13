@@ -35,18 +35,21 @@ public class Account {
 
     @Column(nullable = false)
     @NotNull
-    private String phone;
+    private String primaryPhone;
 
     @Column(nullable = false, unique = true)
     @NotNull
     @Email
-    private String email;
+    private String primaryEmail;
 
     @Column
     private String passwordHash;
 
     @Column
-    private String additionalContactInfo;
+    private String secondaryEmail;
+
+    @Column
+    private String secondaryPhone;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<VehicleInformation> vehicles;
