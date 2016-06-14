@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Data
 @EqualsAndHashCode(of = "licensePlate")
-public class VehicleInformation {
+public class Vehicle {
     @Id
     @Column(nullable = false)
     @NotNull

@@ -142,7 +142,7 @@ public class TokenUtils {
         if (userDetails instanceof AuthenticatedUserDetails) {
             final Account user = ((AuthenticatedUserDetails) userDetails).getAccount();
             final String username = this.getUsernameFromToken(token);
-            return (username.equals(user.getEmail()) && !(this.isTokenExpired(token)));
+            return (username.equals(user.getPrimaryEmail()) && !(this.isTokenExpired(token)));
         } else {
             throw new IllegalArgumentException("Expected object of type Account as user details.");
         }
