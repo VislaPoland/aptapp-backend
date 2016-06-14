@@ -70,18 +70,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return authenticationTokenFilter;
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurerAdapter() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                            .allowedOrigins("*")
-                            .allowedMethods("OPTIONS", "POST", "PUT", "GET", "HEAD", "DELETE");
-            }
-        };
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -96,7 +84,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/auth/verify-code").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/attempt").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users/create/test").permitAll() //TODO delete
-                .anyRequest().authenticated()
+                .antMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
                 .and()
             .csrf()
                 .disable();

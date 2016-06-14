@@ -14,7 +14,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 
 @EnableSwagger2
 @Configuration
-@Order(5)
+@Order(4)
 public class SwaggerConfiguration {
     @Bean
     public Docket api() {
@@ -28,10 +28,10 @@ public class SwaggerConfiguration {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Gym Time")
-                .description("Gym Time application backend")
-                .contact(new Contact("Tomas Sedlak", "http://thinkcreatix.com/", "tomas.sedlak@thinkcratix.com"))
-                .version("0.0.1")
+                .title("Aptapp")
+                .description("Aptapp application backend")
+                .contact(new Contact("Tomas Sedlak", "http://thinkcreatix.com/", "tomas.sedlak@thinkcreatix.com"))
+                .version("1.0.0-beta")
                 .build();
     }
 }

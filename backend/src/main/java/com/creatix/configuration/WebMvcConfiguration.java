@@ -25,7 +25,7 @@ public class WebMvcConfiguration extends WebMvcAutoConfiguration {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
-                        .allowedOrigins("http://192.168.1.1:3000", "http://aptapp-demo.herokuapp.com")
+                        .allowedOrigins("http://127.0.0.1:3000", "http://localhost:3000", "http://aptapp-demo.herokuapp.com")
                         .allowedHeaders("Accept-Encoding", "Accept-Language", "User-Agent", "Connection", "Timezone-Offset", "Origin", "X-Requested-With", "Content-Type", "Accept", jwtProperties.getHeader())
                         .allowCredentials(true)
                         .maxAge(3600);
