@@ -10,6 +10,6 @@ import javax.persistence.ManyToOne;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SubTenant extends Account {
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Tenant parentTenant;
 }

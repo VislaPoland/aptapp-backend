@@ -20,7 +20,7 @@ public class AuthorizationManager {
     }
 
     public boolean isAdministrator() {
-        return getCurrentAccount().getRole() == AccountRole.PropertyOwner;
+        return getCurrentAccount().getRole() == AccountRole.Administrator;
     }
 
     public Account getCurrentAccount() throws SecurityException {

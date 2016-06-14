@@ -19,6 +19,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
 @EnableWebSecurity
@@ -67,6 +70,18 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return authenticationTokenFilter;
     }
 
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                            .allowedOrigins("*")
+                            .allowedMethods("OPTIONS", "POST", "PUT", "GET", "HEAD", "DELETE");
+            }
+        };
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -80,6 +95,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/verify-code").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/attempt").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/users/create/test").permitAll() //TODO delete
                 .anyRequest().authenticated()
                 .and()
             .csrf()

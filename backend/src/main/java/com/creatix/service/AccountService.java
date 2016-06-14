@@ -3,7 +3,7 @@ package com.creatix.service;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dto.LoginResponse;
-import com.creatix.domain.dto.UpdateAccountDto;
+import com.creatix.domain.dto.account.UpdateAccountDto;
 import com.creatix.domain.entity.Account;
 import com.creatix.security.AuthenticatedUserDetailsService;
 import com.creatix.security.AuthorizationManager;
@@ -29,7 +29,6 @@ import java.util.Date;
 @Service
 @Transactional
 public class AccountService {
-
     @Autowired
     private AccountDao accountDao;
     @Autowired
@@ -113,7 +112,7 @@ public class AccountService {
         if (account == null) {
             throw new EntityNotFoundException(String.format("Activation code %s not found", activationCode));
         }
-        if (account.isActive()) {
+        if (account.getActive()) {
             throw new SecurityException("Account already activated");
         }
 

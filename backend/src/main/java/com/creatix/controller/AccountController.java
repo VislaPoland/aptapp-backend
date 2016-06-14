@@ -1,9 +1,9 @@
 package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
-import com.creatix.domain.dto.AccountDto;
+import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.UpdateAccountDto;
+import com.creatix.domain.dto.account.UpdateAccountDto;
 import com.creatix.domain.entity.Account;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.service.AccountService;

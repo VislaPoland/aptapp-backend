@@ -11,10 +11,10 @@ public class TestUtils {
 
     public static void setupFakeAdminAccount() {
         Account a = new Account();
-        a.setEmail("test@admin.com");
+        a.setPrimaryEmail("test@admin.com");
         a.setPasswordHash("098765432");
         a.setId(1L);
-        a.setRole(AccountRole.PropertyOwner);
+        a.setRole(AccountRole.Administrator);
         AuthenticatedUserDetails userDetails = new AuthenticatedUserDetails(a);
         SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(userDetails, userDetails.getAuthorities()));
     }

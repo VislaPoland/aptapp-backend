@@ -15,10 +15,6 @@ public class Tenant extends Account {
     @Enumerated(EnumType.STRING)
     private TenantType type;
 
-    @OneToOne(optional = false)
-    @JoinColumn
-    private Address address;
-
     @OneToMany(mappedBy = "usingTenant")
     private Set<ParkingStall> parkingStalls;
 
@@ -28,31 +24,12 @@ public class Tenant extends Account {
     @OneToMany(mappedBy = "parentTenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SubTenant> subTenants;
 
-    @OneToOne(optional = false)
+    @OneToOne
     @JoinColumn
     private Apartment apartment;
 
-    @OneToOne
-    @JoinColumn
-    private Tenant aboveTenant;
-
-    @OneToOne
-    @JoinColumn
-    private Tenant belowTenant;
-
-    @OneToOne
-    @JoinColumn
-    private Tenant leftTenant;
-
-    @OneToOne
-    @JoinColumn
-    private Tenant rightTenant;
-
-    @OneToOne
-    @JoinColumn
-    private Tenant oppositeTenant;
-
-    @OneToOne
-    @JoinColumn
-    private Tenant behindTenant;
+    @Transient
+    public Address getAddress() {
+        return apartment.getProperty().getAddress();
+    }
 }

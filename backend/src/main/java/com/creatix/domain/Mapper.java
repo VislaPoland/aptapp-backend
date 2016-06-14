@@ -1,6 +1,6 @@
 package com.creatix.domain;
 
-import com.creatix.domain.dto.AccountDto;
+import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.entity.Account;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;

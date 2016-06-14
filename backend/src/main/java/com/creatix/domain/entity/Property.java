@@ -25,6 +25,9 @@ public class Property {
     @NotNull
     private PropertyStatus status;
 
+    @Column
+    private String additionalInformation;
+
     @OneToOne(optional = false)
     @JoinColumn
     @NotNull
@@ -36,7 +39,7 @@ public class Property {
     private PropertyOwner owner;
 
     @OneToOne(optional = false)
-    @JoinColumn
+    @JoinColumn(unique = true)
     @NotNull
     private PropertyManager manager;
 }

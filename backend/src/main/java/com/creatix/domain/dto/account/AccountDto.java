@@ -1,5 +1,6 @@
-package com.creatix.domain.dto;
+package com.creatix.domain.dto.account;
 
+import com.creatix.domain.dto.AddressDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
