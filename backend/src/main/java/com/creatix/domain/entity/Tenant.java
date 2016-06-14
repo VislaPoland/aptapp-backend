@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
@@ -13,16 +12,22 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class Tenant extends Account {
     @Column
-    @NotNull
     private String unitNumber;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "usingTenant")
-    private Set<ParkingStall> parkingStalls;
 
     @Column
     @Enumerated(EnumType.STRING)
     private TenantType type;
 
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VehicleInformation> vehicles;
+    @OneToOne(optional = false)
+    @JoinColumn
+    private Address address;
+
+    @OneToMany(mappedBy = "usingTenant")
+    private Set<ParkingStall> parkingStalls;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Vehicle> vehicles;
+
+    @OneToMany(mappedBy = "parentTenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<SubTenant> subTenants;
 }

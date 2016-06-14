@@ -9,7 +9,6 @@ import org.hibernate.validator.constraints.Email;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Set;
 
 @Entity
 @Data
@@ -19,6 +18,7 @@ import java.util.Set;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false)
@@ -46,20 +46,20 @@ public class Account {
     private String passwordHash;
 
     @Column
+    @Email
     private String secondaryEmail;
 
     @Column
     private String secondaryPhone;
 
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VehicleInformation> vehicles;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @NotNull
     private AccountRole role;
 
     @Column(nullable = false)
-    private boolean active;
+    @NotNull
+    private Boolean active;
 
     @Column(length = 128, unique = true)
     private String actionToken;

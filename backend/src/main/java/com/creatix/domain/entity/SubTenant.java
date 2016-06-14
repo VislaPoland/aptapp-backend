@@ -4,12 +4,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PropertyManager extends Account {
-    @OneToOne(mappedBy = "manager")
-    private Property managedProperty;
+public class SubTenant extends Account {
+    @ManyToOne(optional = false)
+    private Tenant parentTenant;
 }

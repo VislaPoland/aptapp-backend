@@ -14,8 +14,8 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(of = "id")
 public class Address {
     @Id
-    @Column(nullable = false)
     @GeneratedValue
+    @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false)

@@ -11,11 +11,11 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(of = "number")
 public class ParkingStall {
     @Id
+    @Column(nullable = false)
     @NotNull
-    @Column(nullable = false, updatable = false)
     private String number;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn
     private Tenant usingTenant;
 }

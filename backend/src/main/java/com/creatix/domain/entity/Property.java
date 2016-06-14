@@ -1,5 +1,6 @@
 package com.creatix.domain.entity;
 
+import com.creatix.domain.enums.PropertyStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 public class Property {
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false)
@@ -19,23 +21,22 @@ public class Property {
     private String name;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @NotNull
-    private Boolean active;
+    private PropertyStatus status;
 
-    @OneToOne(optional = false, fetch = FetchType.EAGER)
+    @OneToOne(optional = false)
     @JoinColumn
     @NotNull
     private Address address;
 
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @ManyToOne(optional = false)
     @JoinColumn
     @NotNull
     private PropertyOwner owner;
 
-    @OneToOne(optional = false, fetch = FetchType.EAGER)
+    @OneToOne(optional = false)
     @JoinColumn
     @NotNull
     private PropertyManager manager;
-
-
 }
