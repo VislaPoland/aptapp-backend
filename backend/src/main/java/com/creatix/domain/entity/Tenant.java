@@ -12,9 +12,6 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class Tenant extends Account {
     @Column
-    private String unitNumber;
-
-    @Column
     @Enumerated(EnumType.STRING)
     private TenantType type;
 
@@ -30,4 +27,32 @@ public class Tenant extends Account {
 
     @OneToMany(mappedBy = "parentTenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SubTenant> subTenants;
+
+    @OneToOne(optional = false)
+    @JoinColumn
+    private Apartment apartment;
+
+    @OneToOne
+    @JoinColumn
+    private Tenant aboveTenant;
+
+    @OneToOne
+    @JoinColumn
+    private Tenant belowTenant;
+
+    @OneToOne
+    @JoinColumn
+    private Tenant leftTenant;
+
+    @OneToOne
+    @JoinColumn
+    private Tenant rightTenant;
+
+    @OneToOne
+    @JoinColumn
+    private Tenant oppositeTenant;
+
+    @OneToOne
+    @JoinColumn
+    private Tenant behindTenant;
 }

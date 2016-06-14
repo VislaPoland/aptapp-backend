@@ -11,8 +11,8 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
-@Data
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Data
 @EqualsAndHashCode(of = "id")
 @BatchSize(size = 80)
 public class Account {
