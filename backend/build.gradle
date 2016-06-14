@@ -1,3 +1,6 @@
+group = 'aptapp-backend'
+version = '1.0.0-SNAPSHOT'
+
 buildscript {
 	ext {
 		springBootVersion = '1.4.0.M3'
@@ -17,13 +20,10 @@ apply plugin: 'propdeps'
 apply plugin: 'propdeps-maven'
 apply plugin: 'propdeps-idea'
 apply plugin: 'java'
+apply plugin: 'war'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
-jar {
-	baseName = 'aptapp-backend'
-	version = '1.0.0-SNAPSHOT'
-}
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -36,6 +36,7 @@ repositories {
 
 
 dependencies {
+
 	optional('org.springframework.boot:spring-boot-configuration-processor')
 
 	compile("org.springframework.boot:spring-boot-starter")
@@ -47,7 +48,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-mail')
 	compile('org.projectlombok:lombok:1.16.8')
 	compile('io.jsonwebtoken:jjwt:0.6.0')
-	compile('org.hibernate:hibernate-core:5.2.0.Final')
+	compile('org.hibernate:hibernate-core:5.1.0.Final')
 	compile('org.hibernate:hibernate-entitymanager:5.1.0.Final')
 	compile('org.hibernate:hibernate-validator:5.2.4.Final')
 	compile('org.springframework:spring-orm:4.3.0.RELEASE') // hibernate 5.2 support was added in spring-orm 4.3
@@ -62,6 +63,9 @@ dependencies {
 	runtime('org.postgresql:postgresql')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+	// ensure that the embedded servlet container does not interfere with the servlet container
+	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 }
 
 compileJava.dependsOn(processResources)
