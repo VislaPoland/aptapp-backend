@@ -22,7 +22,7 @@ public class RoleSecuredAnnotationMetadataExtractor implements AnnotationMetadat
 
         for ( AccountRole role : attributeTokens ) {
             // add prefix ROLE_ to enable RoleVoter
-            attributes.add(new SecurityConfig("ROLE_" + role.name()));
+            attributes.add(new SecurityConfig("ROLE_" + role.name().toUpperCase()));
         }
 
         return attributes;
