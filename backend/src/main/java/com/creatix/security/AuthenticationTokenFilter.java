@@ -33,7 +33,12 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
-        final String authToken = extractAuthToken(httpRequest.getHeader(this.tokenHeader));
+        String authToken = extractAuthToken(httpRequest.getHeader(this.tokenHeader));
+
+        if ( authToken == null ) {
+            authToken = httpRequest.getHeader("api_key");
+        }
+
         final String username = this.tokenUtils.getUsernameFromToken(authToken);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

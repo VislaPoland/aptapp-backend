@@ -6,6 +6,7 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.account.UpdateAccountDto;
 import com.creatix.domain.entity.Account;
 import com.creatix.security.AuthorizationManager;
+import com.creatix.security.RoleSecured;
 import com.creatix.service.AccountService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -38,6 +39,7 @@ public class AccountController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/me/profile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
     public DataResponse<AccountDto> getSelfProfile() {
         Account account = accountService.getAccount(authorizationManager.getCurrentAccount().getId());
         return new DataResponse<>(mapper.toAccountDto(account));

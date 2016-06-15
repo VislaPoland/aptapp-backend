@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Import({
         WebMvcConfiguration.class,
         WebSecurityConfiguration.class,
+        MethodSecurityConfiguration.class,
         SwaggerConfiguration.class
 })
 @EnableConfigurationProperties({

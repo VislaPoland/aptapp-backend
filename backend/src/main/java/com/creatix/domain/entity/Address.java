@@ -3,10 +3,7 @@ package com.creatix.domain.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -26,6 +23,12 @@ public class Address {
     @NotNull
     private String streetName;
 
+    /**
+     * E, W, N, S
+     */
+    @Column
+    private String compass;
+
     @Column(nullable = false)
     @NotNull
     private String town;
@@ -37,4 +40,9 @@ public class Address {
     @Column(nullable = false)
     @NotNull
     private String zipCode;
+
+    @Transient
+    public String getFullAddress() {
+        return String.format("%s %s %s, %s, %s %s", getHouseNumber(), getCompass(), getStreetName(), getTown(), getState(), getZipCode());
+    }
 }
