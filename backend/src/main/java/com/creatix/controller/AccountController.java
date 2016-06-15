@@ -65,9 +65,9 @@ public class AccountController {
     })
     @RoleSecured(AccountRole.PropertyManager)
     @RequestMapping(value = "/{accountId}/reset-code", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> resetCode(@PathVariable long accountId) {
+    public DataResponse<String> resetCode(@PathVariable long accountId) {
         final Account account = accountService.getAccount(accountId);
         accountService.setActionToken(account);
-        return new DataResponse<>(mapper.toAccountDto(account));
+        return new DataResponse<>(account.getActionToken());
     }
 }
