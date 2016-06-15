@@ -1,6 +1,7 @@
 package com.creatix.domain.dao;
 
 import org.springframework.core.GenericTypeResolver;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,16 +14,18 @@ import javax.persistence.criteria.CriteriaQuery;
 /**
  * Base class for all repository classes.
  */
-@Repository
+@Component
 @Transactional
-class DaoBase<T, ID> {
+abstract class DaoBase<T, ID> {
     @PersistenceContext
     EntityManager em;
 
     Class<T> type;
 
+    @SuppressWarnings("unchecked")
     DaoBase() {
-        this.type = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), DaoBase.class);
+        final Class<?>[] classes = GenericTypeResolver.resolveTypeArguments(getClass(), DaoBase.class);
+        this.type = (Class<T>) classes[0];
     }
 
     public T findById(ID id) {
