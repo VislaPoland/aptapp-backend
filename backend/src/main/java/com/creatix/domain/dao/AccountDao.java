@@ -8,10 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AccountDao extends DaoBase<Account, Long> {
 
-    public Account findById(long id) {
-        return em.find(Account.class, id);
-    }
-
     /**
      * Find account by primaryEmail address. This method will return even deleted accounts
      * to prevent primaryEmail name clash and user spoofing.

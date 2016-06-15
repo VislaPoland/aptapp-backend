@@ -2,9 +2,7 @@ package com.creatix.domain;
 
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
-import com.creatix.domain.entity.Account;
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.PropertyOwner;
+import com.creatix.domain.entity.*;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -27,12 +25,18 @@ public class Mapper {
         mapperFactory.classMap(Property.class, PropertyDetailsDto.class)
                 .byDefault()
                 .field("address.fullAddress", "address")
-                .customize(new CustomMapper<Property, PropertyDetailsDto>() {
-                    @Override
-                    public void mapAtoB(Property property, PropertyDetailsDto propertyDetailsDto, MappingContext context) {
+                .register();
 
-                    }
-                })
+        mapperFactory.classMap(Facility.class, PropertyDetailsDto.Facility.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(Contact.class, PropertyDetailsDto.Contact.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(FacilityDetail.class, PropertyDetailsDto.Facility.Detail.class)
+                .byDefault()
                 .register();
 
         mapperFactory.classMap(PropertyOwner.class, PropertyDetailsDto.Owner.class)

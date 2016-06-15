@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @Data
@@ -42,4 +43,10 @@ public class Property {
     @JoinColumn(unique = true)
     @NotNull
     private PropertyManager manager;
+
+    @OneToMany(mappedBy = "property")
+    private List<Facility> facilities;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Contact> contacts;
 }

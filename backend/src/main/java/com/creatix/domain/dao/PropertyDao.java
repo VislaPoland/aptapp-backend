@@ -7,7 +7,4 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public class PropertyDao extends DaoBase<Property, Long> {
-    public Property findById(Long id) {
-        return em.find(Property.class, id);
-    }
 }

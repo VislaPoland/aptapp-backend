@@ -32,11 +32,11 @@ public class PropertyDetailsDto {
         @ApiModelProperty(value = "Type of facility", required = true)
         private FacilityType type;
         @ApiModelProperty(value = "Facility info", required = true)
-        private List<Info> info;
+        private List<Detail> details;
 
         @ApiModel
         @Data
-        public static class Info {
+        public static class Detail {
             @ApiModelProperty(required = true)
             private String name;
             @ApiModelProperty(required = true)
