@@ -4,3 +4,4 @@ out
 /build
 /classes
 /src/main/resources/application.properties
+/.gradle/
