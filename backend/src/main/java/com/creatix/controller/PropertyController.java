@@ -1,6 +1,7 @@
 package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
+import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.account.UpdateAccountDto;
@@ -27,6 +28,8 @@ public class PropertyController {
 
     @Autowired
     private Mapper mapper;
+    @Autowired
+    private PropertyDao propertyDao;
 
     @ApiOperation(value = "Get property details")
     @ApiResponses(value = {
@@ -37,6 +40,6 @@ public class PropertyController {
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<PropertyDetailsDto> getPropertyDetails(@PathVariable long propertyId) {
-        throw new NotInstrumentedException("This is not implemented yet");
+        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyDao.findById(propertyId)));
     }
 }
