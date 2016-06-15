@@ -4,6 +4,8 @@ import com.creatix.domain.entity.Account;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 @Transactional
 public class AccountDao extends DaoBase<Account, Long> {
@@ -22,8 +24,9 @@ public class AccountDao extends DaoBase<Account, Long> {
     }
 
     public Account findByActionToken(String actionToken) {
-        return (Account) em.createQuery("FROM Account WHERE actionToken = :actionToken")
+        final List<Account> results = em.createQuery("FROM Account WHERE actionToken = :actionToken", Account.class)
                 .setParameter("actionToken", actionToken)
-                .getSingleResult();
+                .getResultList();
+        return results.isEmpty() ? null : results.get(0);
     }
 }

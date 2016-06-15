@@ -23,8 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -45,34 +47,32 @@ public class AccountService {
     private Mapper mapper;
 
     private static void validatePassword(String password) {
-        if (StringUtils.isBlank(password)) {
+        if ( StringUtils.isBlank(password) ) {
             throw new IllegalArgumentException("Password cannot be empty");
         }
-        if (password.length() < 6) {
+        if ( password.length() < 6 ) {
             throw new IllegalStateException("Password must be at least 6 characters long");
         }
     }
 
-    private static void setActionToken(Account account) {
-        if (account == null) {
-            throw new NullPointerException("Reference to account is null");
-        }
+    private static void setActionToken(@NotNull  Account account) {
+        Objects.requireNonNull(account);
 
-        account.setActionToken(RandomStringUtils.randomAlphanumeric(64));
-        account.setActionTokenValidUntil(new DateTime().plusDays(1).toDate());
+        account.setActionToken(RandomStringUtils.randomNumeric(12));
+        account.setActionTokenValidUntil(DateTime.now().plusDays(7).toDate());
     }
 
     private static void checkTokenValidity(String token, Account account) {
-        if (StringUtils.isBlank(token)) {
+        if ( StringUtils.isBlank(token) ) {
             throw new IllegalArgumentException("Token cannot be empty");
         }
-        if (account.getActionTokenValidUntil() == null) {
+        if ( account.getActionTokenValidUntil() == null ) {
             throw new IllegalStateException("Missing token valid until");
         }
-        if (!(StringUtils.equalsIgnoreCase(token, account.getActionToken()))) {
+        if ( !(StringUtils.equalsIgnoreCase(token, account.getActionToken())) ) {
             throw new SecurityException("Token mismatch");
         }
-        if (account.getActionTokenValidUntil().before(new Date())) {
+        if ( account.getActionTokenValidUntil().before(new Date()) ) {
             throw new SecurityException("Token has expired");
         }
     }
@@ -101,7 +101,7 @@ public class AccountService {
 
     public Account getAccount(Long accountId) {
         final Account account = accountDao.findById(accountId);
-        if (account == null) {
+        if ( account == null ) {
             throw new EntityNotFoundException(String.format("Account id=%d not found", accountId));
         }
         return account;
@@ -109,18 +109,15 @@ public class AccountService {
 
     public Account activateAccount(String activationCode) {
         final Account account = accountDao.findByActionToken(activationCode);
-        if (account == null) {
-            throw new EntityNotFoundException(String.format("Activation code %s not found", activationCode));
+        if ( account == null ) {
+            throw new SecurityException("Activation code not valid");
         }
-        if (account.getActive()) {
-            throw new SecurityException("Account already activated");
+        if ( account.getActive() ) {
+            return account;
         }
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(account.getActionTokenValidUntil());
-        cal.add(Calendar.DATE, 7);
-        if (account.getActionTokenValidUntil().after(cal.getTime())) {
-            throw new SecurityException("Activation code expired");
+        if ( account.getActionTokenValidUntil().after(DateTime.now().toDate()) ) {
+            throw new SecurityException("Activation code has expired");
         }
 
         account.setActive(true);
