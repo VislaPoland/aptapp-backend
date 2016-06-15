@@ -3,7 +3,7 @@ package com.creatix.service;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dto.LoginResponse;
-import com.creatix.domain.dto.account.UpdateAccountDto;
+import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
 import com.creatix.domain.entity.Account;
 import com.creatix.security.AuthenticatedUserDetailsService;
 import com.creatix.security.AuthorizationManager;
@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
@@ -137,10 +136,12 @@ public class AccountService {
         return accountDao.findByEmail(account.getPrimaryEmail());
     }
 
-    public Account updateAccount(Account account, UpdateAccountDto accountDto) {
+    public Account updateAccount(Account account, UpdateAccountProfileRequest accountDto) {
         account.setSecondaryEmail(accountDto.getSecondaryEmail());
         account.setSecondaryPhone(accountDto.getSecondaryPhone());
-        account.setPasswordHash(passwordEncoder.encode(accountDto.getPassword()));
+        if ( StringUtils.isNotBlank(accountDto.getPassword()) ) {
+            account.setPasswordHash(passwordEncoder.encode(accountDto.getPassword()));
+        }
 
         accountDao.persist(account);
 

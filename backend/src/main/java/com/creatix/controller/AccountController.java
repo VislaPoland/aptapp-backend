@@ -3,7 +3,7 @@ package com.creatix.controller;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.account.UpdateAccountDto;
+import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
 import com.creatix.domain.entity.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
@@ -50,9 +50,23 @@ public class AccountController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/me/profile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updateSelfProfile(@RequestBody @Valid UpdateAccountDto updateAccountDto) {
+    public DataResponse<AccountDto> updateSelfProfile(@RequestBody @Valid UpdateAccountProfileRequest request) {
         Account account = accountService.getAccount(authorizationManager.getCurrentAccount().getId());
-        account = accountService.updateAccount(account, updateAccountDto);
+        account = accountService.updateAccount(account, request);
+
+        return new DataResponse<>(mapper.toAccountDto(account));
+    }
+
+    @ApiOperation(value = "Update user profile information")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{accountId}/profile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<AccountDto> updateProfile(@PathVariable long accountId, @RequestBody @Valid UpdateAccountProfileRequest request) {
+        Account account = accountService.getAccount(accountId);
+        account = accountService.updateAccount(account, request);
 
         return new DataResponse<>(mapper.toAccountDto(account));
     }

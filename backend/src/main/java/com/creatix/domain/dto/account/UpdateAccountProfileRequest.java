@@ -6,7 +6,7 @@ import lombok.Data;
 
 @ApiModel("Update account DTO")
 @Data
-public class UpdateAccountDto {
+public class UpdateAccountProfileRequest {
     @ApiModelProperty(value = "Secondary email address")
     private String secondaryEmail;
 

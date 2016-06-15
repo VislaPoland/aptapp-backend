@@ -3,23 +3,15 @@ package com.creatix.controller;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.account.AccountDto;
-import com.creatix.domain.dto.account.UpdateAccountDto;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
-import com.creatix.domain.entity.Account;
-import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.AccountService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.hibernate.bytecode.spi.NotInstrumentedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @RestController
 @Transactional
