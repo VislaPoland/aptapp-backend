@@ -30,7 +30,7 @@ public class AccountController {
     @Autowired
     private AuthorizationManager authorizationManager;
 
-    @ApiOperation(value = "Get user profile information")
+    @ApiOperation(value = "Get self profile information")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
@@ -43,7 +43,20 @@ public class AccountController {
         return new DataResponse<>(mapper.toAccountDto(account));
     }
 
-    @ApiOperation(value = "Update user profile information")
+    @ApiOperation(value = "Get user profile information")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{accountId}/profile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<AccountDto> getProfile(@PathVariable long accountId) {
+        Account account = accountService.getAccount(accountId);
+        return new DataResponse<>(mapper.toAccountDto(account));
+    }
+
+    @ApiOperation(value = "Update self profile information")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
