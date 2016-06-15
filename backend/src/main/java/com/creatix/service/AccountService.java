@@ -55,11 +55,17 @@ public class AccountService {
         }
     }
 
-    private static void setActionToken(@NotNull  Account account) {
+    public Account getAccount(long accouuntId) {
+        return accountDao.findById(accouuntId);
+    }
+
+    public void setActionToken(@NotNull  Account account) {
         Objects.requireNonNull(account);
 
         account.setActionToken(RandomStringUtils.randomNumeric(12));
         account.setActionTokenValidUntil(DateTime.now().plusDays(7).toDate());
+
+        accountDao.persist(account);
     }
 
     private static void checkTokenValidity(String token, Account account) {
