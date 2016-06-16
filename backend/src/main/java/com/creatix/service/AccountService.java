@@ -5,6 +5,7 @@ import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
 import com.creatix.domain.entity.Account;
+import com.creatix.security.AuthenticatedUserDetails;
 import com.creatix.security.AuthenticatedUserDetailsService;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.TokenUtils;
@@ -89,7 +90,7 @@ public class AccountService {
 
         final LoginResponse result = new LoginResponse();
         result.setToken(token);
-        final Account account = authorizationManager.getCurrentAccount();
+        final Account account = ((AuthenticatedUserDetails) userDetails).getAccount();
         result.setId(account.getId());
         result.setAccount(mapper.toAccountDto(account));
 
