@@ -1,15 +1,17 @@
 package com.creatix.domain;
 
 import com.creatix.domain.dto.account.AccountDto;
+import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.entity.*;
-import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Component
@@ -45,6 +47,7 @@ public class Mapper {
                 .field("website", "web")
                 .field("primaryPhone", "phone")
                 .register();
+
     }
 
 
@@ -59,4 +62,9 @@ public class Mapper {
         return mapperFactory.getMapperFacade().map(property, PropertyDetailsDto.class);
     }
 
+    public Map<Integer, List<NotificationDto>> toNotificationDtoMap(@NotNull Map<Integer, List<Notification>> notifications) {
+        final Map<Integer, List<NotificationDto>> result = new HashMap<>();
+        notifications.forEach((day, nList) -> result.put(day, mapperFactory.getMapperFacade().mapAsList(nList, NotificationDto.class)));
+        return result;
+    }
 }

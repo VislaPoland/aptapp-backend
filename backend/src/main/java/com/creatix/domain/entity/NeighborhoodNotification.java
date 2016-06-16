@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NeighborhoodNotification extends Notification {
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn
     @NotNull
     private Apartment targetApartment;

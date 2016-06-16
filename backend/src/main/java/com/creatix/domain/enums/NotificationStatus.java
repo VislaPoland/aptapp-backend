@@ -1,5 +1,5 @@
 package com.creatix.domain.enums;
 
-public enum ActivityStatus {
+public enum NotificationStatus {
     Pending, Resolved
 }

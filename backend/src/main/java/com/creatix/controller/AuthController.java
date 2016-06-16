@@ -1,7 +1,10 @@
 package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
-import com.creatix.domain.dto.*;
+import com.creatix.domain.dto.ActivationCode;
+import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.LoginRequest;
+import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.entity.Account;
 import com.creatix.security.AuthorizationManager;
@@ -12,7 +15,10 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 

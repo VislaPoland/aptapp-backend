@@ -13,12 +13,12 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MaintenanceNotification extends Notification {
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn
     @NotNull
     private Apartment targetApartment;
 
-    @Column(nullable = false)
+    @Column
     @NotNull
     private Boolean accessIfNotAtHome;
 }

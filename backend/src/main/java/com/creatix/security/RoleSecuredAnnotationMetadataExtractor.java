@@ -2,8 +2,8 @@ package com.creatix.security;
 
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.annotation.AnnotationMetadataExtractor;
 import org.springframework.security.access.SecurityConfig;
+import org.springframework.security.access.annotation.AnnotationMetadataExtractor;
 
 import java.util.ArrayList;
 import java.util.Collection;

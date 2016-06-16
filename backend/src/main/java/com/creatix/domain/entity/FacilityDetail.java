@@ -1,6 +1,5 @@
 package com.creatix.domain.entity;
 
-import com.creatix.domain.enums.FacilityType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -1,6 +1,7 @@
 package com.creatix.domain.entity;
 
-import com.creatix.domain.enums.ActivityStatus;
+import com.creatix.domain.enums.NotificationStatus;
+import com.creatix.domain.enums.NotificationType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,9 +20,6 @@ public class Notification {
     @Column(nullable = false)
     private Long id;
 
-    @Column
-    private String title;
-
     @Column(nullable = false, length = 20)
     @NotNull
     @Size(max = 20)
@@ -34,7 +32,7 @@ public class Notification {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
-    private ActivityStatus status;
+    private NotificationStatus status;
 
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -42,4 +40,13 @@ public class Notification {
 
     @Column
     private String response;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private NotificationType type;
+
+    @ManyToOne(optional = false)
+    @JoinColumn
+    private Account author;
 }
