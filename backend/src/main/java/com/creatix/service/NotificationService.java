@@ -7,6 +7,7 @@ import com.creatix.domain.dao.NotificationDao;
 import com.creatix.domain.entity.MaintenanceNotification;
 import com.creatix.domain.entity.NeighborhoodNotification;
 import com.creatix.domain.entity.Notification;
+import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class NotificationService {
         return notificationDao.findAllInDateRangeGroupedByDayFilteredByAccount(from, till, accountDao.findById(authorizationManager.getCurrentAccount().getId()));
     }
 
-    public Notification getNotification(Long notificationId) {
+    public Notification getSecurityNotification(Long notificationId) {
         Notification n = notificationDao.findById(notificationId);
         if (n == null)
             throw new EntityNotFoundException(String.format("Account id=%d not found", notificationId));
@@ -56,6 +57,27 @@ public class NotificationService {
         if (n == null)
             throw new EntityNotFoundException(String.format("Account id=%d not found", notificationId));
 
+        return n;
+    }
+
+    public Notification saveSecurityNotification(Notification n) {
+        n.setType(NotificationType.Security);
+        n.setAuthor(accountDao.findById(authorizationManager.getCurrentAccount().getId()));
+        notificationDao.persist(n);
+        return n;
+    }
+
+    public MaintenanceNotification saveMaintenanceNotification(MaintenanceNotification n) {
+        n.setType(NotificationType.Maintenance);
+        n.setAuthor(accountDao.findById(authorizationManager.getCurrentAccount().getId()));
+        notificationDao.persist(n);
+        return n;
+    }
+
+    public NeighborhoodNotification saveNeighborhoodNotification(NeighborhoodNotification n) {
+        n.setType(NotificationType.Neighborhood);
+        n.setAuthor(accountDao.findById(authorizationManager.getCurrentAccount().getId()));
+        notificationDao.persist(n);
         return n;
     }
 }

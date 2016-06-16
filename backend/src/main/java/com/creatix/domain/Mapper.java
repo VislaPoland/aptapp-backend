@@ -1,13 +1,13 @@
 package com.creatix.domain;
 
 import com.creatix.domain.dto.account.AccountDto;
-import com.creatix.domain.dto.notification.MaintenanceNotificationDto;
-import com.creatix.domain.dto.notification.NeighborhoodNotificationDto;
-import com.creatix.domain.dto.notification.NotificationDto;
+import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.entity.*;
+import com.creatix.service.ApartmentService;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
@@ -18,6 +18,8 @@ import java.util.Objects;
 
 @Component
 public class Mapper {
+    @Autowired
+    private ApartmentService apartmentService;
 
     private static final MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 
@@ -63,6 +65,20 @@ public class Mapper {
                 .byDefault()
                 .field("targetApartment.unitNumber", "unitNumber")
                 .register();
+
+        mapperFactory.classMap(CreateNotificationDto.class, Notification.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(CreateMaintenanceNotificationDto.class, MaintenanceNotification.class)
+                .byDefault()
+                .exclude("unitNumber")
+                .register();
+
+        mapperFactory.classMap(CreateNeighborhoodNotificationDto.class, NeighborhoodNotification.class)
+                .byDefault()
+                .exclude("unitNumber")
+                .register();
     }
 
 
@@ -93,5 +109,21 @@ public class Mapper {
 
     public NeighborhoodNotificationDto toNeighborhoodNotificationDto(@NotNull NeighborhoodNotification n) {
         return mapperFactory.getMapperFacade().map(n, NeighborhoodNotificationDto.class);
+    }
+
+    public Notification fromNotificationDto(@NotNull CreateNotificationDto dto) {
+        return mapperFactory.getMapperFacade().map(dto, Notification.class);
+    }
+
+    public MaintenanceNotification fromMaintenanceNotificationDto(@NotNull CreateMaintenanceNotificationDto dto) {
+        MaintenanceNotification n = mapperFactory.getMapperFacade().map(dto, MaintenanceNotification.class);
+        n.setTargetApartment(apartmentService.getApartment(dto.getUnitNumber()));
+        return n;
+    }
+
+    public NeighborhoodNotification fromNeighborhoodNotificationDto(@NotNull CreateNeighborhoodNotificationDto dto) {
+        NeighborhoodNotification n = mapperFactory.getMapperFacade().map(dto, NeighborhoodNotification.class);
+        n.setTargetApartment(apartmentService.getApartment(dto.getUnitNumber()));
+        return n;
     }
 }

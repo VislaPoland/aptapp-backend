@@ -2,10 +2,10 @@ package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.notification.MaintenanceNotificationDto;
-import com.creatix.domain.dto.notification.NeighborhoodNotificationDto;
-import com.creatix.domain.dto.notification.NotificationDto;
-import com.creatix.domain.dto.notification.RequestNotificationsDto;
+import com.creatix.domain.dto.notification.*;
+import com.creatix.domain.entity.MaintenanceNotification;
+import com.creatix.domain.entity.NeighborhoodNotification;
+import com.creatix.domain.entity.Notification;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.NotificationService;
 import io.swagger.annotations.ApiOperation;
@@ -41,13 +41,25 @@ public class NotificationController {
         return new DataResponse<>(mapper.toNotificationDtoMap(notificationService.getAllInDateRangeGroupedByDay(request.getFrom(), request.getTill())));
     }
 
+    @ApiOperation(value = "Get concrete security notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
     @RequestMapping(method = RequestMethod.GET, path = "/security/{notificationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     //TODO make accessible only to relevant users
     public DataResponse<NotificationDto> getSecurityNotificationDetail(@PathVariable Long notificationId) {
-        return new DataResponse<>(mapper.toNotificationDto(notificationService.getNotification(notificationId)));
+        return new DataResponse<>(mapper.toNotificationDto(notificationService.getSecurityNotification(notificationId)));
     }
 
+    @ApiOperation(value = "Get concrete maintenance notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
     @RequestMapping(method = RequestMethod.GET, path = "/maintenance/{notificationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     //TODO make accessible only to relevant users
@@ -55,10 +67,58 @@ public class NotificationController {
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.getMaintenanceNotification(notificationId)));
     }
 
+    @ApiOperation(value = "Get concrete neighborhood notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
     @RequestMapping(method = RequestMethod.GET, path = "/neighborhood/{notificationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     //TODO make accessible only to relevant users
     public DataResponse<NeighborhoodNotificationDto> getNeighborhoodNotificationDetail(@PathVariable Long notificationId) {
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.getNeighborhoodNotification(notificationId)));
+    }
+
+    @ApiOperation(value = "Create security notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RequestMapping(method = RequestMethod.POST, path = "/security", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    //TODO make accessible only to relevant users
+    public DataResponse<NotificationDto> saveSecurityNotification(@RequestBody @Valid CreateNotificationDto dto) {
+        Notification n = mapper.fromNotificationDto(dto);
+        return new DataResponse<>(mapper.toNotificationDto(notificationService.saveSecurityNotification(n)));
+    }
+
+    @ApiOperation(value = "Create maintenance notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RequestMapping(method = RequestMethod.POST, path = "/maintenance", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    //TODO make accessible only to relevant users
+    public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@RequestBody @Valid CreateMaintenanceNotificationDto dto) {
+        MaintenanceNotification n = mapper.fromMaintenanceNotificationDto(dto);
+        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(n)));
+    }
+
+    @ApiOperation(value = "Create neighborhood notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RequestMapping(method = RequestMethod.POST, path = "/neighborhood", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    //TODO make accessible only to relevant users
+    public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@RequestBody @Valid CreateNeighborhoodNotificationDto dto) {
+        NeighborhoodNotification n = mapper.fromNeighborhoodNotificationDto(dto);
+        return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(n)));
     }
 }
