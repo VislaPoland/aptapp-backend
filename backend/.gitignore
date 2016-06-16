@@ -5,3 +5,4 @@ out
 /classes
 /src/main/resources/application.properties
 /.gradle/
+/src/main/resources/data.sql

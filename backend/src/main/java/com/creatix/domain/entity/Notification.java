@@ -23,11 +23,11 @@ public class Notification {
     @Column(nullable = false, length = 20)
     @NotNull
     @Size(max = 20)
-    private String description;
+    private String title;
 
     @Column(length = 100)
     @Size(max = 100)
-    private String message;
+    private String description;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

@@ -9,14 +9,14 @@ import lombok.Data;
 
 import java.util.Date;
 
-@ApiModel("Notification object DTO")
+@ApiModel("Neighborhood notification DTO")
 @Data
-public class NotificationDto {
+public class NeighborhoodNotificationDto {
     @ApiModelProperty(value = "id", required = true)
     private Long id;
     @ApiModelProperty(value = "Short notification title", required = true)
     private String title;
-    @ApiModelProperty(value = "Longer notification title")
+    @ApiModelProperty(value = "Longer notification description")
     private String description;
     @ApiModelProperty(value = "Notification status", required = true)
     private NotificationStatus status;
@@ -27,4 +27,6 @@ public class NotificationDto {
     private String response;
     @ApiModelProperty(value = "Notification type", required = true)
     private NotificationType type;
+    @ApiModelProperty(value = "Target apartment unit number", required = true)
+    private String unitNumber;
 }
