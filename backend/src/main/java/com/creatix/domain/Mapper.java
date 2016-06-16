@@ -4,7 +4,9 @@ import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.entity.*;
+import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +24,17 @@ public class Mapper {
     static {
         mapperFactory.classMap(Account.class, AccountDto.class)
                 .byDefault()
+                .customize(new CustomMapper<Account, AccountDto>() {
+                    @Override
+                    public void mapAtoB(Account account, AccountDto accountDto, MappingContext context) {
+                        if ( account instanceof Tenant ) {
+                            accountDto.setPropertyId(((Tenant) account).getApartment().getProperty().getId());
+                        }
+                        else if ( account instanceof PropertyManager ) {
+                            accountDto.setPropertyId(((PropertyManager) account).getManagedProperty().getId());
+                        }
+                    }
+                })
                 .register();
 
         mapperFactory.classMap(Property.class, PropertyDetailsDto.class)

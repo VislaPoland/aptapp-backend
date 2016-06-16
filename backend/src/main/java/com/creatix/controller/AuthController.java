@@ -53,8 +53,8 @@ public class AuthController {
             @ApiResponse(code = 401, message = "Unauthorized")
     })
     @RequestMapping(value = "/attempt", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public LoginResponse signIn(@RequestBody @Valid LoginRequest loginRequest) {
+    public DataResponse<LoginResponse> signIn(@RequestBody @Valid LoginRequest loginRequest) {
         accountService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
-        return accountService.createLoginResponse(loginRequest.getEmail());
+        return new DataResponse<>(accountService.createLoginResponse(loginRequest.getEmail()));
     }
 }

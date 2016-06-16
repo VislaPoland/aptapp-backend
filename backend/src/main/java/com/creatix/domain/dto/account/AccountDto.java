@@ -19,4 +19,7 @@ public class AccountDto {
 
     @ApiModelProperty(value = "Address", required = true)
     private AddressDto address;
+
+    @ApiModelProperty(value = "Associated property ID", required = false, notes = "This is required for tenant and pproperty manager")
+    private Long propertyId;
 }

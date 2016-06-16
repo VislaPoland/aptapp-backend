@@ -91,6 +91,7 @@ public class AccountService {
         result.setToken(token);
         final Account account = authorizationManager.getCurrentAccount();
         result.setId(account.getId());
+        result.setAccount(mapper.toAccountDto(account));
 
         return result;
     }
