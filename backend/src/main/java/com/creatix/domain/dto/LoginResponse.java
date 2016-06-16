@@ -1,5 +1,6 @@
 package com.creatix.domain.dto;
 
+import com.creatix.domain.dto.account.AccountDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,5 +13,5 @@ public class LoginResponse {
     @ApiModelProperty(value = "Authenticated account id", required = true)
     private long id;
     @ApiModelProperty(value = "Authenticated user of APT. app", required = true)
-    private Object auth;
+    private AccountDto account;
 }
