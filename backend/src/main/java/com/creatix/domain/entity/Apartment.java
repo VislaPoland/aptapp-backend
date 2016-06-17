@@ -20,6 +20,9 @@ public class Apartment {
     @NotNull
     private String unitNumber;
 
+    @Column
+    private Integer floor;
+
     @ManyToOne(optional = false)
     @JoinColumn
     private Property property;

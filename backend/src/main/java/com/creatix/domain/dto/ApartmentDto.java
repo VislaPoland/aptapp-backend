@@ -22,6 +22,9 @@ public class ApartmentDto {
     @ApiModelProperty(value = "Associated property ID", required = false, notes = "This is required for tenant and pproperty manager")
     private Long propertyId;
 
+    @ApiModelProperty(value = "Floor number")
+    private Integer floor;
+
     @ApiModelProperty(required = true)
     private Neighbors neighbors;
 
@@ -50,5 +53,7 @@ public class ApartmentDto {
         private long id;
         @ApiModelProperty(required = true)
         private String unitNumber;
+        @ApiModelProperty(value = "Floor number")
+        private Integer floor;
     }
 }
