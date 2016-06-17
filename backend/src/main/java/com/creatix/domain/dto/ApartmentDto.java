@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * Account data transfer object
  */
-@ApiModel("Account DTO")
+@ApiModel
 @Data
 public class ApartmentDto {
     @ApiModelProperty(value = "Full name", required = true)

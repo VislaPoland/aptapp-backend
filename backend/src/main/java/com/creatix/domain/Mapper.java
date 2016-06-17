@@ -120,10 +120,13 @@ public class Mapper {
 
     }
 
+    public ApartmentDto toApartmentDto(@NotNull Apartment apartment) {
+        Objects.requireNonNull(apartment);
+        return mapperFactory.getMapperFacade().map(apartment, ApartmentDto.class);
+    }
 
     public AccountDto toAccountDto(Account account) {
         Objects.requireNonNull(account);
-
         return mapperFactory.getMapperFacade().map(account, AccountDto.class);
     }
 
@@ -133,36 +136,43 @@ public class Mapper {
     }
 
     public Map<Integer, List<NotificationDto>> toNotificationDtoMap(@NotNull Map<Integer, List<Notification>> notifications) {
+        Objects.requireNonNull(notifications);
         final Map<Integer, List<NotificationDto>> result = new HashMap<>();
         notifications.forEach((day, nList) -> result.put(day, mapperFactory.getMapperFacade().mapAsList(nList, NotificationDto.class)));
         return result;
     }
 
     public NotificationDto toNotificationDto(@NotNull Notification notification) {
+        Objects.requireNonNull(notification);
         return mapperFactory.getMapperFacade().map(notification, NotificationDto.class);
     }
 
     public MaintenanceNotificationDto toMaintenanceNotificationDto(@NotNull MaintenanceNotification n) {
+        Objects.requireNonNull(n);
         return mapperFactory.getMapperFacade().map(n, MaintenanceNotificationDto.class);
     }
 
     public NeighborhoodNotificationDto toNeighborhoodNotificationDto(@NotNull NeighborhoodNotification n) {
+        Objects.requireNonNull(n);
         return mapperFactory.getMapperFacade().map(n, NeighborhoodNotificationDto.class);
     }
 
     public Notification fromNotificationDto(@NotNull CreateNotificationDto dto) {
+        Objects.requireNonNull(dto);
         return mapperFactory.getMapperFacade().map(dto, Notification.class);
     }
 
     public MaintenanceNotification fromMaintenanceNotificationDto(@NotNull CreateMaintenanceNotificationDto dto) {
+        Objects.requireNonNull(dto);
         MaintenanceNotification n = mapperFactory.getMapperFacade().map(dto, MaintenanceNotification.class);
-        n.setTargetApartment(apartmentService.getApartment(dto.getUnitNumber()));
+        n.setTargetApartment(apartmentService.getApartment(dto.getApartmentId()));
         return n;
     }
 
     public NeighborhoodNotification fromNeighborhoodNotificationDto(@NotNull CreateNeighborhoodNotificationDto dto) {
+        Objects.requireNonNull(dto);
         NeighborhoodNotification n = mapperFactory.getMapperFacade().map(dto, NeighborhoodNotification.class);
-        n.setTargetApartment(apartmentService.getApartment(dto.getUnitNumber()));
+        n.setTargetApartment(apartmentService.getApartment(dto.getApartmentId()));
         return n;
     }
 }

@@ -14,10 +14,12 @@ public class ApartmentService {
     @Autowired
     private ApartmentDao apartmentDao;
 
-    public Apartment getApartment(String unitNumber) {
-        Apartment apartment = apartmentDao.findById(unitNumber);
-        if (apartment == null)
-            throw new EntityNotFoundException(String.format("Apartment with unit number %s not found", unitNumber));
+    public Apartment getApartment(long apartmentId) {
+        Apartment apartment = apartmentDao.findById(apartmentId);
+        if ( apartment == null ) {
+            throw new EntityNotFoundException(String.format("Apartment with unit number %d not found", apartmentId));
+        }
+
         return apartment;
     }
 }
