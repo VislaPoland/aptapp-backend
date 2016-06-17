@@ -1,5 +1,7 @@
 package com.creatix.domain.dao;
 
+import com.querydsl.jpa.JPQLQueryFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +15,14 @@ import javax.persistence.PersistenceContext;
 @Component
 @Transactional
 abstract class DaoBase<T, ID> {
+
     @PersistenceContext
     EntityManager em;
 
-    Class<T> type;
+    @Autowired
+    JPQLQueryFactory queryFactory;
+
+    private Class<T> type;
 
     @SuppressWarnings("unchecked")
     DaoBase() {

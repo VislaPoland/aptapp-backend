@@ -1,10 +1,9 @@
 package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.Account;
+import com.creatix.domain.entity.QAccount;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Repository
 @Transactional
@@ -18,15 +17,16 @@ public class AccountDao extends DaoBase<Account, Long> {
      * @return found account
      */
     public Account findByEmail(String email) {
-        return em.createQuery("FROM Account WHERE primaryEmail = :email", Account.class)
-                .setParameter("email", email)
-                .getSingleResult();
+        QAccount account = QAccount.account;
+        return queryFactory.selectFrom(account)
+                .where(account.primaryEmail.eq(email))
+                .fetchOne();
     }
 
     public Account findByActionToken(String actionToken) {
-        final List<Account> results = em.createQuery("FROM Account WHERE actionToken = :actionToken", Account.class)
-                .setParameter("actionToken", actionToken)
-                .getResultList();
-        return results.isEmpty() ? null : results.get(0);
+        QAccount account = QAccount.account;
+        return queryFactory.selectFrom(account)
+                .where(account.actionToken.eq(actionToken))
+                .fetchOne();
     }
 }

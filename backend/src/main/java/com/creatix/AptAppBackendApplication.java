@@ -9,7 +9,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
@@ -20,13 +19,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         WebMvcConfiguration.class,
         WebSecurityConfiguration.class,
         MethodSecurityConfiguration.class,
+        JpaConfiguration.class,
         SwaggerConfiguration.class
 })
 @EnableConfigurationProperties({
         MailProperties.class,
         JwtProperties.class
 })
-@Order(1)
 public class AptAppBackendApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
