@@ -1,5 +1,6 @@
 package com.creatix.domain;
 
+import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
@@ -92,6 +93,31 @@ public class Mapper {
                 .byDefault()
                 .exclude("unitNumber")
                 .register();
+
+        mapperFactory.classMap(Apartment.class, ApartmentDto.NeighborApartment.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(Apartment.class, ApartmentDto.Neighbors.class)
+                .field("aboveApartment", "above")
+                .field("belowApartment", "below")
+                .field("leftApartment", "left")
+                .field("rightApartment", "right")
+                .field("oppositeApartment", "opposite")
+                .field("behindApartment", "behind")
+                .register();
+        mapperFactory.classMap(Apartment.class, ApartmentDto.class)
+                .byDefault()
+                .field("tenant.fullName", "fullName")
+                .field("tenant.primaryEmail", "primaryEmail")
+                .field("property.id", "propertyId")
+                .customize(new CustomMapper<Apartment, ApartmentDto>() {
+                    @Override
+                    public void mapAtoB(Apartment apartment, ApartmentDto apartmentDto, MappingContext context) {
+                        apartmentDto.setNeighbors(mapperFactory.getMapperFacade().map(apartment, ApartmentDto.Neighbors.class));
+                    }
+                })
+                .register();
+
     }
 
 

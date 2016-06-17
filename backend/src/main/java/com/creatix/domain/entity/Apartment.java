@@ -8,9 +8,14 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Data
-@EqualsAndHashCode(of = "unitNumber")
+@EqualsAndHashCode(of = "id")
 public class Apartment {
+
     @Id
+    @GeneratedValue
+    @Column(nullable = false)
+    private Long id;
+
     @Column(nullable = false)
     @NotNull
     private String unitNumber;
