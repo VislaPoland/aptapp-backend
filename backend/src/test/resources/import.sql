@@ -21,9 +21,9 @@ INSERT INTO public.property (id, additional_information, name, status, address_i
 INSERT INTO public.property (id, additional_information, name, status, address_id, manager_id, owner_id) VALUES (7, 'Bla bla bla', 'Test property 2', 'Active', 5, 3, 1);
 
 -- apartments
-INSERT INTO public.apartment (unit_number, above_apartment_unit_number, behind_apartment_unit_number, below_apartment_unit_number, left_apartment_unit_number, opposite_apartment_unit_number, property_id, right_apartment_unit_number) VALUES ('2', null, null, null, null, null, 6, null);
-INSERT INTO public.apartment (unit_number, above_apartment_unit_number, behind_apartment_unit_number, below_apartment_unit_number, left_apartment_unit_number, opposite_apartment_unit_number, property_id, right_apartment_unit_number) VALUES ('1', null, null, '2', null, null, 6, null);
-UPDATE public.apartment SET above_apartment_unit_number = '1' WHERE unit_number = '2';
+INSERT INTO public.apartment (id, unit_number, above_apartment_id, behind_apartment_id, below_apartment_id, left_apartment_id, opposite_apartment_id, property_id, right_apartment_id) VALUES (2, '2', null, null, null, null, null, 6, null);
+INSERT INTO public.apartment (id, unit_number, above_apartment_id, behind_apartment_id, below_apartment_id, left_apartment_id, opposite_apartment_id, property_id, right_apartment_id) VALUES (1, '1', null, null, 2, null, null, 6, null);
+UPDATE public.apartment SET above_apartment_id = 1 WHERE id = 2;
 
 -- tenants
 INSERT INTO public.account (dtype, id, action_token, action_token_valid_until, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, secondary_email, secondary_phone, website, type, parent_tenant_id, apartment_unit_number) VALUES ('Tenant', 8, null, null, true, 'Cool Company', 'Joe', 'Tenant1', '$2a$10$/gP.lBHwosvJepgBZimscODeBXghvua0g.85U3HNic6UMsTxfzArq', 'joe.tenant1@mail.com', '123456789', 'Tenant', null, null, null, 'Owner', null, '1');
