@@ -18,7 +18,7 @@ public class AccountDao extends DaoBase<Account, Long> {
      * @return found account
      */
     public Account findByEmail(String email) {
-        return (Account) em.createQuery("FROM Account WHERE primaryEmail = :email")
+        return em.createQuery("FROM Account WHERE primaryEmail = :email", Account.class)
                 .setParameter("email", email)
                 .getSingleResult();
     }
