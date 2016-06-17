@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Transactional
-@RequestMapping("/api/property")
+@RequestMapping("/api/properties")
 public class PropertyController {
 
     @Autowired
