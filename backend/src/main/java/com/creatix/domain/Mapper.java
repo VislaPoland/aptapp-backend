@@ -20,23 +20,33 @@ import java.util.Map;
 import java.util.Objects;
 
 @Component
-public class Mapper {
+public final class Mapper {
+
+    private MapperFactory mapperFactory;
+
     @Autowired
     private ApartmentService apartmentService;
 
-    private static final MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
+    public Mapper() {
+        mapperFactory = new DefaultMapperFactory.Builder().build();
+        configure(mapperFactory);
+    }
 
-    static {
+    private void configure(MapperFactory mapperFactory) {
+
         mapperFactory.classMap(Account.class, AccountDto.class)
                 .byDefault()
                 .customize(new CustomMapper<Account, AccountDto>() {
                     @Override
                     public void mapAtoB(Account account, AccountDto accountDto, MappingContext context) {
                         if ( account instanceof Tenant ) {
-                            accountDto.setPropertyId(((Tenant) account).getApartment().getProperty().getId());
+                            final Apartment apartment = ((Tenant) account).getApartment();
+                            final Property property = apartment.getProperty();
+                            accountDto.setProperty(toPropertyDetailsDto(property));
+                            accountDto.setApartment(toApartmentDto(apartment));
                         }
                         else if ( account instanceof PropertyManager ) {
-                            accountDto.setPropertyId(((PropertyManager) account).getManagedProperty().getId());
+                            accountDto.setProperty(toPropertyDetailsDto(((PropertyManager) account).getManagedProperty()));
                         }
                     }
                 })
