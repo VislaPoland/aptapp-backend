@@ -37,7 +37,7 @@ public class ApartmentController {
     })
     @RequestMapping(value = "/{apartmentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<ApartmentDto> getApartments(@PathVariable long apartmentId) {
+    public DataResponse<ApartmentDto> getApartment(@PathVariable Long apartmentId) {
         return new DataResponse<>(mapper.toApartmentDto(apartmentService.getApartment(apartmentId)));
     }
 }

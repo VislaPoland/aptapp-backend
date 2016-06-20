@@ -27,8 +27,8 @@ public class MaintenanceNotificationDto {
     private String response;
     @ApiModelProperty(value = "Notification type", required = true)
     private NotificationType type;
-    @ApiModelProperty(value = "Target apartment unit number", required = true)
-    private String unitNumber;
+    @ApiModelProperty(value = "Target apartment ID", required = true)
+    private Long apartmentId;
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
     private Boolean accessIfNotAtHome;
 }

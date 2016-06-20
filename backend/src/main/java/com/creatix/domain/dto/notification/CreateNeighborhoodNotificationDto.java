@@ -31,4 +31,8 @@ public class CreateNeighborhoodNotificationDto {
     @ApiModelProperty(value = "Target apartment ID", required = true)
     @NotNull
     private Long apartmentId;
+    @ApiModelProperty(value = "Target apartment unit number")
+    private String unitNumber;
+    @ApiModelProperty(value = "Target property ID")
+    private Long propertyId;
 }

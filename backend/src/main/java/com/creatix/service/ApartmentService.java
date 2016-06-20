@@ -2,6 +2,7 @@ package com.creatix.service;
 
 import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.entity.Apartment;
+import com.creatix.domain.entity.Property;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,13 +14,20 @@ import javax.persistence.EntityNotFoundException;
 public class ApartmentService {
     @Autowired
     private ApartmentDao apartmentDao;
+    @Autowired
+    private PropertyService propertyService;
 
-    public Apartment getApartment(long apartmentId) {
+    public Apartment getApartment(Long apartmentId) {
         Apartment apartment = apartmentDao.findById(apartmentId);
         if ( apartment == null ) {
-            throw new EntityNotFoundException(String.format("Apartment with unit number %d not found", apartmentId));
+            throw new EntityNotFoundException(String.format("Apartment with id %d not found", apartmentId));
         }
 
         return apartment;
+    }
+
+    public Apartment getApartment(Long propertyId, String unitNumber) {
+        Property property = propertyService.getProperty(propertyId);
+        return apartmentDao.findByUnitNumberWithinProperty(property, unitNumber);
     }
 }

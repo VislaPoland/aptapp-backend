@@ -28,9 +28,12 @@ public class CreateMaintenanceNotificationDto {
     private Date date;
     @ApiModelProperty(value = "Response message")
     private String response;
-    @ApiModelProperty(value = "Target apartment ID", required = true)
-    @NotNull
+    @ApiModelProperty(value = "Target apartment ID")
     private Long apartmentId;
+    @ApiModelProperty(value = "Target apartment unit number")
+    private String unitNumber;
+    @ApiModelProperty(value = "Target property ID")
+    private Long propertyId;
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
     @NotNull
     private Boolean accessIfNotAtHome;

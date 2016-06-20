@@ -6,3 +6,4 @@ out
 /src/main/resources/application.properties
 /.gradle/
 /src/main/resources/data.sql
+/src/main/generated/

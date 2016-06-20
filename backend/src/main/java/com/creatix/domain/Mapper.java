@@ -5,6 +5,7 @@ import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.entity.*;
+import com.creatix.security.AuthorizationManager;
 import com.creatix.service.ApartmentService;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
@@ -27,25 +28,26 @@ public final class Mapper {
     @Autowired
     private ApartmentService apartmentService;
 
+    @Autowired
+    private AuthorizationManager authorizationManager;
+
     public Mapper() {
         mapperFactory = new DefaultMapperFactory.Builder().build();
         configure(mapperFactory);
     }
 
     private void configure(MapperFactory mapperFactory) {
-
         mapperFactory.classMap(Account.class, AccountDto.class)
                 .byDefault()
                 .customize(new CustomMapper<Account, AccountDto>() {
                     @Override
                     public void mapAtoB(Account account, AccountDto accountDto, MappingContext context) {
-                        if ( account instanceof Tenant ) {
+                        if (account instanceof Tenant) {
                             final Apartment apartment = ((Tenant) account).getApartment();
                             final Property property = apartment.getProperty();
                             accountDto.setProperty(toPropertyDetailsDto(property));
                             accountDto.setApartment(toApartmentDto(apartment));
-                        }
-                        else if ( account instanceof PropertyManager ) {
+                        } else if (account instanceof PropertyManager) {
                             accountDto.setProperty(toPropertyDetailsDto(((PropertyManager) account).getManagedProperty()));
                         }
                     }
@@ -96,17 +98,42 @@ public final class Mapper {
 
         mapperFactory.classMap(CreateMaintenanceNotificationDto.class, MaintenanceNotification.class)
                 .byDefault()
-                .exclude("unitNumber")
+                .customize(new CustomMapper<CreateMaintenanceNotificationDto, MaintenanceNotification>() {
+                    @SuppressWarnings("Duplicates")
+                    @Override
+                    public void mapAtoB(CreateMaintenanceNotificationDto dto, MaintenanceNotification n, MappingContext c) {
+                        if (dto.getApartmentId() != null) {
+                            n.setTargetApartment(apartmentService.getApartment(dto.getApartmentId()));
+                        } else {
+                            String unitNumber = dto.getUnitNumber();
+                            Objects.requireNonNull(unitNumber);
+                            n.setTargetApartment(apartmentService.getApartment(dto.getPropertyId(), unitNumber));
+                        }
+                    }
+                })
                 .register();
 
         mapperFactory.classMap(CreateNeighborhoodNotificationDto.class, NeighborhoodNotification.class)
                 .byDefault()
-                .exclude("unitNumber")
+                .customize(new CustomMapper<CreateNeighborhoodNotificationDto, NeighborhoodNotification>() {
+                    @SuppressWarnings("Duplicates")
+                    @Override
+                    public void mapAtoB(CreateNeighborhoodNotificationDto dto, NeighborhoodNotification n, MappingContext c) {
+                        if (dto.getApartmentId() != null) {
+                            n.setTargetApartment(apartmentService.getApartment(dto.getApartmentId()));
+                        } else {
+                            String unitNumber = dto.getUnitNumber();
+                            Objects.requireNonNull(unitNumber);
+                            n.setTargetApartment(apartmentService.getApartment(dto.getPropertyId(), unitNumber));
+                        }
+                    }
+                })
                 .register();
 
         mapperFactory.classMap(Apartment.class, ApartmentDto.NeighborApartment.class)
                 .byDefault()
                 .register();
+
         mapperFactory.classMap(Apartment.class, ApartmentDto.Neighbors.class)
                 .field("aboveApartment", "above")
                 .field("belowApartment", "below")
@@ -115,6 +142,7 @@ public final class Mapper {
                 .field("oppositeApartment", "opposite")
                 .field("behindApartment", "behind")
                 .register();
+
         mapperFactory.classMap(Apartment.class, ApartmentDto.class)
                 .byDefault()
                 .field("tenant.fullName", "fullName")
@@ -127,7 +155,6 @@ public final class Mapper {
                     }
                 })
                 .register();
-
     }
 
     public ApartmentDto toApartmentDto(@NotNull Apartment apartment) {
@@ -174,15 +201,11 @@ public final class Mapper {
 
     public MaintenanceNotification fromMaintenanceNotificationDto(@NotNull CreateMaintenanceNotificationDto dto) {
         Objects.requireNonNull(dto);
-        MaintenanceNotification n = mapperFactory.getMapperFacade().map(dto, MaintenanceNotification.class);
-        n.setTargetApartment(apartmentService.getApartment(dto.getApartmentId()));
-        return n;
+        return mapperFactory.getMapperFacade().map(dto, MaintenanceNotification.class);
     }
 
     public NeighborhoodNotification fromNeighborhoodNotificationDto(@NotNull CreateNeighborhoodNotificationDto dto) {
         Objects.requireNonNull(dto);
-        NeighborhoodNotification n = mapperFactory.getMapperFacade().map(dto, NeighborhoodNotification.class);
-        n.setTargetApartment(apartmentService.getApartment(dto.getApartmentId()));
-        return n;
+        return mapperFactory.getMapperFacade().map(dto, NeighborhoodNotification.class);
     }
 }

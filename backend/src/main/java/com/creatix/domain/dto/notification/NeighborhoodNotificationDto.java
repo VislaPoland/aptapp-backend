@@ -27,6 +27,6 @@ public class NeighborhoodNotificationDto {
     private String response;
     @ApiModelProperty(value = "Notification type", required = true)
     private NotificationType type;
-    @ApiModelProperty(value = "Target apartment unit number", required = true)
-    private String unitNumber;
+    @ApiModelProperty(value = "Target apartment ID", required = true)
+    private Long apartmentId;
 }
