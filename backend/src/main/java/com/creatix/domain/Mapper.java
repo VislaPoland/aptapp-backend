@@ -1,8 +1,10 @@
 package com.creatix.domain;
 
+import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.notification.*;
+import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.entity.*;
 import com.creatix.service.ApartmentService;
@@ -128,6 +130,17 @@ public final class Mapper {
                 })
                 .register();
 
+        mapperFactory.classMap(AddressDto.class, Address.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(CreatePropertyRequest.class, Property.class)
+                .byDefault()
+                .register();
+    }
+
+    public Property toProperty(@NotNull CreatePropertyRequest request) {
+        Objects.requireNonNull(request);
+        return mapperFactory.getMapperFacade().map(request, Property.class);
     }
 
     public ApartmentDto toApartmentDto(@NotNull Apartment apartment) {

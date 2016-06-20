@@ -39,10 +39,8 @@ public class Property {
     @NotNull
     private PropertyOwner owner;
 
-    @OneToOne(optional = false)
-    @JoinColumn(unique = true)
-    @NotNull
-    private PropertyManager manager;
+    @OneToMany(mappedBy = "managedProperty")
+    private List<PropertyManager> managers;
 
     @OneToMany(mappedBy = "property")
     private List<Facility> facilities;
