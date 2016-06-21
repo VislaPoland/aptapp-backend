@@ -75,12 +75,12 @@ public final class Mapper {
 
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
                 .byDefault()
-                .field("targetApartment.unitNumber", "unitNumber")
+                .field("targetApartment.id", "apartmentId")
                 .register();
 
         mapperFactory.classMap(NeighborhoodNotification.class, NeighborhoodNotificationDto.class)
                 .byDefault()
-                .field("targetApartment.unitNumber", "unitNumber")
+                .field("targetApartment.id", "apartmentId")
                 .register();
 
         mapperFactory.classMap(CreateNotificationRequest.class, Notification.class)

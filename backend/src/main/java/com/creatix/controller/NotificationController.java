@@ -41,10 +41,12 @@ public class NotificationController {
         return new DataResponse<>(mapper.toNotificationDtoMap(notificationService.getRelevantInDateRangeGroupedByDayNumber(request.getFrom(), request.getTill())));
     }
 
+    /*
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public DataResponse<List<NotificationDto>> getNotifications(@RequestBody @Valid NotificationsCollectionRequest request) {
         return new DataResponse<>(mapper.toNotificationDtoList(notificationService.getRelevantInDateRange(request.getFrom(), request.getTill())));
     }
+    */
 
     @ApiOperation(value = "Get concrete security notification")
     @ApiResponses(value = {
