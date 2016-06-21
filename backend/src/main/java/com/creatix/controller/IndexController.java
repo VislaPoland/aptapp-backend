@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
@@ -62,7 +63,7 @@ class IndexController implements ErrorController {
         handleException(ex, HttpStatus.NOT_FOUND, response);
     }
 
-    @ExceptionHandler({DataIntegrityViolationException.class, ConstraintViolationException.class, IllegalArgumentException.class, IllegalStateException.class})
+    @ExceptionHandler({DataIntegrityViolationException.class, ConstraintViolationException.class, IllegalArgumentException.class, IllegalStateException.class, MethodArgumentNotValidException.class})
     public void integrityViolation(Exception ex, HttpServletResponse response) throws IOException {
         handleException(ex, HttpStatus.UNPROCESSABLE_ENTITY, response);
     }

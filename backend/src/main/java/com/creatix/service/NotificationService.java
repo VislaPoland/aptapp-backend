@@ -1,11 +1,12 @@
 package com.creatix.service;
 
 import com.creatix.configuration.MailProperties;
-import com.creatix.domain.dao.*;
-import com.creatix.domain.entity.Account;
-import com.creatix.domain.entity.MaintenanceNotification;
-import com.creatix.domain.entity.NeighborhoodNotification;
-import com.creatix.domain.entity.Notification;
+import com.creatix.domain.dao.ApartmentDao;
+import com.creatix.domain.dao.MaintenanceNotificationDao;
+import com.creatix.domain.dao.NeighborhoodNotificationDao;
+import com.creatix.domain.dao.NotificationDao;
+import com.creatix.domain.entity.*;
+import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +105,7 @@ public class NotificationService {
     public Notification saveSecurityNotification(Notification n) {
         n.setType(NotificationType.Security);
         n.setAuthor(authorizationManager.getCurrentAccount());
+        n.setStatus(NotificationStatus.Pending);
         notificationDao.persist(n);
         return n;
     }
@@ -111,7 +113,11 @@ public class NotificationService {
     public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, MaintenanceNotification n) {
         n.setType(NotificationType.Maintenance);
         n.setAuthor(authorizationManager.getCurrentAccount());
-        n.setTargetApartment(apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty()));
+        n.setStatus(NotificationStatus.Pending);
+        Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty());
+        if (apartment == null)
+            throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
+        n.setTargetApartment(apartment);
         notificationDao.persist(n);
         return n;
     }
@@ -119,7 +125,11 @@ public class NotificationService {
     public NeighborhoodNotification saveNeighborhoodNotification(String targetUnitNumber, NeighborhoodNotification n) {
         n.setType(NotificationType.Neighborhood);
         n.setAuthor(authorizationManager.getCurrentAccount());
-        n.setTargetApartment(apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty()));
+        n.setStatus(NotificationStatus.Pending);
+        Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty());
+        if (apartment == null)
+            throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
+        n.setTargetApartment(apartment);
         notificationDao.persist(n);
         return n;
     }
