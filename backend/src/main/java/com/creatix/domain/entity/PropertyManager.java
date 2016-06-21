@@ -5,13 +5,15 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PropertyManager extends Account {
-    @OneToOne(mappedBy = "manager")
+
+    @ManyToOne
     private Property managedProperty;
 
     @Column
