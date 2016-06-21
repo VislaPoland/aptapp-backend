@@ -35,7 +35,7 @@ public class PropertyController {
             @ApiResponse(code = 403, message = "Forbidden"),
     })
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(AccountRole.Administrator)
     public DataResponse<List<PropertyDetailsDto>> getAllProperties() {
         return new DataResponse<>(propertyService.getAllProperties().stream()
                 .map(p -> mapper.toPropertyDetailsDto(p))
