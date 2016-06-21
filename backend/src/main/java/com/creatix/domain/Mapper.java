@@ -41,7 +41,10 @@ public final class Mapper {
                             accountDto.setProperty(toPropertyDetailsDto(property));
                             accountDto.setApartment(toApartmentDto(apartment));
                         } else if (account instanceof PropertyManager) {
-                            accountDto.setProperty(toPropertyDetailsDto(((PropertyManager) account).getManagedProperty()));
+                            final Property managedProperty = ((PropertyManager) account).getManagedProperty();
+                            if ( managedProperty != null ) {
+                                accountDto.setProperty(toPropertyDetailsDto(managedProperty));
+                            }
                         }
                     }
                 })

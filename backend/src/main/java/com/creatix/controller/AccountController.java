@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Transactional
@@ -29,6 +31,20 @@ public class AccountController {
     private AccountService accountService;
     @Autowired
     private AuthorizationManager authorizationManager;
+
+    @ApiOperation(value = "Get accounts")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(AccountRole.Administrator)
+    public DataResponse<List<AccountDto>> getAccounts(@RequestParam(required = false) AccountRole role) {
+        return new DataResponse<>(accountService.getAccounts(role).stream()
+                .map(a -> mapper.toAccountDto(a))
+                .collect(Collectors.toList()));
+    }
 
     @ApiOperation(value = "Get self profile information")
     @ApiResponses(value = {

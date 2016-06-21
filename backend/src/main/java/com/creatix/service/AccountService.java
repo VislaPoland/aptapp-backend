@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -153,6 +154,16 @@ public class AccountService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
+    @RoleSecured(AccountRole.Administrator)
+    public List<Account> getAccounts(AccountRole role) {
+        if ( role == null ) {
+            return accountDao.findAll();
+        }
+        else {
+            return accountDao.findByRole(role);
+        }
+    }
+
     public Account getAccount(Long accountId) {
         final Account account = accountDao.findById(accountId);
         if ( account == null ) {
@@ -178,11 +189,6 @@ public class AccountService {
         accountDao.persist(account);
 
         return account;
-    }
-
-    public Account saveAccount(Account account) {
-        accountDao.persist(account);
-        return accountDao.findByEmail(account.getPrimaryEmail());
     }
 
     public Account updateAccount(Account account, UpdateAccountProfileRequest accountDto) {
