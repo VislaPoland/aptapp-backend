@@ -21,6 +21,5 @@ public class CreateNotificationRequest {
     private String description;
     @ApiModelProperty(value = "Timestamp of notification", required = true, example = "2016-06-1 00:00:00")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    @NotNull
-    private Date date;
+    private Date date = new Date();
 }
