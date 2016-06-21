@@ -34,13 +34,6 @@ public class NotificationService {
     @Autowired
     private AuthorizationManager authorizationManager;
 
-    /**
-     * Get relevant notifications in date range grouped by date
-     *
-     * @param fromDate start date
-     * @param tillDate end date
-     * @return Notifications in date range grouped by date
-     */
     public Map<Integer, List<Notification>> getRelevantInDateRangeGroupedByDayNumber(Date fromDate, Date tillDate) {
         return notificationDao.findAllInDateRange(fromDate, tillDate).stream()
                 .filter(n -> relevantNotificationsFilter(n, authorizationManager.getCurrentAccount()))
@@ -98,7 +91,7 @@ public class NotificationService {
 
     public Notification saveSecurityNotification(Notification n) {
         n.setType(NotificationType.Security);
-        n.setAuthor(accountDao.findById(authorizationManager.getCurrentAccount().getId()));
+        n.setAuthor(authorizationManager.getCurrentAccount());
         notificationDao.persist(n);
         return n;
     }
@@ -113,7 +106,7 @@ public class NotificationService {
 
     public NeighborhoodNotification saveNeighborhoodNotification(String targetUnitNumber, NeighborhoodNotification n) {
         n.setType(NotificationType.Neighborhood);
-        n.setAuthor(accountDao.findById(authorizationManager.getCurrentAccount().getId()));
+        n.setAuthor(authorizationManager.getCurrentAccount());
         n.setTargetApartment(apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty()));
         notificationDao.persist(n);
         return n;

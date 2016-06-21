@@ -14,8 +14,6 @@ import javax.persistence.EntityNotFoundException;
 public class ApartmentService {
     @Autowired
     private ApartmentDao apartmentDao;
-    @Autowired
-    private PropertyService propertyService;
 
     public Apartment getApartment(Long apartmentId) {
         Apartment apartment = apartmentDao.findById(apartmentId);
@@ -24,10 +22,5 @@ public class ApartmentService {
         }
 
         return apartment;
-    }
-
-    public Apartment getApartment(Long propertyId, String unitNumber) {
-        Property property = propertyService.getProperty(propertyId);
-        return apartmentDao.findByUnitNumberWithinProperty(property, unitNumber);
     }
 }

@@ -19,7 +19,7 @@ public class ApartmentDto {
     @ApiModelProperty(value = "Address", required = true)
     private AddressDto address;
 
-    @ApiModelProperty(value = "Associated property ID", required = false, notes = "This is required for tenant and pproperty manager")
+    @ApiModelProperty(value = "Associated property ID", required = false, notes = "This is required for tenant and property manager")
     private Long propertyId;
 
     @ApiModelProperty(value = "Floor number")

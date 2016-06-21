@@ -12,7 +12,7 @@ import java.util.Date;
 
 @ApiModel("Maintenance notification object DTO")
 @Data
-public class CreateNeighborhoodNotificationDto {
+public class CreateNeighborhoodNotificationRequest {
     @ApiModelProperty(value = "Short notification title", required = true)
     @NotNull
     private String title;

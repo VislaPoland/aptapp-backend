@@ -10,13 +10,13 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@ApiModel("Notification object DTO")
+@ApiModel("Maintenance notification object DTO")
 @Data
-public class CreateNotificationDto {
+public class CreateMaintenanceNotificationRequest {
     @ApiModelProperty(value = "Short notification title", required = true)
     @NotNull
     private String title;
-    @ApiModelProperty(value = "Longer notification title")
+    @ApiModelProperty(value = "Longer notification description")
     private String description;
     @ApiModelProperty(value = "Notification status", required = true)
     @NotNull
@@ -28,4 +28,10 @@ public class CreateNotificationDto {
     private Date date;
     @ApiModelProperty(value = "Response message")
     private String response;
+    @ApiModelProperty(value = "Target apartment unit number", required = true)
+    @NotNull
+    private String unitNumber;
+    @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
+    @NotNull
+    private Boolean accessIfNotAtHome;
 }

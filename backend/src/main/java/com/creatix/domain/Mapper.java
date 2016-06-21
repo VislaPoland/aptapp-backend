@@ -84,15 +84,15 @@ public final class Mapper {
                 .field("targetApartment.unitNumber", "unitNumber")
                 .register();
 
-        mapperFactory.classMap(CreateNotificationDto.class, Notification.class)
+        mapperFactory.classMap(CreateNotificationRequest.class, Notification.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(CreateMaintenanceNotificationDto.class, MaintenanceNotification.class)
+        mapperFactory.classMap(CreateMaintenanceNotificationRequest.class, MaintenanceNotification.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(CreateNeighborhoodNotificationDto.class, NeighborhoodNotification.class)
+        mapperFactory.classMap(CreateNeighborhoodNotificationRequest.class, NeighborhoodNotification.class)
                 .byDefault()
                 .register();
 
@@ -173,17 +173,17 @@ public final class Mapper {
         return mapperFactory.getMapperFacade().map(n, NeighborhoodNotificationDto.class);
     }
 
-    public Notification fromNotificationDto(@NotNull CreateNotificationDto dto) {
+    public Notification fromNotificationDto(@NotNull CreateNotificationRequest dto) {
         Objects.requireNonNull(dto);
         return mapperFactory.getMapperFacade().map(dto, Notification.class);
     }
 
-    public MaintenanceNotification fromMaintenanceNotificationDto(@NotNull CreateMaintenanceNotificationDto dto) {
+    public MaintenanceNotification fromMaintenanceNotificationDto(@NotNull CreateMaintenanceNotificationRequest dto) {
         Objects.requireNonNull(dto);
         return mapperFactory.getMapperFacade().map(dto, MaintenanceNotification.class);
     }
 
-    public NeighborhoodNotification fromNeighborhoodNotificationDto(@NotNull CreateNeighborhoodNotificationDto dto) {
+    public NeighborhoodNotification fromNeighborhoodNotificationDto(@NotNull CreateNeighborhoodNotificationRequest dto) {
         Objects.requireNonNull(dto);
         return mapperFactory.getMapperFacade().map(dto, NeighborhoodNotification.class);
     }

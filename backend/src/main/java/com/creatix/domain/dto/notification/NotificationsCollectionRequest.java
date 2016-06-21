@@ -10,7 +10,7 @@ import java.util.Date;
 
 @ApiModel("Notifications collection request object")
 @Data
-public class RequestNotificationsDto {
+public class NotificationsCollectionRequest {
     @ApiModelProperty(value = "From date", required = true, example = "2016-06-1 00:00:00")
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

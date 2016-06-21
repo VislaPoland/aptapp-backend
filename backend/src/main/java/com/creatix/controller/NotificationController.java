@@ -37,7 +37,7 @@ public class NotificationController {
     })
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
-    public DataResponse<Map<Integer, List<NotificationDto>>> getNotificationsGroupedByDay(@RequestBody @Valid RequestNotificationsDto request) {
+    public DataResponse<Map<Integer, List<NotificationDto>>> getNotificationsGroupedByDay(@RequestBody @Valid NotificationsCollectionRequest request) {
         return new DataResponse<>(mapper.toNotificationDtoMap(notificationService.getRelevantInDateRangeGroupedByDayNumber(request.getFrom(), request.getTill())));
     }
 
@@ -85,7 +85,7 @@ public class NotificationController {
     })
     @RequestMapping(method = RequestMethod.POST, path = "/security", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
-    public DataResponse<NotificationDto> saveSecurityNotification(@RequestBody @Valid CreateNotificationDto dto) {
+    public DataResponse<NotificationDto> saveSecurityNotification(@RequestBody @Valid CreateNotificationRequest dto) {
         Notification n = mapper.fromNotificationDto(dto);
         return new DataResponse<>(mapper.toNotificationDto(notificationService.saveSecurityNotification(n)));
     }
@@ -98,7 +98,7 @@ public class NotificationController {
     })
     @RequestMapping(method = RequestMethod.POST, path = "/maintenance", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
-    public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@RequestBody @Valid CreateMaintenanceNotificationDto dto) {
+    public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@RequestBody @Valid CreateMaintenanceNotificationRequest dto) {
         MaintenanceNotification n = mapper.fromMaintenanceNotificationDto(dto);
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n)));
     }
@@ -111,7 +111,7 @@ public class NotificationController {
     })
     @RequestMapping(method = RequestMethod.POST, path = "/neighborhood", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
-    public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@RequestBody @Valid CreateNeighborhoodNotificationDto dto) {
+    public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@RequestBody @Valid CreateNeighborhoodNotificationRequest dto) {
         NeighborhoodNotification n = mapper.fromNeighborhoodNotificationDto(dto);
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(dto.getUnitNumber(), n)));
     }
