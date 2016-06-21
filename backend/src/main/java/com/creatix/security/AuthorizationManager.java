@@ -1,7 +1,9 @@
 package com.creatix.security;
 
+import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.entity.*;
 import com.creatix.domain.enums.AccountRole;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +17,9 @@ import java.util.Objects;
  */
 @Component
 public class AuthorizationManager {
+
+    @Autowired
+    private AccountDao accountDao;
 
     public boolean isSelf(Account account) {
         return Objects.equals(account, getCurrentAccount());
@@ -52,11 +57,13 @@ public class AuthorizationManager {
             throw new SecurityException("No authenticated account found in session.");
         }
 
-        return current;
+        return current != null ? accountDao.findById(current.getId()) : null;
     }
 
     public Property getCurrentProperty() throws SecurityException {
         Account account = getCurrentAccount(false);
+        assert account != null;
+
         switch (account.getRole()) {
             case Tenant:
                 return ((Tenant) account).getApartment().getProperty();
