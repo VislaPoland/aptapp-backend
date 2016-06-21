@@ -7,6 +7,8 @@ import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
+import com.creatix.domain.dto.tenant.CreateTenantRequest;
+import com.creatix.domain.dto.tenant.UpdateTenantRequest;
 import com.creatix.domain.entity.*;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
@@ -132,6 +134,22 @@ public final class Mapper {
                 .byDefault()
                 .register();
 
+        mapperFactory.classMap(CreateTenantRequest.class, Tenant.class)
+                .byDefault()
+                .register();
+
+    }
+
+    public Tenant toTenant(@NotNull CreateTenantRequest request) {
+        Objects.requireNonNull(request);
+        return mapperFactory.getMapperFacade().map(request, Tenant.class);
+    }
+
+    public void fillTenant(@NotNull UpdateTenantRequest dto, @NotNull Tenant entity) {
+        Objects.requireNonNull(dto);
+        Objects.requireNonNull(entity);
+
+        mapperFactory.getMapperFacade().map(dto, entity);
     }
 
     public void fillProperty(@NotNull UpdatePropertyRequest dto, @NotNull Property entity) {

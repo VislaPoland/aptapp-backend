@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -68,4 +69,17 @@ public class AuthorizationManager {
                     throw new SecurityException("Impossible to extract single linked property.");
         }
     }
+
+    public void checkManager(@NotNull Property property) {
+        if ( !(isManager(property)) ) {
+            throw new SecurityException("Not a property manager");
+        }
+    }
+
+    @RoleSecured(AccountRole.PropertyManager)
+    public boolean isManager(@NotNull Property property) {
+        Objects.requireNonNull(property);
+        return Objects.equals(property, ((PropertyManager) getCurrentAccount()).getManagedProperty());
+    }
+
 }

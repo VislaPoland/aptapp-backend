@@ -4,11 +4,13 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
+import com.creatix.domain.dto.tenant.CreateTenantRequest;
+import com.creatix.domain.dto.tenant.UpdateTenantRequest;
 import com.creatix.domain.entity.Account;
-import com.creatix.security.AuthenticatedUserDetails;
-import com.creatix.security.AuthenticatedUserDetailsService;
-import com.creatix.security.AuthorizationManager;
-import com.creatix.security.TokenUtils;
+import com.creatix.domain.entity.Apartment;
+import com.creatix.domain.entity.Tenant;
+import com.creatix.domain.enums.AccountRole;
+import com.creatix.security.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -45,6 +47,8 @@ public class AccountService {
     private TokenUtils tokenUtils;
     @Autowired
     private Mapper mapper;
+    @Autowired
+    private ApartmentService apartmentService;
 
     private static void validatePassword(String password) {
         if ( StringUtils.isBlank(password) ) {
@@ -53,6 +57,49 @@ public class AccountService {
         if ( password.length() < 6 ) {
             throw new IllegalStateException("Password must be at least 6 characters long");
         }
+    }
+
+    public Tenant getTenant(long accountId) {
+        final Account account = accountDao.findById(accountId);
+        if ( account instanceof Tenant ) {
+            return (Tenant) account;
+        }
+
+        throw new EntityNotFoundException(String.format("Tenant id=%d not found", accountId));
+    }
+
+    @RoleSecured(AccountRole.PropertyManager)
+    public Tenant createTenantFromRequest(@NotNull CreateTenantRequest request) {
+        Objects.requireNonNull(request);
+
+        final Apartment apartment = apartmentService.getApartment(request.getApartmentId());
+        authorizationManager.checkManager(apartment.getProperty());
+
+
+        final Tenant tenant = mapper.toTenant(request);
+        tenant.setApartment(apartment);
+        tenant.setActive(false);
+        accountDao.persist(tenant);
+
+        setActionToken(tenant);
+
+        return tenant;
+    }
+
+    @RoleSecured(AccountRole.PropertyManager)
+    public Tenant updateTenantFromRequest(long tenantId, @NotNull UpdateTenantRequest request) {
+        Objects.requireNonNull(request);
+
+        final Apartment apartment = apartmentService.getApartment(request.getApartmentId());
+        authorizationManager.checkManager(apartment.getProperty());
+
+
+        final Tenant tenant = getTenant(tenantId);
+        mapper.fillTenant(request, tenant);
+        tenant.setApartment(apartment);
+        accountDao.persist(tenant);
+
+        return tenant;
     }
 
     public Account getAccount(long accouuntId) {
