@@ -1,5 +1,6 @@
 package com.creatix.service;
 
+import com.creatix.configuration.MailProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.entity.Account;
 import com.creatix.domain.entity.MaintenanceNotification;
@@ -8,8 +9,11 @@ import com.creatix.domain.entity.Notification;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Calendar;
@@ -31,6 +35,10 @@ public class NotificationService {
     private ApartmentDao apartmentDao;
     @Autowired
     private AuthorizationManager authorizationManager;
+    @Autowired
+    private MailProperties mailProperties;
+    @Autowired
+    private MailSender mailSender;
 
     public Map<Integer, List<Notification>> getRelevantInDateRangeGroupedByDayNumber(Date fromDate, Date tillDate) {
         return notificationDao.findAllInDateRange(fromDate, tillDate).stream()
@@ -114,5 +122,19 @@ public class NotificationService {
         n.setTargetApartment(apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty()));
         notificationDao.persist(n);
         return n;
+    }
+
+    private void sendMail(String to, String subject, String body) {
+
+        if ( StringUtils.isEmpty(mailProperties.getFrom()) ) {
+            throw new IllegalStateException("'From' address not defined in configuration");
+        }
+
+        final SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom(mailProperties.getFrom());
+        mailMessage.setTo(to);
+        mailMessage.setSubject(subject);
+        mailMessage.setText(body);
+        mailSender.send(mailMessage);
     }
 }
