@@ -8,7 +8,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@ApiModel("Notifications collection request object")
+@ApiModel
 @Data
 public class NotificationsCollectionRequest {
     @ApiModelProperty(value = "From date", required = true, example = "2016-06-1 00:00:00")

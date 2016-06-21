@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
-@ApiModel("Maintenance notification object DTO")
+@ApiModel
 @Data
 public class CreateMaintenanceNotificationRequest {
     @ApiModelProperty(value = "Short notification title", required = true, notes = "Maximum size of 20 letters")

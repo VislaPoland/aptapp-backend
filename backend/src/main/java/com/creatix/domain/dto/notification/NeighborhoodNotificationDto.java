@@ -9,7 +9,7 @@ import lombok.Data;
 
 import java.util.Date;
 
-@ApiModel("Neighborhood notification DTO")
+@ApiModel
 @Data
 public class NeighborhoodNotificationDto {
     @ApiModelProperty(value = "id", required = true)
