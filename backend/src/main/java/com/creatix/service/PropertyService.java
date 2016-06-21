@@ -4,6 +4,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.PropertyOwnerDao;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
+import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.entity.Property;
 import com.creatix.domain.entity.PropertyOwner;
 import com.creatix.domain.enums.AccountRole;
@@ -59,7 +60,7 @@ public class PropertyService {
     }
 
     @RoleSecured(AccountRole.Administrator)
-    public Property updateFromRequest(long propertyId, @NotNull CreatePropertyRequest request) {
+    public Property updateFromRequest(long propertyId, @NotNull UpdatePropertyRequest request) {
         Objects.requireNonNull(request);
 
         final Property property = getProperty(propertyId);
@@ -70,6 +71,7 @@ public class PropertyService {
             }
             property.setOwner(propertyOwner);
         }
+        mapper.fillProperty(request, property);
         propertyDao.persist(property);
         return property;
     }

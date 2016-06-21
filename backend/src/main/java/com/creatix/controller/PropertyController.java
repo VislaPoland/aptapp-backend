@@ -4,6 +4,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.PropertyService;
@@ -76,7 +77,7 @@ public class PropertyController {
     })
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(AccountRole.Administrator)
-    public DataResponse<PropertyDetailsDto> createProperty(@PathVariable Long propertyId, @Valid @RequestBody CreatePropertyRequest request) {
+    public DataResponse<PropertyDetailsDto> createProperty(@PathVariable Long propertyId, @Valid @RequestBody UpdatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.updateFromRequest(propertyId, request)));
     }
 
