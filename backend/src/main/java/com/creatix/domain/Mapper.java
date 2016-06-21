@@ -15,10 +15,8 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public final class Mapper {
@@ -165,9 +163,13 @@ public final class Mapper {
 
     public Map<Integer, List<NotificationDto>> toNotificationDtoMap(@NotNull Map<Integer, List<Notification>> notifications) {
         Objects.requireNonNull(notifications);
-        final Map<Integer, List<NotificationDto>> result = new HashMap<>();
-        notifications.forEach((day, nList) -> result.put(day, mapperFactory.getMapperFacade().mapAsList(nList, NotificationDto.class)));
-        return result;
+        return notifications.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> mapperFactory.getMapperFacade().mapAsList(e.getValue(), NotificationDto.class)));
+    }
+
+    public List<NotificationDto> toNotificationDtoList(@NotNull List<Notification> notifications) {
+        Objects.requireNonNull(notifications);
+        return mapperFactory.getMapperFacade().mapAsList(notifications, NotificationDto.class);
     }
 
     public NotificationDto toNotificationDto(@NotNull Notification notification) {

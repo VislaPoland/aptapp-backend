@@ -28,8 +28,6 @@ public class NotificationService {
     @Autowired
     private NeighborhoodNotificationDao neighborhoodNotificationDao;
     @Autowired
-    private AccountDao accountDao;
-    @Autowired
     private ApartmentDao apartmentDao;
     @Autowired
     private AuthorizationManager authorizationManager;
@@ -38,6 +36,12 @@ public class NotificationService {
         return notificationDao.findAllInDateRange(fromDate, tillDate).stream()
                 .filter(n -> relevantNotificationsFilter(n, authorizationManager.getCurrentAccount()))
                 .collect(Collectors.groupingBy(n -> extractDayNumber(n.getDate())));
+    }
+
+    public List<Notification> getRelevantInDateRange(Date fromDate, Date tillDate) {
+        return notificationDao.findAllInDateRange(fromDate, tillDate).stream()
+                .filter(n -> relevantNotificationsFilter(n, authorizationManager.getCurrentAccount()))
+                .collect(Collectors.toList());
     }
 
     private boolean relevantNotificationsFilter(Notification n, Account a) {
