@@ -18,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @Transactional
 @RequestMapping("/api/properties")
@@ -49,7 +51,19 @@ public class PropertyController {
     })
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(AccountRole.Administrator)
-    public DataResponse<PropertyDetailsDto> createProperty(@RequestBody CreatePropertyRequest request) {
+    public DataResponse<PropertyDetailsDto> createProperty(@Valid @RequestBody CreatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.createFromRequest(request)));
+    }
+
+    @ApiOperation(value = "Update property", notes = "Update existing property. This endpoint can only be called by account with Administrator role.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{propertyId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(AccountRole.Administrator)
+    public DataResponse<PropertyDetailsDto> createProperty(@PathVariable Long propertyId, @Valid @RequestBody CreatePropertyRequest request) {
+        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.updateFromRequest(propertyId, request)));
     }
 }

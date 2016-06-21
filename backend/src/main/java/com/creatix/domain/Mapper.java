@@ -6,6 +6,7 @@ import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.entity.*;
 import com.creatix.service.ApartmentService;
 import ma.glasnost.orika.CustomMapper;
@@ -136,6 +137,17 @@ public final class Mapper {
         mapperFactory.classMap(CreatePropertyRequest.class, Property.class)
                 .byDefault()
                 .register();
+        mapperFactory.classMap(UpdatePropertyRequest.class, Property.class)
+                .byDefault()
+                .register();
+
+    }
+
+    public void fillProperty(@NotNull UpdatePropertyRequest dto, @NotNull Property entity) {
+        Objects.requireNonNull(dto);
+        Objects.requireNonNull(entity);
+
+        mapperFactory.getMapperFacade().map(dto, entity);
     }
 
     public Property toProperty(@NotNull CreatePropertyRequest request) {

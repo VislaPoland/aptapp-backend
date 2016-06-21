@@ -54,4 +54,20 @@ public class PropertyService {
         propertyDao.persist(property);
         return property;
     }
+
+    @RoleSecured(AccountRole.Administrator)
+    public Property updateFromRequest(long propertyId, @NotNull CreatePropertyRequest request) {
+        Objects.requireNonNull(request);
+
+        final Property property = getProperty(propertyId);
+        if ( request.getPropertyOwnerId() != null ) {
+            final PropertyOwner propertyOwner = propertyOwnerDao.findById(request.getPropertyOwnerId());
+            if ( propertyOwner == null ) {
+                throw new EntityNotFoundException(String.format("Property owner %d not found", request.getPropertyOwnerId()));
+            }
+            property.setOwner(propertyOwner);
+        }
+        propertyDao.persist(property);
+        return property;
+    }
 }
