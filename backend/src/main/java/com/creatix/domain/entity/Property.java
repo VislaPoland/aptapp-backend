@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,10 @@ public class Property {
     @JoinColumn
     @NotNull
     private Address address;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column
+    private Date deleteDate;
 
     @ManyToOne(optional = false)
     @JoinColumn

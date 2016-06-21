@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 
 @ApiModel
 @Data
-public class CreatePropertyRequest {
+public class UpdatePropertyRequest {
 
     @NotEmpty
     @ApiModelProperty(value = "Name of property", required = true)
@@ -28,6 +28,8 @@ public class CreatePropertyRequest {
     @ApiModelProperty(value = "ID of the property owner", required = true)
     private Long propertyOwnerId;
 
-
+    @NotNull
+    @ApiModelProperty(value = "Status of the property", required = true, notes = "Valid statuses are: Draft, Active")
+    private PropertyStatus status;
 
 }

@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -26,6 +28,11 @@ public class PropertyService {
     private PropertyOwnerDao propertyOwnerDao;
     @Autowired
     private Mapper mapper;
+
+    @RoleSecured(AccountRole.Administrator)
+    public List<Property> getAllProperties() {
+        return propertyDao.findAll();
+    }
 
     @RoleSecured
     public Property getProperty(long propertyId) {
@@ -47,6 +54,30 @@ public class PropertyService {
         }
         property.setOwner(propertyOwner);
         property.setStatus(PropertyStatus.Draft);
+        propertyDao.persist(property);
+        return property;
+    }
+
+    @RoleSecured(AccountRole.Administrator)
+    public Property updateFromRequest(long propertyId, @NotNull CreatePropertyRequest request) {
+        Objects.requireNonNull(request);
+
+        final Property property = getProperty(propertyId);
+        if ( request.getPropertyOwnerId() != null ) {
+            final PropertyOwner propertyOwner = propertyOwnerDao.findById(request.getPropertyOwnerId());
+            if ( propertyOwner == null ) {
+                throw new EntityNotFoundException(String.format("Property owner %d not found", request.getPropertyOwnerId()));
+            }
+            property.setOwner(propertyOwner);
+        }
+        propertyDao.persist(property);
+        return property;
+    }
+
+    @RoleSecured(AccountRole.Administrator)
+    public Property deleteProperty(long propertyId) {
+        final Property property = getProperty(propertyId);
+        property.setDeleteDate(new Date());
         propertyDao.persist(property);
         return property;
     }
