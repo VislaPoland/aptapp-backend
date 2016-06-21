@@ -1,9 +1,7 @@
 package com.creatix.service;
 
-import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.dao.MaintenanceNotificationDao;
-import com.creatix.domain.dao.NeighborhoodNotificationDao;
-import com.creatix.domain.dao.NotificationDao;
+import com.creatix.domain.dao.*;
+import com.creatix.domain.entity.Account;
 import com.creatix.domain.entity.MaintenanceNotification;
 import com.creatix.domain.entity.NeighborhoodNotification;
 import com.creatix.domain.entity.Notification;
@@ -14,9 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,10 +30,46 @@ public class NotificationService {
     @Autowired
     private AccountDao accountDao;
     @Autowired
+    private ApartmentDao apartmentDao;
+    @Autowired
     private AuthorizationManager authorizationManager;
 
-    public Map<Integer, List<Notification>> getAllInDateRangeGroupedByDay(Date from, Date till) {
-        return notificationDao.findAllInDateRangeGroupedByDayFilteredByAccount(from, till, accountDao.findById(authorizationManager.getCurrentAccount().getId()));
+    /**
+     * Get relevant notifications in date range grouped by date
+     *
+     * @param fromDate start date
+     * @param tillDate end date
+     * @return Notifications in date range grouped by date
+     */
+    public Map<Integer, List<Notification>> getRelevantInDateRangeGroupedByDayNumber(Date fromDate, Date tillDate) {
+        return notificationDao.findAllInDateRange(fromDate, tillDate).stream()
+                .filter(n -> relevantNotificationsFilter(n, authorizationManager.getCurrentAccount()))
+                .collect(Collectors.groupingBy(n -> extractDayNumber(n.getDate())));
+    }
+
+    private boolean relevantNotificationsFilter(Notification n, Account a) {
+        switch (a.getRole()) {
+            case Maintenance:
+                return n.getType().equals(NotificationType.Maintenance);
+            case Security:
+                return n.getType().equals(NotificationType.Security);
+            case Tenant:
+                boolean r = n.getAuthor().equals(a);
+                if (n.getType().equals(NotificationType.Maintenance))
+                    r = r || ((MaintenanceNotification) n).getTargetApartment().getTenant().equals(a);
+                if (n.getType().equals(NotificationType.Neighborhood))
+                    //noinspection ConstantConditions
+                    r = r || ((NeighborhoodNotification) n).getTargetApartment().getTenant().equals(a);
+                return r;
+            default:
+                return false;
+        }
+    }
+
+    private int extractDayNumber(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal.get(Calendar.DAY_OF_MONTH);
     }
 
     public Notification getSecurityNotification(Long notificationId) {
@@ -67,16 +103,18 @@ public class NotificationService {
         return n;
     }
 
-    public MaintenanceNotification saveMaintenanceNotification(MaintenanceNotification n) {
+    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, MaintenanceNotification n) {
         n.setType(NotificationType.Maintenance);
-        n.setAuthor(accountDao.findById(authorizationManager.getCurrentAccount().getId()));
+        n.setAuthor(authorizationManager.getCurrentAccount());
+        n.setTargetApartment(apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty()));
         notificationDao.persist(n);
         return n;
     }
 
-    public NeighborhoodNotification saveNeighborhoodNotification(NeighborhoodNotification n) {
+    public NeighborhoodNotification saveNeighborhoodNotification(String targetUnitNumber, NeighborhoodNotification n) {
         n.setType(NotificationType.Neighborhood);
         n.setAuthor(accountDao.findById(authorizationManager.getCurrentAccount().getId()));
+        n.setTargetApartment(apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty()));
         notificationDao.persist(n);
         return n;
     }

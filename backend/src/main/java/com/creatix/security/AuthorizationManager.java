@@ -1,6 +1,6 @@
 package com.creatix.security;
 
-import com.creatix.domain.entity.Account;
+import com.creatix.domain.entity.*;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -31,28 +31,41 @@ public class AuthorizationManager {
         return getCurrentAccount(true) != null;
     }
 
-    private Account getCurrentAccount(boolean suppressException) throws SecurityException{
+    private Account getCurrentAccount(boolean suppressException) throws SecurityException {
 
         Account current = null;
 
         final SecurityContext securityContext = SecurityContextHolder.getContext();
-        if ( securityContext != null ) {
+        if (securityContext != null) {
             final Authentication authentication = securityContext.getAuthentication();
-            if ( authentication != null ) {
-                if ( authentication instanceof AuthenticatedUserDetails ) {
+            if (authentication != null) {
+                if (authentication instanceof AuthenticatedUserDetails) {
                     current = ((AuthenticatedUserDetails) authentication).getAccount();
-                }
-                else if ( authentication.getPrincipal() instanceof AuthenticatedUserDetails ) {
+                } else if (authentication.getPrincipal() instanceof AuthenticatedUserDetails) {
                     current = ((AuthenticatedUserDetails) authentication.getPrincipal()).getAccount();
                 }
             }
         }
 
-        if ( (current == null) && !(suppressException) ) {
+        if ((current == null) && !(suppressException)) {
             throw new SecurityException("No authenticated account found in session.");
         }
 
         return current;
     }
 
+    public Property getCurrentProperty() throws SecurityException {
+        Account account = getCurrentAccount(false);
+        switch (account.getRole()) {
+            case Tenant:
+                return ((Tenant) account).getApartment().getProperty();
+            case PropertyManager:
+                return ((PropertyManager) account).getManagedProperty();
+            default:
+                if (account instanceof Employee)
+                    return ((Employee) account).getManager().getManagedProperty();
+                else
+                    throw new SecurityException("Impossible to extract single linked property.");
+        }
+    }
 }

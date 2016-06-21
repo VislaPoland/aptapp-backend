@@ -7,13 +7,10 @@ import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.entity.*;
-import com.creatix.security.AuthorizationManager;
-import com.creatix.service.ApartmentService;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
@@ -24,14 +21,7 @@ import java.util.Objects;
 
 @Component
 public final class Mapper {
-
     private MapperFactory mapperFactory;
-
-    @Autowired
-    private ApartmentService apartmentService;
-
-    @Autowired
-    private AuthorizationManager authorizationManager;
 
     public Mapper() {
         mapperFactory = new DefaultMapperFactory.Builder().build();
@@ -100,36 +90,10 @@ public final class Mapper {
 
         mapperFactory.classMap(CreateMaintenanceNotificationDto.class, MaintenanceNotification.class)
                 .byDefault()
-                .customize(new CustomMapper<CreateMaintenanceNotificationDto, MaintenanceNotification>() {
-                    @SuppressWarnings("Duplicates")
-                    @Override
-                    public void mapAtoB(CreateMaintenanceNotificationDto dto, MaintenanceNotification n, MappingContext c) {
-                        if (dto.getApartmentId() != null) {
-                            n.setTargetApartment(apartmentService.getApartment(dto.getApartmentId()));
-                        } else {
-                            String unitNumber = dto.getUnitNumber();
-                            Objects.requireNonNull(unitNumber);
-                            n.setTargetApartment(apartmentService.getApartment(dto.getPropertyId(), unitNumber));
-                        }
-                    }
-                })
                 .register();
 
         mapperFactory.classMap(CreateNeighborhoodNotificationDto.class, NeighborhoodNotification.class)
                 .byDefault()
-                .customize(new CustomMapper<CreateNeighborhoodNotificationDto, NeighborhoodNotification>() {
-                    @SuppressWarnings("Duplicates")
-                    @Override
-                    public void mapAtoB(CreateNeighborhoodNotificationDto dto, NeighborhoodNotification n, MappingContext c) {
-                        if (dto.getApartmentId() != null) {
-                            n.setTargetApartment(apartmentService.getApartment(dto.getApartmentId()));
-                        } else {
-                            String unitNumber = dto.getUnitNumber();
-                            Objects.requireNonNull(unitNumber);
-                            n.setTargetApartment(apartmentService.getApartment(dto.getPropertyId(), unitNumber));
-                        }
-                    }
-                })
                 .register();
 
         mapperFactory.classMap(Apartment.class, ApartmentDto.NeighborApartment.class)

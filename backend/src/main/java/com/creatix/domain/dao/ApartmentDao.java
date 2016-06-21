@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public class ApartmentDao extends DaoBase<Apartment, Long> {
-    public Apartment findByUnitNumberWithinProperty(Property property, String unitNumber) {
+    public Apartment findByUnitNumberWithinProperty(String unitNumber, Property property) {
         return em.createQuery("SELECT a FROM Apartment a WHERE a.property = :property AND a.unitNumber = :unitNumber", Apartment.class)
                 .setParameter("property", property)
                 .setParameter("unitNumber", unitNumber)
