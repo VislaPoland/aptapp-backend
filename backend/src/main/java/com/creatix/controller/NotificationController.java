@@ -41,12 +41,16 @@ public class NotificationController {
         return new DataResponse<>(mapper.toNotificationDtoMap(notificationService.getRelevantInDateRangeGroupedByDayNumber(request.getFrom(), request.getTill())));
     }
 
-    /*
+    @ApiOperation(value = "Get relevant notifications in date range")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RequestMapping(method = RequestMethod.POST, path = "/list", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public DataResponse<List<NotificationDto>> getNotifications(@RequestBody @Valid NotificationsCollectionRequest request) {
         return new DataResponse<>(mapper.toNotificationDtoList(notificationService.getRelevantInDateRange(request.getFrom(), request.getTill())));
     }
-    */
 
     @ApiOperation(value = "Get concrete security notification")
     @ApiResponses(value = {
