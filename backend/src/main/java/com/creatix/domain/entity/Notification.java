@@ -13,8 +13,13 @@ import java.util.Date;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class Notification extends HistoryEntity {
+@EqualsAndHashCode(of = "id")
+public class Notification {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(nullable = false)
+    private Long id;
+
     @Column(nullable = false, length = 20)
     @NotNull
     @Size(max = 20)
@@ -44,4 +49,16 @@ public class Notification extends HistoryEntity {
     @ManyToOne(optional = false)
     @JoinColumn
     private Account author;
+
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deletedAt;
 }
