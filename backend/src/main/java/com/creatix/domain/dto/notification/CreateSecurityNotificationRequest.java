@@ -11,7 +11,7 @@ import java.util.Date;
 
 @ApiModel
 @Data
-public class CreateNotificationRequest {
+public class CreateSecurityNotificationRequest {
     @ApiModelProperty(value = "Short notification title", required = true, notes = "Maximum size of 20 letters")
     @NotNull
     @Size(max = 20)

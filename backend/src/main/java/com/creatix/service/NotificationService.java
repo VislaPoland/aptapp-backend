@@ -1,10 +1,7 @@
 package com.creatix.service;
 
 import com.creatix.configuration.MailProperties;
-import com.creatix.domain.dao.ApartmentDao;
-import com.creatix.domain.dao.MaintenanceNotificationDao;
-import com.creatix.domain.dao.NeighborhoodNotificationDao;
-import com.creatix.domain.dao.NotificationDao;
+import com.creatix.domain.dao.*;
 import com.creatix.domain.entity.*;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
@@ -32,6 +29,8 @@ public class NotificationService {
     private MaintenanceNotificationDao maintenanceNotificationDao;
     @Autowired
     private NeighborhoodNotificationDao neighborhoodNotificationDao;
+    @Autowired
+    private SecurityNotificationDao securityNotificationDao;
     @Autowired
     private ApartmentDao apartmentDao;
     @Autowired
@@ -78,8 +77,8 @@ public class NotificationService {
         return cal.get(Calendar.DAY_OF_MONTH);
     }
 
-    public Notification getSecurityNotification(Long notificationId) {
-        Notification n = notificationDao.findById(notificationId);
+    public SecurityNotification getSecurityNotification(Long notificationId) {
+        SecurityNotification n = securityNotificationDao.findById(notificationId);
         if (n == null)
             throw new EntityNotFoundException(String.format("Account id=%d not found", notificationId));
 
@@ -102,11 +101,11 @@ public class NotificationService {
         return n;
     }
 
-    public Notification saveSecurityNotification(Notification n) {
+    public SecurityNotification saveSecurityNotification(SecurityNotification n) {
         n.setType(NotificationType.Security);
         n.setAuthor(authorizationManager.getCurrentAccount());
         n.setStatus(NotificationStatus.Pending);
-        notificationDao.persist(n);
+        securityNotificationDao.persist(n);
         return n;
     }
 
@@ -118,7 +117,7 @@ public class NotificationService {
         if (apartment == null)
             throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
         n.setTargetApartment(apartment);
-        notificationDao.persist(n);
+        maintenanceNotificationDao.persist(n);
         return n;
     }
 
@@ -130,7 +129,7 @@ public class NotificationService {
         if (apartment == null)
             throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
         n.setTargetApartment(apartment);
-        notificationDao.persist(n);
+        neighborhoodNotificationDao.persist(n);
         return n;
     }
 

@@ -78,6 +78,10 @@ public final class Mapper {
                 .byDefault()
                 .register();
 
+        mapperFactory.classMap(SecurityNotification.class, SecurityNotificationDto.class)
+                .byDefault()
+                .register();
+
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
                 .byDefault()
                 .field("targetApartment.id", "apartmentId")
@@ -88,7 +92,7 @@ public final class Mapper {
                 .field("targetApartment.id", "apartmentId")
                 .register();
 
-        mapperFactory.classMap(CreateNotificationRequest.class, Notification.class)
+        mapperFactory.classMap(CreateSecurityNotificationRequest.class, SecurityNotification.class)
                 .byDefault()
                 .register();
 
@@ -193,9 +197,9 @@ public final class Mapper {
         return mapperFactory.getMapperFacade().mapAsList(notifications, NotificationDto.class);
     }
 
-    public NotificationDto toNotificationDto(@NotNull Notification notification) {
-        Objects.requireNonNull(notification);
-        return mapperFactory.getMapperFacade().map(notification, NotificationDto.class);
+    public SecurityNotificationDto toSecurityNotificationDto(@NotNull SecurityNotification n) {
+        Objects.requireNonNull(n);
+        return mapperFactory.getMapperFacade().map(n, SecurityNotificationDto.class);
     }
 
     public MaintenanceNotificationDto toMaintenanceNotificationDto(@NotNull MaintenanceNotification n) {
@@ -208,17 +212,17 @@ public final class Mapper {
         return mapperFactory.getMapperFacade().map(n, NeighborhoodNotificationDto.class);
     }
 
-    public Notification fromNotificationDto(@NotNull CreateNotificationRequest dto) {
+    public SecurityNotification fromSecurityNotificationRequest(@NotNull CreateSecurityNotificationRequest dto) {
         Objects.requireNonNull(dto);
-        return mapperFactory.getMapperFacade().map(dto, Notification.class);
+        return mapperFactory.getMapperFacade().map(dto, SecurityNotification.class);
     }
 
-    public MaintenanceNotification fromMaintenanceNotificationDto(@NotNull CreateMaintenanceNotificationRequest dto) {
+    public MaintenanceNotification fromMaintenanceNotificationRequest(@NotNull CreateMaintenanceNotificationRequest dto) {
         Objects.requireNonNull(dto);
         return mapperFactory.getMapperFacade().map(dto, MaintenanceNotification.class);
     }
 
-    public NeighborhoodNotification fromNeighborhoodNotificationDto(@NotNull CreateNeighborhoodNotificationRequest dto) {
+    public NeighborhoodNotification fromNeighborhoodNotificationRequest(@NotNull CreateNeighborhoodNotificationRequest dto) {
         Objects.requireNonNull(dto);
         return mapperFactory.getMapperFacade().map(dto, NeighborhoodNotification.class);
     }

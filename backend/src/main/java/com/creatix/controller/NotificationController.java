@@ -6,6 +6,7 @@ import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.entity.MaintenanceNotification;
 import com.creatix.domain.entity.NeighborhoodNotification;
 import com.creatix.domain.entity.Notification;
+import com.creatix.domain.entity.SecurityNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.NotificationService;
@@ -60,8 +61,8 @@ public class NotificationController {
     })
     @RequestMapping(method = RequestMethod.GET, path = "/security/{notificationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
-    public DataResponse<NotificationDto> getSecurityNotificationDetail(@PathVariable Long notificationId) {
-        return new DataResponse<>(mapper.toNotificationDto(notificationService.getSecurityNotification(notificationId)));
+    public DataResponse<SecurityNotificationDto> getSecurityNotificationDetail(@PathVariable Long notificationId) {
+        return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.getSecurityNotification(notificationId)));
     }
 
     @ApiOperation(value = "Get concrete maintenance notification")
@@ -96,9 +97,9 @@ public class NotificationController {
     })
     @RequestMapping(method = RequestMethod.POST, path = "/security", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
-    public DataResponse<NotificationDto> saveSecurityNotification(@RequestBody @Valid CreateNotificationRequest dto) {
-        Notification n = mapper.fromNotificationDto(dto);
-        return new DataResponse<>(mapper.toNotificationDto(notificationService.saveSecurityNotification(n)));
+    public DataResponse<SecurityNotificationDto> saveSecurityNotification(@RequestBody @Valid CreateSecurityNotificationRequest dto) {
+        SecurityNotification n = mapper.fromSecurityNotificationRequest(dto);
+        return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.saveSecurityNotification(n)));
     }
 
     @ApiOperation(value = "Create maintenance notification")
@@ -110,7 +111,7 @@ public class NotificationController {
     @RequestMapping(method = RequestMethod.POST, path = "/maintenance", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
     public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@RequestBody @Valid CreateMaintenanceNotificationRequest dto) {
-        MaintenanceNotification n = mapper.fromMaintenanceNotificationDto(dto);
+        MaintenanceNotification n = mapper.fromMaintenanceNotificationRequest(dto);
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n)));
     }
 
@@ -123,7 +124,7 @@ public class NotificationController {
     @RequestMapping(method = RequestMethod.POST, path = "/neighborhood", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@RequestBody @Valid CreateNeighborhoodNotificationRequest dto) {
-        NeighborhoodNotification n = mapper.fromNeighborhoodNotificationDto(dto);
+        NeighborhoodNotification n = mapper.fromNeighborhoodNotificationRequest(dto);
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(dto.getUnitNumber(), n)));
     }
 }
