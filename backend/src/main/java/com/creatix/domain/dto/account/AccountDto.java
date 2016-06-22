@@ -27,6 +27,15 @@ public class AccountDto {
     @ApiModelProperty(value = "Email address", required = true)
     private String primaryEmail;
 
+    @ApiModelProperty(value = "Secondary email address", required = true)
+    private String secondaryEmail;
+
+    @ApiModelProperty(value = "Phone number", required = true)
+    private String primaryPhone;
+
+    @ApiModelProperty(value = "Secondary phone number", required = true)
+    private String secondaryPhone;
+
     @ApiModelProperty(value = "Address", required = true)
     private AddressDto address;
 
