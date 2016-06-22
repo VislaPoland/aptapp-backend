@@ -6,5 +6,5 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
-abstract class AbstractNotificationDao<T extends Notification> extends DaoBase<T, Long> {
+public abstract class AbstractNotificationDao<T extends Notification> extends DaoBase<T, Long> {
 }

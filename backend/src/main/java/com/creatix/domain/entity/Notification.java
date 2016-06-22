@@ -13,13 +13,8 @@ import java.util.Date;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Data
-@EqualsAndHashCode(of = "id")
-public class Notification {
-    @Id
-    @GeneratedValue
-    @Column(nullable = false)
-    private Long id;
-
+@EqualsAndHashCode(callSuper = true)
+public class Notification extends HistoryEntity {
     @Column(nullable = false, length = 20)
     @NotNull
     @Size(max = 20)

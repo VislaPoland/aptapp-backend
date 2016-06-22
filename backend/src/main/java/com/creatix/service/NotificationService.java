@@ -79,24 +79,27 @@ public class NotificationService {
 
     public SecurityNotification getSecurityNotification(Long notificationId) {
         SecurityNotification n = securityNotificationDao.findById(notificationId);
-        if (n == null)
+        if (n == null) {
             throw new EntityNotFoundException(String.format("Account id=%d not found", notificationId));
+        }
 
         return n;
     }
 
     public MaintenanceNotification getMaintenanceNotification(Long notificationId) {
         MaintenanceNotification n = maintenanceNotificationDao.findById(notificationId);
-        if (n == null)
+        if (n == null) {
             throw new EntityNotFoundException(String.format("Account id=%d not found", notificationId));
+        }
 
         return n;
     }
 
     public NeighborhoodNotification getNeighborhoodNotification(Long notificationId) {
         NeighborhoodNotification n = neighborhoodNotificationDao.findById(notificationId);
-        if (n == null)
+        if (n == null) {
             throw new EntityNotFoundException(String.format("Account id=%d not found", notificationId));
+        }
 
         return n;
     }
@@ -105,7 +108,7 @@ public class NotificationService {
         n.setType(NotificationType.Security);
         n.setAuthor(authorizationManager.getCurrentAccount());
         n.setStatus(NotificationStatus.Pending);
-        securityNotificationDao.persist(n);
+        saveNotification(n, securityNotificationDao);
         return n;
     }
 
@@ -114,10 +117,11 @@ public class NotificationService {
         n.setAuthor(authorizationManager.getCurrentAccount());
         n.setStatus(NotificationStatus.Pending);
         Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty());
-        if (apartment == null)
+        if (apartment == null) {
             throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
+        }
         n.setTargetApartment(apartment);
-        maintenanceNotificationDao.persist(n);
+        saveNotification(n, maintenanceNotificationDao);
         return n;
     }
 
@@ -126,11 +130,22 @@ public class NotificationService {
         n.setAuthor(authorizationManager.getCurrentAccount());
         n.setStatus(NotificationStatus.Pending);
         Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty());
-        if (apartment == null)
+        if (apartment == null) {
             throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
+        }
         n.setTargetApartment(apartment);
-        neighborhoodNotificationDao.persist(n);
+        saveNotification(n, neighborhoodNotificationDao);
         return n;
+    }
+
+    private <T extends Notification> void saveNotification(T n, AbstractNotificationDao<T> dao) {
+        if (n.getCreatedAt() == null) {
+            n.setCreatedAt(new Date());
+            n.setUpdatedAt(new Date());
+        } else {
+            n.setUpdatedAt(new Date());
+        }
+        dao.persist(n);
     }
 
     private void sendMail(String to, String subject, String body) {
