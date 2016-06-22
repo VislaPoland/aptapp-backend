@@ -119,7 +119,6 @@ public final class Mapper {
 
         mapperFactory.classMap(Apartment.class, ApartmentDto.class)
                 .byDefault()
-                .field("id", "apartmentId")
                 .field("tenant.fullName", "fullName")
                 .field("tenant.primaryEmail", "primaryEmail")
                 .field("property.id", "propertyId")

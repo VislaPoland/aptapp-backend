@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class ApartmentDto {
     @ApiModelProperty
-    private Long apartmentId;
+    private Long id;
 
     @ApiModelProperty(value = "Full name", required = true)
     private String fullName;
