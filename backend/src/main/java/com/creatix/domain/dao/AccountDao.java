@@ -12,9 +12,9 @@ import java.util.List;
 @Transactional
 public class AccountDao extends DaoBase<Account, Long> {
 
-    public List<Account> findByRole(AccountRole role) {
+    public List<Account> findByRoles(AccountRole[] role) {
         return queryFactory.selectFrom(QAccount.account)
-                .where(QAccount.account.role.eq(role))
+                .where(QAccount.account.role.in(role))
                 .fetch();
     }
 

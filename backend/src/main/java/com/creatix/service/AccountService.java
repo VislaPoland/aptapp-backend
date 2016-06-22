@@ -155,12 +155,12 @@ public class AccountService {
     }
 
     @RoleSecured(AccountRole.Administrator)
-    public List<Account> getAccounts(AccountRole role) {
-        if ( role == null ) {
+    public List<Account> getAccounts(AccountRole[] roles) {
+        if ( (roles == null) || (roles.length == 0) ) {
             return accountDao.findAll();
         }
         else {
-            return accountDao.findByRole(role);
+            return accountDao.findByRoles(roles);
         }
     }
 
