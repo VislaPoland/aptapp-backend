@@ -13,6 +13,10 @@ import lombok.Data;
 @ApiModel("Account DTO")
 @Data
 public class AccountDto {
+
+    @ApiModelProperty(value = "Account ID", required = true)
+    private Long id;
+
     @ApiModelProperty(value = "Full name", required = true)
     private String fullName;
 
