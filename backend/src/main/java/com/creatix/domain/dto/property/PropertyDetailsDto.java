@@ -13,6 +13,8 @@ import java.util.List;
 @Data
 public class PropertyDetailsDto {
 
+    @ApiModelProperty(value = "Property ID", required = true)
+    private Long id;
     @ApiModelProperty(value = "Property name", required = true)
     private String name;
     @ApiModelProperty(value = "Property full address", required = true)
