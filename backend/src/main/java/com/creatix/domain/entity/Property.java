@@ -27,9 +27,6 @@ public class Property {
     @NotNull
     private PropertyStatus status;
 
-    @Column
-    private String additionalInformation;
-
     @OneToOne(optional = false)
     @JoinColumn
     @NotNull

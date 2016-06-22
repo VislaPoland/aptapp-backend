@@ -17,11 +17,8 @@ public class UpdatePropertyRequest {
     @ApiModelProperty(value = "Name of property", required = true)
     private String name;
 
-    @ApiModelProperty(value = "Additional information")
-    private String additionalInformation;
-
     @NotNull
-    @ApiModelProperty(value = "Additional information", required = true)
+    @ApiModelProperty(value = "Property address", required = true)
     private AddressDto address;
 
     @NotNull
