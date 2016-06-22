@@ -1,6 +1,5 @@
 package com.creatix.domain.dto.notification;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,7 +18,7 @@ public class CreateMaintenanceNotificationRequest {
     @ApiModelProperty(value = "Longer notification description", notes = "Maximum size of 100 letters")
     @Size(max = 100)
     private String description;
-    @ApiModelProperty(value = "Timestamp of notification", example = "2016-06-1 00:00:00")
+    @ApiModelProperty(value = "Timestamp of notification")
     @NotNull
     private Date date;
     @ApiModelProperty(value = "Target apartment unit number", required = true)

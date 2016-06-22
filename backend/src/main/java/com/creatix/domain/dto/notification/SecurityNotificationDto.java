@@ -2,7 +2,6 @@ package com.creatix.domain.dto.notification;
 
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,7 +19,7 @@ public class SecurityNotificationDto {
     private String description;
     @ApiModelProperty(value = "Notification status", required = true)
     private NotificationStatus status;
-    @ApiModelProperty(value = "Timestamp of notification", required = true, example = "2016-06-1 00:00:00")
+    @ApiModelProperty(value = "Timestamp of notification", required = true)
     private Date date;
     @ApiModelProperty(value = "Response message")
     private String response;
