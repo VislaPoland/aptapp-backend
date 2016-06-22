@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(of = "id")
 public class Apartment {
-
     @Id
     @GeneratedValue
     @Column(nullable = false)

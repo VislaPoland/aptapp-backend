@@ -10,16 +10,22 @@ import lombok.Data;
 @ApiModel
 @Data
 public class ApartmentDto {
+    @ApiModelProperty
+    private Long apartmentId;
+
     @ApiModelProperty(value = "Full name", required = true)
     private String fullName;
 
     @ApiModelProperty(value = "Email address", required = true)
     private String primaryEmail;
 
+    @ApiModelProperty(value = "Unit number", required = true)
+    private String unitNumber;
+
     @ApiModelProperty(value = "Address", required = true)
     private AddressDto address;
 
-    @ApiModelProperty(value = "Associated property ID", required = false, notes = "This is required for tenant and property manager")
+    @ApiModelProperty(value = "Associated property ID", notes = "This is required for tenant and property manager")
     private Long propertyId;
 
     @ApiModelProperty(value = "Floor number")
