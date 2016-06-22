@@ -20,6 +20,5 @@ public class CreateSecurityNotificationRequest {
     @Size(max = 100)
     private String description;
     @ApiModelProperty(value = "Timestamp of notification", example = "2016-06-1 00:00:00")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date date = new Date();
 }

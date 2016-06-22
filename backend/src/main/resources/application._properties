@@ -24,7 +24,8 @@ jwt.token.secret=3sw756ywmct5x2sa4c5rgt6asezugr2455eus8o4795yw5
 jwt.token.expiration=604800
 
 # JACKSON
-spring.jackson.serialization.INDENT_OUTPUT=true
+spring.jackson.serialization.indent_output=true
+spring.jackson.serialization.write_dates_as_timestamps=false
 
 # Logging
 logging.level.org.springframework.web=DEBUG

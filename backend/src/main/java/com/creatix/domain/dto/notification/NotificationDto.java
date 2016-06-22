@@ -21,7 +21,6 @@ public class NotificationDto {
     @ApiModelProperty(value = "Notification status", required = true)
     private NotificationStatus status;
     @ApiModelProperty(value = "Timestamp of notification", required = true, example = "2016-06-1 00:00:00")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date date;
     @ApiModelProperty(value = "Response message")
     private String response;
