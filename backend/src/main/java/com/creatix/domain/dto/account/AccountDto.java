@@ -3,6 +3,7 @@ package com.creatix.domain.dto.account;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.enums.AccountRole;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,6 +17,9 @@ public class AccountDto {
 
     @ApiModelProperty(value = "Account ID", required = true)
     private Long id;
+
+    @ApiModelProperty(value = "Role", required = true)
+    private AccountRole role;
 
     @ApiModelProperty(value = "Full name", required = true)
     private String fullName;
