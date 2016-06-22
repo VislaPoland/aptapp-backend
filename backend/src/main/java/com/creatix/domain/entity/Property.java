@@ -27,7 +27,7 @@ public class Property {
     @NotNull
     private PropertyStatus status;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
     @NotNull
     private Address address;
