@@ -10,8 +10,31 @@ INSERT INTO public.address (id, house_number, state, street_name, town, zip_code
 INSERT INTO public.address (id, house_number, state, street_name, town, zip_code) VALUES (2, '222', 'MA', 'Street2', 'Boston', '2222222');
 
 -- properties
-INSERT INTO public.property (id, additional_information, name, status, address_id, owner_id) VALUES (1, 'Bla bla bla', 'Test property 1', 'Active', 1, 1);
-INSERT INTO public.property (id, additional_information, name, status, address_id, owner_id) VALUES (2, 'Bla bla bla', 'Test property 2', 'Active', 2, 1);
+INSERT INTO public.property (id, name, status, address_id, owner_id) VALUES (1, 'Test property 1', 'Active', 1, 1);
+INSERT INTO public.property (id, name, status, address_id, owner_id) VALUES (2, 'Test property 2', 'Active', 2, 1);
+
+-- properties contacts
+INSERT INTO
+public.contact(id, type, communication_type, value)
+VALUES
+(1, 'Police', 'Phone', '1-541-754-3010'),
+(2, 'Police', 'Email', 'police@gmail.com'),
+(3, 'MedicalEmergency', 'Phone', '1-541-754-3010'),
+(4, 'MedicalEmergency', 'Email', 'medical@gmail.com'),
+(5, 'FireService', 'Phone', '1-541-754-3010'),
+(6, 'FireService', 'Email', 'fire@gmail.com')
+;
+
+INSERT INTO
+public.property_contacts(property_id, contacts_id)
+VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(2, 5),
+(2, 6)
+;
 
 -- apartments
 INSERT INTO public.apartment (id, unit_number, property_id)
@@ -52,9 +75,9 @@ INSERT INTO public.account (dtype, id, active, company_name, first_name, last_na
 VALUES ('Tenant', 7, true, 'Cool Company', 'Joe', 'Tenant2', '$2a$10$N/AhcCcImjmbsPRy4oDfOukA3.6xFE95qKoHAXEJbjOCJ3.JFPgZa',
                   'joe.tenant2@mail.com', '123456789', 'Tenant', 'Owner', 2);
 
-INSERT INTO public.notification (dtype, id, date, title, status, description, type, author_id)
-VALUES ('Notification', 1, '2016-06-16 15:36:38', 'Security not', 'Pending', 'Security test notification title', 'Security', 6);
-INSERT INTO public.notification (dtype, id, date, title, status, description, access_if_not_at_home, target_apartment_id, type, author_id)
-VALUES ('MaintenanceNotification', 2, '2016-06-16 15:36:38', 'Maintenance not', 'Pending', 'Maintenance test notification title', true, 2, 'Maintenance', 2);
-INSERT INTO public.notification (dtype, id, date, title, status, description, target_apartment_id, type, author_id)
-VALUES ('NeighborhoodNotification', 3, '2016-06-19 15:36:38', 'Neighborhood not', 'Pending', 'Neighborhood test notification title', 2, 'Neighborhood', 2);
+INSERT INTO public.notification (dtype, id, date, title, status, description, type, author_id, created_at)
+VALUES ('Notification', 1, '2016-06-16 15:36:38', 'Security not', 'Pending', 'Security test notification title', 'Security', 6, now());
+INSERT INTO public.notification (dtype, id, date, title, status, description, access_if_not_at_home, target_apartment_id, type, author_id, created_at)
+VALUES ('MaintenanceNotification', 2, '2016-06-16 15:36:38', 'Maintenance not', 'Pending', 'Maintenance test notification title', true, 2, 'Maintenance', 2, now());
+INSERT INTO public.notification (dtype, id, date, title, status, description, target_apartment_id, type, author_id, created_at)
+VALUES ('NeighborhoodNotification', 3, '2016-06-19 15:36:38', 'Neighborhood not', 'Pending', 'Neighborhood test notification title', 2, 'Neighborhood', 2, now());
