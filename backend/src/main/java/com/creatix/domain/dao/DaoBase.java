@@ -14,7 +14,7 @@ import javax.persistence.PersistenceContext;
  */
 @Component
 @Transactional
-abstract class DaoBase<T, ID> {
+public abstract class DaoBase<T, ID> {
 
     @PersistenceContext
     EntityManager em;

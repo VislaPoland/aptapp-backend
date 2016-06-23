@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @Transactional
 @RequestMapping("/api/properties")
 public class PropertyController {
-
     @Autowired
     private Mapper mapper;
     @Autowired
@@ -36,13 +35,12 @@ public class PropertyController {
             @ApiResponse(code = 403, message = "Forbidden"),
     })
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(AccountRole.Administrator)
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<List<PropertyDetailsDto>> getAllProperties() {
         return new DataResponse<>(propertyService.getAllProperties().stream()
                 .map(p -> mapper.toPropertyDetailsDto(p))
                 .collect(Collectors.toList()));
     }
-
 
     @ApiOperation(value = "Get property details")
     @ApiResponses(value = {
@@ -51,11 +49,10 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<PropertyDetailsDto> getPropertyDetails(@PathVariable long propertyId) {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.getProperty(propertyId)));
     }
-
 
     @ApiOperation(value = "Create new property")
     @ApiResponses(value = {
@@ -64,7 +61,7 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(AccountRole.Administrator)
+    @RoleSecured({AccountRole.Administrator})
     public DataResponse<PropertyDetailsDto> createProperty(@Valid @RequestBody CreatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.createFromRequest(request)));
     }
@@ -76,8 +73,8 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(AccountRole.Administrator)
-    public DataResponse<PropertyDetailsDto> createProperty(@PathVariable Long propertyId, @Valid @RequestBody UpdatePropertyRequest request) {
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public DataResponse<PropertyDetailsDto> updateProperty(@PathVariable Long propertyId, @Valid @RequestBody UpdatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.updateFromRequest(propertyId, request)));
     }
 
@@ -88,7 +85,7 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(AccountRole.Administrator)
+    @RoleSecured({AccountRole.Administrator})
     public DataResponse<PropertyDetailsDto> deleteProperty(@PathVariable Long propertyId) {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.deleteProperty(propertyId)));
     }

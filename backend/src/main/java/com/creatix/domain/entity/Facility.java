@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -28,5 +28,5 @@ public class Facility {
     private FacilityType type;
 
     @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FacilityDetail> details;
+    private Set<FacilityDetail> details;
 }

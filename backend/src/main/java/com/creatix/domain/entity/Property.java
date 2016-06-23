@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -42,11 +42,11 @@ public class Property {
     private PropertyOwner owner;
 
     @OneToMany(mappedBy = "managedProperty")
-    private List<PropertyManager> managers;
+    private Set<PropertyManager> managers;
 
     @OneToMany(mappedBy = "property")
-    private List<Facility> facilities;
+    private Set<Facility> facilities;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Contact> contacts;
+    private Set<Contact> contacts;
 }
