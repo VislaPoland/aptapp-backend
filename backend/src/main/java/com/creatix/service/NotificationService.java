@@ -52,29 +52,8 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
-    private boolean relevantNotificationsFilter(Notification n, Account a) {
-        switch (a.getRole()) {
-            case Maintenance:
-                return n.getType().equals(NotificationType.Maintenance);
-            case Security:
-                return n.getType().equals(NotificationType.Security);
-            case Tenant:
-                boolean r = n.getAuthor().equals(a);
-                if (n.getType().equals(NotificationType.Maintenance))
-                    r = r || ((MaintenanceNotification) n).getTargetApartment().getTenant().equals(a);
-                if (n.getType().equals(NotificationType.Neighborhood))
-                    //noinspection ConstantConditions
-                    r = r || ((NeighborhoodNotification) n).getTargetApartment().getTenant().equals(a);
-                return r;
-            default:
-                return false;
-        }
-    }
-
-    private int extractDayNumber(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        return cal.get(Calendar.DAY_OF_MONTH);
+    public List<MaintenanceNotification> getMaintenanceNotificationsInDateRange(Date fromDate, Date tillDate) {
+        return notificationDao.findAllMaintenanceInDateRange(fromDate, tillDate);
     }
 
     public SecurityNotification getSecurityNotification(Long notificationId) {
@@ -148,9 +127,34 @@ public class NotificationService {
         dao.persist(n);
     }
 
+    private boolean relevantNotificationsFilter(Notification n, Account a) {
+        switch (a.getRole()) {
+            case Maintenance:
+                return n.getType().equals(NotificationType.Maintenance);
+            case Security:
+                return n.getType().equals(NotificationType.Security);
+            case Tenant:
+                boolean r = n.getAuthor().equals(a);
+                if (n.getType().equals(NotificationType.Maintenance))
+                    r = r || ((MaintenanceNotification) n).getTargetApartment().getTenant().equals(a);
+                if (n.getType().equals(NotificationType.Neighborhood))
+                    //noinspection ConstantConditions
+                    r = r || ((NeighborhoodNotification) n).getTargetApartment().getTenant().equals(a);
+                return r;
+            default:
+                return false;
+        }
+    }
+
+    private int extractDayNumber(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal.get(Calendar.DAY_OF_MONTH);
+    }
+
     private void sendMail(String to, String subject, String body) {
 
-        if ( StringUtils.isEmpty(mailProperties.getFrom()) ) {
+        if (StringUtils.isEmpty(mailProperties.getFrom())) {
             throw new IllegalStateException("'From' address not defined in configuration");
         }
 

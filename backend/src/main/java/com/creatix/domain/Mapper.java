@@ -17,8 +17,7 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Component
 public final class Mapper {
@@ -38,7 +37,8 @@ public final class Mapper {
                         if (account instanceof Tenant) {
                             final Apartment apartment = ((Tenant) account).getApartment();
                             final Property property = apartment.getProperty();
-                            accountDto.setProperty(toPropertyDetailsDto(property));
+                            PropertyDetailsDto details = toPropertyDetailsDto(property);
+                            accountDto.setProperty(details);
                             accountDto.setApartment(toApartmentDto(apartment));
                         } else if (account instanceof PropertyManager) {
                             final Property managedProperty = ((PropertyManager) account).getManagedProperty();
@@ -53,6 +53,10 @@ public final class Mapper {
         mapperFactory.classMap(Property.class, PropertyDetailsDto.class)
                 .byDefault()
                 .field("address.fullAddress", "address")
+                .register();
+
+        mapperFactory.classMap(PropertySchedule.class, PropertyDetailsDto.Schedule.class)
+                .byDefault()
                 .register();
 
         mapperFactory.classMap(Facility.class, PropertyDetailsDto.Facility.class)
@@ -186,15 +190,10 @@ public final class Mapper {
         return mapperFactory.getMapperFacade().map(property, PropertyDetailsDto.class);
     }
 
-    public Map<Integer, List<NotificationDto>> toNotificationDtoMap(@NotNull Map<Integer, List<Notification>> notifications) {
-        Objects.requireNonNull(notifications);
-        return notifications.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> mapperFactory.getMapperFacade().mapAsList(e.getValue(), NotificationDto.class)));
-    }
+    public NotificationDto toNotificationDto(@NotNull Notification n) {
+        Objects.requireNonNull(n);
 
-    public List<NotificationDto> toNotificationDtoList(@NotNull List<Notification> notifications) {
-        Objects.requireNonNull(notifications);
-        return mapperFactory.getMapperFacade().mapAsList(notifications, NotificationDto.class);
+        return mapperFactory.getMapperFacade().map(n, NotificationDto.class);
     }
 
     public SecurityNotificationDto toSecurityNotificationDto(@NotNull SecurityNotification n) {

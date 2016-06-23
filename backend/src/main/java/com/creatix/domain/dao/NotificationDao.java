@@ -1,6 +1,8 @@
 package com.creatix.domain.dao;
 
+import com.creatix.domain.entity.MaintenanceNotification;
 import com.creatix.domain.entity.Notification;
+import com.creatix.domain.entity.QMaintenanceNotification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,5 +17,11 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                 .setParameter("fromDate", fromDate)
                 .setParameter("tillDate", tillDate)
                 .getResultList();
+    }
+
+    public List<MaintenanceNotification> findAllMaintenanceInDateRange(Date fromDate, Date tillDate) {
+        return queryFactory.selectFrom(QMaintenanceNotification.maintenanceNotification)
+                .where(QMaintenanceNotification.maintenanceNotification.date.between(fromDate, tillDate))
+                .fetch();
     }
 }

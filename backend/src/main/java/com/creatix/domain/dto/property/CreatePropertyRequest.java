@@ -1,7 +1,6 @@
 package com.creatix.domain.dto.property;
 
 import com.creatix.domain.dto.AddressDto;
-import com.creatix.domain.enums.PropertyStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
