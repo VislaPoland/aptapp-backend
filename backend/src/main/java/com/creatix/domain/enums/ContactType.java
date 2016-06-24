@@ -1,5 +1,5 @@
 package com.creatix.domain.enums;
 
 public enum ContactType {
-    Police, MedicalEmergency, FireService
+    Police, MedicalEmergency, FireService, OtherUseful, OtherEmergency
 }
