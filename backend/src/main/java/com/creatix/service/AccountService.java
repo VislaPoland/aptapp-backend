@@ -146,6 +146,10 @@ public class AccountService {
     }
 
     public void authenticate(String email, String password) throws AuthenticationException {
+        Account account = getAccount(email);
+        if (!account.getActive()) {
+            throw new SecurityException("Account not activated");
+        }
 
         Authentication authentication = this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
@@ -162,6 +166,14 @@ public class AccountService {
         else {
             return accountDao.findByRoles(roles);
         }
+    }
+
+    public Account getAccount(String email) {
+        final  Account account = accountDao.findByEmail(email);
+        if (account == null) {
+            throw new EntityNotFoundException(String.format("Account with email=%s not found", email));
+        }
+        return account;
     }
 
     public Account getAccount(Long accountId) {
@@ -181,7 +193,7 @@ public class AccountService {
             return account;
         }
 
-        if ( account.getActionTokenValidUntil().after(DateTime.now().toDate()) ) {
+        if ( account.getActionTokenValidUntil().before(DateTime.now().toDate()) ) {
             throw new SecurityException("Activation code has expired");
         }
 
