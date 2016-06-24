@@ -53,7 +53,7 @@ public class NotificationService {
     }
 
     public List<MaintenanceNotification> getMaintenanceNotificationsInDateRange(Date fromDate, Date tillDate) {
-        return notificationDao.findAllMaintenanceInDateRange(fromDate, tillDate);
+        return maintenanceNotificationDao.findAllInDateRange(fromDate, tillDate);
     }
 
     public SecurityNotification getSecurityNotification(Long notificationId) {
