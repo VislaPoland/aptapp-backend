@@ -2,9 +2,12 @@ package com.creatix.service;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.AccountDao;
+import com.creatix.domain.dao.DaoBase;
+import com.creatix.domain.dao.TenantDao;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
 import com.creatix.domain.dto.tenant.CreateTenantRequest;
+import com.creatix.domain.dto.tenant.TenantSelfUpdateRequest;
 import com.creatix.domain.dto.tenant.UpdateTenantRequest;
 import com.creatix.domain.entity.Account;
 import com.creatix.domain.entity.Apartment;
@@ -41,15 +44,11 @@ public class AccountService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private AuthorizationManager authorizationManager;
-    @Autowired
     private AuthenticatedUserDetailsService userDetailsService;
     @Autowired
     private TokenUtils tokenUtils;
     @Autowired
     private Mapper mapper;
-    @Autowired
-    private ApartmentService apartmentService;
 
     private static void validatePassword(String password) {
         if (StringUtils.isBlank(password)) {
@@ -75,51 +74,12 @@ public class AccountService {
         }
     }
 
-    public Tenant getTenant(long accountId) {
-        final Account account = accountDao.findById(accountId);
-        if (account instanceof Tenant) {
-            return (Tenant) account;
+    private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
+        final T item = dao.findById(id);
+        if (item == null) {
+            throw ex;
         }
-
-        throw new EntityNotFoundException(String.format("Tenant id=%d not found", accountId));
-    }
-
-    @RoleSecured(AccountRole.PropertyManager)
-    public Tenant createTenantFromRequest(@NotNull CreateTenantRequest request) {
-        Objects.requireNonNull(request);
-
-        final Apartment apartment = apartmentService.getApartment(request.getApartmentId());
-        authorizationManager.checkManager(apartment.getProperty());
-
-
-        final Tenant tenant = mapper.toTenant(request);
-        tenant.setApartment(apartment);
-        tenant.setActive(false);
-        accountDao.persist(tenant);
-
-        setActionToken(tenant);
-
-        return tenant;
-    }
-
-    @RoleSecured(AccountRole.PropertyManager)
-    public Tenant updateTenantFromRequest(long tenantId, @NotNull UpdateTenantRequest request) {
-        Objects.requireNonNull(request);
-
-        final Apartment apartment = apartmentService.getApartment(request.getApartmentId());
-        authorizationManager.checkManager(apartment.getProperty());
-
-
-        final Tenant tenant = getTenant(tenantId);
-        mapper.fillTenant(request, tenant);
-        tenant.setApartment(apartment);
-        accountDao.persist(tenant);
-
-        return tenant;
-    }
-
-    public Account getAccount(long accouuntId) {
-        return accountDao.findById(accouuntId);
+        return item;
     }
 
     public void setActionToken(@NotNull Account account) {
@@ -176,11 +136,7 @@ public class AccountService {
     }
 
     public Account getAccount(Long accountId) {
-        final Account account = accountDao.findById(accountId);
-        if (account == null) {
-            throw new EntityNotFoundException(String.format("Account id=%d not found", accountId));
-        }
-        return account;
+        return getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
     }
 
     public Account activateAccount(String activationCode) {

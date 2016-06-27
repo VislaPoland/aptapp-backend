@@ -8,7 +8,13 @@ import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.dto.tenant.CreateTenantRequest;
+import com.creatix.domain.dto.tenant.TenantDto;
+import com.creatix.domain.dto.tenant.TenantSelfUpdateRequest;
 import com.creatix.domain.dto.tenant.UpdateTenantRequest;
+import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
+import com.creatix.domain.dto.tenant.vehicle.CreateVehicleRequest;
+import com.creatix.domain.dto.tenant.vehicle.UpdateVehicleRequest;
+import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.entity.*;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
@@ -153,6 +159,41 @@ public final class Mapper {
                 .byDefault()
                 .register();
 
+        mapperFactory.classMap(UpdateTenantRequest.class, Tenant.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(TenantSelfUpdateRequest.class, Tenant.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(Tenant.class, TenantDto.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(CreateVehicleRequest.class, Vehicle.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(Vehicle.class, VehicleDto.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(ParkingStall.class, VehicleDto.ParkingStall.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(UpdateVehicleRequest.class, Vehicle.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(ParkingStall.class, ParkingStallDto.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(Vehicle.class, ParkingStallDto.VehicleDto.class)
+                .byDefault()
+                .register();
     }
 
     public Tenant toTenant(@NotNull CreateTenantRequest request) {
@@ -161,6 +202,13 @@ public final class Mapper {
     }
 
     public void fillTenant(@NotNull UpdateTenantRequest dto, @NotNull Tenant entity) {
+        Objects.requireNonNull(dto);
+        Objects.requireNonNull(entity);
+
+        mapperFactory.getMapperFacade().map(dto, entity);
+    }
+
+    public void fillTenant(@NotNull TenantSelfUpdateRequest dto, @NotNull Tenant entity) {
         Objects.requireNonNull(dto);
         Objects.requireNonNull(entity);
 
@@ -228,5 +276,33 @@ public final class Mapper {
     public NeighborhoodNotification fromNeighborhoodNotificationRequest(@NotNull CreateNeighborhoodNotificationRequest dto) {
         Objects.requireNonNull(dto);
         return mapperFactory.getMapperFacade().map(dto, NeighborhoodNotification.class);
+    }
+
+    public TenantDto toTenantDto(@NotNull Tenant tenant) {
+        Objects.requireNonNull(tenant);
+        return mapperFactory.getMapperFacade().map(tenant, TenantDto.class);
+    }
+
+    public VehicleDto toVehicleDto(@NotNull Vehicle vehicle) {
+        Objects.requireNonNull(vehicle);
+        return mapperFactory.getMapperFacade().map(vehicle, VehicleDto.class);
+    }
+
+    public Vehicle toVehicle(@NotNull CreateVehicleRequest request) {
+        Objects.requireNonNull(request);
+        return mapperFactory.getMapperFacade().map(request, Vehicle.class);
+    }
+
+    public void fillVehicle(@NotNull UpdateVehicleRequest dto, @NotNull Vehicle entity) {
+        Objects.requireNonNull(dto);
+        Objects.requireNonNull(entity);
+
+        mapperFactory.getMapperFacade().map(dto, entity);
+    }
+
+    public ParkingStallDto toParkingStallDto(@NotNull ParkingStall parkingStall) {
+        Objects.requireNonNull(parkingStall);
+
+        return mapperFactory.getMapperFacade().map(parkingStall, ParkingStallDto.class);
     }
 }

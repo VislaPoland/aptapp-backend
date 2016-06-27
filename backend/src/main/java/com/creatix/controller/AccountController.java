@@ -55,7 +55,7 @@ public class AccountController {
     @RequestMapping(value = "/me/profile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<AccountDto> getSelfProfile() {
-        Account account = accountService.getAccount(authorizationManager.getCurrentAccount().getId());
+        Account account = authorizationManager.getCurrentAccount();
         return new DataResponse<>(mapper.toAccountDto(account));
     }
 
@@ -67,7 +67,7 @@ public class AccountController {
     })
     @RequestMapping(value = "/{accountId}/profile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<AccountDto> getProfile(@PathVariable long accountId) {
+    public DataResponse<AccountDto> getProfile(@PathVariable Long accountId) {
         Account account = accountService.getAccount(accountId);
         return new DataResponse<>(mapper.toAccountDto(account));
     }
@@ -80,7 +80,7 @@ public class AccountController {
     })
     @RequestMapping(value = "/me/profile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> updateSelfProfile(@RequestBody @Valid UpdateAccountProfileRequest request) {
-        Account account = accountService.getAccount(authorizationManager.getCurrentAccount().getId());
+        Account account = authorizationManager.getCurrentAccount();
         account = accountService.updateAccount(account, request);
 
         return new DataResponse<>(mapper.toAccountDto(account));
@@ -93,7 +93,7 @@ public class AccountController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/{accountId}/profile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updateProfile(@PathVariable long accountId, @RequestBody @Valid UpdateAccountProfileRequest request) {
+    public DataResponse<AccountDto> updateProfile(@PathVariable Long accountId, @RequestBody @Valid UpdateAccountProfileRequest request) {
         Account account = accountService.getAccount(accountId);
         account = accountService.updateAccount(account, request);
 
@@ -108,7 +108,7 @@ public class AccountController {
     })
     @RoleSecured(AccountRole.PropertyManager)
     @RequestMapping(value = "/{accountId}/reset-code", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<String> resetCode(@PathVariable long accountId) {
+    public DataResponse<String> resetCode(@PathVariable Long accountId) {
         final Account account = accountService.getAccount(accountId);
         accountService.setActionToken(account);
         return new DataResponse<>(account.getActionToken());
