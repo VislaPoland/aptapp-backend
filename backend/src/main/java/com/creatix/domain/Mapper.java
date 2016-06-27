@@ -14,6 +14,7 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
@@ -21,15 +22,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public final class Mapper {
-    private MapperFactory mapperFactory;
+public class Mapper {
 
-    public Mapper() {
-        mapperFactory = new DefaultMapperFactory.Builder().build();
-        configure(mapperFactory);
+    protected MapperFactory mapperFactory;
+
+    @Autowired
+    public Mapper(MapperFactory mapperFactory) {
+        this.mapperFactory = mapperFactory;
+        this.configure(mapperFactory);
     }
 
-    private void configure(MapperFactory mapperFactory) {
+    protected void configure(MapperFactory mapperFactory) {
         mapperFactory.classMap(Account.class, AccountDto.class)
                 .byDefault()
                 .customize(new CustomMapper<Account, AccountDto>() {
@@ -226,4 +229,6 @@ public final class Mapper {
         Objects.requireNonNull(dto);
         return mapperFactory.getMapperFacade().map(dto, NeighborhoodNotification.class);
     }
+
+
 }

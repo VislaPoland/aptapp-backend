@@ -13,6 +13,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = "id")
 public class Property {
+
     @Id
     @GeneratedValue
     @Column(nullable = false)

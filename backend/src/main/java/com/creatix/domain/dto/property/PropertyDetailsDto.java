@@ -30,7 +30,8 @@ public class PropertyDetailsDto {
     @ApiModel
     @Data
     public static class Facility {
-
+        @ApiModelProperty(value = "Facility ID", required = true)
+        private Long id;
         @ApiModelProperty(value = "Type of facility", required = true)
         private FacilityType type;
         @ApiModelProperty(value = "Facility info", required = true)
@@ -50,6 +51,8 @@ public class PropertyDetailsDto {
     @ApiModel
     @Data
     public static class Contact {
+        @ApiModelProperty(value = "Contact ID", required = true)
+        private Long id;
         @ApiModelProperty(value = "Type of contact", required = true)
         private ContactType type;
         @ApiModelProperty(required = true)
