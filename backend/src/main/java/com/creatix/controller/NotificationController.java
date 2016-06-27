@@ -156,6 +156,7 @@ public class NotificationController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 404, message = "Not found")})
     @RequestMapping(value = "/{notificationId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
     public DataResponse<NotificationDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long notificationId) throws IOException {
         return new DataResponse<>(mapper.toNotificationDto(notificationService.storeNotificationPhotos(files, notificationId)));
     }
@@ -166,6 +167,7 @@ public class NotificationController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 404, message = "Not found")})
     @RequestMapping(value = "/{notificationId}/photos/{photoId}", method = RequestMethod.GET)
+    @RoleSecured
     @ResponseBody
     public HttpEntity<byte[]> getFile(@PathVariable Long notificationId, @PathVariable Long photoId) throws IOException {
         final NotificationPhoto file = notificationService.getNotificationPhoto(photoId);
