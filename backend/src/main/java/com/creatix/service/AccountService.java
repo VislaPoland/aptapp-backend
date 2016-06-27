@@ -153,8 +153,8 @@ public class AccountService {
         }
 
         account.setActive(true);
-        account.setActionToken(null);
-        account.setActionTokenValidUntil(null);
+//        account.setActionToken(null);
+//        account.setActionTokenValidUntil(null);
         accountDao.persist(account);
 
         return account;
