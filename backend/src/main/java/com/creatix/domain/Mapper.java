@@ -169,6 +169,7 @@ public final class Mapper {
 
         mapperFactory.classMap(Tenant.class, TenantDto.class)
                 .byDefault()
+                .field("apartment.property", "property")
                 .register();
 
         mapperFactory.classMap(CreateVehicleRequest.class, Vehicle.class)

@@ -108,13 +108,22 @@ public class TenantService {
         if (authorizationManager.isSelf(tenant)) {
             final Vehicle vehicle = mapper.toVehicle(request);
             vehicle.setOwner(tenant);
-            vehicle.setParkingStall(getOrElseThrow(request.getParkingStallId(), parkingStallDao,
-                    new EntityNotFoundException(String.format("Parking stall id=%d not found", request.getParkingStallId()))));
-            vehicleDao.persist(vehicle);
-            return vehicle;
+            final ParkingStall parkingStall = getOrElseThrow(request.getParkingStallId(), parkingStallDao,
+                    new EntityNotFoundException(String.format("Parking stall id=%d not found", request.getParkingStallId())));
+            if (isTenantEligibleToUseParkingStall(tenant, parkingStall)) {
+                vehicle.setParkingStall(parkingStall);
+                vehicleDao.persist(vehicle);
+                return vehicle;
+            }
+
+            throw new SecurityException(String.format("You are not eligible to use parking stall=%d", request.getParkingStallId()));
         }
 
         throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
+    }
+
+    private boolean isTenantEligibleToUseParkingStall(Tenant tenant, ParkingStall parkingStall) {
+        return tenant.getParkingStalls().contains(parkingStall);
     }
 
     @RoleSecured({AccountRole.Tenant})
@@ -125,10 +134,15 @@ public class TenantService {
         if (authorizationManager.isSelf(tenant)) {
             final Vehicle vehicle = getOrElseThrow(licensePlate, vehicleDao, new EntityNotFoundException(String.format("Vehicle %s not found", licensePlate)));
             mapper.fillVehicle(request, vehicle);
-            vehicle.setParkingStall(getOrElseThrow(request.getParkingStallId(), parkingStallDao,
-                    new EntityNotFoundException(String.format("Parking stall id=%d not found", request.getParkingStallId()))));
-            vehicleDao.persist(vehicle);
-            return vehicle;
+            final ParkingStall parkingStall = getOrElseThrow(request.getParkingStallId(), parkingStallDao,
+                    new EntityNotFoundException(String.format("Parking stall id=%d not found", request.getParkingStallId())));
+            if (isTenantEligibleToUseParkingStall(tenant, parkingStall)) {
+                vehicle.setParkingStall(parkingStall);
+                vehicleDao.persist(vehicle);
+                return vehicle;
+            }
+
+            throw new SecurityException(String.format("You are not eligible to use parking stall=%d", request.getParkingStallId()));
         }
 
         throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
