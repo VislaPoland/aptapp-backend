@@ -197,7 +197,7 @@ public class AccountService {
         }
 
         account.setActive(true);
-        account.setPasswordHash(passwordEncoder.encode(account.getActionToken()));
+        account.setActionToken(null);
         account.setActionTokenValidUntil(null);
         accountDao.persist(account);
 

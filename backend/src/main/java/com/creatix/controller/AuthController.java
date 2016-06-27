@@ -45,7 +45,6 @@ public class AuthController {
     public DataResponse<LoginResponse> verifyCode(@RequestBody @Valid ActivationCode codeRequest) {
         Account activatedAccount = accountService.activateAccount(codeRequest.getCode());
 
-        accountService.authenticate(activatedAccount.getPrimaryEmail(), activatedAccount.getActionToken());
         return new DataResponse<>(accountService.createLoginResponse(activatedAccount.getPrimaryEmail()));
     }
 
