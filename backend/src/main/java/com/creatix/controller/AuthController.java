@@ -44,8 +44,8 @@ public class AuthController {
     @RequestMapping(value = "/verify-code", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<LoginResponse> verifyCode(@RequestBody @Valid ActivationCode codeRequest) {
         Account activatedAccount = accountService.activateAccount(codeRequest.getCode());
-        //TODO just for demo, remove later
-        accountService.authenticate(activatedAccount.getPrimaryEmail(), "test");
+
+        accountService.authenticate(activatedAccount.getPrimaryEmail(), activatedAccount.getActionToken());
         return new DataResponse<>(accountService.createLoginResponse(activatedAccount.getPrimaryEmail()));
     }
 

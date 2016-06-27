@@ -52,17 +52,32 @@ public class AccountService {
     private ApartmentService apartmentService;
 
     private static void validatePassword(String password) {
-        if ( StringUtils.isBlank(password) ) {
+        if (StringUtils.isBlank(password)) {
             throw new IllegalArgumentException("Password cannot be empty");
         }
-        if ( password.length() < 6 ) {
+        if (password.length() < 6) {
             throw new IllegalStateException("Password must be at least 6 characters long");
+        }
+    }
+
+    private static void checkTokenValidity(String token, Account account) {
+        if (StringUtils.isBlank(token)) {
+            throw new IllegalArgumentException("Token cannot be empty");
+        }
+        if (account.getActionTokenValidUntil() == null) {
+            throw new IllegalStateException("Missing token valid until");
+        }
+        if (!(StringUtils.equalsIgnoreCase(token, account.getActionToken()))) {
+            throw new SecurityException("Token mismatch");
+        }
+        if (account.getActionTokenValidUntil().before(new Date())) {
+            throw new SecurityException("Token has expired");
         }
     }
 
     public Tenant getTenant(long accountId) {
         final Account account = accountDao.findById(accountId);
-        if ( account instanceof Tenant ) {
+        if (account instanceof Tenant) {
             return (Tenant) account;
         }
 
@@ -107,28 +122,13 @@ public class AccountService {
         return accountDao.findById(accouuntId);
     }
 
-    public void setActionToken(@NotNull  Account account) {
+    public void setActionToken(@NotNull Account account) {
         Objects.requireNonNull(account);
 
         account.setActionToken(RandomStringUtils.randomNumeric(12));
         account.setActionTokenValidUntil(DateTime.now().plusDays(7).toDate());
 
         accountDao.persist(account);
-    }
-
-    private static void checkTokenValidity(String token, Account account) {
-        if ( StringUtils.isBlank(token) ) {
-            throw new IllegalArgumentException("Token cannot be empty");
-        }
-        if ( account.getActionTokenValidUntil() == null ) {
-            throw new IllegalStateException("Missing token valid until");
-        }
-        if ( !(StringUtils.equalsIgnoreCase(token, account.getActionToken())) ) {
-            throw new SecurityException("Token mismatch");
-        }
-        if ( account.getActionTokenValidUntil().before(new Date()) ) {
-            throw new SecurityException("Token has expired");
-        }
     }
 
     public LoginResponse createLoginResponse(String email) {
@@ -160,16 +160,15 @@ public class AccountService {
 
     @RoleSecured(AccountRole.Administrator)
     public List<Account> getAccounts(AccountRole[] roles) {
-        if ( (roles == null) || (roles.length == 0) ) {
+        if ((roles == null) || (roles.length == 0)) {
             return accountDao.findAll();
-        }
-        else {
+        } else {
             return accountDao.findByRoles(roles);
         }
     }
 
     public Account getAccount(String email) {
-        final  Account account = accountDao.findByEmail(email);
+        final Account account = accountDao.findByEmail(email);
         if (account == null) {
             throw new EntityNotFoundException(String.format("Account with email=%s not found", email));
         }
@@ -178,7 +177,7 @@ public class AccountService {
 
     public Account getAccount(Long accountId) {
         final Account account = accountDao.findById(accountId);
-        if ( account == null ) {
+        if (account == null) {
             throw new EntityNotFoundException(String.format("Account id=%d not found", accountId));
         }
         return account;
@@ -186,18 +185,20 @@ public class AccountService {
 
     public Account activateAccount(String activationCode) {
         final Account account = accountDao.findByActionToken(activationCode);
-        if ( account == null ) {
+        if (account == null) {
             throw new SecurityException("Activation code not valid");
         }
-        if ( account.getActive() ) {
+        if (account.getActive()) {
             return account;
         }
 
-        if ( account.getActionTokenValidUntil().before(DateTime.now().toDate()) ) {
+        if (account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate())) {
             throw new SecurityException("Activation code has expired");
         }
 
         account.setActive(true);
+        account.setPasswordHash(passwordEncoder.encode(account.getActionToken()));
+        account.setActionTokenValidUntil(null);
         accountDao.persist(account);
 
         return account;
@@ -206,7 +207,7 @@ public class AccountService {
     public Account updateAccount(Account account, UpdateAccountProfileRequest accountDto) {
         account.setSecondaryEmail(accountDto.getSecondaryEmail());
         account.setSecondaryPhone(accountDto.getSecondaryPhone());
-        if ( StringUtils.isNotBlank(accountDto.getPassword()) ) {
+        if (StringUtils.isNotBlank(accountDto.getPassword())) {
             account.setPasswordHash(passwordEncoder.encode(accountDto.getPassword()));
         }
 
