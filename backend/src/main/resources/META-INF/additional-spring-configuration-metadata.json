@@ -19,6 +19,11 @@
       "name": "mail.from",
       "type": "java.lang.String",
       "description": "Source address for system generated email messages."
+    },
+    {
+      "name": "upload.repository-path",
+      "type": "java.lang.String",
+      "description": "Path to upload repository."
     }
   ]
 }

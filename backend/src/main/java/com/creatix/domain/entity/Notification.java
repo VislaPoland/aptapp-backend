@@ -8,7 +8,9 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -61,4 +63,7 @@ public class Notification {
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date deletedAt;
+
+    @OneToMany(mappedBy = "notification")
+    private List<NotificationPhoto> photos = new ArrayList<>(1);
 }

@@ -91,6 +91,10 @@ public final class Mapper {
                 .field("targetApartment.id", "apartmentId")
                 .register();
 
+        mapperFactory.classMap(NotificationPhoto.class, NotificationPhotoDto.class)
+                .byDefault()
+                .register();
+
         mapperFactory.classMap(NeighborhoodNotification.class, NeighborhoodNotificationDto.class)
                 .byDefault()
                 .field("targetApartment.id", "apartmentId")

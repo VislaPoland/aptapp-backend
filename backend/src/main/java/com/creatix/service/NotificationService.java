@@ -1,5 +1,6 @@
 package com.creatix.service;
 
+import com.creatix.configuration.FileUploadProperties;
 import com.creatix.configuration.MailProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.entity.*;
@@ -13,9 +14,14 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +45,11 @@ public class NotificationService {
     @Autowired
     private MailProperties mailProperties;
     @Autowired
+    private FileUploadProperties uploadProperties;
+    @Autowired
     private MailSender mailSender;
+    @Autowired
+    private NotificationPhotoDao notificationPhotoDao;
 
     public List<Notification> getRelevantInDateRange(@NotNull Date beginDate, @NotNull Date endDate) {
         Objects.requireNonNull(beginDate);
@@ -160,5 +170,40 @@ public class NotificationService {
         mailMessage.setSubject(subject);
         mailMessage.setText(body);
         mailSender.send(mailMessage);
+    }
+
+    public Notification storeNotificationPhotos(MultipartFile[] files, long notificationId) throws IOException {
+
+        final Notification notification = notificationDao.findById(notificationId);
+        if ( notification == null ) {
+            throw new EntityNotFoundException(String.format("Notification id=%d not found", notificationId));
+        }
+
+        for ( MultipartFile file : files ) {
+
+            // move uploaded file to file repository
+            final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename()));
+            file.transferTo(photoFilePath.toFile());
+
+            final NotificationPhoto photo = new NotificationPhoto();
+            photo.setNotification(notification);
+            photo.setFileName(file.getOriginalFilename());
+            photo.setFilePath(photoFilePath.toString());
+            notificationPhotoDao.persist(photo);
+
+            notification.getPhotos().add(photo);
+        }
+
+        return notification;
+    }
+
+    public NotificationPhoto getNotificationPhoto(long notificationPhotoId) {
+
+        final NotificationPhoto photo = notificationPhotoDao.findById(notificationPhotoId);
+        if ( photo == null ) {
+            throw new EntityNotFoundException(String.format("Photo id=%d not found", notificationPhotoId));
+        }
+
+        return photo;
     }
 }
