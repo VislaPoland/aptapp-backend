@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.NoResultException;
+import java.util.List;
 
 @Repository
 @Transactional
@@ -18,5 +19,12 @@ public class ApartmentDao extends DaoBase<Apartment, Long> {
                 .where(apartment.property.eq(property).and(apartment.unitNumber.eq(unitNumber)))
                 .fetchOne();
 
+    }
+
+    public List<Apartment> findByProperty(Property property) {
+        final QApartment apartment = QApartment.apartment;
+        return queryFactory.selectFrom(apartment)
+                .where(apartment.property.eq(property))
+                .fetch();
     }
 }

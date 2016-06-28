@@ -1,12 +1,14 @@
 package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
+import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.ApartmentService;
 import com.creatix.service.PropertyService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -28,6 +30,8 @@ public class PropertyController {
     private Mapper mapper;
     @Autowired
     private PropertyService propertyService;
+    @Autowired
+    private ApartmentService apartmentService;
 
     @ApiOperation(value = "Get all properties")
     @ApiResponses(value = {
@@ -88,5 +92,18 @@ public class PropertyController {
     @RoleSecured({AccountRole.Administrator})
     public DataResponse<PropertyDetailsDto> deleteProperty(@PathVariable Long propertyId) {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.deleteProperty(propertyId)));
+    }
+
+    @ApiOperation(value = "Get apartments")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{propertyId}/apartments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Administrator})
+    public DataResponse<List<ApartmentDto>> getApartments(@PathVariable Long propertyId) {
+        return new DataResponse<>(apartmentService.getApartmentsByPropertyId(propertyId).stream()
+                .map(a -> mapper.toApartmentDto(a)).collect(Collectors.toList()));
     }
 }
