@@ -101,7 +101,7 @@ public class PropertyContactService {
     private Property getProperty(@NotNull Long propertyId) {
         Objects.requireNonNull(propertyId);
         final Property property = this.propertyDao.findById(propertyId);
-        if (property == null) {
+        if ( property == null ) {
             throw new EntityNotFoundException(String.format("Property id=%d not found", propertyId));
         }
         return property;
@@ -111,8 +111,8 @@ public class PropertyContactService {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(contactId);
         final Contact contact = this.propertyContactDao.findById(propertyId, contactId);
-        if (contact == null) {
-            throw new EntityNotFoundException(String.format("Contact id=%d not found", propertyId));
+        if ( contact == null ) {
+            throw new EntityNotFoundException(String.format("Contact id=%d not found", contactId));
         }
         return contact;
     }
