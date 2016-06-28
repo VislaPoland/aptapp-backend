@@ -25,7 +25,8 @@ public class PropertyDetailsDto {
     private List<Contact> contacts;
     @ApiModelProperty(value = "Property owner info", required = true)
     private Owner owner;
-
+    @ApiModelProperty(value = "Property schedule", required = true)
+    private Schedule schedule;
 
     @ApiModel
     @Data
@@ -72,5 +73,20 @@ public class PropertyDetailsDto {
         private String email;
         @ApiModelProperty(required = true)
         private String web;
+    }
+
+    @ApiModel
+    @Data
+    public static class Schedule {
+        @ApiModelProperty(value = "Start hour of schedule time", required = true, notes = "24-hour clock")
+        private Integer startHour;
+        @ApiModelProperty(value = "Start minute of schedule time", required = true)
+        private Integer startMinute;
+        @ApiModelProperty(value = "End hour of schedule time", required = true, notes = "24-hour clock")
+        private Integer endHour;
+        @ApiModelProperty(value = "End minute of schedule time", required = true)
+        private Integer endMinute;
+        @ApiModelProperty(value = "Number of slots per schedule time", required = true)
+        private Integer slotsCount;
     }
 }

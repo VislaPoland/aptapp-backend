@@ -11,6 +11,10 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(of = "number")
 public class ParkingStall {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(nullable = false)
+    private Long id;
+
     @Column(nullable = false)
     @NotNull
     private String number;
@@ -18,4 +22,7 @@ public class ParkingStall {
     @ManyToOne
     @JoinColumn
     private Tenant usingTenant;
+
+    @OneToOne(mappedBy = "parkingStall")
+    private Vehicle parkingVehicle;
 }

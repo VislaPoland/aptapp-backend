@@ -2,7 +2,6 @@ package com.creatix.service;
 
 import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.entity.Apartment;
-import com.creatix.domain.entity.Property;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

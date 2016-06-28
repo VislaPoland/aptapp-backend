@@ -27,8 +27,15 @@ public class Vehicle {
     @NotNull
     private Integer year;
 
+    @Column(nullable = false)
+    @NotNull
+    private String color;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(nullable = false)
     @NotNull
     private Tenant owner;
+
+    @OneToOne
+    private ParkingStall parkingStall;
 }

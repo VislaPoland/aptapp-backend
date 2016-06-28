@@ -1,11 +1,8 @@
 package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
-import com.creatix.domain.dao.ApartmentDao;
-import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.ApartmentService;
 import io.swagger.annotations.ApiOperation;

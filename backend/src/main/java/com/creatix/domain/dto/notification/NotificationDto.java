@@ -4,12 +4,17 @@ import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @ApiModel
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class NotificationDto {
     @ApiModelProperty(value = "id", required = true)
     private Long id;
@@ -25,4 +30,6 @@ public class NotificationDto {
     private String response;
     @ApiModelProperty(value = "Notification type", required = true)
     private NotificationType type;
+    @ApiModelProperty(value = "Notification photo")
+    private List<NotificationPhotoDto> photos;
 }

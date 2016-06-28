@@ -3,13 +3,16 @@ package com.creatix.domain.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 @Entity
 @Data
 @EqualsAndHashCode(of = "id")
-public class Address {
+public class PropertySchedule {
     @Id
     @GeneratedValue
     @Column(nullable = false)
@@ -17,26 +20,22 @@ public class Address {
 
     @Column(nullable = false)
     @NotNull
-    private String houseNumber;
+    private Integer startHour;
 
     @Column(nullable = false)
     @NotNull
-    private String streetName;
+    private Integer startMinute;
 
     @Column(nullable = false)
     @NotNull
-    private String town;
+    private Integer endHour;
 
     @Column(nullable = false)
     @NotNull
-    private String state;
+    private Integer endMinute;
 
     @Column(nullable = false)
     @NotNull
-    private String zipCode;
-
-    @Transient
-    public String getFullAddress() {
-        return String.format("%s %s, %s, %s %s", getHouseNumber(), getStreetName(), getTown(), getState(), getZipCode());
-    }
+    private Integer slotsCount;
+    //TODO add per day working hours and multiple slots per interval
 }

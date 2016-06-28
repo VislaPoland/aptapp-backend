@@ -27,7 +27,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 })
 @EnableConfigurationProperties({
         MailProperties.class,
-        JwtProperties.class
+        JwtProperties.class,
+        FileUploadProperties.class,
 })
 public class AptAppBackendApplication extends SpringBootServletInitializer {
 

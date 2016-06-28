@@ -50,4 +50,7 @@ public class Property {
 
     @OneToMany(cascade = CascadeType.ALL)
     private Set<Contact> contacts;
+
+    @ManyToOne
+    private PropertySchedule schedule;
 }

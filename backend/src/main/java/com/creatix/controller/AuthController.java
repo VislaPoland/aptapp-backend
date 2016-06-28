@@ -42,9 +42,10 @@ public class AuthController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(value = "/verify-code", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> verifyCode(@RequestBody @Valid ActivationCode codeRequest) {
+    public DataResponse<LoginResponse> verifyCode(@RequestBody @Valid ActivationCode codeRequest) {
         Account activatedAccount = accountService.activateAccount(codeRequest.getCode());
-        return new DataResponse<>(mapper.toAccountDto(activatedAccount));
+
+        return new DataResponse<>(accountService.createLoginResponse(activatedAccount.getPrimaryEmail()));
     }
 
     @ApiOperation(value = "Attempt to sign in")

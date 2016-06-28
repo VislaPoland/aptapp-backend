@@ -1,8 +1,3 @@
-SELECT setval('hibernate_sequence', 200);
-
--------------------
--- DEMO DATA
--------------------
 -- property owner
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
                             primary_email, primary_phone, role)
@@ -84,117 +79,14 @@ UPDATE public.apartment SET left_apartment_id = 36, below_apartment_id = 27 WHER
 -- tenant
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
                             primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until)
-VALUES ('Tenant', 3, false, 'South Water Apartments', 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS',
+VALUES ('Tenant', 3, true, 'South Water Apartments', 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS',
                   'apt@test.com', '(905) 545-0256', 'Tenant', 'Owner', 22, '123456', '2017-06-16 15:36:38');
 
--------------------
--- /DEMO DATA
--------------------
-
--------------------
--- DEVELOPMENT DATA
--------------------
-
--- administrator
+-- tenant
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
-                            primary_email, primary_phone, role)
-VALUES ('Account', 108, true, 'Cool Company', 'Joe', 'Admin', '$2a$10$IXniWKP6M12dNGoTzHW9Feo/7Jn4nke0GeRGvvU7n38WuYkY40eyG',
-        'joe.admin@mail.com', '123456789', 'Administrator');
-
--- property owner
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
-                            primary_email, primary_phone, role)
-VALUES ('PropertyOwner', 101, true, 'Cool Company', 'Joe', 'Owner', '$2a$10$IXniWKP6M12dNGoTzHW9Feo/7Jn4nke0GeRGvvU7n38WuYkY40eyG',
-        'joe.owner@mail.com', '123456789', 'PropertyOwner');
-
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
-                            primary_email, primary_phone, role)
-VALUES ('PropertyOwner', 109, true, 'Cool Company', 'Joe', 'Owner2', '$2a$10$IXniWKP6M12dNGoTzHW9Feo/7Jn4nke0GeRGvvU7n38WuYkY40eyG',
-        'joe.owner2@mail.com', '123456789', 'PropertyOwner');
-
--- addresses
-INSERT INTO public.address (id, house_number, state, street_name, town, zip_code) VALUES (101, '111', 'MA', 'Street1', 'Boston', '1111111');
-INSERT INTO public.address (id, house_number, state, street_name, town, zip_code) VALUES (102, '222', 'MA', 'Street2', 'Boston', '2222222');
-
--- property schedules
-INSERT INTO public.property_schedule(id, start_hour, start_minute, end_hour, end_minute, slots_count) VALUES (101, 9, 0, 17, 0, 8);
-
--- properties
-INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id) VALUES (101, 'Test property 1', 'Active', 101, 101, 101);
-INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id) VALUES (102, 'Test property 2', 'Active', 102, 109, 101);
-
--- properties contacts
-INSERT INTO
-public.contact(id, type, communication_type, value)
-VALUES
-(1, 'Police', 'Phone', '1-541-754-3010'),
-(2, 'Police', 'Email', 'police@gmail.com'),
-(3, 'MedicalEmergency', 'Phone', '1-541-754-3010'),
-(4, 'MedicalEmergency', 'Email', 'medical@gmail.com'),
-(5, 'FireService', 'Phone', '1-541-754-3010'),
-(6, 'FireService', 'Email', 'fire@gmail.com')
-;
-
-INSERT INTO
-public.property_contacts(property_id, contacts_id)
-VALUES
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-(2, 5),
-(2, 6)
-;
-
--- apartments
-INSERT INTO public.apartment (id, unit_number, property_id)
-VALUES (101, '1', 101);
-INSERT INTO public.apartment (id, unit_number, below_apartment_id, property_id)
-VALUES (102, '2', 101, 101);
-UPDATE public.apartment SET above_apartment_id = 102 WHERE id = 101;
-
--- property manager
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
-                            primary_email, primary_phone, role, managed_property_id)
-VALUES ('PropertyManager', 102, true, 'Cool Company', 'Joe', 'Manager1', '$2a$10$M9hvOTL71BvwzoClkcOdYOarTyWIuirEFjV/08EOh7BvNpV.Ew9mG',
-                           'joe.manager1@mail.com', '123456789', 'PropertyManager', 101);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
-                            primary_email, primary_phone, role, managed_property_id)
-VALUES ('PropertyManager', 103, true, 'Cool Company', 'Joe', 'Manager2', '$2a$10$djKfGlbkHPoD2FVM3DvRn.mfKR7OkTquEJyubIc.mJi3dBusOY4Ty',
-                           'joe.manager2@mail.com', '123456789', 'PropertyManager', 102);
-
--- security account
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
-                            primary_email, primary_phone, role, manager_id)
-VALUES ('Employee', 104, true, 'Cool Company', 'Joe', 'Security', '$2a$10$uxh1J.QHtM5iiVoUEIA46.Ndt/Srp71L.0kn8x8bIAE0/kk22AeLK',
-                    'joe.security@mail.com', '123456789', 'Security', 102);
-
--- maintenance account
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
-                            primary_email, primary_phone, role, manager_id)
-VALUES ('Employee', 105, true, 'Cool Company', 'Joe', 'Maintenance', '$2a$10$pjJnFRFriSqLgv9nEi8jWuW/BKk4xnNqyNJPUx5ietHXt3WWetorS',
-                    'joe.maintenance@mail.com', '123456789', 'Maintenance', 102);
-
--- tenants
-INSERT INTO public.account (dtype, id, active, action_token, action_token_valid_until, company_name, first_name, last_name,
-                            primary_email, primary_phone, role, type, apartment_id)
-VALUES ('Tenant', 106, false, '666666', '2017-06-16 15:36:38', 'Cool Company', 'Joe', 'Tenant1',
-                  'joe.tenant1@mail.com', '123456789', 'Tenant', 'Owner', 101);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
-                            primary_email, primary_phone, role, type, apartment_id)
-VALUES ('Tenant', 107, true, 'Cool Company', 'Joe', 'Tenant2', '$2a$10$N/AhcCcImjmbsPRy4oDfOukA3.6xFE95qKoHAXEJbjOCJ3.JFPgZa',
-                  'joe.tenant2@mail.com', '123456789', 'Tenant', 'Owner', 102);
+                            primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until)
+VALUES ('Tenant', 4, true, 'South Water Apartments', 'Joe', 'Developer', '$2a$10$/gP.lBHwosvJepgBZimscODeBXghvua0g.85U3HNic6UMsTxfzArq',
+                  'joe.developer@mail.com', '(905) 545-0256', 'Tenant', 'Owner', 13, '666666', '2017-06-16 15:36:38');
 
 -- parking stall
-INSERT INTO public.parking_stall(id, number, using_tenant_id) VALUES (101, '22', 107);
-
--- notifications
-INSERT INTO public.notification (dtype, id, date, title, status, description, type, author_id, created_at)
-VALUES ('SecurityNotification', 101, '2016-06-16 15:36:38', 'Security not', 'Pending', 'Security test notification title', 'Security', 106, '2016-06-16 15:36:38');
-INSERT INTO public.notification (dtype, id, date, title, status, description, access_if_not_at_home, target_apartment_id, type, author_id, created_at)
-VALUES ('MaintenanceNotification', 102, '2016-06-16 15:36:38', 'Maintenance not', 'Pending', 'Maintenance test notification title', true, 102, 'Maintenance', 102, '2016-06-16 15:36:38');
-INSERT INTO public.notification (dtype, id, date, title, status, description, target_apartment_id, type, author_id, created_at)
-VALUES ('NeighborhoodNotification', 103, '2016-06-19 15:36:38', 'Neighborhood not', 'Pending', 'Neighborhood test notification title', 102, 'Neighborhood', 102, '2016-06-16 15:36:38');
--------------------
--- /DEVELOPMENT DATA
--------------------
+INSERT INTO public.parking_stall (number, using_tenant_id) VALUES ('22', 3);
