@@ -1,5 +1,6 @@
 package com.creatix.domain.dto.property;
 
+import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.enums.CommunicationType;
 import com.creatix.domain.enums.ContactType;
 import com.creatix.domain.enums.FacilityType;
@@ -17,8 +18,10 @@ public class PropertyDetailsDto {
     private Long id;
     @ApiModelProperty(value = "Property name", required = true)
     private String name;
-    @ApiModelProperty(value = "Property full address", required = true)
-    private String address;
+    @ApiModelProperty(value = "Property address", required = true)
+    private AddressDto address;
+    @ApiModelProperty(value = "Full address", required = true)
+    private AddressDto fullAddress;
     @ApiModelProperty
     private List<Facility> facilities;
     @ApiModelProperty

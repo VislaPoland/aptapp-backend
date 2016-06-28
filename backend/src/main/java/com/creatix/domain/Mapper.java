@@ -63,7 +63,7 @@ public class Mapper {
 
         mapperFactory.classMap(Property.class, PropertyDetailsDto.class)
                 .byDefault()
-                .field("address.fullAddress", "address")
+                .field("address.fullAddress", "fullAddress")
                 .register();
 
         mapperFactory.classMap(PropertySchedule.class, PropertyDetailsDto.Schedule.class)
