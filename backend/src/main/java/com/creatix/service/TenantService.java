@@ -70,6 +70,8 @@ public class TenantService {
         tenant.setActive(false);
         tenant.setRole(AccountRole.Tenant);
         tenantDao.persist(tenant);
+        apartment.setTenant(tenant);
+        apartmentDao.persist(apartment);
 
         accountService.setActionToken(tenant);
 
@@ -81,14 +83,27 @@ public class TenantService {
         Objects.requireNonNull(request);
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
-                new EntityNotFoundException(String.format("Apartment with id %d not found", request.getApartmentId())));
+                new EntityNotFoundException(String.format("Apartment id=%d not found", request.getApartmentId())));
         authorizationManager.checkManager(apartment.getProperty());
 
-
         final Tenant tenant = getTenant(tenantId);
+
+        if ( (apartment.getTenant() != null) && !(Objects.equals(apartment.getTenant(), tenant)) ) {
+            throw new IllegalArgumentException(String.format("Apartment id=%d has already tenant id=%d assigned.", apartment.getId(), apartment.getTenant().getId()));
+        }
+
         mapper.fillTenant(request, tenant);
+
+        if ( (tenant.getApartment() != null) && !(Objects.equals(apartment, tenant.getApartment())) ) {
+            // apartment changed, un-assign tenant from previous apartment
+            final Apartment apartmentPrev = tenant.getApartment();
+            apartmentPrev.setTenant(null);
+            apartmentDao.persist(apartmentPrev);
+        }
         tenant.setApartment(apartment);
         tenantDao.persist(tenant);
+        apartment.setTenant(tenant);
+        apartmentDao.persist(apartment);
 
         return tenant;
     }
