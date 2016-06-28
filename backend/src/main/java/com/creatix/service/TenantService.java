@@ -61,6 +61,9 @@ public class TenantService {
                 new EntityNotFoundException(String.format("Apartment with id %d not found", request.getApartmentId())));
         authorizationManager.checkManager(apartment.getProperty());
 
+        if ( apartment.getTenant() != null ) {
+            throw new IllegalArgumentException(String.format("Apartment id=%d has already tenant id=%d assigned.", apartment.getId(), apartment.getTenant().getId()));
+        }
 
         final Tenant tenant = mapper.toTenant(request);
         tenant.setApartment(apartment);
