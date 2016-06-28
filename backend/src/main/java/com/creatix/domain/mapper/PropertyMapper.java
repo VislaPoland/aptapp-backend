@@ -1,12 +1,9 @@
 package com.creatix.domain.mapper;
 
-import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.contact.CreatePropertyContactRequest;
 import com.creatix.domain.dto.property.contact.UpdatePropertyContactRequest;
 import com.creatix.domain.entity.Contact;
-import com.creatix.domain.entity.Facility;
-import com.creatix.domain.entity.FacilityDetail;
 import com.creatix.domain.entity.Property;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
@@ -26,24 +23,18 @@ public final class PropertyMapper extends ConfigurableMapper {
                 .field("address.fullAddress", "address")
                 .register();
 
-        mapperFactory.classMap(Facility.class, PropertyDetailsDto.Facility.class)
-                .byDefault()
-                .register();
-
+        //region Contact
         mapperFactory.classMap(Contact.class, PropertyDetailsDto.Contact.class)
                 .byDefault()
                 .register();
-
-        mapperFactory.classMap(FacilityDetail.class, PropertyDetailsDto.Facility.Detail.class)
-                .byDefault()
-                .register();
-
         mapperFactory.classMap(CreatePropertyContactRequest.class, Contact.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(UpdatePropertyContactRequest.class, Property.class)
+        mapperFactory.classMap(UpdatePropertyContactRequest.class, Contact.class)
                 .byDefault()
                 .register();
+        //endregion
+        
     }
 
     public PropertyDetailsDto toPropertyDetailsDto(@NotNull Property property) {
@@ -52,6 +43,7 @@ public final class PropertyMapper extends ConfigurableMapper {
         return this.map(property, PropertyDetailsDto.class);
     }
 
+    //region Contact
     public PropertyDetailsDto.Contact toPropertyContact(@NotNull Contact contact) {
         Objects.requireNonNull(contact);
 
@@ -70,5 +62,6 @@ public final class PropertyMapper extends ConfigurableMapper {
 
         this.map(request, contact);
     }
+    //endregion
 
 }
