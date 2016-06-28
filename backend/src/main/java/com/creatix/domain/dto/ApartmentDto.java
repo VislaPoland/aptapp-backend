@@ -31,6 +31,9 @@ public class ApartmentDto {
     @ApiModelProperty(value = "Floor number")
     private Integer floor;
 
+    @ApiModelProperty(value = "Tenant ID")
+    private Long tenantId;
+
     @ApiModelProperty(required = true)
     private Neighbors neighbors;
 

@@ -139,6 +139,7 @@ public class Mapper {
                 .field("tenant.fullName", "fullName")
                 .field("tenant.primaryEmail", "primaryEmail")
                 .field("property.id", "propertyId")
+                .field("tenant.id", "tenantId")
                 .customize(new CustomMapper<Apartment, ApartmentDto>() {
                     @Override
                     public void mapAtoB(Apartment apartment, ApartmentDto apartmentDto, MappingContext context) {
