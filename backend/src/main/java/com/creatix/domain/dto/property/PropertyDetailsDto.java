@@ -67,6 +67,8 @@ public class PropertyDetailsDto {
     @Data
     public static class Owner {
         @ApiModelProperty(required = true)
+        private String id;
+        @ApiModelProperty(required = true)
         private String name;
         @ApiModelProperty(required = true)
         private String phone;

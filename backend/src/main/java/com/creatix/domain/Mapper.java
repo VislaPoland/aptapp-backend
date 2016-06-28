@@ -87,6 +87,7 @@ public class Mapper {
                 .field("fullName", "name")
                 .field("website", "web")
                 .field("primaryPhone", "phone")
+                .field("id", "id")
                 .register();
 
         mapperFactory.classMap(Notification.class, NotificationDto.class)
