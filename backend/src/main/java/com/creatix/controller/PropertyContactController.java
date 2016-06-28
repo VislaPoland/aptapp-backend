@@ -7,7 +7,7 @@ import com.creatix.domain.dto.property.contact.UpdatePropertyContactRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.PropertyContactService;
+import com.creatix.service.property.PropertyContactService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;

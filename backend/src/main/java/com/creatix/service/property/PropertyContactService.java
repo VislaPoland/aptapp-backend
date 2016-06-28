@@ -1,4 +1,4 @@
-package com.creatix.service;
+package com.creatix.service.property;
 
 import com.creatix.domain.dao.PropertyContactDao;
 import com.creatix.domain.dao.PropertyDao;
@@ -35,7 +35,9 @@ public class PropertyContactService {
     @RoleSecured
     public List<Contact> details(@NotNull Long propertyId) {
         Objects.requireNonNull(propertyId);
+
         authorizationManager.checkAccess(this.getProperty(propertyId));
+
         return propertyContactDao
                 .findAllByProperty(propertyId).stream()
                 .collect(Collectors.toList());
@@ -44,8 +46,11 @@ public class PropertyContactService {
     @RoleSecured
     public Contact detail(@NotNull Long propertyId, @NotNull Long contactId) {
         Objects.requireNonNull(propertyId);
+
         authorizationManager.checkAccess(this.getProperty(propertyId));
+
         final Contact contact = this.getContact(propertyId, contactId);
+
         return contact;
     }
 
@@ -56,6 +61,7 @@ public class PropertyContactService {
 
         final Property property = this.getProperty(propertyId);
         authorizationManager.checkAccess(property);
+
         final Contact contact = propertyMapper.toPropertyContact(request);
         property.getContacts().add(contact);
         propertyDao.persist(property);
@@ -73,17 +79,22 @@ public class PropertyContactService {
 
         final Contact contact = this.getContact(propertyId, contactId);
         propertyMapper.fillPropertyContact(request, contact);
+        propertyContactDao.persist(contact);
+
         return contact;
     }
 
     @RoleSecured(AccountRole.PropertyManager)
     public Contact delete(@NotNull Long propertyId, @NotNull Long contactId) {
         Objects.requireNonNull(propertyId);
+
         final Property property = this.getProperty(propertyId);
         authorizationManager.checkAccess(property);
+
         final Contact contact = this.getContact(propertyId, contactId);
         property.getContacts().remove(contact);
         propertyDao.persist(property);
+
         return contact;
     }
 
