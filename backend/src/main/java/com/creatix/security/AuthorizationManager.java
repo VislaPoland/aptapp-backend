@@ -89,4 +89,28 @@ public class AuthorizationManager {
         return Objects.equals(property, ((PropertyManager) getCurrentAccount()).getManagedProperty());
     }
 
+    public boolean checkAccess(@NotNull Property property) {
+        Objects.requireNonNull(property);
+        boolean allowed = false;
+        switch (this.getCurrentAccount().getRole()) {
+            case Administrator:
+                allowed = true;
+                break;
+            case PropertyOwner:
+                allowed = property.getOwner().equals(this.getCurrentAccount());
+                break;
+            case PropertyManager:
+                //noinspection SuspiciousMethodCalls
+                allowed = property.getManagers().contains(this.getCurrentAccount());
+                break;
+            case AssistantPropertyManager:
+                allowed = property.getManagers().contains(((Employee) this.getCurrentAccount()).getManager());
+                break;
+        }
+        if (allowed) {
+            return allowed;
+        }
+        throw new SecurityException(String.format("You are not eligible to read info about property with id=%d", property.getId()));
+    }
+
 }

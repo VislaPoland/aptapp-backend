@@ -123,6 +123,29 @@ INSERT INTO public.property_schedule(id, start_hour, start_minute, end_hour, end
 INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id) VALUES (101, 'Test property 1', 'Active', 101, 101, 101);
 INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id) VALUES (102, 'Test property 2', 'Active', 102, 109, 101);
 
+-- properties contacts
+INSERT INTO
+public.contact(id, type, communication_type, value)
+VALUES
+(1, 'Police', 'Phone', '1-541-754-3010'),
+(2, 'Police', 'Email', 'police@gmail.com'),
+(3, 'MedicalEmergency', 'Phone', '1-541-754-3010'),
+(4, 'MedicalEmergency', 'Email', 'medical@gmail.com'),
+(5, 'FireService', 'Phone', '1-541-754-3010'),
+(6, 'FireService', 'Email', 'fire@gmail.com')
+;
+
+INSERT INTO
+public.property_contacts(property_id, contacts_id)
+VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(2, 5),
+(2, 6)
+;
+
 -- apartments
 INSERT INTO public.apartment (id, unit_number, property_id)
 VALUES (101, '1', 101);
