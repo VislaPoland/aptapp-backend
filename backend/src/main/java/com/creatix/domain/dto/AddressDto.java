@@ -6,7 +6,7 @@ import lombok.Data;
 
 @ApiModel("Address DTO")
 @Data
-public class AddressDto {   //TODO rework addressdto usage
+public class AddressDto {
     @ApiModelProperty(value = "House number", required = true)
     private String houseNumber;
 

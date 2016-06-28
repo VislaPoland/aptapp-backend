@@ -1,14 +1,9 @@
 package com.creatix.domain.entity;
 
-import com.creatix.domain.enums.NotificationStatus;
-import com.creatix.domain.enums.NotificationType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.Date;
 
 @Entity
 @Data

@@ -21,7 +21,7 @@ public class Tenant extends Account {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Vehicle> vehicles;
 
-    @OneToMany(mappedBy = "parentTenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parentTenant", orphanRemoval = true)
     private Set<SubTenant> subTenants;
 
     @OneToOne(fetch = FetchType.LAZY)

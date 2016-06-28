@@ -6,6 +6,9 @@ import com.creatix.domain.dto.tenant.CreateTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
 import com.creatix.domain.dto.tenant.TenantSelfUpdateRequest;
 import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
+import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
+import com.creatix.domain.dto.tenant.subs.SubTenantDto;
+import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.CreateVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.UpdateVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
@@ -92,7 +95,7 @@ public class TenantController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 422, message = "Unprocessable"),
+            @ApiResponse(code = 422, message = "Unprocessable")
     })
     @RequestMapping(value = "/{tenantId}/vehicles", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
@@ -141,5 +144,75 @@ public class TenantController {
         return new DataResponse<>(tenantService.getTenantParkingStalls(tenantId).stream()
                 .map(ps -> mapper.toParkingStallDto(ps))
                 .collect(Collectors.toList()));
+    }
+
+    @ApiOperation(value = "Get sub-tenants created by tenant")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{tenantId}/subs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<List<SubTenantDto>> getSubTenants(@PathVariable Long tenantId) {
+        return new DataResponse<>(tenantService.getSubTenants(tenantId).stream()
+                .map(t -> mapper.toSubTenantDto(t))
+                .collect(Collectors.toList()));
+    }
+
+    @ApiOperation(value = "Create sub-tenant account")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 422, message = "Unprocessable")
+    })
+    @RequestMapping(value = "/{tenantId}/subs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Tenant})
+    public DataResponse<SubTenantDto> createSubTenant(@PathVariable Long tenantId, @RequestBody @Valid CreateSubTenantRequest request) {
+        return new DataResponse<>(mapper.toSubTenantDto(tenantService.createSubTenant(tenantId, request)));
+    }
+
+    @ApiOperation(value = "Get single sub-tenant")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<SubTenantDto> getSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId) {
+        return new DataResponse<>(mapper.toSubTenantDto(tenantService.getSubTenant(subTenantId)));
+    }
+
+    @ApiOperation(value = "Update sub-tenant account")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 422, message = "Unprocessable")
+    })
+    @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Tenant})
+    public DataResponse<SubTenantDto> updateSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId, @RequestBody @Valid UpdateSubTenantRequest request) {
+        return new DataResponse<>(mapper.toSubTenantDto(tenantService.updateSubTenant(tenantId, subTenantId, request)));
+    }
+
+    @ApiOperation(value = "Delete sub-tenant account")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Tenant})
+    public DataResponse<Void> deleteSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId) {
+        tenantService.deleteSubTenant(tenantId, subTenantId);
+        return new DataResponse<>();
     }
 }

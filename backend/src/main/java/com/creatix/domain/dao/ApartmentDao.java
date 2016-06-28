@@ -6,7 +6,6 @@ import com.creatix.domain.entity.QApartment;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.NoResultException;
 import java.util.List;
 
 @Repository

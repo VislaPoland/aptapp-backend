@@ -7,7 +7,6 @@ import com.creatix.domain.entity.*;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
-import com.creatix.security.RoleSecured;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -147,9 +145,8 @@ public class NotificationService {
                 if ( n.getType().equals(NotificationType.Maintenance) ) {
                     r = r || ((MaintenanceNotification) n).getTargetApartment().getTenant().equals(a);
                 }
-                if ( n.getType().equals(NotificationType.Neighborhood) )
-                //noinspection ConstantConditions
-                {
+                if ( n.getType().equals(NotificationType.Neighborhood) ) {
+                    //noinspection ConstantConditions
                     r = r || ((NeighborhoodNotification) n).getTargetApartment().getTenant().equals(a);
                 }
                 return r;

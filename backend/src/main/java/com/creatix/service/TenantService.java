@@ -5,13 +5,13 @@ import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.tenant.CreateTenantRequest;
 import com.creatix.domain.dto.tenant.TenantSelfUpdateRequest;
 import com.creatix.domain.dto.tenant.UpdateTenantRequest;
+import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
+import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.CreateVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.UpdateVehicleRequest;
-import com.creatix.domain.entity.Apartment;
-import com.creatix.domain.entity.ParkingStall;
-import com.creatix.domain.entity.Tenant;
-import com.creatix.domain.entity.Vehicle;
+import com.creatix.domain.entity.*;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.TenantType;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +36,8 @@ public class TenantService {
     private ApartmentDao apartmentDao;
     @Autowired
     private ParkingStallDao parkingStallDao;
+    @Autowired
+    private SubTenantDao subTenantDao;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -199,5 +201,69 @@ public class TenantService {
     public List<ParkingStall> getTenantParkingStalls(Long tenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         return tenant.getParkingStalls().stream().collect(Collectors.toList());
+    }
+
+    @RoleSecured
+    public List<SubTenant> getSubTenants(Long tenantId) {
+        final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
+        return tenant.getSubTenants().stream().collect(Collectors.toList());
+    }
+
+    @RoleSecured({AccountRole.Tenant})
+    public SubTenant createSubTenant(Long tenantId, @NotNull CreateSubTenantRequest request) {
+        Objects.requireNonNull(request);
+
+        final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
+        if (authorizationManager.isSelf(tenant)) {
+            final SubTenant subTenant = mapper.toSubTenant(request);
+            subTenant.setCompanyName(tenant.getCompanyName());
+            subTenant.setRole(AccountRole.SubTenant);
+            subTenant.setActive(false);
+            accountService.setActionToken(subTenant);
+            subTenant.setType(TenantType.Sub);
+            subTenant.setParentTenant(tenant);
+            subTenantDao.persist(subTenant);
+            return subTenant;
+        }
+        throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
+    }
+
+    @RoleSecured
+    public SubTenant getSubTenant(Long subTenantId) {
+        return getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
+    }
+
+    @RoleSecured({AccountRole.Tenant})
+    public SubTenant updateSubTenant(Long tenantId, Long subTenantId, @NotNull UpdateSubTenantRequest request) {
+        Objects.requireNonNull(request);
+
+        final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
+        if (authorizationManager.isSelf(tenant)) {
+            final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
+
+            if (tenant.getSubTenants().contains(subTenant)) {
+                mapper.fillSubTenant(request, subTenant);
+                subTenantDao.persist(subTenant);
+                return subTenant;
+            }
+            throw new SecurityException(String.format("You are not eligible to edit sub-tenant=%d profile", subTenantId));
+        }
+        throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
+    }
+
+    @RoleSecured({AccountRole.Tenant})
+    public void deleteSubTenant(Long tenantId, Long subTenantId) {
+        final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
+        if (authorizationManager.isSelf(tenant)) {
+            final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
+
+            if (tenant.getSubTenants().contains(subTenant)) {
+                subTenantDao.delete(subTenant);
+            } else {
+                throw new SecurityException(String.format("You are not eligible to edit sub-tenant=%d profile", subTenantId));
+            }
+        } else {
+            throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
+        }
     }
 }
