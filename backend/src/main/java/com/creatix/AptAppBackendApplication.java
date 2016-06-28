@@ -23,12 +23,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         WebSecurityConfiguration.class,
         MethodSecurityConfiguration.class,
         JpaConfiguration.class,
-        SwaggerConfiguration.class
+        SwaggerConfiguration.class,
 })
 @EnableConfigurationProperties({
         MailProperties.class,
         JwtProperties.class,
         FileUploadProperties.class,
+        TwilioProperties.class,
 })
 public class AptAppBackendApplication extends SpringBootServletInitializer {
 
