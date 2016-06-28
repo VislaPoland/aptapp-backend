@@ -40,7 +40,7 @@ public class AccountController {
     })
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<List<AccountDto>> getAccounts(@RequestParam(required = false) AccountRole[] roles, @RequestParam Long propertyId) {
+    public DataResponse<List<AccountDto>> getAccounts(@RequestParam(required = false) AccountRole[] roles, @RequestParam(required = false) Long propertyId) {
         return new DataResponse<>(accountService.getAccounts(roles, propertyId).stream()
                 .map(a -> mapper.toAccountDto(a))
                 .collect(Collectors.toList()));
