@@ -65,6 +65,7 @@ public class TenantService {
         final Tenant tenant = mapper.toTenant(request);
         tenant.setApartment(apartment);
         tenant.setActive(false);
+        tenant.setRole(AccountRole.Tenant);
         tenantDao.persist(tenant);
 
         accountService.setActionToken(tenant);
