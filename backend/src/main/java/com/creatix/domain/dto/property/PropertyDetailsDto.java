@@ -45,7 +45,8 @@ public class PropertyDetailsDto {
             private String name;
             @ApiModelProperty(required = true)
             private String value;
-
+            @ApiModelProperty(required = true)
+            private Integer ordinal;
         }
     }
 

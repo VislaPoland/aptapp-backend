@@ -15,7 +15,7 @@ public class FacilityDetail {
     @Column(nullable = false)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Facility facility;
 
     @Column(nullable = false)
@@ -25,5 +25,9 @@ public class FacilityDetail {
     @Column(nullable = false)
     @NotNull
     private String value;
+
+    @Column(nullable = false)
+    @NotNull
+    private Integer ordinal;
 
 }
