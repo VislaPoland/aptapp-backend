@@ -21,7 +21,7 @@ public class PropertyDetailsDto {
     @ApiModelProperty(value = "Property address", required = true)
     private AddressDto address;
     @ApiModelProperty(value = "Full address", required = true)
-    private AddressDto fullAddress;
+    private String fullAddress;
     @ApiModelProperty
     private List<Facility> facilities;
     @ApiModelProperty
