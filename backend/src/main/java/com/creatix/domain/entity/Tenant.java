@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, of = "id")
 public class Tenant extends Account {
     @Column
     @Enumerated(EnumType.STRING)
@@ -24,7 +24,7 @@ public class Tenant extends Account {
     @OneToMany(mappedBy = "parentTenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SubTenant> subTenants;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Apartment apartment;
 

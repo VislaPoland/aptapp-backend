@@ -26,30 +26,30 @@ public class Apartment {
     @JoinColumn
     private Property property;
 
-    @OneToOne(mappedBy = "apartment")
+    @OneToOne(mappedBy = "apartment", fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Apartment aboveApartment;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Apartment belowApartment;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Apartment leftApartment;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Apartment rightApartment;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Apartment oppositeApartment;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Apartment behindApartment;
 }
