@@ -9,17 +9,14 @@ import com.creatix.domain.entity.Facility;
 import com.creatix.domain.entity.FacilityDetail;
 import com.creatix.domain.entity.Property;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Component
-public final class PropertyMapper extends Mapper {
-
-    public PropertyMapper(MapperFactory mapperFactory) {
-        super(mapperFactory);
-    }
+public final class PropertyMapper extends ConfigurableMapper {
 
     protected void configure(MapperFactory mapperFactory) {
         super.configure(mapperFactory);
@@ -51,24 +48,27 @@ public final class PropertyMapper extends Mapper {
 
     public PropertyDetailsDto toPropertyDetailsDto(@NotNull Property property) {
         Objects.requireNonNull(property);
-        return mapperFactory.getMapperFacade().map(property, PropertyDetailsDto.class);
+
+        return this.map(property, PropertyDetailsDto.class);
     }
 
     public PropertyDetailsDto.Contact toPropertyContact(@NotNull Contact contact) {
         Objects.requireNonNull(contact);
-        return mapperFactory.getMapperFacade().map(contact, PropertyDetailsDto.Contact.class);
+
+        return this.map(contact, PropertyDetailsDto.Contact.class);
     }
 
     public Contact toPropertyContact(@NotNull CreatePropertyContactRequest request) {
         Objects.requireNonNull(request);
-        return mapperFactory.getMapperFacade().map(request, Contact.class);
+
+        return this.map(request, Contact.class);
     }
 
     public void fillPropertyContact(@NotNull UpdatePropertyContactRequest request, @NotNull Contact contact) {
         Objects.requireNonNull(request);
         Objects.requireNonNull(contact);
 
-        mapperFactory.getMapperFacade().map(request, contact);
+        this.map(request, contact);
     }
 
 }
