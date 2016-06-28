@@ -6,10 +6,11 @@ import com.creatix.domain.dao.DaoBase;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
 import com.creatix.domain.entity.Account;
+import com.creatix.domain.entity.PropertyManager;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthenticatedUserDetails;
 import com.creatix.security.AuthenticatedUserDetailsService;
-import com.creatix.security.RoleSecured;
+import com.creatix.security.AuthorizationManager;
 import com.creatix.security.TokenUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +47,8 @@ public class AccountService {
     private TokenUtils tokenUtils;
     @Autowired
     private Mapper mapper;
+    @Autowired
+    private AuthorizationManager authorizationManager;
 
     private static void validatePassword(String password) {
         if (StringUtils.isBlank(password)) {
@@ -115,13 +118,16 @@ public class AccountService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    @RoleSecured(AccountRole.Administrator)
-    public List<Account> getAccounts(AccountRole[] roles) {
-        if ((roles == null) || (roles.length == 0)) {
-            return accountDao.findAll();
-        } else {
-            return accountDao.findByRoles(roles);
+    public List<Account> getAccounts(AccountRole[] roles, Long propertyId) {
+        Long propertyIdForced = propertyId;
+        if ( !(authorizationManager.isAdministrator()) ) {
+            final Account account = authorizationManager.getCurrentAccount();
+            if ( account instanceof PropertyManager ) {
+                propertyIdForced = ((PropertyManager) account).getManagedProperty().getId();
+            }
         }
+
+        return accountDao.findByRolesAndPropertyId(roles, propertyIdForced);
     }
 
     public Account getAccount(String email) {

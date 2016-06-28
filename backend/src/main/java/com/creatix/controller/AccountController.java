@@ -39,9 +39,9 @@ public class AccountController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(AccountRole.Administrator)
-    public DataResponse<List<AccountDto>> getAccounts(@RequestParam(required = false) AccountRole[] roles) {
-        return new DataResponse<>(accountService.getAccounts(roles).stream()
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    public DataResponse<List<AccountDto>> getAccounts(@RequestParam(required = false) AccountRole[] roles, @RequestParam Long propertyId) {
+        return new DataResponse<>(accountService.getAccounts(roles, propertyId).stream()
                 .map(a -> mapper.toAccountDto(a))
                 .collect(Collectors.toList()));
     }

@@ -1,21 +1,62 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.Account;
-import com.creatix.domain.entity.QAccount;
+import com.creatix.domain.entity.*;
 import com.creatix.domain.enums.AccountRole;
+import com.querydsl.jpa.JPQLQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 @Transactional
 public class AccountDao extends DaoBase<Account, Long> {
 
-    public List<Account> findByRoles(AccountRole[] role) {
-        return queryFactory.selectFrom(QAccount.account)
-                .where(QAccount.account.role.in(role))
-                .fetch();
+    public List<Account> findByRolesAndPropertyId(@NotNull AccountRole[] roles, Long propertyId) {
+        Objects.requireNonNull(roles);
+
+        final List<Account> accounts;
+        if ( propertyId == null ) {
+            accounts = queryFactory.selectFrom(QAccount.account)
+                    .where(QAccount.account.role.in(roles))
+                    .fetch();
+        }
+        else {
+            accounts = new ArrayList<>();
+            for ( AccountRole role : roles ) {
+                if ( role == AccountRole.Tenant ) {
+                    accounts.addAll(queryFactory.selectFrom(QTenant.tenant)
+                            .where(QTenant.tenant.apartment.property.id.eq(propertyId))
+                            .fetch());
+                }
+                else if ( EnumSet.of(AccountRole.Maintenance, AccountRole.Security).contains(role) ) {
+                    accounts.addAll(queryFactory.selectFrom(QEmployee.employee)
+                            .where(QEmployee.employee.manager.managedProperty.id.eq(propertyId))
+                            .fetch());
+                }
+                else if ( role == AccountRole.PropertyManager ) {
+                    accounts.addAll(queryFactory.selectFrom(QPropertyManager.propertyManager)
+                            .where(QPropertyManager.propertyManager.managedProperty.id.eq(propertyId))
+                            .fetch());
+                }
+                else if ( role == AccountRole.PropertyOwner ) {
+                    accounts.addAll(queryFactory.selectFrom(QPropertyOwner.propertyOwner)
+                            .where(QPropertyOwner.propertyOwner.ownedProperties.any().id.eq(propertyId))
+                            .fetch());
+                }
+                else if ( role == AccountRole.SubTenant ) {
+                    accounts.addAll(queryFactory.selectFrom(QSubTenant.subTenant)
+                            .where(QSubTenant.subTenant.parentTenant.apartment.property.id.eq(propertyId))
+                            .fetch());
+                }
+            }
+        }
+
+        return accounts;
     }
 
     public List<Account> findAll() {
