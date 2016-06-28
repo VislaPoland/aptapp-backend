@@ -24,6 +24,16 @@
       "name": "upload.repository-path",
       "type": "java.lang.String",
       "description": "Path to upload repository."
+    },
+    {
+      "name": "twilio.account-sid",
+      "type": "java.lang.String",
+      "description": "Twilio account SID."
+    },
+    {
+      "name": "twilio.auth-token",
+      "type": "java.lang.String",
+      "description": "Twilio authentication token."
     }
   ]
 }
