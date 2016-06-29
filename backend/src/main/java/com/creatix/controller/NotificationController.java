@@ -2,11 +2,15 @@ package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.notification.*;
-import com.creatix.domain.entity.MaintenanceNotification;
-import com.creatix.domain.entity.NeighborhoodNotification;
-import com.creatix.domain.entity.NotificationPhoto;
-import com.creatix.domain.entity.SecurityNotification;
+import com.creatix.domain.dto.PageableDataResponse;
+import com.creatix.domain.dto.notification.NotificationDto;
+import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
+import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
+import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
+import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationDto;
+import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
+import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
+import com.creatix.domain.entity.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.NotificationService;
@@ -45,13 +49,12 @@ public class NotificationController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
-    public DataResponse<List<NotificationDto>> getNotifications(@RequestBody @Valid NotificationsCollectionRequest request) {
-        List<NotificationDto> data = notificationService.getRelevantInDateRange(request.getFrom(), request.getTill()).stream()
-                .map(n -> mapper.toNotificationDto(n))
-                .collect(Collectors.toList());
-        return new DataResponse<>(data);
+    public PageableDataResponse<List<NotificationDto>> getNotifications(
+            @RequestParam(required = false, defaultValue = "0") Long page,
+            @RequestParam(required = false, defaultValue = "20") Long size) {
+        return mapper.toPageableDataResponse(notificationService.getRelevantNotificationsInDateRange(page, size), n -> mapper.toNotificationDto(n));
     }
 
     //maintenance

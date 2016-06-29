@@ -3,10 +3,17 @@ package com.creatix.domain;
 import com.creatix.domain.dao.EmployeeDao;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.ApartmentDto;
+import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.account.PersistAdministratorRequest;
 import com.creatix.domain.dto.account.PersistPropertyOwnerRequest;
 import com.creatix.domain.dto.notification.*;
+import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
+import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
+import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
+import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationDto;
+import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
+import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
@@ -29,7 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -408,5 +417,14 @@ public class Mapper {
         Objects.requireNonNull(entity);
 
         mapperFactory.getMapperFacade().map(request, entity);
+    }
+
+    public <T, R> PageableDataResponse<List<R>> toPageableDataResponse(@NotNull PageableDataResponse<List<T>> response, @NotNull Function<T, R> mappingFunction) {
+        Objects.requireNonNull(response);
+        Objects.requireNonNull(mappingFunction);
+
+        return new PageableDataResponse<>(response.getData().stream()
+                .map(mappingFunction)
+                .collect(Collectors.toList()), response.getPageSize(), response.getTotalItems(), response.getTotalPages(), response.getPageNumber());
     }
 }

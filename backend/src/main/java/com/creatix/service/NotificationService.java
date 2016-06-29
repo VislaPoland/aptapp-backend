@@ -1,18 +1,15 @@
 package com.creatix.service;
 
 import com.creatix.configuration.FileUploadProperties;
-import com.creatix.configuration.MailProperties;
 import com.creatix.domain.dao.*;
+import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.entity.*;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
@@ -45,12 +42,27 @@ public class NotificationService {
     @Autowired
     private NotificationPhotoDao notificationPhotoDao;
 
-    public List<Notification> getRelevantInDateRange(@NotNull Date beginDate, @NotNull Date endDate) {
-        Objects.requireNonNull(beginDate);
-        Objects.requireNonNull(endDate);
-        return notificationDao.findAllInDateRange(beginDate, endDate).stream()
+    private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
+        final T item = dao.findById(id);
+        if (item == null) {
+            throw ex;
+        }
+        return item;
+    }
+
+    //TODO make filtering logic more effective
+    public PageableDataResponse<List<Notification>> getRelevantNotificationsInDateRange(
+            Long pageNumber, Long pageSize) {
+        List<Notification> notifications = notificationDao.findAll().stream()
                 .filter(n -> relevantNotificationsFilter(n, authorizationManager.getCurrentAccount()))
                 .collect(Collectors.toList());
+        long totalItems = notifications.size();
+        long totalPages = totalItems / pageSize;
+
+        return new PageableDataResponse<>(notifications.stream()
+                .limit(pageNumber * pageSize + pageSize)
+                .skip(pageNumber * pageSize)
+                .collect(Collectors.toList()), pageSize, totalItems, totalPages, pageNumber);
     }
 
     public List<MaintenanceNotification> getMaintenanceNotificationsInDateRange(@NotNull Date beginDate, @NotNull Date endDate) {
@@ -61,32 +73,23 @@ public class NotificationService {
 
     public SecurityNotification getSecurityNotification(@NotNull Long notificationId) {
         Objects.requireNonNull(notificationId);
-        SecurityNotification n = securityNotificationDao.findById(notificationId);
-        if ( n == null ) {
-            throw new EntityNotFoundException(String.format("Notification id=%d not found", notificationId));
-        }
 
-        return n;
+        return getOrElseThrow(notificationId, securityNotificationDao,
+                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
     }
 
     public MaintenanceNotification getMaintenanceNotification(@NotNull Long notificationId) {
         Objects.requireNonNull(notificationId);
-        MaintenanceNotification n = maintenanceNotificationDao.findById(notificationId);
-        if ( n == null ) {
-            throw new EntityNotFoundException(String.format("Notification id=%d not found", notificationId));
-        }
 
-        return n;
+        return getOrElseThrow(notificationId, maintenanceNotificationDao,
+                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
     }
 
     public NeighborhoodNotification getNeighborhoodNotification(@NotNull Long notificationId) {
         Objects.requireNonNull(notificationId);
-        NeighborhoodNotification n = neighborhoodNotificationDao.findById(notificationId);
-        if ( n == null ) {
-            throw new EntityNotFoundException(String.format("Notification id=%d not found", notificationId));
-        }
 
-        return n;
+        return getOrElseThrow(notificationId, neighborhoodNotificationDao,
+                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
     }
 
     public SecurityNotification saveSecurityNotification(@NotNull SecurityNotification notification) {
@@ -124,24 +127,24 @@ public class NotificationService {
 
     private Apartment getApartmentByUnitNumber(String targetUnitNumber) {
         final Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty());
-        if ( apartment == null ) {
+        if (apartment == null) {
             throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
         }
         return apartment;
     }
 
     private boolean relevantNotificationsFilter(Notification n, Account a) {
-        switch ( a.getRole() ) {
+        switch (a.getRole()) {
             case Maintenance:
                 return n.getType().equals(NotificationType.Maintenance);
             case Security:
                 return n.getType().equals(NotificationType.Security);
             case Tenant:
                 boolean r = n.getAuthor().equals(a);
-                if ( n.getType().equals(NotificationType.Maintenance) ) {
+                if (n.getType().equals(NotificationType.Maintenance)) {
                     r = r || ((MaintenanceNotification) n).getTargetApartment().getTenant().equals(a);
                 }
-                if ( n.getType().equals(NotificationType.Neighborhood) ) {
+                if (n.getType().equals(NotificationType.Neighborhood)) {
                     //noinspection ConstantConditions
                     r = r || ((NeighborhoodNotification) n).getTargetApartment().getTenant().equals(a);
                 }
@@ -154,11 +157,11 @@ public class NotificationService {
     public Notification storeNotificationPhotos(MultipartFile[] files, long notificationId) throws IOException {
 
         final Notification notification = notificationDao.findById(notificationId);
-        if ( notification == null ) {
+        if (notification == null) {
             throw new EntityNotFoundException(String.format("Notification id=%d not found", notificationId));
         }
 
-        for ( MultipartFile file : files ) {
+        for (MultipartFile file : files) {
 
             // move uploaded file to file repository
             final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename()));
@@ -179,7 +182,7 @@ public class NotificationService {
     public NotificationPhoto getNotificationPhoto(long notificationPhotoId) {
 
         final NotificationPhoto photo = notificationPhotoDao.findById(notificationPhotoId);
-        if ( photo == null ) {
+        if (photo == null) {
             throw new EntityNotFoundException(String.format("Photo id=%d not found", notificationPhotoId));
         }
 

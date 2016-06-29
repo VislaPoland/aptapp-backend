@@ -1,4 +1,4 @@
-package com.creatix.domain.dto.notification;
+package com.creatix.domain.dto.notification.neighborhood;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
