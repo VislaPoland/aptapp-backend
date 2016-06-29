@@ -59,7 +59,9 @@ public class AccountDao extends DaoBase<Account, Long> {
     }
 
     public List<Account> findAll() {
-        return queryFactory.selectFrom(QAccount.account)
+        return queryFactory
+                .selectFrom(QAccount.account)
+                .where(QAccount.account.deletedAt.isNull())
                 .fetch();
     }
 

@@ -16,7 +16,8 @@ public class EmployeeDao extends AbstractAccountDao<Employee> {
         final QEmployee employee = QEmployee.employee;
         return queryFactory
                 .selectFrom(employee)
-                .where(employee.manager.managedProperty.id.eq(propertyId))
+                .where(employee.deletedAt.isNull()
+                        .and(employee.manager.managedProperty.id.eq(propertyId)))
                 .fetch();
     }
 
@@ -24,7 +25,9 @@ public class EmployeeDao extends AbstractAccountDao<Employee> {
         final QEmployee employee = QEmployee.employee;
         return queryFactory
                 .selectFrom(employee)
-                .where(employee.manager.managedProperty.id.eq(propertyId).and(employee.role.ne(AccountRole.AssistantPropertyManager)))
+                .where(employee.deletedAt.isNull()
+                        .and(employee.manager.managedProperty.id.eq(propertyId)
+                                .and(employee.role.ne(AccountRole.AssistantPropertyManager))))
                 .fetch();
     }
 
@@ -32,7 +35,9 @@ public class EmployeeDao extends AbstractAccountDao<Employee> {
         final QEmployee employee = QEmployee.employee;
         return queryFactory
                 .selectFrom(employee)
-                .where(employee.manager.managedProperty.id.eq(propertyId).and(employee.role.eq(AccountRole.AssistantPropertyManager)))
+                .where(employee.deletedAt.isNull()
+                        .and(employee.manager.managedProperty.id.eq(propertyId)
+                                .and(employee.role.eq(AccountRole.AssistantPropertyManager))))
                 .fetch();
     }
 
