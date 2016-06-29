@@ -62,7 +62,7 @@ public class PropertyContactController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<PropertyDetailsDto.Contact> createPropertyContact(@PathVariable Long propertyId, @Valid @RequestBody CreatePropertyContactRequest request) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.create(propertyId, request)));
     }
@@ -74,7 +74,7 @@ public class PropertyContactController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/{contactId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<PropertyDetailsDto.Contact> updatePropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId, @Valid @RequestBody UpdatePropertyContactRequest request) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.update(propertyId, contactId, request)));
     }
@@ -86,7 +86,7 @@ public class PropertyContactController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/{contactId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<PropertyDetailsDto.Contact> deletePropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.delete(propertyId, contactId)));
     }

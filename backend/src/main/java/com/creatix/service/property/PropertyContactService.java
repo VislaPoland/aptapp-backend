@@ -54,7 +54,7 @@ public class PropertyContactService {
         return contact;
     }
 
-    @RoleSecured(AccountRole.PropertyManager)
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public Contact create(@NotNull Long propertyId, @NotNull CreatePropertyContactRequest request) {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(request);
@@ -69,7 +69,7 @@ public class PropertyContactService {
         return contact;
     }
 
-    @RoleSecured(AccountRole.PropertyManager)
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public Contact update(@NotNull Long propertyId, @NotNull Long contactId, @NotNull UpdatePropertyContactRequest request) {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(request);
@@ -84,7 +84,7 @@ public class PropertyContactService {
         return contact;
     }
 
-    @RoleSecured(AccountRole.PropertyManager)
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public Contact delete(@NotNull Long propertyId, @NotNull Long contactId) {
         Objects.requireNonNull(propertyId);
 

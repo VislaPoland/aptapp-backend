@@ -56,7 +56,7 @@ public class PropertyFacilityService {
         return facilty;
     }
 
-    @RoleSecured(AccountRole.PropertyManager)
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public Facility create(@NotNull Long propertyId, @NotNull CreatePropertyFacilityRequest request) {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(request);
@@ -71,7 +71,7 @@ public class PropertyFacilityService {
         return facility;
     }
 
-    @RoleSecured(AccountRole.PropertyManager)
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public Facility update(@NotNull Long propertyId, @NotNull Long facilityId, @NotNull UpdatePropertyFacilityRequest request) {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(request);
@@ -90,7 +90,7 @@ public class PropertyFacilityService {
         return facility;
     }
 
-    @RoleSecured(AccountRole.PropertyManager)
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public Facility delete(@NotNull Long propertyId, @NotNull Long facilityId) {
         Objects.requireNonNull(propertyId);
 
