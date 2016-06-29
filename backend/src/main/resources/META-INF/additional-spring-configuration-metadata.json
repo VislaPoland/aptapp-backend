@@ -34,6 +34,11 @@
       "name": "twilio.auth-token",
       "type": "java.lang.String",
       "description": "Twilio authentication token."
+    },
+    {
+      "name": "twilio.from",
+      "type": "java.lang.String",
+      "description": "Phone number to send SMS from."
     }
   ]
 }
