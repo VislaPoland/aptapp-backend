@@ -11,14 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SmsMessageSender {
 
+    @Autowired
     private TwilioProperties twilioProperties;
 
-    @Autowired
-    public SmsMessageSender(TwilioProperties twilioProperties) {
-        this.twilioProperties = twilioProperties;
-
-        Twilio.init(twilioProperties.getAccountSid(), twilioProperties.getAuthToken());
-    }
+    private boolean isInitialized = false;
 
     /**
      * Send SMS message to phone number.
@@ -27,6 +23,12 @@ public class SmsMessageSender {
      * @param recipientPhone SMS recipient phone number. Example: "+12345678901"
      */
     public void send(String body, String recipientPhone) throws MessageDeliveryException {
+
+        if ( !(isInitialized) ) {
+            Twilio.init(twilioProperties.getAccountSid(), twilioProperties.getAuthToken());
+            isInitialized = true;
+        }
+
         Message message = new MessageCreator(
                 twilioProperties.getAccountSid(),
                 new PhoneNumber(recipientPhone),
