@@ -15,7 +15,6 @@ public class PropertyDao extends DaoBase<Property, Long> {
         return queryFactory.selectFrom(QProperty.property)
                 .where(QProperty.property.deleteDate.isNull())
                 .fetch();
-
     }
 
 }

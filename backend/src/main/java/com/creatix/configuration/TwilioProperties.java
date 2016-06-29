@@ -7,6 +7,7 @@ public class TwilioProperties {
 
     private String accountSid;
     private String authToken;
+    private String from;
 
     public String getAccountSid() {
         return accountSid;
@@ -22,5 +23,13 @@ public class TwilioProperties {
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
     }
 }

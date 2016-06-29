@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true, of = "id")
+@EqualsAndHashCode(callSuper = true, exclude = {"employees", "managedProperty"})
 public class PropertyManager extends Account {
     @ManyToOne
     private Property managedProperty;

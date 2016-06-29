@@ -7,6 +7,8 @@ import com.creatix.domain.enums.FacilityType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -28,6 +30,12 @@ public class PropertyDetailsDto {
     private List<Contact> contacts;
     @ApiModelProperty(value = "Property owner info", required = true)
     private Owner owner;
+    @ApiModelProperty(value = "Property managers")
+    private List<Account> managers;
+    @ApiModelProperty(value = "Property assistants of managers")
+    private List<Account> assistantManagers;
+    @ApiModelProperty(value = "Property employees")
+    private List<Account> employees;
     @ApiModelProperty(value = "Property schedule", required = true)
     private Schedule schedule;
 
@@ -62,8 +70,17 @@ public class PropertyDetailsDto {
     }
 
     @ApiModel
-    @Data
-    public static class Owner {
+    @Getter
+    @Setter
+    public static class Owner extends Account {
+        @ApiModelProperty(required = true)
+        private String web;
+    }
+
+    @ApiModel
+    @Getter
+    @Setter
+    public static class Account {
         @ApiModelProperty(required = true)
         private String id;
         @ApiModelProperty(required = true)
@@ -72,8 +89,6 @@ public class PropertyDetailsDto {
         private String phone;
         @ApiModelProperty(required = true)
         private String email;
-        @ApiModelProperty(required = true)
-        private String web;
     }
 
     @ApiModel
@@ -87,7 +102,9 @@ public class PropertyDetailsDto {
         private Integer endHour;
         @ApiModelProperty(value = "End minute of schedule time", required = true)
         private Integer endMinute;
-        @ApiModelProperty(value = "Number of slots per schedule time", required = true)
-        private Integer slotsCount;
+        @ApiModelProperty(value = "Length of the period in minutes", required = true, notes = "This needs to be a divisor of the working time")
+        private Integer periodLength;
+        @ApiModelProperty(value = "Number of slots per period", required = true)
+        private Integer slotsPerPeriod;
     }
 }

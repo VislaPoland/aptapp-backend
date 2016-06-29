@@ -51,6 +51,6 @@ public class Property {
     @OneToMany(cascade = CascadeType.ALL)
     private Set<Contact> contacts;
 
-    @ManyToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private PropertySchedule schedule;
 }

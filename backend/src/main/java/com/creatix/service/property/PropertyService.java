@@ -1,7 +1,8 @@
-package com.creatix.service;
+package com.creatix.service.property;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.DaoBase;
+import com.creatix.domain.dao.EmployeeDao;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.PropertyOwnerDao;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
@@ -12,6 +13,7 @@ import com.creatix.domain.entity.Property;
 import com.creatix.domain.entity.PropertyOwner;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.PropertyStatus;
+import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ public class PropertyService {
     private PropertyDao propertyDao;
     @Autowired
     private PropertyOwnerDao propertyOwnerDao;
+
     @Autowired
     private Mapper mapper;
     @Autowired
@@ -74,12 +77,13 @@ public class PropertyService {
     }
 
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public Property getProperty(Long propertyId) {
-        final Property property = getOrElseThrow(propertyId, propertyDao, new EntityNotFoundException(String.format("Property %d not found", propertyId)));
-        if (isEligibleToReadProperty(property, authorizationManager.getCurrentAccount())) {
-            return property;
-        }
-        throw new SecurityException(String.format("You are not eligible to read info about property with id=%d", propertyId));
+    public Property getDetail(@NotNull Long propertyId) {
+        Objects.requireNonNull(propertyId);
+
+        final Property property = this.getProperty(propertyId);
+        authorizationManager.checkAccess(property);
+
+        return property;
     }
 
     @RoleSecured(AccountRole.Administrator)
@@ -124,4 +128,14 @@ public class PropertyService {
         propertyDao.persist(property);
         return property;
     }
+
+    private Property getProperty(@NotNull Long propertyId) {
+        Objects.requireNonNull(propertyId);
+        final Property property = this.propertyDao.findById(propertyId);
+        if (property == null) {
+            throw new EntityNotFoundException(String.format("Property id=%d not found", propertyId));
+        }
+        return property;
+    }
+
 }

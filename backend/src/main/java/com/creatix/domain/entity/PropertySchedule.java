@@ -36,6 +36,9 @@ public class PropertySchedule {
 
     @Column(nullable = false)
     @NotNull
-    private Integer slotsCount;
-    //TODO add per day working hours and multiple slots per interval
+    private Integer periodLength;
+
+    @Column(nullable = false)
+    @NotNull
+    private Integer slotsPerPeriod;
 }

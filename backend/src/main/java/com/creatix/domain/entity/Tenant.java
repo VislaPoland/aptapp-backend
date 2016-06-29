@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true, of = "id")
+@EqualsAndHashCode(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})
 public class Tenant extends Account {
     @Column
     @Enumerated(EnumType.STRING)

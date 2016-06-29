@@ -1,17 +1,14 @@
 package com.creatix.domain.entity;
 
 import com.creatix.domain.enums.TenantType;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 
-@SuppressWarnings("Lombok")
 @Entity
-@Getter
-@Setter
-@EqualsAndHashCode(callSuper = true, of = "id")
+@Data
+@EqualsAndHashCode(callSuper = true, exclude = {"parentTenant"})
 public class SubTenant extends Account {
     @Column
     @Enumerated(EnumType.STRING)
