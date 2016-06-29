@@ -4,6 +4,8 @@ import com.creatix.domain.dao.EmployeeDao;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.account.AccountDto;
+import com.creatix.domain.dto.account.PersistAdministratorRequest;
+import com.creatix.domain.dto.account.PersistPropertyOwnerRequest;
 import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
@@ -20,7 +22,6 @@ import com.creatix.domain.dto.tenant.vehicle.CreateVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.UpdateVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.entity.*;
-import com.creatix.domain.enums.AccountRole;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -28,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -265,6 +264,21 @@ public class Mapper {
                 .field("phone", "primaryPhone")
                 .field("email", "primaryEmail")
                 .register();
+
+        mapperFactory.classMap(PersistAdministratorRequest.class, Account.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(PersistPropertyOwnerRequest.class, Account.class)
+                .byDefault()
+                .register();
+    }
+
+    public void fillAccount(PersistAdministratorRequest req, Account acc) {
+        mapperFactory.getMapperFacade().map(req, acc);
+    }
+
+    public void fillAccount(PersistPropertyOwnerRequest req, Account acc) {
+        mapperFactory.getMapperFacade().map(req, acc);
     }
 
     public Tenant toTenant(@NotNull CreateTenantRequest request) {
