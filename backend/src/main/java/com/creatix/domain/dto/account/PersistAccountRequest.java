@@ -15,8 +15,12 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class PersistAccountRequest {
 
     @NotEmpty
-    @ApiModelProperty(value = "Full name", required = true)
-    private String fullName;
+    @ApiModelProperty(value = "First name", required = true)
+    private String firstName;
+
+    @NotEmpty
+    @ApiModelProperty(value = "Last name", required = true)
+    private String lastName;
 
     @NotEmpty
     @ApiModelProperty(value = "Email address", required = true)
