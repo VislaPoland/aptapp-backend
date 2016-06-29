@@ -8,7 +8,7 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true, of = "id")
+@EqualsAndHashCode(callSuper = true, exclude = {"manager"})
 public class Employee extends Account {
     @ManyToOne
     private PropertyManager manager;
