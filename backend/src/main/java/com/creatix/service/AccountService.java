@@ -101,6 +101,7 @@ public class AccountService {
         final Account account = ((AuthenticatedUserDetails) userDetails).getAccount();
         result.setId(account.getId());
         result.setAccount(mapper.toAccountDto(account));
+        result.setRole(account.getRole());
 
         return result;
     }
