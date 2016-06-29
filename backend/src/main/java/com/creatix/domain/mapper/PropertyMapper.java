@@ -7,7 +7,6 @@ import com.creatix.domain.dto.property.facility.CreatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.facility.UpdatePropertyFacilityRequest;
 import com.creatix.domain.entity.Contact;
 import com.creatix.domain.entity.Facility;
-import com.creatix.domain.entity.FacilityDetail;
 import com.creatix.domain.entity.Property;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
@@ -42,49 +41,14 @@ public final class PropertyMapper extends ConfigurableMapper {
         //endregion
 
         //region Facility
-        mapperFactory.classMap(FacilityDetail.class, PropertyDetailsDto.Facility.Detail.class)
-                .byDefault()
-                .register();
         mapperFactory.classMap(Facility.class, PropertyDetailsDto.Facility.class)
-                .byDefault()
-                .register();
-        mapperFactory.classMap(CreatePropertyFacilityRequest.Detail.class, FacilityDetail.class)
                 .byDefault()
                 .register();
         mapperFactory.classMap(CreatePropertyFacilityRequest.class, Facility.class)
                 .byDefault()
-                .customize(
-                        new CustomMapper<CreatePropertyFacilityRequest, Facility>() {
-                            @Override
-                            public void mapAtoB(CreatePropertyFacilityRequest createPropertyFacilityRequest, Facility facility, MappingContext context) {
-                                super.mapAtoB(createPropertyFacilityRequest, facility, context);
-                                if (facility.getDetails() != null) {
-                                    for (FacilityDetail facilityDetail : facility.getDetails()) {
-                                        facilityDetail.setFacility(facility);
-                                    }
-                                }
-                            }
-                        }
-                )
-                .register();
-        mapperFactory.classMap(UpdatePropertyFacilityRequest.Detail.class, FacilityDetail.class)
-                .byDefault()
                 .register();
         mapperFactory.classMap(UpdatePropertyFacilityRequest.class, Facility.class)
                 .byDefault()
-                .customize(
-                        new CustomMapper<UpdatePropertyFacilityRequest, Facility>() {
-                            @Override
-                            public void mapAtoB(UpdatePropertyFacilityRequest updatePropertyFacilityRequest, Facility facility, MappingContext context) {
-                                super.mapAtoB(updatePropertyFacilityRequest, facility, context);
-                                if (facility.getDetails() != null) {
-                                    for (FacilityDetail facilityDetail : facility.getDetails()) {
-                                        facilityDetail.setFacility(facility);
-                                    }
-                                }
-                            }
-                        }
-                )
                 .register();
         //endregion
     }
