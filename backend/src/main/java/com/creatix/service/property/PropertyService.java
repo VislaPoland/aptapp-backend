@@ -1,4 +1,4 @@
-package com.creatix.service;
+package com.creatix.service.property;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.DaoBase;
