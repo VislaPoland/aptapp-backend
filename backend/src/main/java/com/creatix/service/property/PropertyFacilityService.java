@@ -5,7 +5,6 @@ import com.creatix.domain.dao.PropertyFacilityDao;
 import com.creatix.domain.dto.property.facility.CreatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.facility.UpdatePropertyFacilityRequest;
 import com.creatix.domain.entity.Facility;
-import com.creatix.domain.entity.FacilityDetail;
 import com.creatix.domain.entity.Property;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.PropertyMapper;
@@ -80,11 +79,7 @@ public class PropertyFacilityService {
         authorizationManager.checkAccess(property);
 
         final Facility facility = this.getFacilty(propertyId, facilityId);
-        Set<FacilityDetail> details = facility.getDetails();
-        details.clear();
         propertyMapper.fillPropertyFacility(request, facility);
-        details.addAll(facility.getDetails());
-        facility.setDetails(details);
         propertyFacilityDao.persist(facility);
 
         return facility;

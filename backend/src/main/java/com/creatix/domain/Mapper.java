@@ -117,10 +117,6 @@ public class Mapper {
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(FacilityDetail.class, PropertyDetailsDto.Facility.Detail.class)
-                .byDefault()
-                .register();
-
         mapperFactory.classMap(PropertyOwner.class, PropertyDetailsDto.Owner.class)
                 .field("primaryEmail", "email")
                 .field("fullName", "name")

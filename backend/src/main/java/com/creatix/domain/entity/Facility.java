@@ -27,6 +27,16 @@ public class Facility {
     @NotNull
     private FacilityType type;
 
-    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<FacilityDetail> details;
+    @Column
+    private String name;
+
+    @Column(length = 4096)
+    private String description;
+
+    @Column
+    private String openingHours;
+
+    @Column
+    private String location;
+
 }

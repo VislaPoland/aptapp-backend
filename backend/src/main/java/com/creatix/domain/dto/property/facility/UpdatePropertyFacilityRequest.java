@@ -5,26 +5,19 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @ApiModel
 @Data
 public class UpdatePropertyFacilityRequest {
 
     @ApiModelProperty(value = "Type of facility", required = true)
     private FacilityType type;
-    @ApiModelProperty(value = "Facility info", required = true)
-    private List<Detail> details;
-
-    @ApiModel
-    @Data
-    public static class Detail {
-        @ApiModelProperty(required = true)
-        private String name;
-        @ApiModelProperty(required = true)
-        private String value;
-        @ApiModelProperty(required = true)
-        private Integer ordinal;
-    }
+    @ApiModelProperty(value = "Facility name")
+    private String name;
+    @ApiModelProperty(value = "Facility description")
+    private String description;
+    @ApiModelProperty(value = "Facility opening hours")
+    private String openingHours;
+    @ApiModelProperty(value = "Facility location name")
+    private String location;
 
 }
