@@ -5,10 +5,8 @@ import com.creatix.domain.dto.property.contact.CreatePropertyContactRequest;
 import com.creatix.domain.dto.property.contact.UpdatePropertyContactRequest;
 import com.creatix.domain.dto.property.facility.CreatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.facility.UpdatePropertyFacilityRequest;
-import com.creatix.domain.entity.Contact;
-import com.creatix.domain.entity.Facility;
-import com.creatix.domain.entity.FacilityDetail;
-import com.creatix.domain.entity.Property;
+import com.creatix.domain.dto.property.schedule.PropertyScheduleDto;
+import com.creatix.domain.entity.*;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -87,6 +85,15 @@ public final class PropertyMapper extends ConfigurableMapper {
                 )
                 .register();
         //endregion
+
+        //region Schedule
+        mapperFactory.classMap(PropertyScheduleDto.class, PropertySchedule.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(PropertySchedule.class, PropertyScheduleDto.class)
+                .byDefault()
+                .register();
+        //endregion
     }
 
     public PropertyDetailsDto toPropertyDetailsDto(@NotNull Property property) {
@@ -137,4 +144,24 @@ public final class PropertyMapper extends ConfigurableMapper {
     }
     //endregion
 
+    //region Schedule
+    public PropertyScheduleDto toPropertyScheduleDto(@NotNull PropertySchedule schedule) {
+        Objects.requireNonNull(schedule);
+
+        return this.map(schedule, PropertyScheduleDto.class);
+    }
+
+    public PropertySchedule toPropertySchedule(@NotNull PropertyScheduleDto request) {
+        Objects.requireNonNull(request);
+
+        return this.map(request, PropertySchedule.class);
+    }
+
+    public void fillPropertySchedule(@NotNull PropertyScheduleDto request, @NotNull PropertySchedule schedule) {
+        Objects.requireNonNull(request);
+        Objects.requireNonNull(schedule);
+
+        this.map(request, schedule);
+    }
+    //endregion
 }

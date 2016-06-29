@@ -107,7 +107,9 @@ public class PropertyDetailsDto {
         private Integer endHour;
         @ApiModelProperty(value = "End minute of schedule time", required = true)
         private Integer endMinute;
-        @ApiModelProperty(value = "Number of slots per schedule time", required = true)
-        private Integer slotsCount;
+        @ApiModelProperty(value = "Length of the period in minutes", required = true, notes = "This needs to be a divisor of the working time")
+        private Integer periodLength;
+        @ApiModelProperty(value = "Number of slots per period", required = true)
+        private Integer slotsPerPeriod;
     }
 }

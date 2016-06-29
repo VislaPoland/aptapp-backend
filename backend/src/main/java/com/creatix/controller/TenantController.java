@@ -63,10 +63,10 @@ public class TenantController {
     @ApiOperation(value = "Update tenant")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found")
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 422, message = "Unprocessable")
     })
     @RequestMapping(value = "/{tenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant})
@@ -109,7 +109,7 @@ public class TenantController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 422, message = "Unprocessable"),
+            @ApiResponse(code = 422, message = "Unprocessable")
     })
     @RequestMapping(value = "/{tenantId}/vehicles/{licensePlate}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
