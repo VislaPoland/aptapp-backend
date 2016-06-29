@@ -46,7 +46,7 @@ public class PropertyController {
                 .collect(Collectors.toList()));
     }
 
-    @ApiOperation(value = "Get property details")
+    @ApiOperation(value = "Get property detail")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
@@ -55,7 +55,7 @@ public class PropertyController {
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<PropertyDetailsDto> getPropertyDetails(@PathVariable long propertyId) {
-        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.getProperty(propertyId)));
+        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.getDetail(propertyId)));
     }
 
     @ApiOperation(value = "Create new property")
