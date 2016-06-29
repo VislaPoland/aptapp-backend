@@ -164,6 +164,7 @@ public class AccountService {
     @RoleSecured(AccountRole.Administrator)
     public Account createAdministrator(@NotNull PersistAdministratorRequest request) {
         Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         final Account account = new Account();
         account.setRole(AccountRole.Administrator);
@@ -180,6 +181,7 @@ public class AccountService {
         Objects.requireNonNull(request);
 
         final Account account = getAccount(accountId);
+        preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
         if ( account.getRole() != AccountRole.Administrator ) {
             throw new SecurityException("Account role change is not allowed.");
         }
@@ -192,6 +194,7 @@ public class AccountService {
     @RoleSecured(AccountRole.Administrator)
     public Account createPropertyOwner(@NotNull PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException {
         Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         final PropertyOwner account = new PropertyOwner();
         account.setRole(AccountRole.PropertyOwner);
@@ -211,6 +214,7 @@ public class AccountService {
         Objects.requireNonNull(request);
 
         final PropertyOwner account = propertyOwnerDao.findById(accountId);
+        preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
         if ( account.getRole() != AccountRole.PropertyOwner ) {
             throw new SecurityException("Account role change is not allowed.");
         }
@@ -220,5 +224,14 @@ public class AccountService {
         return account;
     }
 
+    private void preventAccountDuplicity(String email, String emailExisting) {
+        if ( Objects.equals(email, emailExisting) ) {
+            // email will not change, assume account is not a duplicate
+            return;
+        }
 
+        if ( accountDao.findByEmail(email) != null ) {
+            throw new IllegalArgumentException(String.format("Account %s already exists.", email));
+        }
+    }
 }
