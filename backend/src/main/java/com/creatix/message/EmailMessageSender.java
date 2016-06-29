@@ -19,10 +19,10 @@ public class EmailMessageSender {
     @Autowired
     private MailSender mailSender;
     @Autowired
-    private EmailTemplateProcessor emailTemplateProcessor;
+    private EmailTemplateProcessor templateProcessor;
 
     public void send(EmailMessageTemplate template) throws IOException, TemplateException, MessageDeliveryException {
-        send(template.getSubject(), emailTemplateProcessor.processTemplate(template), template.getRecipient());
+        send(template.getSubject(), templateProcessor.processTemplate(template), template.getRecipient());
     }
 
     public void send(String subject, String body, String recipientEmail) throws MessageDeliveryException {
