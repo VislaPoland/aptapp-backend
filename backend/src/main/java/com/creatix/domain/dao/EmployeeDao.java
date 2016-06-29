@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 @Transactional
-public class EmployeeDao extends DaoBase<Employee, Long> {
+public class EmployeeDao extends AbstractAccountDao<Employee> {
 
     public List<Employee> findAllByProperty(Long propertyId) {
         final QEmployee employee = QEmployee.employee;

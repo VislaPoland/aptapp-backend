@@ -89,6 +89,8 @@ public class PropertyDetailsDto {
         private String phone;
         @ApiModelProperty(required = true)
         private String email;
+        @ApiModelProperty
+        private Boolean deleted;
     }
 
     @ApiModel

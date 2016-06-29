@@ -6,5 +6,5 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class TenantDao extends DaoBase<Tenant, Long> {
+public class TenantDao extends AbstractAccountDao<Tenant> {
 }

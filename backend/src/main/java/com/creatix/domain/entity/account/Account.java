@@ -68,6 +68,28 @@ public class Account {
     @Column
     private Date actionTokenValidUntil;
 
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deletedAt;
+
+    @Transient
+    public boolean isDeleted() {
+        return this.deletedAt != null;
+    }
+
+    @Transient
+    public boolean getIsDeleted() {
+        return this.isDeleted();
+    }
+
     @Transient
     public String getFullName() {
         return String.format("%s %s", getFirstName(), getLastName());
