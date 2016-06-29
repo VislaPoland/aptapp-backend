@@ -1,6 +1,6 @@
 package com.creatix.security;
 
-import com.creatix.domain.entity.Account;
+import com.creatix.domain.entity.account.Account;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

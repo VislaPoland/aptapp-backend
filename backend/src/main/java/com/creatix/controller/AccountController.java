@@ -4,7 +4,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
-import com.creatix.domain.entity.Account;
+import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;

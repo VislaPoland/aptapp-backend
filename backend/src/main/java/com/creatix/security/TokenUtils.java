@@ -1,6 +1,6 @@
 package com.creatix.security;
 
-import com.creatix.domain.entity.Account;
+import com.creatix.domain.entity.account.Account;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

@@ -1,5 +1,11 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.account;
 
+import com.creatix.domain.entity.Address;
+import com.creatix.domain.entity.Apartment;
+import com.creatix.domain.entity.ParkingStall;
+import com.creatix.domain.entity.Vehicle;
+import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.account.SubTenant;
 import com.creatix.domain.enums.TenantType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

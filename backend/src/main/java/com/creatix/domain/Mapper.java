@@ -20,7 +20,7 @@ import com.creatix.domain.dto.tenant.vehicle.CreateVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.UpdateVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.entity.*;
-import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.entity.account.*;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -28,8 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 

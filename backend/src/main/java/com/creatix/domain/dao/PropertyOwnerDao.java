@@ -1,6 +1,6 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.PropertyOwner;
+import com.creatix.domain.entity.account.PropertyOwner;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

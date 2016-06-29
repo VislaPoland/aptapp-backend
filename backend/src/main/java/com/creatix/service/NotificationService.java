@@ -1,18 +1,15 @@
 package com.creatix.service;
 
 import com.creatix.configuration.FileUploadProperties;
-import com.creatix.configuration.MailProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.entity.*;
+import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;

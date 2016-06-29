@@ -1,4 +1,4 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.account;
 
 import com.creatix.domain.enums.AccountRole;
 import lombok.Data;

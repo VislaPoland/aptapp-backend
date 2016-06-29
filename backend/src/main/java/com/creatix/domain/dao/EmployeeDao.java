@@ -1,7 +1,7 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.Employee;
-import com.creatix.domain.entity.QEmployee;
+import com.creatix.domain.entity.account.QEmployee;
+import com.creatix.domain.entity.account.Employee;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,4 +35,5 @@ public class EmployeeDao extends DaoBase<Employee, Long> {
                 .where(employee.manager.managedProperty.id.eq(propertyId).and(employee.role.eq(AccountRole.AssistantPropertyManager)))
                 .fetch();
     }
+
 }
