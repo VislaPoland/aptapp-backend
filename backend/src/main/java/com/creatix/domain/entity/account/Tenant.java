@@ -16,10 +16,7 @@ import java.util.Set;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})
-public class Tenant extends Account {
-    @Column
-    @Enumerated(EnumType.STRING)
-    private TenantType type;
+public class Tenant extends TenantBase {
 
     @OneToMany(mappedBy = "usingTenant")
     private Set<ParkingStall> parkingStalls;

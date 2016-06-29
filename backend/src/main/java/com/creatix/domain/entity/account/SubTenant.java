@@ -12,10 +12,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"parentTenant"})
-public class SubTenant extends Account {
-    @Column
-    @Enumerated(EnumType.STRING)
-    private TenantType type;
+public class SubTenant extends TenantBase {
 
     @ManyToOne
     private Tenant parentTenant;
