@@ -7,6 +7,8 @@ import com.creatix.domain.enums.FacilityType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -28,6 +30,12 @@ public class PropertyDetailsDto {
     private List<Contact> contacts;
     @ApiModelProperty(value = "Property owner info", required = true)
     private Owner owner;
+    @ApiModelProperty(value = "Property managers")
+    private List<Account> managers;
+    @ApiModelProperty(value = "Property assistants of managers")
+    private List<Account> assistantManagers;
+    @ApiModelProperty(value = "Property employees")
+    private List<Account> employees;
     @ApiModelProperty(value = "Property schedule", required = true)
     private Schedule schedule;
 
@@ -67,8 +75,17 @@ public class PropertyDetailsDto {
     }
 
     @ApiModel
-    @Data
-    public static class Owner {
+    @Getter
+    @Setter
+    public static class Owner extends Account {
+        @ApiModelProperty(required = true)
+        private String web;
+    }
+
+    @ApiModel
+    @Getter
+    @Setter
+    public static class Account {
         @ApiModelProperty(required = true)
         private String id;
         @ApiModelProperty(required = true)
@@ -77,8 +94,6 @@ public class PropertyDetailsDto {
         private String phone;
         @ApiModelProperty(required = true)
         private String email;
-        @ApiModelProperty(required = true)
-        private String web;
     }
 
     @ApiModel

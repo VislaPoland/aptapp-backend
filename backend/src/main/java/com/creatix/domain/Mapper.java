@@ -1,5 +1,6 @@
 package com.creatix.domain;
 
+import com.creatix.domain.dao.EmployeeDao;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.account.AccountDto;
@@ -19,6 +20,7 @@ import com.creatix.domain.dto.tenant.vehicle.CreateVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.UpdateVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.entity.*;
+import com.creatix.domain.enums.AccountRole;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -26,12 +28,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class Mapper {
 
     protected MapperFactory mapperFactory;
+
+    @Autowired
+    private EmployeeDao employeeDao;
 
     @Autowired
     public Mapper(MapperFactory mapperFactory) {
@@ -61,9 +69,40 @@ public class Mapper {
                 })
                 .register();
 
+        mapperFactory.classMap(Employee.class, PropertyDetailsDto.Account.class)
+                .field("id", "id")
+                .field("fullName", "name")
+                .field("primaryEmail", "email")
+                .field("primaryPhone", "phone")
+                .register();
+        mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.Account.class)
+                .field("id", "id")
+                .field("fullName", "name")
+                .field("primaryEmail", "email")
+                .field("primaryPhone", "phone")
+                .register();
         mapperFactory.classMap(Property.class, PropertyDetailsDto.class)
                 .byDefault()
                 .field("address.fullAddress", "fullAddress")
+                .customize(
+                        new CustomMapper<Property, PropertyDetailsDto>() {
+                            @Override
+                            public void mapAtoB(Property property, PropertyDetailsDto propertyDetailsDto, MappingContext context) {
+                                super.mapAtoB(property, propertyDetailsDto, context);
+
+                                propertyDetailsDto.setAssistantManagers(
+                                        employeeDao.findAllAssistantsByProperty(property.getId()).stream()
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.Account.class))
+                                                .collect(Collectors.toList())
+                                );
+                                propertyDetailsDto.setEmployees(
+                                        employeeDao.findAllNotAssistantsByProperty(property.getId()).stream()
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.Account.class))
+                                                .collect(Collectors.toList())
+                                );
+                            }
+                        }
+                )
                 .register();
 
         mapperFactory.classMap(PropertySchedule.class, PropertyDetailsDto.Schedule.class)
