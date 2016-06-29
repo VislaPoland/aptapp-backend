@@ -41,11 +41,7 @@ public class NotificationService {
     @Autowired
     private AuthorizationManager authorizationManager;
     @Autowired
-    private MailProperties mailProperties;
-    @Autowired
     private FileUploadProperties uploadProperties;
-    @Autowired
-    private MailSender mailSender;
     @Autowired
     private NotificationPhotoDao notificationPhotoDao;
 
@@ -153,20 +149,6 @@ public class NotificationService {
             default:
                 return false;
         }
-    }
-
-    private void sendMail(String to, String subject, String body) {
-
-        if ( StringUtils.isEmpty(mailProperties.getFrom()) ) {
-            throw new IllegalStateException("'From' address not defined in configuration");
-        }
-
-        final SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setFrom(mailProperties.getFrom());
-        mailMessage.setTo(to);
-        mailMessage.setSubject(subject);
-        mailMessage.setText(body);
-        mailSender.send(mailMessage);
     }
 
     public Notification storeNotificationPhotos(MultipartFile[] files, long notificationId) throws IOException {
