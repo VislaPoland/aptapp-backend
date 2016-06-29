@@ -71,12 +71,14 @@ public class Mapper {
 
         mapperFactory.classMap(Employee.class, PropertyDetailsDto.Account.class)
                 .field("id", "id")
+                .field("role", "role")
                 .field("fullName", "name")
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
                 .register();
         mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.Account.class)
                 .field("id", "id")
+                .field("role", "role")
                 .field("fullName", "name")
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
