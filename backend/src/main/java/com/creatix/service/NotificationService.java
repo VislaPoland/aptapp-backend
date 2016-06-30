@@ -51,8 +51,7 @@ public class NotificationService {
     }
 
     //TODO make filtering logic more effective
-    public PageableDataResponse<List<Notification>> getRelevantNotificationsInDateRange(
-            Long pageNumber, Long pageSize) {
+    public PageableDataResponse<List<Notification>> getRelevantNotifications(Long pageNumber, Long pageSize) {
         List<Notification> notifications = notificationDao.findAll().stream()
                 .filter(n -> relevantNotificationsFilter(n, authorizationManager.getCurrentAccount()))
                 .collect(Collectors.toList());
@@ -142,11 +141,11 @@ public class NotificationService {
             case Tenant:
                 boolean r = n.getAuthor().equals(a);
                 if (n.getType().equals(NotificationType.Maintenance)) {
-                    r = r || ((MaintenanceNotification) n).getTargetApartment().getTenant().equals(a);
+                    r = r || a.equals(((MaintenanceNotification) n).getTargetApartment().getTenant());
                 }
                 if (n.getType().equals(NotificationType.Neighborhood)) {
                     //noinspection ConstantConditions
-                    r = r || ((NeighborhoodNotification) n).getTargetApartment().getTenant().equals(a);
+                    r = r || a.equals(((NeighborhoodNotification) n).getTargetApartment().getTenant());
                 }
                 return r;
             default:

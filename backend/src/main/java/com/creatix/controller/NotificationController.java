@@ -54,7 +54,7 @@ public class NotificationController {
     public PageableDataResponse<List<NotificationDto>> getNotifications(
             @RequestParam(required = false, defaultValue = "0") Long page,
             @RequestParam(required = false, defaultValue = "20") Long size) {
-        return mapper.toPageableDataResponse(notificationService.getRelevantNotificationsInDateRange(page, size), n -> mapper.toNotificationDto(n));
+        return mapper.toPageableDataResponse(notificationService.getRelevantNotifications(page, size), n -> mapper.toNotificationDto(n));
     }
 
     //maintenance
