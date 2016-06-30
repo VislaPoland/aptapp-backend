@@ -1,8 +1,7 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.*;
+import com.creatix.domain.entity.account.*;
 import com.creatix.domain.enums.AccountRole;
-import com.querydsl.jpa.JPQLQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +59,9 @@ public class AccountDao extends DaoBase<Account, Long> {
     }
 
     public List<Account> findAll() {
-        return queryFactory.selectFrom(QAccount.account)
+        return queryFactory
+                .selectFrom(QAccount.account)
+                .where(QAccount.account.deletedAt.isNull())
                 .fetch();
     }
 

@@ -6,7 +6,7 @@ import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.account.PersistAdministratorRequest;
 import com.creatix.domain.dto.account.PersistPropertyOwnerRequest;
 import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
-import com.creatix.domain.entity.Account;
+import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.AuthorizationManager;

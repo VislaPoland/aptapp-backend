@@ -2,6 +2,10 @@ package com.creatix.security;
 
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.entity.*;
+import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.account.Employee;
+import com.creatix.domain.entity.account.PropertyManager;
+import com.creatix.domain.entity.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -73,13 +77,13 @@ public class AuthorizationManager {
                 if (account instanceof Employee)
                     return ((Employee) account).getManager().getManagedProperty();
                 else
-                    throw new SecurityException("Impossible to extract single linked property.");
+                    throw new SecurityException("Impossible to extract single linked apartment.");
         }
     }
 
     public void checkManager(@NotNull Property property) {
         if ( !(isManager(property)) ) {
-            throw new SecurityException("Not a property manager");
+            throw new SecurityException("Not a apartment manager");
         }
     }
 
@@ -111,6 +115,30 @@ public class AuthorizationManager {
             return allowed;
         }
         throw new SecurityException(String.format("You are not eligible to read info about property with id=%d", property.getId()));
+    }
+
+    public boolean checkAccess(@NotNull Apartment apartment) {
+        Objects.requireNonNull(apartment);
+        boolean allowed = false;
+        switch (this.getCurrentAccount().getRole()) {
+            case Administrator:
+                allowed = true;
+                break;
+            case PropertyOwner:
+                allowed = apartment.getProperty().getOwner().equals(this.getCurrentAccount());
+                break;
+            case PropertyManager:
+                //noinspection SuspiciousMethodCalls
+                allowed = apartment.getProperty().getManagers().contains(this.getCurrentAccount());
+                break;
+            case AssistantPropertyManager:
+                allowed = apartment.getProperty().getManagers().contains(((Employee) this.getCurrentAccount()).getManager());
+                break;
+        }
+        if (allowed) {
+            return allowed;
+        }
+        throw new SecurityException(String.format("You are not eligible to read info about apartment with id=%d", apartment.getId()));
     }
 
 }

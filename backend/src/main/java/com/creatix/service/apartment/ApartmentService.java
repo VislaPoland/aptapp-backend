@@ -1,4 +1,4 @@
-package com.creatix.service;
+package com.creatix.service.apartment;
 
 import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.dao.PropertyDao;

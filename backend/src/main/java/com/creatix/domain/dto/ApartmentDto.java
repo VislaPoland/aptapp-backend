@@ -65,4 +65,26 @@ public class ApartmentDto {
         @ApiModelProperty(value = "Floor number")
         private Integer floor;
     }
+
+    @ApiModel
+    @Data
+    public static class Tenant {
+        @ApiModelProperty(required = true)
+        private Long id;
+        @ApiModelProperty(required = true)
+        private String lastName;
+        @ApiModelProperty(required = true)
+        private String firstName;
+        @ApiModelProperty
+        private String fullName;
+        @ApiModelProperty(required = true)
+        private String email;
+        @ApiModelProperty(required = true)
+        private String phone;
+        @ApiModelProperty
+        private String companyName;
+        @ApiModelProperty
+        private Boolean deleted;
+    }
+
 }

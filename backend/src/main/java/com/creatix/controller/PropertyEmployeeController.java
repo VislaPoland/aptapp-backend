@@ -1,10 +1,10 @@
 package com.creatix.controller;
 
-import com.creatix.domain.Mapper;
-import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.apartment.ApartmentService;
+import com.creatix.service.property.PropertyEmployeeService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -18,23 +18,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Transactional
-@RequestMapping("/api/apartments")
-public class ApartmentController {
+@RequestMapping(value = "/api/properties/{propertyId}/employees")
+public class PropertyEmployeeController {
 
     @Autowired
-    private Mapper mapper;
+    private PropertyMapper mapper;
     @Autowired
-    private ApartmentService apartmentService;
+    private PropertyEmployeeService propertyEmployeeService;
 
-    @ApiOperation(value = "Get apartment details")
+    @ApiOperation(value = "Remove property employee from property")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(value = "/{apartmentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{employeeId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<ApartmentDto> getApartment(@PathVariable Long apartmentId) {
-        return new DataResponse<>(mapper.toApartmentDto(apartmentService.getApartment(apartmentId)));
+    public DataResponse<PropertyDetailsDto.Account> removePropertyEmployee(@PathVariable Long propertyId, @PathVariable Long employeeId) {
+        return new DataResponse<>(mapper.toPropertyAccount(propertyEmployeeService.delete(propertyId, employeeId)));
     }
+
 }

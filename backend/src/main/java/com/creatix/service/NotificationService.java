@@ -4,6 +4,7 @@ import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.entity.*;
+import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;

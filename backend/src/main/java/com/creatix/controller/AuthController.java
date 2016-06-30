@@ -5,7 +5,7 @@ import com.creatix.domain.dto.ActivationCode;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.LoginRequest;
 import com.creatix.domain.dto.LoginResponse;
-import com.creatix.domain.entity.Account;
+import com.creatix.domain.entity.account.Account;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.service.AccountService;
 import io.swagger.annotations.ApiOperation;

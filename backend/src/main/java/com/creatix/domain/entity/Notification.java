@@ -1,5 +1,6 @@
 package com.creatix.domain.entity;
 
+import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import lombok.Data;

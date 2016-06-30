@@ -1,4 +1,4 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.account;
 
 import com.creatix.domain.enums.AccountRole;
 import lombok.Data;
@@ -67,6 +67,28 @@ public class Account {
     @Temporal(TemporalType.TIMESTAMP)
     @Column
     private Date actionTokenValidUntil;
+
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deletedAt;
+
+    @Transient
+    public boolean isDeleted() {
+        return this.deletedAt != null;
+    }
+
+    @Transient
+    public boolean getIsDeleted() {
+        return this.isDeleted();
+    }
 
     @Transient
     public String getFullName() {

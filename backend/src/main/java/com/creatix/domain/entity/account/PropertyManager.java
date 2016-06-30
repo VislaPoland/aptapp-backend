@@ -1,5 +1,6 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.account;
 
+import com.creatix.domain.entity.Property;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -9,7 +10,8 @@ import java.util.Set;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"employees", "managedProperty"})
-public class PropertyManager extends Account {
+public class PropertyManager extends EmployeeBase {
+
     @ManyToOne
     private Property managedProperty;
 
@@ -18,4 +20,5 @@ public class PropertyManager extends Account {
 
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Employee> employees;
+
 }

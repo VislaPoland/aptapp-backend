@@ -10,6 +10,8 @@ import com.creatix.domain.entity.Contact;
 import com.creatix.domain.entity.Facility;
 import com.creatix.domain.entity.Property;
 import com.creatix.domain.entity.PropertySchedule;
+import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.account.EmployeeBase;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,16 @@ public final class PropertyMapper extends ConfigurableMapper {
                 .byDefault()
                 .field("address.fullAddress", "address")
                 .register();
+
+        //region Account
+        mapperFactory.classMap(EmployeeBase.class, PropertyDetailsDto.Account.class)
+                .field("id", "id")
+                .field("fullName", "name")
+                .field("primaryEmail", "email")
+                .field("primaryPhone", "phone")
+                .field("isDeleted", "deleted")
+                .register();
+        //endregion
 
         //region Contact
         mapperFactory.classMap(Contact.class, PropertyDetailsDto.Contact.class)
@@ -67,6 +79,14 @@ public final class PropertyMapper extends ConfigurableMapper {
 
         return this.map(property, PropertyDetailsDto.class);
     }
+
+    //region Account
+    public PropertyDetailsDto.Account toPropertyAccount(@NotNull Account account) {
+        Objects.requireNonNull(account);
+
+        return this.map(account, PropertyDetailsDto.Account.class);
+    }
+    //endregion
 
     //region Contact
     public PropertyDetailsDto.Contact toPropertyContact(@NotNull Contact contact) {

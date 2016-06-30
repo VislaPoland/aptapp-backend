@@ -9,6 +9,8 @@ import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.entity.*;
+import com.creatix.domain.entity.account.SubTenant;
+import com.creatix.domain.entity.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.TenantType;
 import com.creatix.security.AuthorizationManager;
