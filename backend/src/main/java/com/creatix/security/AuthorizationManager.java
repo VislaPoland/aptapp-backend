@@ -141,4 +141,14 @@ public class AuthorizationManager {
         throw new SecurityException(String.format("You are not eligible to read info about apartment with id=%d", apartment.getId()));
     }
 
+    public void checkOwner(Property property) {
+        if ( !(isOwner(property)) ) {
+            throw new SecurityException("Not owner of the property.");
+        }
+    }
+
+    public boolean isOwner(@NotNull Property property) {
+        Objects.requireNonNull(property);
+        return Objects.equals(property.getOwner(), getCurrentAccount());
+    }
 }

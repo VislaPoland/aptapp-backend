@@ -2,10 +2,7 @@ package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.account.AccountDto;
-import com.creatix.domain.dto.account.PersistAdministratorRequest;
-import com.creatix.domain.dto.account.PersistPropertyOwnerRequest;
-import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
+import com.creatix.domain.dto.account.*;
 import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
@@ -169,5 +166,29 @@ public class AccountController {
     @RequestMapping(value = "/property-owners/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> updatePropertyOwner(@PathVariable Long accountId, @RequestBody @Valid PersistPropertyOwnerRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updatePropertyOwner(accountId, request)));
+    }
+
+    @ApiOperation(value = "Create property manager account")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RequestMapping(value = "/property-managers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<AccountDto> createPropertyManager(@RequestBody @Valid PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+        return new DataResponse<>(mapper.toAccountDto(accountService.createPropertyManager(request)));
+    }
+
+    @ApiOperation(value = "Update property owner account")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RequestMapping(value = "/property-managers/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<AccountDto> updatePropertyManager(@PathVariable Long accountId, @RequestBody @Valid PersistPropertyManagerRequest request) {
+        return new DataResponse<>(mapper.toAccountDto(accountService.updatePropertyManager(accountId, request)));
     }
 }

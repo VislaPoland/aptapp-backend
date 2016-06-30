@@ -1,13 +1,13 @@
 package com.creatix.service;
 
 import com.creatix.domain.Mapper;
-import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.dao.DaoBase;
-import com.creatix.domain.dao.PropertyOwnerDao;
+import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.PersistAdministratorRequest;
+import com.creatix.domain.dto.account.PersistPropertyManagerRequest;
 import com.creatix.domain.dto.account.PersistPropertyOwnerRequest;
 import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
+import com.creatix.domain.entity.Property;
 import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.entity.account.PropertyManager;
 import com.creatix.domain.entity.account.PropertyOwner;
@@ -56,6 +56,10 @@ public class AccountService {
     private AuthorizationManager authorizationManager;
     @Autowired
     private PropertyOwnerDao propertyOwnerDao;
+    @Autowired
+    private PropertyManagerDao propertyManagerDao;
+    @Autowired
+    private PropertyDao propertyDao;
     @Autowired
     private EmailMessageSender emailMessageSender;
 
@@ -224,6 +228,50 @@ public class AccountService {
         return account;
     }
 
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    public PropertyManager createPropertyManager(@NotNull PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+        Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail(), null);
+
+        final Property managedProperty = propertyDao.findById(request.getManagedPropertyId());
+        authorizationManager.checkOwner(managedProperty);
+
+        final PropertyManager account = new PropertyManager();
+        account.setRole(AccountRole.PropertyManager);
+        mapper.fillAccount(request, account);
+        account.setActive(false);
+        account.setManagedProperty(managedProperty);
+        accountDao.persist(account);
+        setActionToken(account);
+
+        emailMessageSender.send(new ActivationMessageTemplate(account));
+
+        return account;
+    }
+
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    public PropertyManager updatePropertyManager(@NotNull Long accountId, @NotNull PersistPropertyManagerRequest request) {
+        Objects.requireNonNull(accountId);
+        Objects.requireNonNull(request);
+
+        final Property managedProperty = propertyDao.findById(request.getManagedPropertyId());
+        authorizationManager.checkOwner(managedProperty);
+
+        final PropertyManager account = propertyManagerDao.findById(accountId);
+        preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
+        if ( account.getRole() != AccountRole.PropertyManager ) {
+            throw new SecurityException("Account role change is not allowed.");
+        }
+        mapper.fillAccount(request, account);
+        account.setManagedProperty(managedProperty);
+        propertyManagerDao.persist(account);
+
+        return account;
+    }
+
+
+
+
     private void preventAccountDuplicity(String email, String emailExisting) {
         if ( Objects.equals(email, emailExisting) ) {
             // email will not change, assume account is not a duplicate
@@ -234,4 +282,6 @@ public class AccountService {
             throw new IllegalArgumentException(String.format("Account %s already exists.", email));
         }
     }
+
+
 }

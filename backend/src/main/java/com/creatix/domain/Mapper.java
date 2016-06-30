@@ -6,6 +6,7 @@ import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.account.PersistAdministratorRequest;
+import com.creatix.domain.dto.account.PersistPropertyManagerRequest;
 import com.creatix.domain.dto.account.PersistPropertyOwnerRequest;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.notification.NotificationPhotoDto;
@@ -277,6 +278,13 @@ public class Mapper {
         mapperFactory.classMap(PersistPropertyOwnerRequest.class, Account.class)
                 .byDefault()
                 .register();
+        mapperFactory.classMap(PersistPropertyManagerRequest.class, Account.class)
+                .byDefault()
+                .register();
+    }
+
+    public void fillAccount(PersistPropertyManagerRequest req, Account acc) {
+        mapperFactory.getMapperFacade().map(req, acc);
     }
 
     public void fillAccount(PersistAdministratorRequest req, Account acc) {

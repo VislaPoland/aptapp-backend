@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
@@ -12,7 +13,8 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true, exclude = {"employees", "managedProperty"})
 public class PropertyManager extends EmployeeBase {
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull
     private Property managedProperty;
 
     @Column
