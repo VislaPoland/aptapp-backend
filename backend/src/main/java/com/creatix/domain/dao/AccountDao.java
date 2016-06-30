@@ -6,10 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 @Transactional
@@ -84,5 +81,18 @@ public class AccountDao extends DaoBase<Account, Long> {
         return queryFactory.selectFrom(account)
                 .where(account.actionToken.eq(actionToken))
                 .fetchOne();
+    }
+
+    @Override
+    public void persist(Account notification) {
+        if ( notification.getCreatedAt() == null ) {
+            notification.setCreatedAt(new Date());
+            notification.setUpdatedAt(new Date());
+        }
+        else {
+            notification.setUpdatedAt(new Date());
+        }
+
+        super.persist(notification);
     }
 }
