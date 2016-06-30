@@ -1,11 +1,15 @@
 package com.creatix.message;
 
 import com.creatix.configuration.MailProperties;
+import com.creatix.message.template.EmailMessageTemplate;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
 
 @Component
 public class EmailMessageSender {
@@ -14,8 +18,14 @@ public class EmailMessageSender {
     private MailProperties mailProperties;
     @Autowired
     private MailSender mailSender;
+    @Autowired
+    private EmailTemplateProcessor templateProcessor;
 
-    private void send(String subject, String body, String recipientEmail) throws MessageDeliveryException {
+    public void send(EmailMessageTemplate template) throws IOException, TemplateException, MessageDeliveryException {
+        send(template.getSubject(), templateProcessor.processTemplate(template), template.getRecipient());
+    }
+
+    public void send(String subject, String body, String recipientEmail) throws MessageDeliveryException {
 
         if ( StringUtils.isEmpty(mailProperties.getFrom()) ) {
             throw new MessageDeliveryException("'From' address not defined in configuration");

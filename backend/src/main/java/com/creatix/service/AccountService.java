@@ -3,15 +3,20 @@ package com.creatix.service;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dao.DaoBase;
+import com.creatix.domain.dao.PropertyOwnerDao;
 import com.creatix.domain.dto.LoginResponse;
+import com.creatix.domain.dto.account.PersistAdministratorRequest;
+import com.creatix.domain.dto.account.PersistPropertyOwnerRequest;
 import com.creatix.domain.dto.account.UpdateAccountProfileRequest;
 import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.entity.account.PropertyManager;
+import com.creatix.domain.entity.account.PropertyOwner;
 import com.creatix.domain.enums.AccountRole;
-import com.creatix.security.AuthenticatedUserDetails;
-import com.creatix.security.AuthenticatedUserDetailsService;
-import com.creatix.security.AuthorizationManager;
-import com.creatix.security.TokenUtils;
+import com.creatix.message.EmailMessageSender;
+import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.template.ActivationMessageTemplate;
+import com.creatix.security.*;
+import freemarker.template.TemplateException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -28,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -49,30 +54,10 @@ public class AccountService {
     private Mapper mapper;
     @Autowired
     private AuthorizationManager authorizationManager;
-
-    private static void validatePassword(String password) {
-        if (StringUtils.isBlank(password)) {
-            throw new IllegalArgumentException("Password cannot be empty");
-        }
-        if (password.length() < 6) {
-            throw new IllegalStateException("Password must be at least 6 characters long");
-        }
-    }
-
-    private static void checkTokenValidity(String token, Account account) {
-        if (StringUtils.isBlank(token)) {
-            throw new IllegalArgumentException("Token cannot be empty");
-        }
-        if (account.getActionTokenValidUntil() == null) {
-            throw new IllegalStateException("Missing token valid until");
-        }
-        if (!(StringUtils.equalsIgnoreCase(token, account.getActionToken()))) {
-            throw new SecurityException("Token mismatch");
-        }
-        if (account.getActionTokenValidUntil().before(new Date())) {
-            throw new SecurityException("Token has expired");
-        }
-    }
+    @Autowired
+    private PropertyOwnerDao propertyOwnerDao;
+    @Autowired
+    private EmailMessageSender emailMessageSender;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -131,7 +116,7 @@ public class AccountService {
         return accountDao.findByRolesAndPropertyId(roles, propertyIdForced);
     }
 
-    public Account getAccount(String email) {
+    private Account getAccount(String email) {
         final Account account = accountDao.findByEmail(email);
         if (account == null) {
             throw new EntityNotFoundException(String.format("Account with email=%s not found", email));
@@ -174,5 +159,79 @@ public class AccountService {
         accountDao.persist(account);
 
         return account;
+    }
+
+    @RoleSecured(AccountRole.Administrator)
+    public Account createAdministrator(@NotNull PersistAdministratorRequest request) {
+        Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail(), null);
+
+        final Account account = new Account();
+        account.setRole(AccountRole.Administrator);
+        mapper.fillAccount(request, account);
+        account.setActive(true);
+        accountDao.persist(account);
+
+        return account;
+    }
+
+    @RoleSecured(AccountRole.Administrator)
+    public Account updateAdministrator(@NotNull Long accountId, @NotNull PersistAdministratorRequest request) {
+        Objects.requireNonNull(accountId);
+        Objects.requireNonNull(request);
+
+        final Account account = getAccount(accountId);
+        preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
+        if ( account.getRole() != AccountRole.Administrator ) {
+            throw new SecurityException("Account role change is not allowed.");
+        }
+        mapper.fillAccount(request, account);
+        accountDao.persist(account);
+
+        return account;
+    }
+
+    @RoleSecured(AccountRole.Administrator)
+    public Account createPropertyOwner(@NotNull PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+        Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail(), null);
+
+        final PropertyOwner account = new PropertyOwner();
+        account.setRole(AccountRole.PropertyOwner);
+        mapper.fillAccount(request, account);
+        account.setActive(false);
+        accountDao.persist(account);
+        setActionToken(account);
+
+        emailMessageSender.send(new ActivationMessageTemplate(account));
+
+        return account;
+    }
+
+    @RoleSecured(AccountRole.Administrator)
+    public Account updatePropertyOwner(@NotNull Long accountId, @NotNull PersistPropertyOwnerRequest request) {
+        Objects.requireNonNull(accountId);
+        Objects.requireNonNull(request);
+
+        final PropertyOwner account = propertyOwnerDao.findById(accountId);
+        preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
+        if ( account.getRole() != AccountRole.PropertyOwner ) {
+            throw new SecurityException("Account role change is not allowed.");
+        }
+        mapper.fillAccount(request, account);
+        propertyOwnerDao.persist(account);
+
+        return account;
+    }
+
+    private void preventAccountDuplicity(String email, String emailExisting) {
+        if ( Objects.equals(email, emailExisting) ) {
+            // email will not change, assume account is not a duplicate
+            return;
+        }
+
+        if ( accountDao.findByEmail(email) != null ) {
+            throw new IllegalArgumentException(String.format("Account %s already exists.", email));
+        }
     }
 }

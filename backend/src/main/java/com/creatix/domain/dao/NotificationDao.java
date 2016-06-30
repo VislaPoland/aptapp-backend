@@ -19,5 +19,11 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                 .fetch();
     }
 
+    //TODO update to more effective query
+    public List<Notification> findAll() {
+        final QNotification notification = QNotification.notification;
+        return queryFactory.selectFrom(notification)
+                .fetch();
+    }
 
 }

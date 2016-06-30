@@ -3,8 +3,18 @@ package com.creatix.domain;
 import com.creatix.domain.dao.EmployeeDao;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.ApartmentDto;
+import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.account.AccountDto;
-import com.creatix.domain.dto.notification.*;
+import com.creatix.domain.dto.account.PersistAdministratorRequest;
+import com.creatix.domain.dto.account.PersistPropertyOwnerRequest;
+import com.creatix.domain.dto.notification.NotificationDto;
+import com.creatix.domain.dto.notification.NotificationPhotoDto;
+import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
+import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
+import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
+import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationDto;
+import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
+import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
@@ -16,8 +26,7 @@ import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
 import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
-import com.creatix.domain.dto.tenant.vehicle.CreateVehicleRequest;
-import com.creatix.domain.dto.tenant.vehicle.UpdateVehicleRequest;
+import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.entity.*;
 import com.creatix.domain.entity.account.*;
@@ -28,7 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -69,12 +80,14 @@ public class Mapper {
 
         mapperFactory.classMap(Employee.class, PropertyDetailsDto.Account.class)
                 .field("id", "id")
+                .field("role", "role")
                 .field("fullName", "name")
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
                 .register();
         mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.Account.class)
                 .field("id", "id")
+                .field("role", "role")
                 .field("fullName", "name")
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -213,10 +226,6 @@ public class Mapper {
                 .field("subTenants", "subs")
                 .register();
 
-        mapperFactory.classMap(CreateVehicleRequest.class, Vehicle.class)
-                .byDefault()
-                .register();
-
         mapperFactory.classMap(Vehicle.class, VehicleDto.class)
                 .byDefault()
                 .register();
@@ -225,7 +234,7 @@ public class Mapper {
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(UpdateVehicleRequest.class, Vehicle.class)
+        mapperFactory.classMap(AssignVehicleRequest.class, Vehicle.class)
                 .byDefault()
                 .register();
 
@@ -261,6 +270,21 @@ public class Mapper {
                 .field("phone", "primaryPhone")
                 .field("email", "primaryEmail")
                 .register();
+
+        mapperFactory.classMap(PersistAdministratorRequest.class, Account.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(PersistPropertyOwnerRequest.class, Account.class)
+                .byDefault()
+                .register();
+    }
+
+    public void fillAccount(PersistAdministratorRequest req, Account acc) {
+        mapperFactory.getMapperFacade().map(req, acc);
+    }
+
+    public void fillAccount(PersistPropertyOwnerRequest req, Account acc) {
+        mapperFactory.getMapperFacade().map(req, acc);
     }
 
     public Tenant toTenant(@NotNull CreateTenantRequest request) {
@@ -355,16 +379,11 @@ public class Mapper {
         return mapperFactory.getMapperFacade().map(vehicle, VehicleDto.class);
     }
 
-    public Vehicle toVehicle(@NotNull CreateVehicleRequest request) {
+    public void fillVehicle(@NotNull AssignVehicleRequest request, @NotNull Vehicle vehicle) {
         Objects.requireNonNull(request);
-        return mapperFactory.getMapperFacade().map(request, Vehicle.class);
-    }
+        Objects.requireNonNull(vehicle);
 
-    public void fillVehicle(@NotNull UpdateVehicleRequest dto, @NotNull Vehicle entity) {
-        Objects.requireNonNull(dto);
-        Objects.requireNonNull(entity);
-
-        mapperFactory.getMapperFacade().map(dto, entity);
+        mapperFactory.getMapperFacade().map(request, vehicle);
     }
 
     public ParkingStallDto toParkingStallDto(@NotNull ParkingStall parkingStall) {
@@ -390,5 +409,14 @@ public class Mapper {
         Objects.requireNonNull(entity);
 
         mapperFactory.getMapperFacade().map(request, entity);
+    }
+
+    public <T, R> PageableDataResponse<List<R>> toPageableDataResponse(@NotNull PageableDataResponse<List<T>> response, @NotNull Function<T, R> mappingFunction) {
+        Objects.requireNonNull(response);
+        Objects.requireNonNull(mappingFunction);
+
+        return new PageableDataResponse<>(response.getData().stream()
+                .map(mappingFunction)
+                .collect(Collectors.toList()), response.getPageSize(), response.getTotalItems(), response.getTotalPages(), response.getPageNumber());
     }
 }

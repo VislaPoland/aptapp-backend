@@ -24,6 +24,6 @@ public class ParkingStall {
     @JoinColumn
     private Tenant usingTenant;
 
-    @OneToOne(mappedBy = "parkingStall")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Vehicle parkingVehicle;
 }

@@ -1,6 +1,7 @@
 package com.creatix.domain.dto.property;
 
 import com.creatix.domain.dto.AddressDto;
+import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.CommunicationType;
 import com.creatix.domain.enums.ContactType;
 import com.creatix.domain.enums.FacilityType;
@@ -83,6 +84,8 @@ public class PropertyDetailsDto {
     public static class Account {
         @ApiModelProperty(required = true)
         private String id;
+        @ApiModelProperty(required = true)
+        private AccountRole role;
         @ApiModelProperty(required = true)
         private String name;
         @ApiModelProperty(required = true)

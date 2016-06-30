@@ -3,10 +3,10 @@ package com.creatix.message;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmailTemplateProcessor extends TemplateProcessor {
+public class SmsTemplateProcessor extends TemplateProcessor {
 
     @Override
     protected String subPath() {
-        return "email";
+        return "sms";
     }
 }

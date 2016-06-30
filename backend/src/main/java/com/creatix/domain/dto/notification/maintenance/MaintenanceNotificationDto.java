@@ -1,4 +1,4 @@
-package com.creatix.domain.dto.notification;
+package com.creatix.domain.dto.notification.maintenance;
 
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
