@@ -13,7 +13,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true, exclude = {"employees", "managedProperty"})
 public class PropertyManager extends EmployeeBase {
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     @NotNull
     private Property managedProperty;
 
