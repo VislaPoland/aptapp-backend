@@ -8,7 +8,5 @@ import lombok.EqualsAndHashCode;
 @ApiModel
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UpdateVehicleRequest extends AbstractVehicleDto {
-    @ApiModelProperty(value = "Assigned parking stall ID")
-    private Long parkingStallId;
+public class AssignVehicleRequest extends AbstractVehicleDto {
 }

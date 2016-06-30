@@ -36,6 +36,6 @@ public class Vehicle {
     @NotNull
     private Tenant owner;
 
-    @OneToOne
+    @OneToOne(mappedBy = "parkingVehicle", optional = false)
     private ParkingStall parkingStall;
 }

@@ -25,8 +25,7 @@ import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
 import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
-import com.creatix.domain.dto.tenant.vehicle.CreateVehicleRequest;
-import com.creatix.domain.dto.tenant.vehicle.UpdateVehicleRequest;
+import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.entity.*;
 import ma.glasnost.orika.CustomMapper;
@@ -225,10 +224,6 @@ public class Mapper {
                 .field("subTenants", "subs")
                 .register();
 
-        mapperFactory.classMap(CreateVehicleRequest.class, Vehicle.class)
-                .byDefault()
-                .register();
-
         mapperFactory.classMap(Vehicle.class, VehicleDto.class)
                 .byDefault()
                 .register();
@@ -237,7 +232,7 @@ public class Mapper {
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(UpdateVehicleRequest.class, Vehicle.class)
+        mapperFactory.classMap(AssignVehicleRequest.class, Vehicle.class)
                 .byDefault()
                 .register();
 
@@ -382,16 +377,11 @@ public class Mapper {
         return mapperFactory.getMapperFacade().map(vehicle, VehicleDto.class);
     }
 
-    public Vehicle toVehicle(@NotNull CreateVehicleRequest request) {
+    public void fillVehicle(@NotNull AssignVehicleRequest request, @NotNull Vehicle vehicle) {
         Objects.requireNonNull(request);
-        return mapperFactory.getMapperFacade().map(request, Vehicle.class);
-    }
+        Objects.requireNonNull(vehicle);
 
-    public void fillVehicle(@NotNull UpdateVehicleRequest dto, @NotNull Vehicle entity) {
-        Objects.requireNonNull(dto);
-        Objects.requireNonNull(entity);
-
-        mapperFactory.getMapperFacade().map(dto, entity);
+        mapperFactory.getMapperFacade().map(request, vehicle);
     }
 
     public ParkingStallDto toParkingStallDto(@NotNull ParkingStall parkingStall) {

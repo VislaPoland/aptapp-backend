@@ -9,8 +9,7 @@ import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
 import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
-import com.creatix.domain.dto.tenant.vehicle.CreateVehicleRequest;
-import com.creatix.domain.dto.tenant.vehicle.UpdateVehicleRequest;
+import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
@@ -89,34 +88,6 @@ public class TenantController {
                 .collect(Collectors.toList()));
     }
 
-    @ApiOperation(value = "Create tenant vehicle")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 422, message = "Unprocessable")
-    })
-    @RequestMapping(value = "/{tenantId}/vehicles", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant})
-    public DataResponse<VehicleDto> createTenantVehicle(@PathVariable Long tenantId, @RequestBody @Valid CreateVehicleRequest request) {
-        return new DataResponse<>(mapper.toVehicleDto(tenantService.createVehicleFromRequest(tenantId, request)));
-    }
-
-    @ApiOperation(value = "Update tenant vehicles")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 422, message = "Unprocessable")
-    })
-    @RequestMapping(value = "/{tenantId}/vehicles/{licensePlate}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant})
-    public DataResponse<VehicleDto> updateTenantVehicle(@PathVariable Long tenantId, @PathVariable String licensePlate, @RequestBody @Valid UpdateVehicleRequest request) {
-        return new DataResponse<>(mapper.toVehicleDto(tenantService.updateVehicleFromRequest(tenantId, licensePlate, request)));
-    }
-
     @ApiOperation(value = "Delete tenant vehicle")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -144,6 +115,22 @@ public class TenantController {
         return new DataResponse<>(tenantService.getTenantParkingStalls(tenantId).stream()
                 .map(ps -> mapper.toParkingStallDto(ps))
                 .collect(Collectors.toList()));
+    }
+
+    @ApiOperation(value = "Update vehicle parked at tenant assigned parking stall")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 422, message = "Unprocessable")
+    })
+    @RequestMapping(value = "/{tenantId}/parking-stalls/{parkingStallId}", method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Tenant})
+    public DataResponse<ParkingStallDto> updateVehicleAtParkingStall(@PathVariable Long tenantId, @PathVariable Long parkingStallId,
+                                                                     @RequestBody @Valid AssignVehicleRequest request) {
+        return new DataResponse<>(mapper.toParkingStallDto(tenantService.updateVehicleAtParkingStall(tenantId, parkingStallId, request)));
     }
 
     @ApiOperation(value = "Get sub-tenants created by tenant")
