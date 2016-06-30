@@ -17,13 +17,9 @@ public final class ApartmentMapper extends ConfigurableMapper {
 
         //region Tenant
         mapperFactory.classMap(TenantBase.class, ApartmentDto.Tenant.class)
-                .field("id", "id")
-                .field("fullName", "fullName")
-                .field("firstName", "firstName")
-                .field("lastName", "lastName")
+                .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
-                .field("companyName", "companyName")
                 .field("isDeleted", "deleted")
                 .register();
         //endregion

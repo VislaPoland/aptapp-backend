@@ -80,18 +80,16 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(Employee.class, PropertyDetailsDto.Account.class)
-                .field("id", "id")
-                .field("role", "role")
-                .field("fullName", "name")
+                .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
+                .field("isDeleted", "deleted")
                 .register();
         mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.Account.class)
-                .field("id", "id")
-                .field("role", "role")
-                .field("fullName", "name")
+                .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
+                .field("isDeleted", "deleted")
                 .register();
         mapperFactory.classMap(Property.class, PropertyDetailsDto.class)
                 .byDefault()
@@ -130,11 +128,11 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(PropertyOwner.class, PropertyDetailsDto.Owner.class)
+                .byDefault()
                 .field("primaryEmail", "email")
-                .field("fullName", "name")
-                .field("website", "web")
                 .field("primaryPhone", "phone")
-                .field("id", "id")
+                .field("isDeleted", "deleted")
+                .field("website", "web")
                 .register();
 
         mapperFactory.classMap(Notification.class, NotificationDto.class)

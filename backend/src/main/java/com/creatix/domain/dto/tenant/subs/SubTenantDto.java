@@ -20,14 +20,17 @@ public class SubTenantDto {
     @ApiModelProperty(value = "Last name", required = true)
     private String lastName;
 
-    @ApiModelProperty(value = "Company name", required = true)
-    private String companyName;
+    @ApiModelProperty(value = "Full name", required = true)
+    private String fullName;
 
     @ApiModelProperty(value = "Phone number", required = true)
     private String phone;
 
     @ApiModelProperty(value = "Email address", required = true)
     private String email;
+
+    @ApiModelProperty(value = "Company name")
+    private String companyName;
 
     @ApiModelProperty(value = "Tenant type", required = true)
     private TenantType type;

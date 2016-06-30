@@ -21,6 +21,12 @@ public class AccountDto {
     @ApiModelProperty(value = "Role", required = true)
     private AccountRole role;
 
+    @ApiModelProperty(value = "First name", required = true)
+    private String firstName;
+
+    @ApiModelProperty(value = "Last name", required = true)
+    private String lastName;
+
     @ApiModelProperty(value = "Full name", required = true)
     private String fullName;
 
@@ -35,6 +41,9 @@ public class AccountDto {
 
     @ApiModelProperty(value = "Secondary phone number", required = true)
     private String secondaryPhone;
+
+    @ApiModelProperty(value = "Company name")
+    private String companyName;
 
     @ApiModelProperty(value = "Address", required = true)
     private AddressDto address;

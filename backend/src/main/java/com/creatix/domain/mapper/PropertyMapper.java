@@ -32,8 +32,7 @@ public final class PropertyMapper extends ConfigurableMapper {
 
         //region Account
         mapperFactory.classMap(EmployeeBase.class, PropertyDetailsDto.Account.class)
-                .field("id", "id")
-                .field("fullName", "name")
+                .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
                 .field("isDeleted", "deleted")

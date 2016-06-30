@@ -72,9 +72,9 @@ public class ApartmentDto {
         @ApiModelProperty(required = true)
         private Long id;
         @ApiModelProperty(required = true)
-        private String lastName;
-        @ApiModelProperty(required = true)
         private String firstName;
+        @ApiModelProperty(required = true)
+        private String lastName;
         @ApiModelProperty
         private String fullName;
         @ApiModelProperty(required = true)

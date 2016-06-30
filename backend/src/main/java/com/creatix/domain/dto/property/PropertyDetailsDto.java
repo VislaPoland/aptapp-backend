@@ -87,11 +87,17 @@ public class PropertyDetailsDto {
         @ApiModelProperty(required = true)
         private AccountRole role;
         @ApiModelProperty(required = true)
-        private String name;
+        private String firstName;
+        @ApiModelProperty(required = true)
+        private String lastName;
+        @ApiModelProperty(required = true)
+        private String fullName;
         @ApiModelProperty(required = true)
         private String phone;
         @ApiModelProperty(required = true)
         private String email;
+        @ApiModelProperty
+        private String companyName;
         @ApiModelProperty
         private Boolean deleted;
     }
