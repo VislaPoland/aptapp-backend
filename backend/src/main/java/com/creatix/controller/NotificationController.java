@@ -3,6 +3,7 @@ package com.creatix.controller;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.PageableDataResponse;
+import com.creatix.domain.dto.notification.NotificationRequestType;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
@@ -53,8 +54,9 @@ public class NotificationController {
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public PageableDataResponse<List<NotificationDto>> getNotifications(
             @RequestParam(required = false, defaultValue = "0") Long page,
-            @RequestParam(required = false, defaultValue = "20") Long size) {
-        return mapper.toPageableDataResponse(notificationService.getRelevantNotifications(page, size), n -> mapper.toNotificationDto(n));
+            @RequestParam(required = false, defaultValue = "20") Long size,
+            @RequestParam NotificationRequestType type) {
+        return mapper.toPageableDataResponse(notificationService.getRelevantNotifications(page, size, type), n -> mapper.toNotificationDto(n));
     }
 
     //maintenance

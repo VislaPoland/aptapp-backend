@@ -3,6 +3,7 @@ package com.creatix.service;
 import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
+import com.creatix.domain.dto.notification.NotificationRequestType;
 import com.creatix.domain.entity.*;
 import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.enums.NotificationStatus;
@@ -52,9 +53,9 @@ public class NotificationService {
     }
 
     //TODO make filtering logic more effective
-    public PageableDataResponse<List<Notification>> getRelevantNotifications(Long pageNumber, Long pageSize) {
+    public PageableDataResponse<List<Notification>> getRelevantNotifications(Long pageNumber, Long pageSize, NotificationRequestType type) {
         List<Notification> notifications = notificationDao.findAll().stream()
-                .filter(n -> relevantNotificationsFilter(n, authorizationManager.getCurrentAccount()))
+                .filter(n -> relevantNotificationsFilter(n, authorizationManager.getCurrentAccount(), type))
                 .collect(Collectors.toList());
         long totalItems = notifications.size();
         long totalPages = totalItems / pageSize;
@@ -133,22 +134,26 @@ public class NotificationService {
         return apartment;
     }
 
-    private boolean relevantNotificationsFilter(Notification n, Account a) {
-        switch (a.getRole()) {
-            case Maintenance:
-                return n.getType().equals(NotificationType.Maintenance);
-            case Security:
-                return n.getType().equals(NotificationType.Security);
-            case Tenant:
-                boolean r = n.getAuthor().equals(a);
-                if (n.getType().equals(NotificationType.Maintenance)) {
-                    r = r || a.equals(((MaintenanceNotification) n).getTargetApartment().getTenant());
+    private boolean relevantNotificationsFilter(Notification n, Account a, NotificationRequestType type) {
+        switch (type) {
+            case Send:
+                return n.getAuthor().equals(a);
+            case Received:
+                switch (a.getRole()) {
+                    case Maintenance:
+                        return n.getType().equals(NotificationType.Maintenance);
+                    case Security:
+                        return n.getType().equals(NotificationType.Security);
+                    case Tenant:
+                        if (n.getType().equals(NotificationType.Maintenance)) {
+                            return a.equals(((MaintenanceNotification) n).getTargetApartment().getTenant());
+                        }
+                        if (n.getType().equals(NotificationType.Neighborhood)) {
+                            return a.equals(((NeighborhoodNotification) n).getTargetApartment().getTenant());
+                        }
+                    default:
+                        return false;
                 }
-                if (n.getType().equals(NotificationType.Neighborhood)) {
-                    //noinspection ConstantConditions
-                    r = r || a.equals(((NeighborhoodNotification) n).getTargetApartment().getTenant());
-                }
-                return r;
             default:
                 return false;
         }
