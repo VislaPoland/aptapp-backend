@@ -13,8 +13,12 @@ import com.creatix.domain.entity.account.SubTenant;
 import com.creatix.domain.entity.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.TenantType;
+import com.creatix.message.EmailMessageSender;
+import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.template.ActivationMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -47,6 +52,8 @@ public class TenantService {
     private Mapper mapper;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private EmailMessageSender emailMessageSender;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -57,7 +64,7 @@ public class TenantService {
     }
 
     @RoleSecured(AccountRole.PropertyManager)
-    public Tenant createTenantFromRequest(@NotNull CreateTenantRequest request) {
+    public Tenant createTenantFromRequest(@NotNull CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException {
         Objects.requireNonNull(request);
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
@@ -77,6 +84,8 @@ public class TenantService {
         apartmentDao.persist(apartment);
 
         accountService.setActionToken(tenant);
+
+        emailMessageSender.send(new ActivationMessageTemplate(tenant));
 
         return tenant;
     }
