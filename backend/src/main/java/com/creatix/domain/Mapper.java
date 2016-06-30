@@ -4,10 +4,7 @@ import com.creatix.domain.dao.EmployeeDao;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.ApartmentDto;
 import com.creatix.domain.dto.PageableDataResponse;
-import com.creatix.domain.dto.account.AccountDto;
-import com.creatix.domain.dto.account.PersistAdministratorRequest;
-import com.creatix.domain.dto.account.PersistPropertyManagerRequest;
-import com.creatix.domain.dto.account.PersistPropertyOwnerRequest;
+import com.creatix.domain.dto.account.*;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.notification.NotificationPhotoDto;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
@@ -279,6 +276,30 @@ public class Mapper {
         mapperFactory.classMap(PersistPropertyManagerRequest.class, Account.class)
                 .byDefault()
                 .register();
+        mapperFactory.classMap(PersistEmployeeRequest.class, Account.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(PersistEmployeeRequest.class, Account.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(PersistSecurityGuyRequest.class, Account.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(PersistMaintenanceGuyRequest.class, Account.class)
+                .byDefault()
+                .register();
+    }
+
+    public void fillAccount(PersistEmployeeRequest req, Account acc) {
+        mapperFactory.getMapperFacade().map(req, acc);
+    }
+
+    public void fillAccount(PersistSecurityGuyRequest req, Account acc) {
+        mapperFactory.getMapperFacade().map(req, acc);
+    }
+
+    public void fillAccount(PersistMaintenanceGuyRequest req, Account acc) {
+        mapperFactory.getMapperFacade().map(req, acc);
     }
 
     public void fillAccount(PersistPropertyManagerRequest req, Account acc) {
