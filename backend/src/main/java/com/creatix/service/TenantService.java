@@ -154,12 +154,6 @@ public class TenantService {
             if (tenant.getParkingStalls().contains(parkingStall)) {
                 //TODO refactor this code to make it more readable and clean
                 Vehicle vehicle = (parkingStall.getParkingVehicle() == null)? new Vehicle() : parkingStall.getParkingVehicle();
-                if (parkingStall.getParkingVehicle() != null && !parkingStall.getParkingVehicle().getLicensePlate().equals(request.getLicensePlate())) {
-                    vehicle = new Vehicle();
-                    parkingStall.setParkingVehicle(null);
-                    parkingStallDao.persist(parkingStall);
-                }
-
                 mapper.fillVehicle(request, vehicle);
                 vehicle.setParkingStall(parkingStall);
                 vehicle.setOwner(tenant);
@@ -174,12 +168,11 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.Tenant})
-    public void deleteVehicle(Long tenantId, String licensePlate) {
+    public void deleteVehicle(Long tenantId, Long id) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
 
         if (authorizationManager.isSelf(tenant)) {
-            final Vehicle vehicle = getOrElseThrow(licensePlate, vehicleDao,
-                    new EntityNotFoundException(String.format("Vehicle licensePlate=%s not found", licensePlate)));
+            final Vehicle vehicle = getOrElseThrow(id, vehicleDao, new EntityNotFoundException(String.format("Vehicle id=%s not found", id)));
             final ParkingStall parkingStall = vehicle.getParkingStall();
             parkingStall.setParkingVehicle(null);
             parkingStallDao.persist(parkingStall);

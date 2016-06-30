@@ -6,5 +6,5 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class VehicleDao extends DaoBase<Vehicle, String> {
+public class VehicleDao extends DaoBase<Vehicle, Long> {
 }

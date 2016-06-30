@@ -95,10 +95,10 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(value = "/{tenantId}/vehicles/{licensePlate}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{tenantId}/vehicles/{vehicleId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
-    public DataResponse<Void> deleteTenantVehicle(@PathVariable Long tenantId, @PathVariable String licensePlate) {
-        tenantService.deleteVehicle(tenantId, licensePlate);
+    public DataResponse<Void> deleteTenantVehicle(@PathVariable Long tenantId, @PathVariable Long vehicleId) {
+        tenantService.deleteVehicle(tenantId, vehicleId);
         return new DataResponse<>();
     }
 
