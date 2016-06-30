@@ -1,6 +1,6 @@
 package com.creatix.message.template;
 
-import com.creatix.domain.entity.Account;
+import com.creatix.domain.entity.account.Account;
 
 public class ActivationMessageTemplate implements EmailMessageTemplate {
 
