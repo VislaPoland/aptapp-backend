@@ -239,4 +239,28 @@ public class AccountController {
     public DataResponse<AccountDto> updateMaintenanceGuy(@PathVariable Long accountId, @RequestBody @Valid PersistMaintenanceGuyRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateMaintenanceGuy(accountId, request)));
     }    
+    
+    @ApiOperation(value = "Create assistant property manager account")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RequestMapping(value = "/assistant-property-managers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<AccountDto> createAssistantPropertyManager(@RequestBody @Valid PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+        return new DataResponse<>(mapper.toAccountDto(accountService.createAssistantPropertyManager(request)));
+    }
+
+    @ApiOperation(value = "Update assistant property manager account")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RequestMapping(value = "/assistant-property-managers/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<AccountDto> updateAssistantPropertyManager(@PathVariable Long accountId, @RequestBody @Valid PersistAssistantPropertyManagerRequest request) {
+        return new DataResponse<>(mapper.toAccountDto(accountService.updateAssistantPropertyManager(accountId, request)));
+    }    
 }

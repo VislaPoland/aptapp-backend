@@ -288,9 +288,12 @@ public class Mapper {
         mapperFactory.classMap(PersistMaintenanceGuyRequest.class, Account.class)
                 .byDefault()
                 .register();
+        mapperFactory.classMap(PersistAssistantPropertyManagerRequest.class, Account.class)
+                .byDefault()
+                .register();
     }
 
-    public void fillAccount(PersistEmployeeRequest req, Account acc) {
+    public void fillAccount(PersistAssistantPropertyManagerRequest req, Account acc) {
         mapperFactory.getMapperFacade().map(req, acc);
     }
 
