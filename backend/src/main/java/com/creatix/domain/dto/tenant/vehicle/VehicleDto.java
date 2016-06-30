@@ -10,6 +10,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class VehicleDto extends AbstractVehicleDto {
+    @ApiModelProperty(required = true, value = "Vehicle ID")
+    private Long id;
+
     @ApiModelProperty(value = "Parking stall")
     private ParkingStall parkingStall;
 

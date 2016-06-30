@@ -12,6 +12,9 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(of = "licensePlate")
 public class Vehicle {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     @Column(nullable = false)
     @NotNull
     private String licensePlate;

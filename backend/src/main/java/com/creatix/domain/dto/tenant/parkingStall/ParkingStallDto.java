@@ -17,5 +17,7 @@ public class ParkingStallDto extends AbstractParkingStallDto {
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class VehicleDto extends AbstractVehicleDto {
+        @ApiModelProperty(required = true, value = "Vehicle ID")
+        private Long id;
     }
 }

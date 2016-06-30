@@ -12,8 +12,10 @@ import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.TenantService;
+import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +45,7 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<TenantDto> createTenant(@RequestBody @Valid CreateTenantRequest request) {
+    public DataResponse<TenantDto> createTenant(@RequestBody @Valid CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException {
         return new DataResponse<>(mapper.toTenantDto(tenantService.createTenantFromRequest(request)));
     }
 
@@ -95,10 +98,10 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(value = "/{tenantId}/vehicles/{licensePlate}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{tenantId}/vehicles/{vehicleId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
-    public DataResponse<Void> deleteTenantVehicle(@PathVariable Long tenantId, @PathVariable String licensePlate) {
-        tenantService.deleteVehicle(tenantId, licensePlate);
+    public DataResponse<Void> deleteTenantVehicle(@PathVariable Long tenantId, @PathVariable Long vehicleId) {
+        tenantService.deleteVehicle(tenantId, vehicleId);
         return new DataResponse<>();
     }
 
