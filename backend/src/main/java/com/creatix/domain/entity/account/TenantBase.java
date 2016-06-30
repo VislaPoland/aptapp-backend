@@ -1,4 +1,3 @@
-
 package com.creatix.domain.entity.account;
 
 import com.creatix.domain.enums.TenantType;
@@ -12,6 +11,7 @@ import javax.persistence.Enumerated;
 
 @Entity
 @Data
+//@EqualsAndHashCode(callSuper = true, exclude = {"vehicles", "subTenants", "apartment", "parentTenant"})
 @EqualsAndHashCode(callSuper = true)
 public abstract class TenantBase extends Account {
 

@@ -1,6 +1,5 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.account.Employee;
 import com.creatix.domain.entity.account.EmployeeBase;
 import com.creatix.domain.entity.account.QEmployee;
 import com.creatix.domain.entity.account.QPropertyManager;

@@ -8,7 +8,7 @@ import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.ApartmentService;
+import com.creatix.service.apartment.ApartmentService;
 import com.creatix.service.property.PropertyService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
