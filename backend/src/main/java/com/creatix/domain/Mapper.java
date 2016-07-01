@@ -191,12 +191,6 @@ public class Mapper {
                 .field("tenant.primaryEmail", "primaryEmail")
                 .field("property.id", "propertyId")
                 .field("tenant.id", "tenantId")
-                .customize(new CustomMapper<Apartment, ApartmentDto>() {
-                    @Override
-                    public void mapAtoB(Apartment apartment, ApartmentDto apartmentDto, MappingContext context) {
-                        apartmentDto.setNeighbors(mapperFactory.getMapperFacade().map(apartment, ApartmentDto.Neighbors.class));
-                    }
-                })
                 .register();
 
         mapperFactory.classMap(AddressDto.class, Address.class)
@@ -362,12 +356,7 @@ public class Mapper {
 
     public ApartmentDto toApartmentDto(@NotNull Apartment apartment) {
         Objects.requireNonNull(apartment);
-        final ApartmentDto dto = mapperFactory.getMapperFacade().map(apartment, ApartmentDto.class);
-
-        final ApartmentDto.Neighbors neighborsDto = mapperFactory.getMapperFacade().map(apartment.getNeighbors(), ApartmentDto.Neighbors.class);
-        dto.setNeighbors(neighborsDto);
-
-        return dto;
+        return mapperFactory.getMapperFacade().map(apartment, ApartmentDto.class);
     }
 
     public AccountDto toAccountDto(Account account) {
