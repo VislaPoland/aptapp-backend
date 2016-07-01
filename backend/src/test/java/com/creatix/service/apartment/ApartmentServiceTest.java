@@ -5,6 +5,7 @@ import com.creatix.TestContext;
 import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.dto.apartment.PersistApartmentRequest;
 import com.creatix.domain.entity.Apartment;
+import com.creatix.domain.entity.ApartmentNeighbor;
 import com.creatix.domain.entity.Property;
 import com.creatix.mock.WithMockCustomUser;
 import com.creatix.service.property.PropertyService;
@@ -70,7 +71,72 @@ public class ApartmentServiceTest extends TestContext {
 
     @Test
     @WithMockCustomUser("helen.owner@apartments.com")
-    public void updateUpdateApartment() throws Exception {
+    public void updateApartment() throws Exception {
+        final Property property = propertyService.getProperty(1L);
+        assertNotNull(property);
+        assertNotNull(property.getId());
         final Apartment apartment31 = apartmentDao.findById(31L);
+        assertNotNull(apartment31);
+        final ApartmentNeighbor neighbor21 = new ApartmentNeighbor();
+
+        final Apartment apartment21 = apartmentDao.findById(21L);
+        assertNotNull(apartment21);
+        neighbor21.setApartment(apartment21);
+        neighbor21.setUnitNumber(apartment21.getUnitNumber());
+        apartment31.getNeighbors().setBelow(neighbor21);
+        apartmentDao.persist(apartment31);
+        assertNotNull(neighbor21.getId());
+
+        final PersistApartmentRequest req = new PersistApartmentRequest();
+        req.setFloor(apartment31.getFloor());
+        req.setUnitNumber(apartment31.getUnitNumber());
+        final PersistApartmentRequest.Neighbors neighbors = new PersistApartmentRequest.Neighbors();
+        req.setNeighbors(neighbors);
+        final PersistApartmentRequest.NeighborApartment above = new PersistApartmentRequest.NeighborApartment();
+        neighbors.setAbove(above);
+        above.setUnitNumber("33");
+        final PersistApartmentRequest.NeighborApartment below = new PersistApartmentRequest.NeighborApartment();
+        neighbors.setBelow(below);
+        below.setUnitNumber(apartment21.getUnitNumber());
+
+        final Apartment apartment = apartmentService.updateApartment(apartment31.getId(), req);
+        assertEquals(apartment31.getId(), apartment.getId());
+        assertNotNull(apartment.getNeighbors().getAbove());
+        assertNotNull(apartment.getNeighbors().getBelow());
+        assertEquals(neighbor21.getId(), apartment.getNeighbors().getBelow().getId());
+        assertEquals(neighbor21.getUnitNumber(), apartment.getNeighbors().getBelow().getUnitNumber());
+        assertNull(apartment.getNeighbors().getLeft());
+        assertNull(apartment.getNeighbors().getRight());
+    }
+
+
+    @Test
+    @WithMockCustomUser("helen.owner@apartments.com")
+    public void unlinkNeighborApartment() throws Exception {
+        final Property property = propertyService.getProperty(1L);
+        assertNotNull(property);
+        assertNotNull(property.getId());
+        final Apartment apartment31 = apartmentDao.findById(31L);
+        assertNotNull(apartment31);
+        final ApartmentNeighbor neighbor21 = new ApartmentNeighbor();
+
+        final Apartment apartment21 = apartmentDao.findById(21L);
+        assertNotNull(apartment21);
+        neighbor21.setApartment(apartment21);
+        neighbor21.setUnitNumber(apartment21.getUnitNumber());
+        apartment31.getNeighbors().setBelow(neighbor21);
+        apartmentDao.persist(apartment31);
+        assertNotNull(neighbor21.getId());
+
+        final PersistApartmentRequest req = new PersistApartmentRequest();
+        req.setFloor(apartment31.getFloor());
+        req.setUnitNumber(apartment31.getUnitNumber());
+        req.setNeighbors(new PersistApartmentRequest.Neighbors());
+
+        final Apartment apartment = apartmentService.updateApartment(apartment31.getId(), req);
+        assertNull(apartment.getNeighbors().getAbove());
+        assertNull(apartment.getNeighbors().getBelow());
+        assertNull(apartment.getNeighbors().getLeft());
+        assertNull(apartment.getNeighbors().getRight());
     }
 }
