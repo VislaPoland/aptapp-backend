@@ -174,7 +174,7 @@ public class AccountController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     @RequestMapping(value = "/property-managers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> createPropertyManager(@RequestBody @Valid PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createPropertyManager(request)));
@@ -186,7 +186,7 @@ public class AccountController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     @RequestMapping(value = "/property-managers/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> updatePropertyManager(@PathVariable Long accountId, @RequestBody @Valid PersistPropertyManagerRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updatePropertyManager(accountId, request)));
