@@ -67,8 +67,15 @@ public class Mapper {
                             PropertyDetailsDto details = toPropertyDetailsDto(property);
                             accountDto.setProperty(details);
                             accountDto.setApartment(toApartmentDto(apartment));
-                        } else if (account instanceof PropertyManager) {
+                        }
+                        else if (account instanceof PropertyManager) {
                             final Property managedProperty = ((PropertyManager) account).getManagedProperty();
+                            if ( managedProperty != null ) {
+                                accountDto.setProperty(toPropertyDetailsDto(managedProperty));
+                            }
+                        }
+                        else if ( account instanceof Employee ) {
+                            final Property managedProperty = ((Employee) account).getManager().getManagedProperty();
                             if ( managedProperty != null ) {
                                 accountDto.setProperty(toPropertyDetailsDto(managedProperty));
                             }
