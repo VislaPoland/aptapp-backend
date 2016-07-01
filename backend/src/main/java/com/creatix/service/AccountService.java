@@ -13,6 +13,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.EmailMessageSender;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.template.ActivationMessageTemplate;
+import com.creatix.message.template.ResetPasswordMessageTemplate;
 import com.creatix.security.*;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -395,6 +396,18 @@ public class AccountService {
         return account;
     }
 
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public boolean resetPassword(@NotNull Long accountId) throws MessageDeliveryException, TemplateException, IOException {
+        Objects.requireNonNull(accountId);
+
+        final Employee account = employeeDao.findById(accountId);
+        
+        setActionToken(account);
+
+        emailMessageSender.send(new ResetPasswordMessageTemplate(account));
+
+        return true;
+    }
 
     private void preventAccountDuplicity(String email, String emailExisting) {
         if ( Objects.equals(email, emailExisting) ) {
