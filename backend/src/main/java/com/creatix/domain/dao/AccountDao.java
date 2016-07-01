@@ -1,12 +1,20 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.account.*;
+import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
+
+import static com.creatix.domain.entity.account.QEmployee.employee;
+import static com.creatix.domain.entity.account.QTenant.tenant;
+import static com.creatix.domain.entity.account.QPropertyManager.propertyManager;
+import static com.creatix.domain.entity.account.QPropertyOwner.propertyOwner;
+import static com.creatix.domain.entity.account.QSubTenant.subTenant;
+import static com.creatix.domain.entity.account.QAccount.account;
+
 
 @Repository
 @Transactional
@@ -17,36 +25,43 @@ public class AccountDao extends DaoBase<Account, Long> {
 
         final List<Account> accounts;
         if ( propertyId == null ) {
-            accounts = queryFactory.selectFrom(QAccount.account)
-                    .where(QAccount.account.role.in(roles))
+            accounts = queryFactory.selectFrom(account)
+                    .where(account.role.in(roles))
                     .fetch();
         }
         else {
             accounts = new ArrayList<>();
             for ( AccountRole role : roles ) {
                 if ( role == AccountRole.Tenant ) {
-                    accounts.addAll(queryFactory.selectFrom(QTenant.tenant)
-                            .where(QTenant.tenant.apartment.property.id.eq(propertyId))
+                    accounts.addAll(queryFactory.selectFrom(tenant)
+                            .where(tenant.apartment.property.id.eq(propertyId))
                             .fetch());
                 }
-                else if ( EnumSet.of(AccountRole.Maintenance, AccountRole.Security).contains(role) ) {
-                    accounts.addAll(queryFactory.selectFrom(QEmployee.employee)
-                            .where(QEmployee.employee.manager.managedProperty.id.eq(propertyId))
+                else if ( role == AccountRole.Maintenance ) {
+                    accounts.addAll(queryFactory.selectFrom(employee)
+                            .where(employee.manager.managedProperty.id.eq(propertyId)
+                                    .and(employee.role.eq(AccountRole.Security)))
+                            .fetch());
+                }
+                else if ( role == AccountRole.Security ) {
+                    accounts.addAll(queryFactory.selectFrom(employee)
+                            .where(employee.manager.managedProperty.id.eq(propertyId)
+                                    .and(employee.role.eq(AccountRole.Security)))
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyManager ) {
-                    accounts.addAll(queryFactory.selectFrom(QPropertyManager.propertyManager)
-                            .where(QPropertyManager.propertyManager.managedProperty.id.eq(propertyId))
+                    accounts.addAll(queryFactory.selectFrom(propertyManager)
+                            .where(propertyManager.managedProperty.id.eq(propertyId))
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyOwner ) {
-                    accounts.addAll(queryFactory.selectFrom(QPropertyOwner.propertyOwner)
-                            .where(QPropertyOwner.propertyOwner.ownedProperties.any().id.eq(propertyId))
+                    accounts.addAll(queryFactory.selectFrom(propertyOwner)
+                            .where(propertyOwner.ownedProperties.any().id.eq(propertyId))
                             .fetch());
                 }
                 else if ( role == AccountRole.SubTenant ) {
-                    accounts.addAll(queryFactory.selectFrom(QSubTenant.subTenant)
-                            .where(QSubTenant.subTenant.parentTenant.apartment.property.id.eq(propertyId))
+                    accounts.addAll(queryFactory.selectFrom(subTenant)
+                            .where(subTenant.parentTenant.apartment.property.id.eq(propertyId))
                             .fetch());
                 }
             }
@@ -57,8 +72,8 @@ public class AccountDao extends DaoBase<Account, Long> {
 
     public List<Account> findAll() {
         return queryFactory
-                .selectFrom(QAccount.account)
-                .where(QAccount.account.deletedAt.isNull())
+                .selectFrom(account)
+                .where(account.deletedAt.isNull())
                 .fetch();
     }
 
@@ -70,14 +85,12 @@ public class AccountDao extends DaoBase<Account, Long> {
      * @return found account
      */
     public Account findByEmail(String email) {
-        QAccount account = QAccount.account;
         return queryFactory.selectFrom(account)
                 .where(account.primaryEmail.eq(email))
                 .fetchOne();
     }
 
     public Account findByActionToken(String actionToken) {
-        QAccount account = QAccount.account;
         return queryFactory.selectFrom(account)
                 .where(account.actionToken.eq(actionToken))
                 .fetchOne();
