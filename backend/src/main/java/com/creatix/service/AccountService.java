@@ -228,13 +228,21 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public PropertyManager createPropertyManager(@NotNull PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
-        final Property managedProperty = propertyDao.findById(request.getManagedPropertyId());
-        authorizationManager.checkOwner(managedProperty);
+        Property managedProperty = null;
+        if (authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner) {
+            Objects.requireNonNull(request.getManagedPropertyId());
+
+            managedProperty = propertyDao.findById(request.getManagedPropertyId());
+            authorizationManager.checkOwner(managedProperty);
+        }
+        else {
+            managedProperty = authorizationManager.getCurrentProperty();
+        }
 
         final PropertyManager account = new PropertyManager();
         account.setRole(AccountRole.PropertyManager);
@@ -249,15 +257,25 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public PropertyManager updatePropertyManager(@NotNull Long accountId, @NotNull PersistPropertyManagerRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
 
-        final Property managedProperty = propertyDao.findById(request.getManagedPropertyId());
-        authorizationManager.checkOwner(managedProperty);
+        Property managedProperty = null;
+        PropertyManager account = null;
+        if (authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner) {
+            Objects.requireNonNull(request.getManagedPropertyId());
 
-        final PropertyManager account = propertyManagerDao.findById(accountId);
+            managedProperty = propertyDao.findById(request.getManagedPropertyId());
+            authorizationManager.checkOwner(managedProperty);
+            account = propertyManagerDao.findById(accountId);
+        }
+        else {
+            managedProperty = authorizationManager.getCurrentProperty();
+            account = propertyManagerDao.findById(accountId);
+            authorizationManager.isSelf(account);
+        }
         preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
         if ( account.getRole() != AccountRole.PropertyManager ) {
             throw new SecurityException("Account role change is not allowed.");
