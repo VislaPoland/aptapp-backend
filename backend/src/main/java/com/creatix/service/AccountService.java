@@ -401,10 +401,7 @@ public class AccountService {
         Objects.requireNonNull(accountId);
 
         final Employee account = employeeDao.findById(accountId);
-
-        account.setRole(AccountRole.PropertyManager);
-        account.setActive(false);
-        accountDao.persist(account);
+        
         setActionToken(account);
 
         emailMessageSender.send(new ResetPasswordMessageTemplate(account));
