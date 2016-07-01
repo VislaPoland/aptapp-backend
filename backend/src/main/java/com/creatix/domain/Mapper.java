@@ -362,7 +362,12 @@ public class Mapper {
 
     public ApartmentDto toApartmentDto(@NotNull Apartment apartment) {
         Objects.requireNonNull(apartment);
-        return mapperFactory.getMapperFacade().map(apartment, ApartmentDto.class);
+        final ApartmentDto dto = mapperFactory.getMapperFacade().map(apartment, ApartmentDto.class);
+
+        final ApartmentDto.Neighbors neighborsDto = mapperFactory.getMapperFacade().map(apartment.getNeighbors(), ApartmentDto.Neighbors.class);
+        dto.setNeighbors(neighborsDto);
+
+        return dto;
     }
 
     public AccountDto toAccountDto(Account account) {
