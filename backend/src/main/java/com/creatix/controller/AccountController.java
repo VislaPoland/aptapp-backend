@@ -102,24 +102,6 @@ public class AccountController {
         return new DataResponse<>(mapper.toAccountDto(account));
     }
 
-    @ApiOperation(value = "Reset authentication code")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
-    @RoleSecured(AccountRole.PropertyManager)
-    @RequestMapping(value = "/{accountId}/reset-code", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<String> resetCode(@PathVariable Long accountId) {
-        final Account account = accountService.getAccount(accountId);
-        accountService.setActionToken(account);
-        return new DataResponse<>(account.getActionToken());
-    }
-
-
-
-
-
     @ApiOperation(value = "Create administrator account")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -262,5 +244,6 @@ public class AccountController {
     @RequestMapping(value = "/assistant-property-managers/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> updateAssistantPropertyManager(@PathVariable Long accountId, @RequestBody @Valid PersistAssistantPropertyManagerRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateAssistantPropertyManager(accountId, request)));
-    }    
+    }
+
 }
