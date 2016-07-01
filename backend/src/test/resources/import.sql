@@ -7,20 +7,43 @@ SELECT setval('hibernate_sequence', 200);
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
                             primary_email, primary_phone, role, created_at)
 VALUES ('PropertyOwner', 1, true, 'South Water Apartments', 'Helen', 'Owner', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426',
-        'helen.owner@apartments.com', '(743) 635-5652', 'PropertyOwner', '2016-06-16 15:36:38');
+                         'helen.owner@apartments.com', '(743) 635-5652', 'PropertyOwner', '2016-06-16 15:36:38');
 
 -- address
 INSERT INTO public.address (id, house_number, state, street_name, town, zip_code) VALUES (1, '747', 'IL', 'Main Street', 'Chicago', '606609');
 
 -- property schedule
-INSERT INTO public.property_schedule(id, start_hour, start_minute, end_hour, end_minute, slots_count) VALUES (1, 9, 0, 17, 0, 8);
+INSERT INTO public.property_schedule(id, start_hour, start_minute, end_hour, end_minute, period_length, slots_per_period) VALUES (1, 9, 0, 17, 0, 60, 5);
 
 -- property
-INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id) VALUES (1, 'South Water Apartments', 'Active', 1, 1, 1);
+INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id, time_zone) VALUES (1, 'South Water Apartments', 'Active', 1, 1, 1, 'America/Chicago');
 
 -- property contacts
 INSERT INTO public.contact (id, communication_type, type, value) VALUES (1, 'Email', 'OtherUseful', 'southwater@apartments.com');
 INSERT INTO public.contact (id, communication_type, type, value) VALUES (2, 'Phone', 'OtherUseful', '(785) 123-9653');
+
+-- properties contacts
+INSERT INTO
+  public.contact(id, type, communication_type, value)
+VALUES
+  (3, 'Police', 'Phone', '1-541-754-3010'),
+  (4, 'Police', 'Email', 'police@gmail.com'),
+  (5, 'MedicalEmergency', 'Phone', '1-541-754-3010'),
+  (6, 'MedicalEmergency', 'Email', 'medical@gmail.com'),
+  (7, 'FireService', 'Phone', '1-541-754-3010'),
+  (8, 'FireService', 'Email', 'fire@gmail.com')
+;
+
+INSERT INTO
+  public.property_contacts(property_id, contacts_id)
+VALUES
+  (1, 3),
+  (1, 4),
+  (1, 5),
+  (1, 6),
+  (1, 7),
+  (1, 8)
+;
 
 -- property contacts connections
 INSERT INTO public.property_contacts (property_id, contacts_id) VALUES (1, 1);
@@ -99,52 +122,29 @@ VALUES ('Tenant', 3, false, 'South Water Apartments', 'John', 'Tenant', '$2a$10$
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
                             primary_email, primary_phone, role, created_at)
 VALUES ('Account', 108, true, 'Cool Company', 'Joe', 'Admin', '$2a$10$IXniWKP6M12dNGoTzHW9Feo/7Jn4nke0GeRGvvU7n38WuYkY40eyG',
-        'joe.admin@mail.com', '123456789', 'Administrator', '2016-06-16 15:36:38');
+                   'joe.admin@mail.com', '123456789', 'Administrator', '2016-06-16 15:36:38');
 
 -- property owner
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
                             primary_email, primary_phone, role, created_at)
 VALUES ('PropertyOwner', 101, true, 'Cool Company', 'Joe', 'Owner', '$2a$10$IXniWKP6M12dNGoTzHW9Feo/7Jn4nke0GeRGvvU7n38WuYkY40eyG',
-        'joe.owner@mail.com', '123456789', 'PropertyOwner', '2016-06-16 15:36:38');
+                         'joe.owner@mail.com', '123456789', 'PropertyOwner', '2016-06-16 15:36:38');
 
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash,
                             primary_email, primary_phone, role, created_at)
 VALUES ('PropertyOwner', 109, true, 'Cool Company', 'Joe', 'Owner2', '$2a$10$IXniWKP6M12dNGoTzHW9Feo/7Jn4nke0GeRGvvU7n38WuYkY40eyG',
-        'joe.owner2@mail.com', '123456789', 'PropertyOwner', '2016-06-16 15:36:38');
+                         'joe.owner2@mail.com', '123456789', 'PropertyOwner', '2016-06-16 15:36:38');
 
 -- addresses
 INSERT INTO public.address (id, house_number, state, street_name, town, zip_code) VALUES (101, '111', 'MA', 'Street1', 'Boston', '1111111');
 INSERT INTO public.address (id, house_number, state, street_name, town, zip_code) VALUES (102, '222', 'MA', 'Street2', 'Boston', '2222222');
 
 -- property schedules
-INSERT INTO public.property_schedule(id, start_hour, start_minute, end_hour, end_minute, slots_count) VALUES (101, 9, 0, 17, 0, 8);
+INSERT INTO public.property_schedule(id, start_hour, start_minute, end_hour, end_minute, period_length, slots_per_period) VALUES (101, 9, 0, 17, 0, 60, 5);
 
 -- properties
-INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id) VALUES (101, 'Test property 1', 'Active', 101, 101, 101);
-INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id) VALUES (102, 'Test property 2', 'Active', 102, 109, 101);
-
--- properties contacts
-INSERT INTO
-public.contact(id, type, communication_type, value)
-VALUES
-(1, 'Police', 'Phone', '1-541-754-3010'),
-(2, 'Police', 'Email', 'police@gmail.com'),
-(3, 'MedicalEmergency', 'Phone', '1-541-754-3010'),
-(4, 'MedicalEmergency', 'Email', 'medical@gmail.com'),
-(5, 'FireService', 'Phone', '1-541-754-3010'),
-(6, 'FireService', 'Email', 'fire@gmail.com')
-;
-
-INSERT INTO
-public.property_contacts(property_id, contacts_id)
-VALUES
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-(2, 5),
-(2, 6)
-;
+INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id, time_zone) VALUES (101, 'Test property 1', 'Active', 101, 101, 101, 'America/New_York');
+INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id, time_zone) VALUES (102, 'Test property 2', 'Active', 102, 109, 101, 'America/New_York');
 
 -- apartments
 INSERT INTO public.apartment (id, unit_number, property_id)
@@ -189,12 +189,12 @@ VALUES ('Tenant', 107, true, 'Cool Company', 'Joe', 'Tenant2', '$2a$10$N/AhcCcIm
 INSERT INTO public.parking_stall(id, number, using_tenant_id) VALUES (101, '22', 107);
 
 -- notifications
-INSERT INTO public.notification (dtype, id, date, title, status, description, type, author_id, created_at)
-VALUES ('SecurityNotification', 101, '2016-06-16 15:36:38', 'Security not', 'Pending', 'Security test notification title', 'Security', 106, '2016-06-16 15:36:38');
-INSERT INTO public.notification (dtype, id, date, title, status, description, access_if_not_at_home, target_apartment_id, type, author_id, created_at)
-VALUES ('MaintenanceNotification', 102, '2016-06-16 15:36:38', 'Maintenance not', 'Pending', 'Maintenance test notification title', true, 102, 'Maintenance', 102, '2016-06-16 15:36:38');
-INSERT INTO public.notification (dtype, id, date, title, status, description, target_apartment_id, type, author_id, created_at)
-VALUES ('NeighborhoodNotification', 103, '2016-06-19 15:36:38', 'Neighborhood not', 'Pending', 'Neighborhood test notification title', 102, 'Neighborhood', 102, '2016-06-16 15:36:38');
+INSERT INTO public.notification (dtype, id, date, title, status, description, type, author_id, created_at, property_id)
+VALUES ('SecurityNotification', 101, '2016-06-16 15:36:38', 'Security not', 'Pending', 'Security test notification title', 'Security', 106, '2016-06-16 15:36:38', 101);
+INSERT INTO public.notification (dtype, id, date, title, status, description, access_if_not_at_home, target_apartment_id, type, author_id, created_at, property_id)
+VALUES ('MaintenanceNotification', 102, '2016-06-16 15:36:38', 'Maintenance not', 'Pending', 'Maintenance test notification title', true, 102, 'Maintenance', 102, '2016-06-16 15:36:38', 101);
+INSERT INTO public.notification (dtype, id, date, title, status, description, target_apartment_id, type, author_id, created_at, property_id)
+VALUES ('NeighborhoodNotification', 103, '2016-06-19 15:36:38', 'Neighborhood not', 'Pending', 'Neighborhood test notification title', 102, 'Neighborhood', 102, '2016-06-16 15:36:38', 101);
 -------------------
 -- /DEVELOPMENT DATA
 -------------------
