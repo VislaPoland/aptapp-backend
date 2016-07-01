@@ -287,12 +287,12 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyManager})
     public Employee createSecurityGuy(@NotNull PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
-        final PropertyManager manager = propertyManagerDao.findById(request.getManagerId());
+        final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
 
         final Employee account = new Employee();
         account.setRole(AccountRole.Security);
@@ -307,12 +307,10 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.Security})
     public Employee updateSecurityGuy(@NotNull Long accountId, @NotNull PersistSecurityGuyRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
-
-        final PropertyManager manager = propertyManagerDao.findById(request.getManagerId());
 
         final Employee account = employeeDao.findById(accountId);
         preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
@@ -320,18 +318,17 @@ public class AccountService {
             throw new SecurityException("Account role change is not allowed.");
         }
         mapper.fillAccount(request, account);
-        account.setManager(manager);
         employeeDao.persist(account);
 
         return account;
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public Employee createMaintenanceGuy(@NotNull PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
-        final PropertyManager manager = propertyManagerDao.findById(request.getManagerId());
+        final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
 
         final Employee account = new Employee();
         account.setRole(AccountRole.Maintenance);
@@ -346,12 +343,10 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.Maintenance})
     public Employee updateMaintenanceGuy(@NotNull Long accountId, @NotNull PersistMaintenanceGuyRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
-
-        final PropertyManager manager = propertyManagerDao.findById(request.getManagerId());
 
         final Employee account = employeeDao.findById(accountId);
         preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
@@ -359,18 +354,17 @@ public class AccountService {
             throw new SecurityException("Account role change is not allowed.");
         }
         mapper.fillAccount(request, account);
-        account.setManager(manager);
         employeeDao.persist(account);
 
         return account;
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyManager})
     public Employee createAssistantPropertyManager(@NotNull PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
-        final PropertyManager manager = propertyManagerDao.findById(request.getManagerId());
+        final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
 
         final Employee account = new Employee();
         account.setRole(AccountRole.AssistantPropertyManager);
@@ -385,12 +379,10 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public Employee updateAssistantPropertyManager(@NotNull Long accountId, @NotNull PersistAssistantPropertyManagerRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
-
-        final PropertyManager manager = propertyManagerDao.findById(request.getManagerId());
 
         final Employee account = employeeDao.findById(accountId);
         preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
@@ -398,7 +390,6 @@ public class AccountService {
             throw new SecurityException("Account role change is not allowed.");
         }
         mapper.fillAccount(request, account);
-        account.setManager(manager);
         employeeDao.persist(account);
 
         return account;

@@ -12,8 +12,4 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class PersistEmployeeRequest extends PersistAccountRequest {
 
-    @NotNull
-    @ApiModelProperty(value = "Property manager id", required = true)
-    private Long managerId;
-
 }
