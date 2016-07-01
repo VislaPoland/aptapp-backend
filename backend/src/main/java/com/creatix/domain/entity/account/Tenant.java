@@ -9,6 +9,7 @@ import com.creatix.domain.entity.account.SubTenant;
 import com.creatix.domain.enums.TenantType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})
+@ToString(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})
 public class Tenant extends TenantBase {
 
     @OneToMany(mappedBy = "usingTenant")
