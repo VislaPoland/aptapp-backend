@@ -1,7 +1,7 @@
 package com.creatix.domain.dto.tenant;
 
 import com.creatix.domain.dto.AddressDto;
-import com.creatix.domain.dto.ApartmentDto;
+import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;

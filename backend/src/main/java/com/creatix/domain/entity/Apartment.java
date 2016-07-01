@@ -25,32 +25,13 @@ public class Apartment {
 
     @ManyToOne(optional = false)
     @JoinColumn
+    @NotNull
     private Property property;
 
     @OneToOne(mappedBy = "apartment", fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Apartment aboveApartment;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Apartment belowApartment;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Apartment leftApartment;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Apartment rightApartment;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Apartment oppositeApartment;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Apartment behindApartment;
+    @Embedded
+    @NotNull
+    private ApartmentNeighbors neighbors;
 }

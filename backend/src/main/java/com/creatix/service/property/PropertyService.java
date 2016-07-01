@@ -74,16 +74,6 @@ public class PropertyService {
                 .collect(Collectors.toList());
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public Property getDetail(@NotNull Long propertyId) {
-        Objects.requireNonNull(propertyId);
-
-        final Property property = this.getProperty(propertyId);
-        authorizationManager.checkAccess(property);
-
-        return property;
-    }
-
     @RoleSecured(AccountRole.Administrator)
     public Property createFromRequest(@NotNull CreatePropertyRequest request) {
         Objects.requireNonNull(request);
@@ -127,12 +117,15 @@ public class PropertyService {
         return property;
     }
 
-    private Property getProperty(@NotNull Long propertyId) {
+    @RoleSecured
+    public Property getProperty(@NotNull Long propertyId) {
         Objects.requireNonNull(propertyId);
         final Property property = this.propertyDao.findById(propertyId);
         if (property == null) {
             throw new EntityNotFoundException(String.format("Property id=%d not found", propertyId));
         }
+        authorizationManager.checkAccess(property);
+
         return property;
     }
 

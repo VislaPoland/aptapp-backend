@@ -1,7 +1,7 @@
 package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
-import com.creatix.domain.dto.ApartmentDto;
+import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
@@ -55,7 +55,7 @@ public class PropertyController {
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<PropertyDetailsDto> getPropertyDetails(@PathVariable long propertyId) {
-        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.getDetail(propertyId)));
+        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.getProperty(propertyId)));
     }
 
     @ApiOperation(value = "Create new property")
