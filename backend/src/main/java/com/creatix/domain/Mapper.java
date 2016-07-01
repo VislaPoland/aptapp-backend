@@ -2,9 +2,10 @@ package com.creatix.domain;
 
 import com.creatix.domain.dao.EmployeeDao;
 import com.creatix.domain.dto.AddressDto;
-import com.creatix.domain.dto.ApartmentDto;
+import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.account.*;
+import com.creatix.domain.dto.apartment.PersistApartmentRequest;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.notification.NotificationPhotoDto;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
@@ -165,18 +166,16 @@ public class Mapper {
         mapperFactory.classMap(CreateNeighborhoodNotificationRequest.class, NeighborhoodNotification.class)
                 .byDefault()
                 .register();
-
-        mapperFactory.classMap(Apartment.class, ApartmentDto.NeighborApartment.class)
+        mapperFactory.classMap(ApartmentNeighbor.class, ApartmentDto.NeighborApartment.class)
+                .byDefault()
+                .field("apartment.id", "id")
+                .field("apartment.floor", "floor")
+                .register();
+        mapperFactory.classMap(ApartmentNeighbors.class, ApartmentDto.Neighbors.class)
                 .byDefault()
                 .register();
-
-        mapperFactory.classMap(Apartment.class, ApartmentDto.Neighbors.class)
-                .field("aboveApartment", "above")
-                .field("belowApartment", "below")
-                .field("leftApartment", "left")
-                .field("rightApartment", "right")
-                .field("oppositeApartment", "opposite")
-                .field("behindApartment", "behind")
+        mapperFactory.classMap(PersistApartmentRequest.class, Apartment.class)
+                .byDefault()
                 .register();
 
         mapperFactory.classMap(Apartment.class, ApartmentDto.class)
@@ -291,6 +290,12 @@ public class Mapper {
         mapperFactory.classMap(PersistAssistantPropertyManagerRequest.class, Account.class)
                 .byDefault()
                 .register();
+    }
+
+    public void fillApartment(@NotNull PersistApartmentRequest req, @NotNull Apartment ap) {
+        Objects.requireNonNull(req);
+        Objects.requireNonNull(ap);
+        mapperFactory.getMapperFacade().map(req, ap);
     }
 
     public void fillAccount(PersistAssistantPropertyManagerRequest req, Account acc) {

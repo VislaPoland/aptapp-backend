@@ -76,6 +76,7 @@ dependencies {
 	runtime('org.postgresql:postgresql')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('org.springframework.security:spring-security-test')
 
 	// ensure that the embedded servlet container does not interfere with the servlet container
 	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")

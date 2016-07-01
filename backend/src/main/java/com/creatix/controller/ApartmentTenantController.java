@@ -1,6 +1,6 @@
 package com.creatix.controller;
 
-import com.creatix.domain.dto.ApartmentDto;
+import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.mapper.ApartmentMapper;
 import com.creatix.security.RoleSecured;
