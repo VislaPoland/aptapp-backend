@@ -67,4 +67,8 @@ public class Notification {
 
     @OneToMany(mappedBy = "notification")
     private List<NotificationPhoto> photos = new ArrayList<>(1);
+
+    @ManyToOne(optional = false)
+    @NotNull
+    private Property property;
 }

@@ -39,6 +39,10 @@ public class Property {
     @Column
     private Date deleteDate;
 
+    @Column(nullable = false)
+    @NotNull
+    private String timeZone;
+
     @ManyToOne(optional = false)
     @JoinColumn
     @NotNull

@@ -6,6 +6,8 @@ import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.NotificationRequestType;
 import com.creatix.domain.entity.*;
 import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.account.Employee;
+import com.creatix.domain.entity.account.PropertyManager;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
@@ -97,6 +99,7 @@ public class NotificationService {
         Objects.requireNonNull(notification);
         notification.setType(NotificationType.Security);
         notification.setAuthor(authorizationManager.getCurrentAccount());
+        notification.setProperty(authorizationManager.getCurrentProperty());
         notification.setStatus(NotificationStatus.Pending);
         securityNotificationDao.persist(notification);
         return notification;
@@ -108,6 +111,7 @@ public class NotificationService {
 
         notification.setType(NotificationType.Maintenance);
         notification.setAuthor(authorizationManager.getCurrentAccount());
+        notification.setProperty(authorizationManager.getCurrentProperty());
         notification.setStatus(NotificationStatus.Pending);
         notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
         maintenanceNotificationDao.persist(notification);
@@ -120,6 +124,7 @@ public class NotificationService {
 
         notification.setType(NotificationType.Neighborhood);
         notification.setAuthor(authorizationManager.getCurrentAccount());
+        notification.setProperty(authorizationManager.getCurrentProperty());
         notification.setStatus(NotificationStatus.Pending);
         notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
         neighborhoodNotificationDao.persist(notification);
@@ -140,10 +145,14 @@ public class NotificationService {
                 return n.getAuthor().equals(a);
             case Received:
                 switch (a.getRole()) {
+                    case PropertyManager:
+                        return ((PropertyManager) a).getManagedProperty().equals(n.getProperty());
+                    case AssistantPropertyManager:
+                        return authorizationManager.getCurrentProperty().equals(n.getProperty());
                     case Maintenance:
-                        return n.getType().equals(NotificationType.Maintenance);
+                        return authorizationManager.getCurrentProperty().equals(n.getProperty()) && n.getType().equals(NotificationType.Maintenance);
                     case Security:
-                        return n.getType().equals(NotificationType.Security);
+                        return authorizationManager.getCurrentProperty().equals(n.getProperty()) && n.getType().equals(NotificationType.Security);
                     case Tenant:
                         if (n.getType().equals(NotificationType.Maintenance)) {
                             return a.equals(((MaintenanceNotification) n).getTargetApartment().getTenant());

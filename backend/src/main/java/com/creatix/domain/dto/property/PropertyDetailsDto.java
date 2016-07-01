@@ -25,6 +25,8 @@ public class PropertyDetailsDto {
     private AddressDto address;
     @ApiModelProperty(value = "Full address", required = true)
     private String fullAddress;
+    @ApiModelProperty(value = "Time zone", required = true)
+    private String timeZone;
     @ApiModelProperty
     private List<Facility> facilities;
     @ApiModelProperty

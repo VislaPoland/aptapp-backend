@@ -1,6 +1,7 @@
 package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.MaintenanceNotification;
+import com.creatix.domain.entity.Property;
 import com.creatix.domain.entity.QMaintenanceNotification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,4 +20,12 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
                 .fetch();
     }
 
+    public boolean doesDateRangeContainMoreThanNumberWithinProperty(Date fromDate, Date tillDate, long number, Property property) {
+        final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;
+
+        return queryFactory.selectFrom(maintenanceNotification)
+                .where(maintenanceNotification.property.eq(property))
+                .where(maintenanceNotification.date.between(fromDate, tillDate))
+                .fetchCount() < number;
+    }
 }
