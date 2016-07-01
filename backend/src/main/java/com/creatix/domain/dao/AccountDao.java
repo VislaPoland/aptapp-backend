@@ -26,7 +26,7 @@ public class AccountDao extends DaoBase<Account, Long> {
         final List<Account> accounts;
         if ( propertyId == null ) {
             accounts = queryFactory.selectFrom(account)
-                    .where(account.role.in(roles))
+                    .where(account.role.in(roles).and(account.deletedAt.isNull()))
                     .fetch();
         }
         else {
@@ -34,34 +34,40 @@ public class AccountDao extends DaoBase<Account, Long> {
             for ( AccountRole role : roles ) {
                 if ( role == AccountRole.Tenant ) {
                     accounts.addAll(queryFactory.selectFrom(tenant)
-                            .where(tenant.apartment.property.id.eq(propertyId))
+                            .where(tenant.apartment.property.id.eq(propertyId)
+                                    .and(tenant.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.Maintenance ) {
                     accounts.addAll(queryFactory.selectFrom(employee)
                             .where(employee.manager.managedProperty.id.eq(propertyId)
-                                    .and(employee.role.eq(AccountRole.Security)))
+                                    .and(employee.role.eq(AccountRole.Security))
+                                    .and(employee.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.Security ) {
                     accounts.addAll(queryFactory.selectFrom(employee)
                             .where(employee.manager.managedProperty.id.eq(propertyId)
-                                    .and(employee.role.eq(AccountRole.Security)))
+                                    .and(employee.role.eq(AccountRole.Security))
+                                    .and(employee.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyManager ) {
                     accounts.addAll(queryFactory.selectFrom(propertyManager)
-                            .where(propertyManager.managedProperty.id.eq(propertyId))
+                            .where(propertyManager.managedProperty.id.eq(propertyId)
+                                    .and(propertyManager.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyOwner ) {
                     accounts.addAll(queryFactory.selectFrom(propertyOwner)
-                            .where(propertyOwner.ownedProperties.any().id.eq(propertyId))
+                            .where(propertyOwner.ownedProperties.any().id.eq(propertyId)
+                                    .and(propertyOwner.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.SubTenant ) {
                     accounts.addAll(queryFactory.selectFrom(subTenant)
-                            .where(subTenant.parentTenant.apartment.property.id.eq(propertyId))
+                            .where(subTenant.parentTenant.apartment.property.id.eq(propertyId)
+                                    .and(subTenant.deletedAt.isNull()))
                             .fetch());
                 }
             }

@@ -36,6 +36,10 @@ public class AccountDaoTest {
         final List<Account> accounts = accountDao.findByRolesAndPropertyId(AccountRole.values(), 1L);
         assertNotNull(accounts);
         assertEquals(5, accounts.size());
+
+        final List<Account> accountsAll = accountDao.findByRolesAndPropertyId(AccountRole.values(), null);
+        assertNotNull(accountsAll);
+        assertEquals(6, accountsAll.size());
     }
 
 }
