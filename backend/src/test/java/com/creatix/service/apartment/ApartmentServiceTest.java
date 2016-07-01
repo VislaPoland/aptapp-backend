@@ -2,6 +2,7 @@ package com.creatix.service.apartment;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
+import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.dto.apartment.PersistApartmentRequest;
 import com.creatix.domain.entity.Apartment;
 import com.creatix.domain.entity.Property;
@@ -32,11 +33,14 @@ public class ApartmentServiceTest extends TestContext {
     @Autowired
     private PropertyService propertyService;
 
+    @Autowired
+    private ApartmentDao apartmentDao;
+
 
 
     @Test
     @WithMockCustomUser("helen.owner@apartments.com")
-    public void createApartment() throws Exception {
+    public void createUpdateApartment() throws Exception {
 
         final Property property = propertyService.getProperty(1L);
         assertNotNull(property);
@@ -64,4 +68,9 @@ public class ApartmentServiceTest extends TestContext {
         assertNotNull(apartment.getNeighbors().getAbove().getId());
     }
 
+    @Test
+    @WithMockCustomUser("helen.owner@apartments.com")
+    public void updateUpdateApartment() throws Exception {
+        final Apartment apartment31 = apartmentDao.findById(31L);
+    }
 }

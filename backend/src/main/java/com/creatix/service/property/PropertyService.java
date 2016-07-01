@@ -14,6 +14,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.PropertyStatus;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,6 +85,9 @@ public class PropertyService {
                 new EntityNotFoundException(String.format("Property owner %d not found", request.getPropertyOwnerId())));
         property.setOwner(propertyOwner);
         property.setStatus(PropertyStatus.Draft);
+        if ( StringUtils.isBlank(property.getTimeZone()) ) {
+            property.setTimeZone(TimeZone.getDefault().toString());
+        }
         propertyDao.persist(property);
         return property;
     }
@@ -102,6 +107,9 @@ public class PropertyService {
                 property.setOwner(propertyOwner);
             }
             mapper.fillProperty(request, property);
+            if ( StringUtils.isBlank(property.getTimeZone()) ) {
+                property.setTimeZone(TimeZone.getDefault().toString());
+            }
             propertyDao.persist(property);
             return property;
         }

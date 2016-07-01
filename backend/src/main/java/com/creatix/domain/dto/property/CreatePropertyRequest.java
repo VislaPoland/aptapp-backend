@@ -24,7 +24,6 @@ public class CreatePropertyRequest {
     @ApiModelProperty(value = "ID of the property owner", required = true)
     private Long propertyOwnerId;
 
-    @NotNull
-    @ApiModelProperty(value = "Time zone of the property", required = true)
+    @ApiModelProperty(value = "Time zone of the property")
     private String timeZone;
 }

@@ -29,7 +29,6 @@ public class UpdatePropertyRequest {
     @ApiModelProperty(value = "Status of the property", required = true, notes = "Valid statuses are: Draft, Active")
     private PropertyStatus status;
 
-    @NotNull
-    @ApiModelProperty(value = "Time zone of the property", required = true)
+    @ApiModelProperty(value = "Time zone of the property")
     private String timeZone;
 }
