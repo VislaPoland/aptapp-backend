@@ -75,13 +75,6 @@ public class AccountDao extends DaoBase<Account, Long> {
         return accounts;
     }
 
-    public List<Account> findAll() {
-        return queryFactory
-                .selectFrom(account)
-                .where(account.deletedAt.isNull())
-                .fetch();
-    }
-
     /**
      * Find account by primaryEmail address. This method will return even deleted accounts
      * to prevent primaryEmail name clash and user spoofing.
