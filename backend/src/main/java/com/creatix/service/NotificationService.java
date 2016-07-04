@@ -6,7 +6,6 @@ import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.NotificationRequestType;
 import com.creatix.domain.entity.*;
 import com.creatix.domain.entity.account.Account;
-import com.creatix.domain.entity.account.Employee;
 import com.creatix.domain.entity.account.PropertyManager;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;

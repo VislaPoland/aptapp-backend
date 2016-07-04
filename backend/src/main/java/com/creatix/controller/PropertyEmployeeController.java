@@ -34,7 +34,7 @@ public class PropertyEmployeeController {
     })
     @RequestMapping(value = "/{employeeId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<PropertyDetailsDto.Account> removePropertyEmployee(@PathVariable Long propertyId, @PathVariable Long employeeId) {
+    public DataResponse<PropertyDetailsDto.AccountDto> removePropertyEmployee(@PathVariable Long propertyId, @PathVariable Long employeeId) {
         return new DataResponse<>(mapper.toPropertyAccount(propertyEmployeeService.delete(propertyId, employeeId)));
     }
 

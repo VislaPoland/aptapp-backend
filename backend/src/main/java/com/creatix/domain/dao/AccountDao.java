@@ -8,7 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
-import static com.creatix.domain.entity.account.QEmployee.employee;
+import static com.creatix.domain.entity.account.QSecurityEmployee.securityEmployee;
+import static com.creatix.domain.entity.account.QMaintenanceEmployee.maintenanceEmployee;
 import static com.creatix.domain.entity.account.QTenant.tenant;
 import static com.creatix.domain.entity.account.QPropertyManager.propertyManager;
 import static com.creatix.domain.entity.account.QPropertyOwner.propertyOwner;
@@ -39,17 +40,15 @@ public class AccountDao extends DaoBase<Account, Long> {
                             .fetch());
                 }
                 else if ( role == AccountRole.Maintenance ) {
-                    accounts.addAll(queryFactory.selectFrom(employee)
-                            .where(employee.manager.managedProperty.id.eq(propertyId)
-                                    .and(employee.role.eq(AccountRole.Security))
-                                    .and(employee.deletedAt.isNull()))
+                    accounts.addAll(queryFactory.selectFrom(maintenanceEmployee)
+                            .where(maintenanceEmployee.manager.managedProperty.id.eq(propertyId)
+                                    .and(maintenanceEmployee.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.Security ) {
-                    accounts.addAll(queryFactory.selectFrom(employee)
-                            .where(employee.manager.managedProperty.id.eq(propertyId)
-                                    .and(employee.role.eq(AccountRole.Security))
-                                    .and(employee.deletedAt.isNull()))
+                    accounts.addAll(queryFactory.selectFrom(securityEmployee)
+                            .where(securityEmployee.manager.managedProperty.id.eq(propertyId)
+                                    .and(securityEmployee.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyManager ) {

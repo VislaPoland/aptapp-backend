@@ -3,7 +3,7 @@ package com.creatix.security;
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.entity.*;
 import com.creatix.domain.entity.account.Account;
-import com.creatix.domain.entity.account.Employee;
+import com.creatix.domain.entity.account.ManagedEmployee;
 import com.creatix.domain.entity.account.PropertyManager;
 import com.creatix.domain.entity.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
@@ -74,8 +74,8 @@ public class AuthorizationManager {
             case PropertyManager:
                 return ((PropertyManager) account).getManagedProperty();
             default:
-                if (account instanceof Employee)
-                    return ((Employee) account).getManager().getManagedProperty();
+                if (account instanceof ManagedEmployee )
+                    return ((ManagedEmployee) account).getManager().getManagedProperty();
                 else
                     throw new SecurityException("Impossible to extract single linked apartment.");
         }
@@ -108,7 +108,7 @@ public class AuthorizationManager {
                 allowed = property.getManagers().contains(this.getCurrentAccount());
                 break;
             case AssistantPropertyManager:
-                allowed = property.getManagers().contains(((Employee) this.getCurrentAccount()).getManager());
+                allowed = property.getManagers().contains(((ManagedEmployee) this.getCurrentAccount()).getManager());
                 break;
         }
         if (allowed) {
@@ -132,7 +132,7 @@ public class AuthorizationManager {
                 allowed = apartment.getProperty().getManagers().contains(this.getCurrentAccount());
                 break;
             case AssistantPropertyManager:
-                allowed = apartment.getProperty().getManagers().contains(((Employee) this.getCurrentAccount()).getManager());
+                allowed = apartment.getProperty().getManagers().contains(((ManagedEmployee) this.getCurrentAccount()).getManager());
                 break;
         }
         if (allowed) {

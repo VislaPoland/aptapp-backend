@@ -37,7 +37,7 @@ public class PropertyContactController {
     })
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<List<PropertyDetailsDto.Contact>> getAllPropertyContacts(@PathVariable Long propertyId) {
+    public DataResponse<List<PropertyDetailsDto.ContactDto>> getAllPropertyContacts(@PathVariable Long propertyId) {
         return new DataResponse<>(propertyContactService.details(propertyId).stream()
                 .map(p -> mapper.toPropertyContact(p))
                 .collect(Collectors.toList()));
@@ -51,7 +51,7 @@ public class PropertyContactController {
     })
     @RequestMapping(value = "/{contactId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<PropertyDetailsDto.Contact> getPropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId) {
+    public DataResponse<PropertyDetailsDto.ContactDto> getPropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.detail(propertyId, contactId)));
     }
 
@@ -63,7 +63,7 @@ public class PropertyContactController {
     })
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<PropertyDetailsDto.Contact> createPropertyContact(@PathVariable Long propertyId, @Valid @RequestBody CreatePropertyContactRequest request) {
+    public DataResponse<PropertyDetailsDto.ContactDto> createPropertyContact(@PathVariable Long propertyId, @Valid @RequestBody CreatePropertyContactRequest request) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.create(propertyId, request)));
     }
 
@@ -75,7 +75,7 @@ public class PropertyContactController {
     })
     @RequestMapping(value = "/{contactId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<PropertyDetailsDto.Contact> updatePropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId, @Valid @RequestBody UpdatePropertyContactRequest request) {
+    public DataResponse<PropertyDetailsDto.ContactDto> updatePropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId, @Valid @RequestBody UpdatePropertyContactRequest request) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.update(propertyId, contactId, request)));
     }
 
@@ -87,7 +87,7 @@ public class PropertyContactController {
     })
     @RequestMapping(value = "/{contactId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<PropertyDetailsDto.Contact> deletePropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId) {
+    public DataResponse<PropertyDetailsDto.ContactDto> deletePropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.delete(propertyId, contactId)));
     }
 

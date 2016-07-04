@@ -1,6 +1,7 @@
 package com.creatix.domain;
 
-import com.creatix.domain.dao.EmployeeDao;
+import com.creatix.domain.dao.AssistantPropertyManagerDao;
+import com.creatix.domain.dao.ManagedEmployeeDao;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.PageableDataResponse;
@@ -47,7 +48,9 @@ public class Mapper {
     protected MapperFactory mapperFactory;
 
     @Autowired
-    private EmployeeDao employeeDao;
+    private ManagedEmployeeDao managedEmployeeDao;
+    @Autowired
+    private AssistantPropertyManagerDao assistantPropertyManagerDao;
 
     @Autowired
     public Mapper(MapperFactory mapperFactory) {
@@ -74,8 +77,8 @@ public class Mapper {
                                 accountDto.setProperty(toPropertyDetailsDto(managedProperty));
                             }
                         }
-                        else if ( account instanceof Employee ) {
-                            final Property managedProperty = ((Employee) account).getManager().getManagedProperty();
+                        else if ( account instanceof ManagedEmployee ) {
+                            final Property managedProperty = ((ManagedEmployee) account).getManager().getManagedProperty();
                             if ( managedProperty != null ) {
                                 accountDto.setProperty(toPropertyDetailsDto(managedProperty));
                             }
@@ -84,13 +87,13 @@ public class Mapper {
                 })
                 .register();
 
-        mapperFactory.classMap(Employee.class, PropertyDetailsDto.Account.class)
+        mapperFactory.classMap(ManagedEmployee.class, PropertyDetailsDto.AccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
                 .field("isDeleted", "deleted")
                 .register();
-        mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.Account.class)
+        mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.AccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -106,13 +109,13 @@ public class Mapper {
                                 super.mapAtoB(property, propertyDetailsDto, context);
 
                                 propertyDetailsDto.setAssistantManagers(
-                                        employeeDao.findAllAssistantsByProperty(property.getId()).stream()
-                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.Account.class))
+                                        assistantPropertyManagerDao.findByProperty(property).stream()
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.AccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
                                 propertyDetailsDto.setEmployees(
-                                        employeeDao.findAllNotAssistantsByProperty(property.getId()).stream()
-                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.Account.class))
+                                        managedEmployeeDao.findByProperty(property).stream()
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.AccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
                             }
@@ -120,19 +123,19 @@ public class Mapper {
                 )
                 .register();
 
-        mapperFactory.classMap(PropertySchedule.class, PropertyDetailsDto.Schedule.class)
+        mapperFactory.classMap(PropertySchedule.class, PropertyDetailsDto.ScheduleDto.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(Facility.class, PropertyDetailsDto.Facility.class)
+        mapperFactory.classMap(Facility.class, PropertyDetailsDto.FacilityDto.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(Contact.class, PropertyDetailsDto.Contact.class)
+        mapperFactory.classMap(Contact.class, PropertyDetailsDto.ContactDto.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(PropertyOwner.class, PropertyDetailsDto.Owner.class)
+        mapperFactory.classMap(PropertyOwner.class, PropertyDetailsDto.OwnerDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")

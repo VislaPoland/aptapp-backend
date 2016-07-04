@@ -23,6 +23,6 @@ public class PropertyManager extends EmployeeBase {
     private String website;
 
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Employee> employees;
+    private Set<ManagedEmployee> employees;
 
 }
