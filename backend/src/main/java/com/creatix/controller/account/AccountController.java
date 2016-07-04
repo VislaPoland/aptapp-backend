@@ -1,4 +1,4 @@
-package com.creatix.controller;
+package com.creatix.controller.account;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
