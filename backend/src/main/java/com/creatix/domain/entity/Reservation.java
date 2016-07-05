@@ -7,6 +7,8 @@ import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,11 +44,10 @@ public class Reservation {
     private Set<SlotUnit> units;
     @ManyToOne(optional = false)
     private Slot slot;
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date beginTime;
+    private OffsetDateTime beginTime;
     @Column(nullable = false)
-    private Date endTime;
+    private OffsetDateTime endTime;
     @Column(nullable = false)
     private int capacity;
     @Column(nullable = false)

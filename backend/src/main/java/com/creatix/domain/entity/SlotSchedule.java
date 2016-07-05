@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.sql.Time;
+import java.time.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,16 +19,17 @@ public class SlotSchedule {
     @ManyToOne(optional = false)
     private Property property;
     @Column(nullable = false)
-    private Time beginTime;
+    private LocalTime beginTime;
     @Column(nullable = false)
-    private Time endTime;
+    private LocalTime endTime;
     @Column(nullable = false)
     private int unitDurationMinutes;
     @Enumerated(EnumType.STRING)
     @Column
     private AccountRole targetRole;
+    @Enumerated(EnumType.STRING)
     @ElementCollection
-    private Set<Integer> daysOfWeek = new HashSet<>();
+    private Set<DayOfWeek> daysOfWeek = new HashSet<>();
     @Column(nullable = false)
     private int initialCapacity;
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.PERSIST)
@@ -49,5 +50,15 @@ public class SlotSchedule {
         if ( slots != null ) {
             slots.stream().forEach(s -> s.setSchedule(null));
         }
+    }
+
+    @Transient
+    public ZoneOffset getZoneOffset(LocalDateTime dt) {
+        return getZoneId().getRules().getOffset(dt);
+    }
+
+    @Transient
+    public ZoneId getZoneId() {
+        return ZoneId.of(getTimeZone());
     }
 }

@@ -6,10 +6,9 @@ import com.creatix.domain.entity.SlotSchedule;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
-import static com.creatix.domain.entity.QProperty.property;
 import static com.creatix.domain.entity.QSlot.slot;
 
 
@@ -23,14 +22,14 @@ public class SlotDao extends DaoBase<Slot, Long> {
                 .fetch();
     }
 
-    public List<Slot> findByPropertyIdAndStartBetween(long gymId, Date beginDt, Date endDt) {
+    public List<Slot> findByPropertyIdAndStartBetween(Long propertyId, OffsetDateTime beginDt, OffsetDateTime endDt) {
         return queryFactory.selectFrom(slot)
-                .where(slot.property.eq(property)
+                .where(slot.property.id.eq(propertyId)
                         .and(slot.beginTime.between(beginDt, endDt)))
                 .fetch();
     }
 
-    public List<Slot> findByScheduleAndStartAfter(SlotSchedule schedule, Date beginDt) {
+    public List<Slot> findByScheduleAndStartAfter(SlotSchedule schedule, OffsetDateTime beginDt) {
         return queryFactory.selectFrom(slot)
                 .where(slot.schedule.eq(schedule)
                         .and(slot.beginTime.after(beginDt)))

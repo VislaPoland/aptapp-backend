@@ -9,6 +9,9 @@ import org.hibernate.annotations.FilterDefs;
 import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -45,12 +48,10 @@ public class Slot {
     private long id;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Property property;
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date beginTime;
-    @Temporal(TemporalType.TIMESTAMP)
+    private OffsetDateTime beginTime;
     @Column(nullable = false)
-    private Date endTime;
+    private OffsetDateTime endTime;
     @JoinTable(
             indexes = {
                     @Index(columnList = "Slot_id"),

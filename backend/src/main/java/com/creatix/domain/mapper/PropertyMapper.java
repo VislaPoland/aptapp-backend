@@ -5,7 +5,7 @@ import com.creatix.domain.dto.property.contact.CreatePropertyContactRequest;
 import com.creatix.domain.dto.property.contact.UpdatePropertyContactRequest;
 import com.creatix.domain.dto.property.facility.CreatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.facility.UpdatePropertyFacilityRequest;
-import com.creatix.domain.dto.property.schedule.PropertyScheduleDto;
+import com.creatix.domain.dto.property.slot.SlotScheduleDto;
 import com.creatix.domain.entity.Contact;
 import com.creatix.domain.entity.Facility;
 import com.creatix.domain.entity.Property;
@@ -64,10 +64,10 @@ public final class PropertyMapper extends ConfigurableMapper {
         //endregion
 
         //region Schedule
-        mapperFactory.classMap(PropertyScheduleDto.class, PropertySchedule.class)
+        mapperFactory.classMap(SlotScheduleDto.class, PropertySchedule.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(PropertySchedule.class, PropertyScheduleDto.class)
+        mapperFactory.classMap(PropertySchedule.class, SlotScheduleDto.class)
                 .byDefault()
                 .register();
         //endregion
@@ -130,19 +130,19 @@ public final class PropertyMapper extends ConfigurableMapper {
     //endregion
 
     //region Schedule
-    public PropertyScheduleDto toPropertyScheduleDto(@NotNull PropertySchedule schedule) {
+    public SlotScheduleDto toPropertyScheduleDto(@NotNull PropertySchedule schedule) {
         Objects.requireNonNull(schedule);
 
-        return this.map(schedule, PropertyScheduleDto.class);
+        return this.map(schedule, SlotScheduleDto.class);
     }
 
-    public PropertySchedule toPropertySchedule(@NotNull PropertyScheduleDto request) {
+    public PropertySchedule toPropertySchedule(@NotNull SlotScheduleDto request) {
         Objects.requireNonNull(request);
 
         return this.map(request, PropertySchedule.class);
     }
 
-    public void fillPropertySchedule(@NotNull PropertyScheduleDto request, @NotNull PropertySchedule schedule) {
+    public void fillPropertySchedule(@NotNull SlotScheduleDto request, @NotNull PropertySchedule schedule) {
         Objects.requireNonNull(request);
         Objects.requireNonNull(schedule);
 
