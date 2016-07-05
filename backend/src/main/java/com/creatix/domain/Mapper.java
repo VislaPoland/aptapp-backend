@@ -3,7 +3,7 @@ package com.creatix.domain;
 import com.creatix.domain.dao.AssistantPropertyManagerDao;
 import com.creatix.domain.dao.ManagedEmployeeDao;
 import com.creatix.domain.dto.AddressDto;
-import com.creatix.domain.dto.property.slot.MaintenanceSlotDto;
+import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.account.*;
@@ -19,8 +19,6 @@ import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
-import com.creatix.domain.dto.property.slot.MaintenanceReservationDto;
-import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
 import com.creatix.domain.dto.tenant.CreateTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
 import com.creatix.domain.dto.tenant.TenantSelfUpdateRequest;
@@ -307,6 +305,9 @@ public class Mapper {
         mapperFactory.classMap(MaintenanceSlotSchedule.class, MaintenanceSlotScheduleDto.class)
                 .byDefault()
                 .register();
+        mapperFactory.classMap(EventSlot.class, EventSlotDto.class)
+                .byDefault()
+                .register();
     }
 
     public void fillApartment(@NotNull PersistApartmentRequest req, @NotNull Apartment ap) {
@@ -476,6 +477,11 @@ public class Mapper {
     public MaintenanceSlotScheduleDto toMaintenanceSlotScheduleDto(@Autowired MaintenanceSlotSchedule schedule) {
         Objects.requireNonNull(schedule);
         return mapperFactory.getMapperFacade().map(schedule, MaintenanceSlotScheduleDto.class);
+    }
+
+    public EventSlotDto toEventSlotDto(@NotNull EventSlot slot) {
+        Objects.requireNonNull(slot);
+        return mapperFactory.getMapperFacade().map(slot, EventSlotDto.class);
     }
 
     public <T, R> PageableDataResponse<List<R>> toPageableDataResponse(@NotNull PageableDataResponse<List<T>> response, @NotNull Function<T, R> mappingFunction) {

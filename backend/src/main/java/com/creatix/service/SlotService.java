@@ -1,10 +1,8 @@
 package com.creatix.service;
 
-import com.creatix.domain.dao.MaintenanceSlotDao;
-import com.creatix.domain.dao.MaintenanceSlotScheduleDao;
-import com.creatix.domain.dao.PropertyDao;
-import com.creatix.domain.dao.SlotUnitDao;
+import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
+import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
 import com.creatix.domain.entity.*;
 import com.creatix.security.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +33,55 @@ public class SlotService {
     private MaintenanceSlotScheduleDao maintenanceSlotScheduleDao;
     @Autowired
     private MaintenanceSlotDao maintenanceSlotDao;
+    @Autowired
+    private EventSlotDao eventSlotDao;
 
+    public EventSlot createEventSlot(@NotNull Long propertyId, @NotNull PersistEventSlotRequest request) {
+        Objects.requireNonNull(propertyId);
+        Objects.requireNonNull(request);
+
+        final Property property = propertyDao.findById(propertyId);
+        if ( property == null ) {
+            throw new EntityNotFoundException(String.format("Property id=%d not found", propertyId));
+        }
+
+        final EventSlot slot = new EventSlot();
+        slot.setBeginTime(request.getBeginTime());
+        slot.setEndTime(slot.getBeginTime().plusMinutes(request.getDurationMinutes()));
+        slot.setUnitDurationMinutes(request.getDurationMinutes());
+        slot.setProperty(property);
+
+        final SlotUnit unit = new SlotUnit();
+        unit.setCapacity(request.getInitialCapacity());
+        unit.setInitialCapacity(request.getInitialCapacity());
+        unit.setOffset(0);
+        slot.addUnit(unit);
+
+        eventSlotDao.persist(slot);
+
+        return slot;
+    }
+
+    public EventSlot deleteEventSlotById(@NotNull Long slotId) {
+        Objects.requireNonNull(slotId);
+
+        final EventSlot slot = eventSlotDao.findById(slotId);
+        if ( slot == null ) {
+            throw new EntityNotFoundException(String.format("Slot id=%d nto found", slotId));
+        }
+
+        eventSlotDao.delete(slot);
+
+        return slot;
+    }
+
+    public List<EventSlot> getEventSlotsByPropertyIdAndTimeRange(@NotNull Long propertyId, @NotNull OffsetDateTime beginDt, @NotNull OffsetDateTime endDt) {
+        Objects.requireNonNull(propertyId);
+        Objects.requireNonNull(beginDt);
+        Objects.requireNonNull(endDt);
+
+        return eventSlotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
+    }
 
     private Slot createMaintenanceSlotFromSchedule(@NotNull LocalDate date, @NotNull MaintenanceSlotSchedule schedule) {
         Objects.requireNonNull(date);

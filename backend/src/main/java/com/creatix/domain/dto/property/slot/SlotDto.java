@@ -10,7 +10,7 @@ import java.util.List;
 
 @ApiModel
 @Data
-public class SlotDto {
+public abstract class SlotDto {
     @ApiModelProperty(value = "Slot ID", required = true)
     private long id;
     @ApiModelProperty(value = "Begin time of the slot", required = true)
