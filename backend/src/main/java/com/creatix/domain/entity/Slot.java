@@ -1,6 +1,5 @@
 package com.creatix.domain.entity;
 
-import com.creatix.domain.enums.AccountRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
@@ -9,10 +8,7 @@ import org.hibernate.annotations.FilterDefs;
 import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -39,7 +35,8 @@ import java.util.Set;
         })
 })
 @BatchSize(size = 80)
-public class Slot {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class Slot {
     public static final String SLOT_BEGIN_TIME_BETWEEN = "slotBeginTimeBetween";
     public static final String SLOT_BEGIN_TIME_FROM = "slotBeginTimeFrom";
 
@@ -58,17 +55,14 @@ public class Slot {
                     @Index(columnList = "amenities_id")
             }
     )
-    @Enumerated(EnumType.STRING)
-    @Column
-    private AccountRole targetRole;
     @Column(nullable = false)
     private int unitDurationMinutes;
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
     private Set<SlotUnit> units;
     @OneToMany(mappedBy = "slot")
-    private Set<Reservation> reservations;
+    private Set<MaintenanceReservation> reservations;
     @ManyToOne(fetch = FetchType.LAZY)
-    private SlotSchedule schedule;
+    private MaintenanceSlotSchedule schedule;
 
     public void addUnit(SlotUnit unit) {
         if ( unit.getSlot() == null ) {

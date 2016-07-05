@@ -2,6 +2,7 @@ package com.creatix.domain.dao;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
+import com.creatix.domain.entity.MaintenanceSlot;
 import com.creatix.domain.entity.Property;
 import com.creatix.domain.entity.Slot;
 import com.creatix.domain.enums.AccountRole;
@@ -39,7 +40,7 @@ import static org.junit.Assert.*;
 public class SlotDaoTest {
 
     @Autowired
-    private SlotDao slotDao;
+    private MaintenanceSlotDao slotDao;
     @Autowired
     private PropertyDao propertyDao;
     @PersistenceContext
@@ -56,9 +57,8 @@ public class SlotDaoTest {
         final Property property = propertyDao.findById(1L);
         assertNotNull(property);
 
-        Slot s = new Slot();
+        MaintenanceSlot s = new MaintenanceSlot();
         s.setProperty(property);
-        s.setTargetRole(AccountRole.Maintenance);
         s.setUnitDurationMinutes(30);
         s.setBeginTime(beginDt);
         s.setEndTime(endDt);

@@ -9,7 +9,7 @@ import java.util.List;
 
 @ApiModel
 @Data
-public class ReservationDto {
+public class MaintenanceReservationDto {
     @ApiModelProperty(value = "Reservation ID", required = true)
     private long id;
     @ApiModelProperty(value = "Account ID", required = true)

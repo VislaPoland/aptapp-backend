@@ -11,7 +11,7 @@ import java.util.Set;
 
 @ApiModel
 @Data
-public class PersistSlotScheduleRequest {
+public class PersistMaintenanceSlotScheduleRequest {
     @ApiModelProperty(value = "Time when slot starts", required = true)
     private LocalTime beginTime;
     @ApiModelProperty(value = "Time when slot ends", required = true)

@@ -1,17 +1,12 @@
 package com.creatix.service;
 
+import com.creatix.domain.dao.MaintenanceSlotDao;
+import com.creatix.domain.dao.MaintenanceSlotScheduleDao;
 import com.creatix.domain.dao.PropertyDao;
-import com.creatix.domain.dao.SlotDao;
-import com.creatix.domain.dao.SlotScheduleDao;
 import com.creatix.domain.dao.SlotUnitDao;
-import com.creatix.domain.dto.property.slot.PersistSlotRequest;
-import com.creatix.domain.dto.property.slot.PersistSlotScheduleRequest;
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.Slot;
-import com.creatix.domain.entity.SlotSchedule;
-import com.creatix.domain.entity.SlotUnit;
+import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
+import com.creatix.domain.entity.*;
 import com.creatix.security.AuthorizationManager;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,10 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
-import java.text.ParseException;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -32,21 +25,19 @@ import java.util.stream.Collectors;
 @Transactional
 public class SlotService {
 
-    private static final int SLOT_UNIT_DURATION_MINUTES = 30;
-
     @Autowired
     private AuthorizationManager authorizationManager;
     @Autowired
     private PropertyDao propertyDao;
     @Autowired
-    private SlotDao slotDao;
-    @Autowired
     private SlotUnitDao slotUnitDao;
     @Autowired
-    private SlotScheduleDao slotScheduleDao;
+    private MaintenanceSlotScheduleDao maintenanceSlotScheduleDao;
+    @Autowired
+    private MaintenanceSlotDao maintenanceSlotDao;
 
 
-    private Slot createSlotFromSchedule(@NotNull LocalDate date, @NotNull SlotSchedule schedule) {
+    private Slot createMaintenanceSlotFromSchedule(@NotNull LocalDate date, @NotNull MaintenanceSlotSchedule schedule) {
         Objects.requireNonNull(date);
         Objects.requireNonNull(schedule);
 
@@ -58,13 +49,12 @@ public class SlotService {
         final OffsetDateTime endDt = date.atTime(schedule.getEndTime()).atOffset(schedule.getZoneOffset(date.atTime(schedule.getEndTime())));
 
         // create parent slot
-        final Slot slot = new Slot();
+        final MaintenanceSlot slot = new MaintenanceSlot();
         slot.setBeginTime(beginDt);
         slot.setEndTime(endDt);
         slot.setUnitDurationMinutes(schedule.getUnitDurationMinutes());
         slot.setProperty(schedule.getProperty());
-        slot.setTargetRole(schedule.getTargetRole());
-        slotDao.persist(slot);
+        maintenanceSlotDao.persist(slot);
 
         // create slot units
 
@@ -82,7 +72,7 @@ public class SlotService {
         return slot;
     }
 
-    int calculateUnitCount(OffsetDateTime beginDt, OffsetDateTime endDt, int unitDurationMinutes) {
+    private int calculateUnitCount(OffsetDateTime beginDt, OffsetDateTime endDt, int unitDurationMinutes) {
         final Duration slotDuration = Duration.between(beginDt, endDt);
         return (int) (slotDuration.get(ChronoUnit.MINUTES) / unitDurationMinutes);
     }
@@ -101,63 +91,15 @@ public class SlotService {
         return (int) (offsetMinutes / slot.getUnitDurationMinutes());
     }
 
-    public Slot deleteById(long slotId) {
-        final Slot slot = slotDao.findById(slotId);
-        if ( slot == null ) {
-            throw new EntityNotFoundException(String.format("Slot id=%d not found", slotId));
-        }
-        if ( slot.getBeginTime().isBefore(OffsetDateTime.now()) ) {
-            throw new IllegalArgumentException("Cannot delete slot in past");
-        }
-
-        // check if slot unit is not reserved
-        if ( (slot.getReservations() != null) && !slot.getReservations().isEmpty() ) {
-            throw new IllegalStateException("Cannot delete slot that has reservation(s)");
-        }
-
-        slotDao.delete(slot);
-
-        return slot;
+    public List<MaintenanceSlot> getMaintenanceSlotsByPropertyAndDateRange(long propertyId, OffsetDateTime beginDt, OffsetDateTime endDt) {
+        return maintenanceSlotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
     }
 
-    public SlotUnit deleteUnitById(long slotUnitId) {
-        final SlotUnit slotUnit = slotUnitDao.findById(slotUnitId);
-        if ( slotUnit == null ) {
-            throw new EntityNotFoundException(String.format("Slot unit id=%d not found", slotUnitId));
-        }
-        if ( slotUnit.getSlot().getBeginTime().isBefore(OffsetDateTime.now()) ) {
-            throw new IllegalArgumentException("Cannot delete slot unit when slot starts in past");
-        }
-        if ( (slotUnit.getReservations() != null) && !slotUnit.getReservations().isEmpty() ) {
-            throw new IllegalStateException("Cannot delete slot unit that has reservation(s)");
-        }
-
-        slotUnitDao.delete(slotUnit);
-
-        return slotUnit;
-    }
-
-    public List<Slot> getByPropertyAndDateRange(long propertyId, OffsetDateTime beginDt, OffsetDateTime endDt) {
-        return slotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
-    }
-
-    private static void validateSlotDuration(int durationMinutes) {
-        if ( (durationMinutes % SLOT_UNIT_DURATION_MINUTES) != 0 ) {
-            throw new IllegalArgumentException("Slot duration must be multiply of " + SLOT_UNIT_DURATION_MINUTES);
-        }
-    }
-
-    private static Date computeEndTime(PersistSlotRequest request) {
-        DateTime endDt = new DateTime(request.getBeginTime());
-        endDt = endDt.plusMinutes(request.getDurationMinutes());
-        return endDt.toDate();
-    }
-
-    public SlotSchedule createSchedule(long gymId, PersistSlotScheduleRequest request) throws ParseException {
-        final Property property = propertyDao.findById(gymId);
+    public MaintenanceSlotSchedule createSchedule(long propertyId, PersistMaintenanceSlotScheduleRequest request) {
+        final Property property = propertyDao.findById(propertyId);
         authorizationManager.isManager(property);
 
-        final SlotSchedule schedule = new SlotSchedule();
+        final MaintenanceSlotSchedule schedule = new MaintenanceSlotSchedule();
         schedule.setBeginTime(request.getBeginTime());
         schedule.setEndTime(request.getEndTime());
         schedule.setDaysOfWeek(request.getDaysOfWeek());
@@ -166,54 +108,54 @@ public class SlotService {
         schedule.setInitialCapacity(schedule.getInitialCapacity());
         schedule.setUnitDurationMinutes(schedule.getUnitDurationMinutes());
         schedule.setTargetRole(schedule.getTargetRole());
-        slotScheduleDao.persist(schedule);
+        maintenanceSlotScheduleDao.persist(schedule);
 
         scheduleSlots(schedule);
 
         return schedule;
     }
 
-    public SlotSchedule deleteScheduleById(long slotScheduleId) {
-        final SlotSchedule schedule = slotScheduleDao.findById(slotScheduleId);
+    public MaintenanceSlotSchedule deleteScheduleById(long slotScheduleId) {
+        final MaintenanceSlotSchedule schedule = maintenanceSlotScheduleDao.findById(slotScheduleId);
         if ( schedule == null ) {
             throw new EntityNotFoundException(String.format("slot schedule id=%d not found", slotScheduleId));
         }
         authorizationManager.checkManager(schedule.getProperty());
 
-        final List<Slot> slots = slotDao.findByScheduleAndStartAfter(schedule, OffsetDateTime.now());
-        for ( Slot slot : slots ) {
+        final List<MaintenanceSlot> slots = maintenanceSlotDao.findByScheduleAndStartAfter(schedule, OffsetDateTime.now());
+        for ( MaintenanceSlot slot : slots ) {
             if ( (slot.getReservations() == null) || slot.getReservations().isEmpty() ) {
-                slotDao.delete(slot);
+                maintenanceSlotDao.delete(slot);
             }
             else {
                 // will not delete slot that has reservations on it, just unlink it from slot schedule
                 slot.setSchedule(null);
-                slotDao.persist(slot);
+                maintenanceSlotDao.persist(slot);
             }
         }
-        slotScheduleDao.delete(schedule);
+        maintenanceSlotScheduleDao.delete(schedule);
         return schedule;
     }
 
-    public List<SlotSchedule> getSlotSchedulesByPropertyId(long propertyId) {
+    public List<MaintenanceSlotSchedule> getSlotSchedulesByPropertyId(long propertyId) {
         final Property property = propertyDao.findById(propertyId);
         authorizationManager.isManager(property);
 
-        return slotScheduleDao.findByProperty(property);
+        return maintenanceSlotScheduleDao.findByProperty(property);
     }
 
     @Scheduled(cron = "0 0 * * * *") // the top of every hour of every day
     public void scheduleSlots() {
-        final List<SlotSchedule> schedules = slotScheduleDao.findAll();
+        final List<MaintenanceSlotSchedule> schedules = maintenanceSlotScheduleDao.findAll();
         schedules.forEach(this::scheduleSlots);
     }
 
-    private void scheduleSlots(SlotSchedule schedule) {
+    private void scheduleSlots(MaintenanceSlotSchedule schedule) {
         if ( (schedule == null) || (schedule.getDaysOfWeek() == null) || schedule.getDaysOfWeek().isEmpty() ) {
             return;
         }
 
-        final List<Slot> scheduledSlots = slotDao.findByScheduleAndStartAfter(schedule, OffsetDateTime.now());
+        final List<MaintenanceSlot> scheduledSlots = maintenanceSlotDao.findByScheduleAndStartAfter(schedule, OffsetDateTime.now());
         final Set<ZonedDateTime> scheduledTimes = scheduledSlots.stream()
                 .map(Slot::getBeginTime)
                 .map(dt -> dt.atZoneSameInstant(ZoneId.systemDefault()))
@@ -235,7 +177,7 @@ public class SlotService {
                     continue;
                 }
 
-                createSlotFromSchedule(dt.toLocalDate(), schedule);
+                createMaintenanceSlotFromSchedule(dt.toLocalDate(), schedule);
             }
         }
     }

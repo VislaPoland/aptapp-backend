@@ -3,7 +3,7 @@ package com.creatix.service.property;
 import com.creatix.domain.dao.DaoBase;
 import com.creatix.domain.dao.MaintenanceNotificationDao;
 import com.creatix.domain.dao.PropertyDao;
-import com.creatix.domain.dto.property.slot.SlotScheduleDto;
+import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
 import com.creatix.domain.entity.Property;
 import com.creatix.domain.entity.PropertySchedule;
 import com.creatix.domain.enums.AccountRole;
@@ -15,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -38,7 +36,7 @@ public class PropertyScheduleService {
     }
 
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public PropertySchedule createPropertyScheduleFromRequest(Long propertyId, @NotNull SlotScheduleDto request) {
+    public PropertySchedule createPropertyScheduleFromRequest(Long propertyId, @NotNull MaintenanceSlotScheduleDto request) {
         Objects.requireNonNull(request);
 
         final Property property = getOrElseThrow(propertyId, propertyDao, new EntityNotFoundException(String.format("Property id=%d not found", propertyId)));
@@ -49,7 +47,7 @@ public class PropertyScheduleService {
     }
 
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public PropertySchedule updatePropertyScheduleFromRequest(Long propertyId, @NotNull SlotScheduleDto request) {
+    public PropertySchedule updatePropertyScheduleFromRequest(Long propertyId, @NotNull MaintenanceSlotScheduleDto request) {
         Objects.requireNonNull(request);
 
         final Property property = getOrElseThrow(propertyId, propertyDao, new EntityNotFoundException(String.format("Property id=%d not found", propertyId)));

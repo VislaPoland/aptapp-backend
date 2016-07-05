@@ -36,5 +36,5 @@ public class SlotUnit {
     @Column(nullable = false)
     private int offset;
     @ManyToMany(mappedBy = "units")
-    private Set<Reservation> reservations;
+    private Set<MaintenanceReservation> reservations;
 }

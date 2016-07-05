@@ -10,7 +10,7 @@ import java.util.Date;
 
 @ApiModel
 @Data
-public class PersistReservationRequest {
+public class PersistMaintenanceReservationRequest {
     @ApiModelProperty(required = true)
     private Long slotId;
     @ApiModelProperty(required = true)

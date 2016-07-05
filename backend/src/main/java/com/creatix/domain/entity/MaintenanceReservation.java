@@ -8,9 +8,8 @@ import org.hibernate.annotations.BatchSize;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -26,7 +25,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = "id")
 @BatchSize(size = 80)
-public class Reservation {
+public class MaintenanceReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -43,7 +42,7 @@ public class Reservation {
     )
     private Set<SlotUnit> units;
     @ManyToOne(optional = false)
-    private Slot slot;
+    private MaintenanceSlot slot;
     @Column(nullable = false)
     private OffsetDateTime beginTime;
     @Column(nullable = false)
@@ -61,11 +60,19 @@ public class Reservation {
     @Column(length = 2048)
     private String note;
 
+    @OneToOne
+    private MaintenanceNotification notification;
+
+    @Transient
     public void addUnit(SlotUnit unit) {
         if ( units == null ) {
             units = new HashSet<>();
         }
+        if ( (slot == null) && (unit.getSlot() instanceof MaintenanceSlot) ) {
+            slot = (MaintenanceSlot) unit.getSlot();
+        }
 
         units.add(unit);
     }
+
 }

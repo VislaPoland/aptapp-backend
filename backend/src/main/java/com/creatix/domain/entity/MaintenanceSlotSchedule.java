@@ -12,7 +12,7 @@ import java.util.Set;
 @Entity
 @Data
 @EqualsAndHashCode(of = "id")
-public class SlotSchedule {
+public class MaintenanceSlotSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MaintenanceNotification extends Notification {
+
     @ManyToOne
     @JoinColumn
     @NotNull
