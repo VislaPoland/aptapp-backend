@@ -28,6 +28,9 @@ public class AccountDeviceFilter extends GenericFilterBean {
     private DeviceDao deviceDao;
 
     @Autowired
+    private AuthorizationManager authorizationManager;
+
+    @Autowired
     private HttpSession httpSession;
 
     @Override
@@ -57,6 +60,12 @@ public class AccountDeviceFilter extends GenericFilterBean {
                     device = new Device();
                     device.setUdid(deviceUDID);
                     device.setPlatform(platformType);
+                    deviceDao.persist(device);
+                }
+                if ((device.getAccount() == null && this.authorizationManager.getCurrentAccount() != null) ||
+                        (device.getAccount() != null && this.authorizationManager.getCurrentAccount() != null &&
+                                device.getAccount().getId() != this.authorizationManager.getCurrentAccount().getId())) {
+                    device.setAccount(this.authorizationManager.getCurrentAccount());
                     deviceDao.persist(device);
                 }
                 this.httpSession.setAttribute("device", device);
