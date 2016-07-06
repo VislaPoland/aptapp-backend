@@ -21,7 +21,6 @@ import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.dto.tenant.CreateTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
-import com.creatix.domain.dto.tenant.TenantSelfUpdateRequest;
 import com.creatix.domain.dto.tenant.UpdateTenantRequest;
 import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
 import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
@@ -221,10 +220,6 @@ public class Mapper {
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(TenantSelfUpdateRequest.class, Tenant.class)
-                .byDefault()
-                .register();
-
         mapperFactory.classMap(Tenant.class, TenantDto.class)
                 .byDefault()
                 .field("apartment.property", "property")
@@ -276,6 +271,9 @@ public class Mapper {
                 .field("email", "primaryEmail")
                 .register();
 
+        mapperFactory.classMap(UpdateAccountProfileRequest.class, Account.class)
+                .byDefault()
+                .register();
         mapperFactory.classMap(PersistAdministratorRequest.class, Account.class)
                 .byDefault()
                 .register();
@@ -321,6 +319,13 @@ public class Mapper {
         mapperFactory.getMapperFacade().map(req, ap);
     }
 
+    public void fillAccount(@NotNull UpdateAccountProfileRequest req, @NotNull Account acc) {
+        Objects.requireNonNull(req);
+        Objects.requireNonNull(acc);
+
+        mapperFactory.getMapperFacade().map(req, acc);
+    }
+
     public void fillAccount(PersistAssistantPropertyManagerRequest req, Account acc) {
         mapperFactory.getMapperFacade().map(req, acc);
     }
@@ -351,13 +356,6 @@ public class Mapper {
     }
 
     public void fillTenant(@NotNull UpdateTenantRequest dto, @NotNull Tenant entity) {
-        Objects.requireNonNull(dto);
-        Objects.requireNonNull(entity);
-
-        mapperFactory.getMapperFacade().map(dto, entity);
-    }
-
-    public void fillTenant(@NotNull TenantSelfUpdateRequest dto, @NotNull Tenant entity) {
         Objects.requireNonNull(dto);
         Objects.requireNonNull(entity);
 

@@ -1,4 +1,4 @@
-package com.creatix.domain.dto.tenant;
+package com.creatix.domain.dto.account;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @ApiModel
 @Data
-public class TenantSelfUpdateRequest {
+public class CreatePasswordRequest {
     @NotNull
     @ApiModelProperty(required = true, value = "Password")
     private String password;

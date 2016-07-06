@@ -3,7 +3,6 @@ package com.creatix.service;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.tenant.CreateTenantRequest;
-import com.creatix.domain.dto.tenant.TenantSelfUpdateRequest;
 import com.creatix.domain.dto.tenant.UpdateTenantRequest;
 import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
@@ -131,22 +130,6 @@ public class TenantService {
     public List<Vehicle> getTenantVehicles(Long tenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         return tenant.getVehicles().stream().collect(Collectors.toList());
-    }
-
-    @RoleSecured({AccountRole.Tenant})
-    public Tenant updateTenantFromRequest(Long tenantId, @NotNull TenantSelfUpdateRequest request) {
-        Objects.requireNonNull(request);
-
-        final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if (authorizationManager.isSelf(tenant)) {
-            mapper.fillTenant(request, tenant);
-            tenant.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-            tenantDao.persist(tenant);
-
-            return tenant;
-        }
-
-        throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
     }
 
     @RoleSecured

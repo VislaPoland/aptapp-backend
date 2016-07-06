@@ -12,7 +12,4 @@ public class UpdateAccountProfileRequest {
 
     @ApiModelProperty(value = "Secondary phone number")
     private String secondaryPhone;
-
-    @ApiModelProperty(value = "User password")
-    private String password;
 }

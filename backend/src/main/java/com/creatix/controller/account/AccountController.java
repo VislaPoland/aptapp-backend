@@ -2,6 +2,7 @@ package com.creatix.controller.account;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
@@ -88,6 +89,32 @@ public class AccountController {
         return new DataResponse<>(mapper.toAccountDto(account));
     }
 
+    @ApiOperation(value = "Change password")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{accountId}/password", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<Void> changePassword(@PathVariable long accountId, @RequestBody @Valid UpdatePasswordRequest request) {
+        accountService.updateAccountPasswordFromRequest(accountId, request);
+        return new DataResponse<>();
+    }
+
+    @ApiOperation(value = "First time set password")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{accountId}/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<Void> setPassword(@PathVariable long accountId, @RequestBody @Valid CreatePasswordRequest request) {
+        accountService.createAccountPasswordFromRequest(accountId, request);
+        return new DataResponse<>();
+    }
+
     @ApiOperation(value = "Update user profile information")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -96,10 +123,7 @@ public class AccountController {
     })
     @RequestMapping(value = "/{accountId}/profile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> updateProfile(@PathVariable Long accountId, @RequestBody @Valid UpdateAccountProfileRequest request) {
-        Account account = accountService.getAccount(accountId);
-        account = accountService.updateAccount(account, request);
-
-        return new DataResponse<>(mapper.toAccountDto(account));
+        return new DataResponse<>(mapper.toAccountDto(accountService.updateAccountFromRequest(accountId, request)));
     }
 
     @ApiOperation(value = "Create administrator account")

@@ -97,15 +97,15 @@ public class AccountDao extends DaoBase<Account, Long> {
     }
 
     @Override
-    public void persist(Account notification) {
-        if ( notification.getCreatedAt() == null ) {
-            notification.setCreatedAt(new Date());
-            notification.setUpdatedAt(new Date());
+    public void persist(Account account) {
+        if ( account.getCreatedAt() == null ) {
+            account.setCreatedAt(new Date());
+            account.setUpdatedAt(new Date());
         }
         else {
-            notification.setUpdatedAt(new Date());
+            account.setUpdatedAt(new Date());
         }
 
-        super.persist(notification);
+        super.persist(account);
     }
 }
