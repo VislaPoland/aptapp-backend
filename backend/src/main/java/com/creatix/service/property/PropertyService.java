@@ -6,9 +6,9 @@ import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.PropertyOwnerDao;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
-import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.Employee;
+import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.PropertyStatus;
@@ -50,7 +50,7 @@ public class PropertyService {
                 //noinspection SuspiciousMethodCalls
                 return property.getManagers().contains(account);
             case AssistantPropertyManager:
-                return property.getManagers().contains(((Employee) account).getManager());
+                return property.getManagers().contains(((ManagedEmployee) account).getManager());
             default:
                 return false;
         }

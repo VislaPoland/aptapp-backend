@@ -1,8 +1,7 @@
 package com.creatix.controller;
 
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.property.schedule.PropertyScheduleDto;
-import com.creatix.domain.dto.property.schedule.ScheduleSlotsListingDto;
+import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.RoleSecured;
@@ -11,13 +10,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
 
 @RestController
 @Transactional
@@ -38,7 +35,7 @@ public class PropertyScheduleController {
     })
     @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<PropertyScheduleDto> createPropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid PropertyScheduleDto request) {
+    public DataResponse<MaintenanceSlotScheduleDto> createPropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid MaintenanceSlotScheduleDto request) {
         return new DataResponse<>(propertyMapper.toPropertyScheduleDto(propertyScheduleService.createPropertyScheduleFromRequest(propertyId, request)));
     }
 
@@ -52,21 +49,9 @@ public class PropertyScheduleController {
     })
     @RequestMapping(path = "", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<PropertyScheduleDto> updatePropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid PropertyScheduleDto request) {
+    public DataResponse<MaintenanceSlotScheduleDto> updatePropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid MaintenanceSlotScheduleDto request) {
         return new DataResponse<>(propertyMapper.toPropertyScheduleDto(propertyScheduleService.updatePropertyScheduleFromRequest(propertyId, request)));
     }
 
-    @ApiOperation(value = "Get schedule slots listing in date range")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
-    public DataResponse<ScheduleSlotsListingDto> getScheduleSlotsListingForTheDay(
-            @PathVariable Long propertyId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date day) {
-        return new DataResponse<>(propertyScheduleService.getScheduleSlotListing(propertyId, day));
-    }
+
 }

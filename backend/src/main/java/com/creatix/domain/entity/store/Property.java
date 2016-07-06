@@ -59,4 +59,6 @@ public class Property {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private PropertySchedule schedule;
+
+
 }

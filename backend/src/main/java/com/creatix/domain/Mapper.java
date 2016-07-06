@@ -1,7 +1,9 @@
 package com.creatix.domain;
 
-import com.creatix.domain.dao.EmployeeDao;
+import com.creatix.domain.dao.AssistantPropertyManagerDao;
+import com.creatix.domain.dao.ManagedEmployeeDao;
 import com.creatix.domain.dto.AddressDto;
+import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.account.*;
@@ -27,6 +29,11 @@ import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
+import com.creatix.domain.entity.store.EventSlot;
+import com.creatix.domain.entity.store.MaintenanceReservation;
+import com.creatix.domain.entity.store.MaintenanceSlot;
+import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
+import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import ma.glasnost.orika.CustomMapper;
@@ -47,7 +54,9 @@ public class Mapper {
     protected MapperFactory mapperFactory;
 
     @Autowired
-    private EmployeeDao employeeDao;
+    private ManagedEmployeeDao managedEmployeeDao;
+    @Autowired
+    private AssistantPropertyManagerDao assistantPropertyManagerDao;
 
     @Autowired
     public Mapper(MapperFactory mapperFactory) {
@@ -74,8 +83,8 @@ public class Mapper {
                                 accountDto.setProperty(toPropertyDetailsDto(managedProperty));
                             }
                         }
-                        else if ( account instanceof Employee ) {
-                            final Property managedProperty = ((Employee) account).getManager().getManagedProperty();
+                        else if ( account instanceof ManagedEmployee) {
+                            final Property managedProperty = ((ManagedEmployee) account).getManager().getManagedProperty();
                             if ( managedProperty != null ) {
                                 accountDto.setProperty(toPropertyDetailsDto(managedProperty));
                             }
@@ -84,13 +93,13 @@ public class Mapper {
                 })
                 .register();
 
-        mapperFactory.classMap(Employee.class, PropertyDetailsDto.Account.class)
+        mapperFactory.classMap(ManagedEmployee.class, PropertyDetailsDto.AccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
                 .field("isDeleted", "deleted")
                 .register();
-        mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.Account.class)
+        mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.AccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -106,13 +115,13 @@ public class Mapper {
                                 super.mapAtoB(property, propertyDetailsDto, context);
 
                                 propertyDetailsDto.setAssistantManagers(
-                                        employeeDao.findAllAssistantsByProperty(property.getId()).stream()
-                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.Account.class))
+                                        assistantPropertyManagerDao.findByProperty(property).stream()
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.AccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
                                 propertyDetailsDto.setEmployees(
-                                        employeeDao.findAllNotAssistantsByProperty(property.getId()).stream()
-                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.Account.class))
+                                        managedEmployeeDao.findByProperty(property).stream()
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.AccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
                             }
@@ -120,19 +129,19 @@ public class Mapper {
                 )
                 .register();
 
-        mapperFactory.classMap(PropertySchedule.class, PropertyDetailsDto.Schedule.class)
+        mapperFactory.classMap(PropertySchedule.class, PropertyDetailsDto.ScheduleDto.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(Facility.class, PropertyDetailsDto.Facility.class)
+        mapperFactory.classMap(Facility.class, PropertyDetailsDto.FacilityDto.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(Contact.class, PropertyDetailsDto.Contact.class)
+        mapperFactory.classMap(Contact.class, PropertyDetailsDto.ContactDto.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(PropertyOwner.class, PropertyDetailsDto.Owner.class)
+        mapperFactory.classMap(PropertyOwner.class, PropertyDetailsDto.OwnerDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -291,6 +300,19 @@ public class Mapper {
         mapperFactory.classMap(PersistAssistantPropertyManagerRequest.class, Account.class)
                 .byDefault()
                 .register();
+
+        mapperFactory.classMap(MaintenanceSlot.class, MaintenanceSlotDto.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(MaintenanceReservation.class, MaintenanceReservationDto.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(MaintenanceSlotSchedule.class, MaintenanceSlotScheduleDto.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(EventSlot.class, EventSlotDto.class)
+                .byDefault()
+                .register();
     }
 
     public void fillApartment(@NotNull PersistApartmentRequest req, @NotNull Apartment ap) {
@@ -445,6 +467,26 @@ public class Mapper {
         Objects.requireNonNull(entity);
 
         mapperFactory.getMapperFacade().map(request, entity);
+    }
+
+    public MaintenanceSlotDto toMaintenanceSlotDto(@NotNull MaintenanceSlot slot) {
+        Objects.requireNonNull(slot);
+        return mapperFactory.getMapperFacade().map(slot, MaintenanceSlotDto.class);
+    }
+
+    public MaintenanceReservationDto toMaintenanceReservationDto(@NotNull MaintenanceReservation reservation) {
+        Objects.requireNonNull(reservation);
+        return mapperFactory.getMapperFacade().map(reservation, MaintenanceReservationDto.class);
+    }
+
+    public MaintenanceSlotScheduleDto toMaintenanceSlotScheduleDto(@Autowired MaintenanceSlotSchedule schedule) {
+        Objects.requireNonNull(schedule);
+        return mapperFactory.getMapperFacade().map(schedule, MaintenanceSlotScheduleDto.class);
+    }
+
+    public EventSlotDto toEventSlotDto(@NotNull EventSlot slot) {
+        Objects.requireNonNull(slot);
+        return mapperFactory.getMapperFacade().map(slot, EventSlotDto.class);
     }
 
     public <T, R> PageableDataResponse<List<R>> toPageableDataResponse(@NotNull PageableDataResponse<List<T>> response, @NotNull Function<T, R> mappingFunction) {

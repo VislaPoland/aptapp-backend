@@ -17,7 +17,7 @@ import javax.persistence.PersistenceContext;
 public abstract class DaoBase<T, ID> {
 
     @PersistenceContext
-    EntityManager em;
+    protected EntityManager em;
 
     @Autowired
     JPQLQueryFactory queryFactory;

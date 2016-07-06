@@ -6,15 +6,18 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
-import static com.creatix.domain.entity.store.account.QEmployee.employee;
-import static com.creatix.domain.entity.store.account.QTenant.tenant;
+import static com.creatix.domain.entity.store.account.QAccount.account;
+import static com.creatix.domain.entity.store.account.QMaintenanceEmployee.maintenanceEmployee;
 import static com.creatix.domain.entity.store.account.QPropertyManager.propertyManager;
 import static com.creatix.domain.entity.store.account.QPropertyOwner.propertyOwner;
+import static com.creatix.domain.entity.store.account.QSecurityEmployee.securityEmployee;
 import static com.creatix.domain.entity.store.account.QSubTenant.subTenant;
-import static com.creatix.domain.entity.store.account.QAccount.account;
-
+import static com.creatix.domain.entity.store.account.QTenant.tenant;
 
 @Repository
 @Transactional
@@ -39,17 +42,15 @@ public class AccountDao extends DaoBase<Account, Long> {
                             .fetch());
                 }
                 else if ( role == AccountRole.Maintenance ) {
-                    accounts.addAll(queryFactory.selectFrom(employee)
-                            .where(employee.manager.managedProperty.id.eq(propertyId)
-                                    .and(employee.role.eq(AccountRole.Security))
-                                    .and(employee.deletedAt.isNull()))
+                    accounts.addAll(queryFactory.selectFrom(maintenanceEmployee)
+                            .where(maintenanceEmployee.manager.managedProperty.id.eq(propertyId)
+                                    .and(maintenanceEmployee.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.Security ) {
-                    accounts.addAll(queryFactory.selectFrom(employee)
-                            .where(employee.manager.managedProperty.id.eq(propertyId)
-                                    .and(employee.role.eq(AccountRole.Security))
-                                    .and(employee.deletedAt.isNull()))
+                    accounts.addAll(queryFactory.selectFrom(securityEmployee)
+                            .where(securityEmployee.manager.managedProperty.id.eq(propertyId)
+                                    .and(securityEmployee.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyManager ) {
@@ -74,13 +75,6 @@ public class AccountDao extends DaoBase<Account, Long> {
         }
 
         return accounts;
-    }
-
-    public List<Account> findAll() {
-        return queryFactory
-                .selectFrom(account)
-                .where(account.deletedAt.isNull())
-                .fetch();
     }
 
     /**

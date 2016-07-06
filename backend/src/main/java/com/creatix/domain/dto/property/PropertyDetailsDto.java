@@ -28,23 +28,23 @@ public class PropertyDetailsDto {
     @ApiModelProperty(value = "Time zone", required = true)
     private String timeZone;
     @ApiModelProperty
-    private List<Facility> facilities;
+    private List<FacilityDto> facilities;
     @ApiModelProperty
-    private List<Contact> contacts;
+    private List<ContactDto> contacts;
     @ApiModelProperty(value = "Property owner info", required = true)
-    private Owner owner;
+    private OwnerDto owner;
     @ApiModelProperty(value = "Property managers")
-    private List<Account> managers;
+    private List<AccountDto> managers;
     @ApiModelProperty(value = "Property assistants of managers")
-    private List<Account> assistantManagers;
+    private List<AccountDto> assistantManagers;
     @ApiModelProperty(value = "Property employees")
-    private List<Account> employees;
+    private List<AccountDto> employees;
     @ApiModelProperty(value = "Property schedule", required = true)
-    private Schedule schedule;
+    private ScheduleDto schedule;
 
     @ApiModel
     @Data
-    public static class Facility {
+    public static class FacilityDto {
         @ApiModelProperty(value = "Facility ID", required = true)
         private Long id;
         @ApiModelProperty(value = "Type of facility", required = true)
@@ -61,7 +61,7 @@ public class PropertyDetailsDto {
 
     @ApiModel
     @Data
-    public static class Contact {
+    public static class ContactDto {
         @ApiModelProperty(value = "Contact ID", required = true)
         private Long id;
         @ApiModelProperty(value = "Type of contact", required = true)
@@ -75,7 +75,7 @@ public class PropertyDetailsDto {
     @ApiModel
     @Getter
     @Setter
-    public static class Owner extends Account {
+    public static class OwnerDto extends AccountDto {
         @ApiModelProperty(required = true)
         private String web;
     }
@@ -83,7 +83,7 @@ public class PropertyDetailsDto {
     @ApiModel
     @Getter
     @Setter
-    public static class Account {
+    public static class AccountDto {
         @ApiModelProperty(required = true)
         private String id;
         @ApiModelProperty(required = true)
@@ -106,7 +106,7 @@ public class PropertyDetailsDto {
 
     @ApiModel
     @Data
-    public static class Schedule {
+    public static class ScheduleDto {
         @ApiModelProperty(value = "Start hour of schedule time", required = true, notes = "24-hour clock")
         private Integer startHour;
         @ApiModelProperty(value = "Start minute of schedule time", required = true)

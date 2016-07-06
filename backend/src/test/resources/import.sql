@@ -54,8 +54,8 @@ INSERT INTO public.property_contacts (property_id, contacts_id) VALUES (1, 2);
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, managed_property_id, created_at) VALUES ('PropertyManager', 2, true, 'South Water Apartments', 'Mark', 'Building', '$2a$10$R6ntl54odFxGtmo/vFx.Kem91x5dXSVxjHLF7bCvHgpryYGShWUSq', 'mark.building@apartments.com', '(854) 253-6566', 'PropertyManager', 1, '2016-06-16 15:36:38');
 
 -- employees
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at, manager_id) VALUES ('Employee', 44, true, 'South Water Apartments', 'Martin', 'Security', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'martin.security@apartments.com', '(743) 635-5651', 'Security', '2016-06-16 15:36:38', 2);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at, manager_id) VALUES ('Employee', 45, true, 'South Water Apartments', 'Martin', 'Maintenance', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'martin.maintenance@apartments.com', '(743) 635-5651', 'Maintenance', '2016-06-16 15:36:38', 2);
+INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at, manager_id) VALUES ('SecurityEmployee', 44, true, 'South Water Apartments', 'Martin', 'Security', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'martin.security@apartments.com', '(743) 635-5651', 'Security', '2016-06-16 15:36:38', 2);
+INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at, manager_id) VALUES ('MaintenanceEmployee', 45, true, 'South Water Apartments', 'Martin', 'Maintenance', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'martin.maintenance@apartments.com', '(743) 635-5651', 'Maintenance', '2016-06-16 15:36:38', 2);
 
 
 -- apartments
