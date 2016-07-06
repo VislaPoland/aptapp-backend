@@ -1,4 +1,4 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.store;
 
 import com.creatix.domain.enums.CommunicationType;
 import com.creatix.domain.enums.ContactType;

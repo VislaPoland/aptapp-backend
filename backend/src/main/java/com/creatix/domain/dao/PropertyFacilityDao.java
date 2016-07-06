@@ -1,15 +1,12 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.Facility;
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.QFacility;
-import com.creatix.domain.entity.QProperty;
+import com.creatix.domain.entity.store.Facility;
+import com.creatix.domain.entity.store.QFacility;
+import com.creatix.domain.entity.store.QProperty;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @Transactional

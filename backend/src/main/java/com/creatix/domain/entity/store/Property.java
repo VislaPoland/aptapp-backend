@@ -1,7 +1,7 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.store;
 
-import com.creatix.domain.entity.account.PropertyManager;
-import com.creatix.domain.entity.account.PropertyOwner;
+import com.creatix.domain.entity.store.account.PropertyManager;
+import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.domain.enums.PropertyStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

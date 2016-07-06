@@ -1,8 +1,8 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.MaintenanceNotification;
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.QMaintenanceNotification;
+import com.creatix.domain.entity.store.MaintenanceNotification;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.QMaintenanceNotification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

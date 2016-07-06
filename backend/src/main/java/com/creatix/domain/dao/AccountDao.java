@@ -1,6 +1,6 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,12 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
-import static com.creatix.domain.entity.account.QEmployee.employee;
-import static com.creatix.domain.entity.account.QTenant.tenant;
-import static com.creatix.domain.entity.account.QPropertyManager.propertyManager;
-import static com.creatix.domain.entity.account.QPropertyOwner.propertyOwner;
-import static com.creatix.domain.entity.account.QSubTenant.subTenant;
-import static com.creatix.domain.entity.account.QAccount.account;
+import static com.creatix.domain.entity.store.account.QEmployee.employee;
+import static com.creatix.domain.entity.store.account.QTenant.tenant;
+import static com.creatix.domain.entity.store.account.QPropertyManager.propertyManager;
+import static com.creatix.domain.entity.store.account.QPropertyOwner.propertyOwner;
+import static com.creatix.domain.entity.store.account.QSubTenant.subTenant;
+import static com.creatix.domain.entity.store.account.QAccount.account;
 
 
 @Repository

@@ -1,4 +1,4 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.store;
 
 import com.creatix.domain.enums.FacilityType;
 import lombok.Data;
@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 @Entity
 @Data

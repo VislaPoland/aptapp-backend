@@ -1,4 +1,4 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.store.account;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,5 +8,6 @@ import javax.persistence.Entity;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SecurityNotification extends Notification {
+public abstract class EmployeeBase extends Account {
+
 }

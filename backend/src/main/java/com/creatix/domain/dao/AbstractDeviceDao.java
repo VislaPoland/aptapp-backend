@@ -1,6 +1,6 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.account.device.Device;
+import com.creatix.domain.entity.store.account.device.Device;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

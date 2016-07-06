@@ -1,6 +1,6 @@
-package com.creatix.domain.entity.account;
+package com.creatix.domain.entity.store.account;
 
-import com.creatix.domain.entity.account.device.Device;
+import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

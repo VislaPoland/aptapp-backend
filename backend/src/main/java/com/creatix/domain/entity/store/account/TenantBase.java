@@ -1,4 +1,4 @@
-package com.creatix.domain.entity.account;
+package com.creatix.domain.entity.store.account;
 
 import com.creatix.domain.enums.TenantType;
 import lombok.Data;

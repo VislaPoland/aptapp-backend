@@ -2,9 +2,7 @@ package com.creatix.controller.account.device;
 
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.account.device.AccountDeviceDto;
-import com.creatix.domain.entity.account.Account;
-import com.creatix.domain.entity.account.device.Device;
-import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.AccountDeviceService;
 import io.swagger.annotations.ApiOperation;

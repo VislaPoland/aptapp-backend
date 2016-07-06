@@ -1,8 +1,8 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.account.EmployeeBase;
-import com.creatix.domain.entity.account.QEmployee;
-import com.creatix.domain.entity.account.QPropertyManager;
+import com.creatix.domain.entity.store.account.EmployeeBase;
+import com.creatix.domain.entity.store.account.QEmployee;
+import com.creatix.domain.entity.store.account.QPropertyManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

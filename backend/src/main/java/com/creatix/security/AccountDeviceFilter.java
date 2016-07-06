@@ -1,7 +1,7 @@
 package com.creatix.security;
 
 import com.creatix.domain.dao.DeviceDao;
-import com.creatix.domain.entity.account.device.Device;
+import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.PlatformType;
 import com.creatix.service.AccountDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;

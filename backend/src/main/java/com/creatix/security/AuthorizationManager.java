@@ -1,12 +1,13 @@
 package com.creatix.security;
 
 import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.entity.*;
-import com.creatix.domain.entity.account.Account;
-import com.creatix.domain.entity.account.Employee;
-import com.creatix.domain.entity.account.PropertyManager;
-import com.creatix.domain.entity.account.Tenant;
-import com.creatix.domain.entity.account.device.Device;
+import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.Employee;
+import com.creatix.domain.entity.store.account.PropertyManager;
+import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

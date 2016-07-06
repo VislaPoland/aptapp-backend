@@ -1,4 +1,4 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.store;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

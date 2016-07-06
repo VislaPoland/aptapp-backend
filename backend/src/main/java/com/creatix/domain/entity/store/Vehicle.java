@@ -1,6 +1,6 @@
-package com.creatix.domain.entity;
+package com.creatix.domain.entity.store;
 
-import com.creatix.domain.entity.account.Tenant;
+import com.creatix.domain.entity.store.account.Tenant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

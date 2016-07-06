@@ -1,12 +1,9 @@
-package com.creatix.domain.entity.account;
+package com.creatix.domain.entity.store.account;
 
-import com.creatix.domain.entity.Address;
-import com.creatix.domain.entity.Apartment;
-import com.creatix.domain.entity.ParkingStall;
-import com.creatix.domain.entity.Vehicle;
-import com.creatix.domain.entity.account.Account;
-import com.creatix.domain.entity.account.SubTenant;
-import com.creatix.domain.enums.TenantType;
+import com.creatix.domain.entity.store.Address;
+import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.ParkingStall;
+import com.creatix.domain.entity.store.Vehicle;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

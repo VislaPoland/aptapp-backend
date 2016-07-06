@@ -1,8 +1,8 @@
-package com.creatix.domain.entity.account;
+package com.creatix.domain.entity.store.account;
 
-import com.creatix.domain.entity.Address;
-import com.creatix.domain.entity.Apartment;
-import com.creatix.domain.entity.Property;
+import com.creatix.domain.entity.store.Address;
+import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.Property;
 import com.querydsl.core.annotations.QueryInit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -2,9 +2,9 @@ package com.creatix.service.apartment;
 
 import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.dao.TenantBaseDao;
-import com.creatix.domain.entity.Apartment;
-import com.creatix.domain.entity.account.Tenant;
-import com.creatix.domain.entity.account.TenantBase;
+import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.TenantBase;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;

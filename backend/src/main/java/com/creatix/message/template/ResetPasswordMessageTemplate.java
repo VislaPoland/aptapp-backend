@@ -1,6 +1,6 @@
 package com.creatix.message.template;
 
-import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.store.account.Account;
 
 public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
 

@@ -11,10 +11,10 @@ import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotifi
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationDto;
 import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
-import com.creatix.domain.entity.MaintenanceNotification;
-import com.creatix.domain.entity.NeighborhoodNotification;
-import com.creatix.domain.entity.NotificationPhoto;
-import com.creatix.domain.entity.SecurityNotification;
+import com.creatix.domain.entity.store.MaintenanceNotification;
+import com.creatix.domain.entity.store.NeighborhoodNotification;
+import com.creatix.domain.entity.store.NotificationPhoto;
+import com.creatix.domain.entity.store.SecurityNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.NotificationService;

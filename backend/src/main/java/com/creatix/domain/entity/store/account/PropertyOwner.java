@@ -1,12 +1,10 @@
-package com.creatix.domain.entity.account;
+package com.creatix.domain.entity.store.account;
 
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.store.Property;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;

@@ -1,8 +1,8 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.Contact;
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.QProperty;
+import com.creatix.domain.entity.store.Contact;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.QProperty;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

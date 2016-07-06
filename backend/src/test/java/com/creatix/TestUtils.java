@@ -1,7 +1,7 @@
 package com.creatix;
 
 import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthenticatedUserDetails;
 import org.springframework.security.authentication.TestingAuthenticationToken;
