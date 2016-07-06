@@ -104,8 +104,6 @@ public class ApartmentService {
                 neighbors.getAbove(),
                 neighbors.getOpposite(),
                 neighbors.getBehind());
-
-
     }
 
     private void linkNeighbors(@NotNull Property property, ApartmentNeighbor... neighbors) {
@@ -121,12 +119,12 @@ public class ApartmentService {
 
                 if ( neighbor.getApartment() != null ) {
                     // update link to new apartment
-                    neighbor.setApartment(getApartment(property, neighbor.getUnitNumber()));
+                    neighbor.setApartment(apartmentDao.findByUnitNumberWithinProperty(neighbor.getUnitNumber(), property));
                     apartmentNeighborDao.persist(neighbor);
                 }
                 else {
                     // create new link to neighbor apartment
-                    neighbor.setApartment(getApartment(property, neighbor.getUnitNumber()));
+                    neighbor.setApartment(apartmentDao.findByUnitNumberWithinProperty(neighbor.getUnitNumber(), property));
                     apartmentNeighborDao.persist(neighbor);
                 }
             }
