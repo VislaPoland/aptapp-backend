@@ -1,6 +1,5 @@
 package com.creatix.security;
 
-import com.creatix.domain.dao.DeviceDao;
 import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.PlatformType;
 import com.creatix.service.AccountDeviceService;
@@ -8,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -25,17 +27,12 @@ public class AccountDeviceFilter extends GenericFilterBean {
     private AccountDeviceService accountDeviceService;
 
     @Autowired
-    private DeviceDao deviceDao;
-
-    @Autowired
-    private AuthorizationManager authorizationManager;
-
-    @Autowired
     private HttpSession httpSession;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
+
 
         if (httpRequest.getRequestURI().contains("/api/") &&
                 (httpRequest.getRequestURI().contains("/api/auth/verify-code") == false || httpRequest.getRequestURI().contains("/api/auth/attempt") == false)) {
@@ -54,23 +51,11 @@ public class AccountDeviceFilter extends GenericFilterBean {
                     throw new SecurityException("Device identifier is required for all requests.");
                 }
 
-                //final Device device = accountDeviceService.getOrCreateDevice(deviceUDID, platformType);
-                Device device = deviceDao.findByUDID(deviceUDID);
-                if (device == null) {
-                    device = new Device();
-                    device.setUdid(deviceUDID);
-                    device.setPlatform(platformType);
-                    deviceDao.persist(device);
-                }
-                if ((device.getAccount() == null && this.authorizationManager.getCurrentAccount() != null) ||
-                        (device.getAccount() != null && this.authorizationManager.getCurrentAccount() != null &&
-                                device.getAccount().getId() != this.authorizationManager.getCurrentAccount().getId())) {
-                    device.setAccount(this.authorizationManager.getCurrentAccount());
-                    deviceDao.persist(device);
-                }
+                final Device device = accountDeviceService.getOrCreateDevice(deviceUDID, platformType);
                 this.httpSession.setAttribute("device", device);
             }
         }
+
 
         filterChain.doFilter(request, response);
     }
