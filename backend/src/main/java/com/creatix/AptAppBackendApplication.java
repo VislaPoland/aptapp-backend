@@ -30,6 +30,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         JwtProperties.class,
         FileUploadProperties.class,
         TwilioProperties.class,
+        DeviceProperties.class,
 })
 public class AptAppBackendApplication extends SpringBootServletInitializer {
 

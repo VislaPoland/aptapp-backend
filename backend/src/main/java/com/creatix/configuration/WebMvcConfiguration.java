@@ -16,6 +16,9 @@ public class WebMvcConfiguration extends WebMvcAutoConfiguration {
     @Autowired
     private JwtProperties jwtProperties;
 
+    @Autowired
+    private DeviceProperties deviceProperties;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurerAdapter() {
@@ -25,7 +28,7 @@ public class WebMvcConfiguration extends WebMvcAutoConfiguration {
                         .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
 //                        .allowedOrigins("http://127.0.0.1:3000", "http://localhost:3000", "http://aptapp-demo.herokuapp.com")
                         .allowedOrigins("*")
-                        .allowedHeaders("Accept-Encoding", "Accept-Language", "User-Agent", "Connection", "Timezone-Offset", "Origin", "X-Requested-With", "Content-Type", "Accept", jwtProperties.getHeader())
+                        .allowedHeaders("Accept-Encoding", "Accept-Language", "User-Agent", "Connection", "Timezone-Offset", "Origin", "X-Requested-With", "Content-Type", "Accept", jwtProperties.getHeader(), deviceProperties.getPlatformHeader(), deviceProperties.getUdidHeader())
                         .allowCredentials(true)
                         .maxAge(3600);
             }

@@ -39,6 +39,16 @@
       "name": "twilio.from",
       "type": "java.lang.String",
       "description": "Phone number to send SMS from."
-    }
+    },
+    {
+      "name": "device.udid.header",
+      "type": "java.lang.String",
+      "description": "Name of device UDID header in HTTP request."
+    },
+    {
+      "name": "device.platform.header",
+      "type": "java.lang.String",
+      "description": "Name of client platform header in HTTP request."
+    },
   ]
 }

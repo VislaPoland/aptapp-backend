@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.account;
 
+import com.creatix.domain.entity.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,6 +10,7 @@ import org.hibernate.validator.constraints.Email;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -79,6 +81,9 @@ public class Account {
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date deletedAt;
+
+    @OneToMany(mappedBy = "account")
+    private Set<Device> devices;
 
     @Transient
     public boolean isDeleted() {

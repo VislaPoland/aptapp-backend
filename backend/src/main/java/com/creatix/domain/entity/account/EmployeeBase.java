@@ -8,7 +8,6 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @Data
-//@EqualsAndHashCode(callSuper = true, exclude = {"manager"})
 @EqualsAndHashCode(callSuper = true)
 public abstract class EmployeeBase extends Account {
 

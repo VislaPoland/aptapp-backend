@@ -6,6 +6,7 @@ import com.creatix.domain.entity.account.Account;
 import com.creatix.domain.entity.account.Employee;
 import com.creatix.domain.entity.account.PropertyManager;
 import com.creatix.domain.entity.account.Tenant;
+import com.creatix.domain.entity.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -82,7 +83,7 @@ public class AuthorizationManager {
     }
 
     public void checkManager(@NotNull Property property) {
-        if ( !(isManager(property)) ) {
+        if (!(isManager(property))) {
             throw new SecurityException("Not a apartment manager");
         }
     }
@@ -142,7 +143,7 @@ public class AuthorizationManager {
     }
 
     public void checkOwner(Property property) {
-        if ( !(isOwner(property)) ) {
+        if (!(isOwner(property))) {
             throw new SecurityException("Not owner of the property.");
         }
     }
@@ -151,4 +152,40 @@ public class AuthorizationManager {
         Objects.requireNonNull(property);
         return Objects.equals(property.getOwner(), getCurrentAccount());
     }
+
+    public boolean checkAccess(@NotNull Device device) {
+        Objects.requireNonNull(device);
+
+        if (device.getAccount() == null) {
+            return true;
+            //throw new SecurityException(String.format("You are not eligible to read unassigned device with id=%d", device.getId()));
+        }
+
+        if (device.getAccount().getId() == this.getCurrentAccount().getId()) {
+            return true;
+        }
+
+        throw new SecurityException(String.format("You are not eligible to read device with id=%d", device.getId()));
+    }
+
+    public boolean checkAccess(@NotNull Device device, @NotNull Account account) {
+        Objects.requireNonNull(device);
+        Objects.requireNonNull(account);
+
+        return true;
+
+        /*
+        if (device.getAccount() == null) {
+            return true;
+        }
+
+        if (this.getCurrentAccount().getRole() == AccountRole.Administrator ||
+                device.getAccount().getId() == account.getId()) {
+            return true;
+        }
+
+        throw new SecurityException(String.format("You are not eligible to read device with id=%d", device.getId()));
+        */
+    }
+
 }
