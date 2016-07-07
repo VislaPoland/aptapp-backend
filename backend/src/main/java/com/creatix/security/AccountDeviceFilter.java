@@ -34,28 +34,25 @@ public class AccountDeviceFilter extends GenericFilterBean {
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
 
 
-        if (httpRequest.getRequestURI().contains("/api/") &&
-                (httpRequest.getRequestURI().contains("/api/auth/verify-code") == false || httpRequest.getRequestURI().contains("/api/auth/attempt") == false)) {
-            String platformString = httpRequest.getHeader(this.platformHeader);
-            if (platformString == null) {
-                throw new SecurityException("Platform type is required for all requests.");
-            }
-            PlatformType platformType = PlatformType.valueOf(platformString);
-            if (platformType == null) {
-                throw new SecurityException("Platform type is required in valid format for all requests.");
-            }
-
-            if (platformType != PlatformType.Web) {
-                String deviceUDID = httpRequest.getHeader(this.deviceHeader);
-                if (deviceUDID == null) {
-                    throw new SecurityException("Device identifier is required for all requests.");
-                }
-
-                final Device device = accountDeviceService.getOrCreateDevice(deviceUDID, platformType);
-                this.httpSession.setAttribute("device", device);
-            }
+        String platformString = httpRequest.getHeader(this.platformHeader);
+        if (platformString == null) {
+            platformString = PlatformType.Web.toString();
+            //throw new SecurityException("Platform type is required for all requests.");
+        }
+        PlatformType platformType = PlatformType.valueOf(platformString);
+        if (platformType == null) {
+            throw new SecurityException("Platform type is required in valid format for all requests.");
         }
 
+        if (platformType != PlatformType.Web) {
+            String deviceUDID = httpRequest.getHeader(this.deviceHeader);
+            if (deviceUDID == null) {
+                throw new SecurityException("Device identifier is required for all requests.");
+            }
+
+            final Device device = accountDeviceService.getOrCreateDevice(deviceUDID, platformType);
+            this.httpSession.setAttribute("device", device);
+        }
 
         filterChain.doFilter(request, response);
     }
