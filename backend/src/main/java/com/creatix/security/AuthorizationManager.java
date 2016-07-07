@@ -68,6 +68,10 @@ public class AuthorizationManager {
 
     public Property getCurrentProperty() throws SecurityException {
         Account account = getCurrentAccount(false);
+        return getCurrentProperty(account);
+    }
+
+    public Property getCurrentProperty(Account account) throws SecurityException {
         assert account != null;
 
         switch (account.getRole()) {

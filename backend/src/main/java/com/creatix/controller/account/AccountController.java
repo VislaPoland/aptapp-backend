@@ -2,7 +2,6 @@ package com.creatix.controller.account;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;

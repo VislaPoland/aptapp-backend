@@ -4,9 +4,9 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.*;
-import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.account.PropertyManager;
 import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.domain.enums.AccountRole;
@@ -17,7 +17,6 @@ import com.creatix.message.template.ResetPasswordMessageTemplate;
 import com.creatix.security.*;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -81,6 +80,34 @@ public class AccountService {
         accountDao.persist(account);
     }
 
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    public String resetCodeFromRequest(@NotNull ResetCodeRequest request) {
+        Objects.requireNonNull(request);
+
+        final Long accountId = request.getAccountId();
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        if (isEligibleToResetCode(authorizationManager.getCurrentAccount(), account)) {
+            setActionToken(account);
+            return account.getActionToken();
+        }
+        throw new SecurityException(String.format("You are not eligible to reset user=%d activation code", accountId));
+    }
+
+    private boolean isEligibleToResetCode(Account principal, Account target) {
+        final Property targetProperty = authorizationManager.getCurrentProperty(target);
+
+        switch (principal.getRole()) {
+            case Administrator:
+                return true;
+            case PropertyOwner:
+                return ((PropertyOwner) principal).getOwnedProperties().contains(targetProperty);
+            case PropertyManager:
+                return targetProperty.equals(authorizationManager.getCurrentProperty(principal));
+            default:
+                return false;
+        }
+    }
+
     public LoginResponse createLoginResponse(String email) {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         final String token = tokenUtils.generateToken(userDetails);
@@ -133,11 +160,16 @@ public class AccountService {
         return getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
     }
 
-    public Account activateAccount(String activationCode) {
-        final Account account = accountDao.findByActionToken(activationCode);
+    public Account getAccountByToken(String actionToken) {
+        final Account account = accountDao.findByActionToken(actionToken);
         if (account == null) {
-            throw new SecurityException("Activation code not valid");
+            throw new SecurityException(String.format("Action token=%s is not valid", actionToken));
         }
+        return account;
+    }
+
+    public Account activateAccount(String activationCode) {
+        final Account account = getAccountByToken(activationCode);
         if (account.getActive()) {
             return account;
         }
@@ -147,8 +179,8 @@ public class AccountService {
         }
 
         account.setActive(true);
-//        account.setActionToken(null);
-//        account.setActionTokenValidUntil(null);
+        account.setActionToken(null);
+        account.setActionTokenValidUntil(null);
         accountDao.persist(account);
 
         return account;
@@ -180,7 +212,7 @@ public class AccountService {
     public void updateAccountPasswordFromRequest(long accountId, @NotNull UpdatePasswordRequest request) {
         Objects.requireNonNull(request);
 
-        Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
         if (authorizationManager.isSelf(account)) {
             authenticate(account.getPrimaryEmail(), request.getOldPassword());
             account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
@@ -194,13 +226,32 @@ public class AccountService {
     public void createAccountPasswordFromRequest(long accountId, @NotNull CreatePasswordRequest request) {
         Objects.requireNonNull(request);
 
-        Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
         if (authorizationManager.isSelf(account)) {
-            account.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-            accountDao.persist(account);
+            if (account.getPasswordHash() == null) {
+                account.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+                accountDao.persist(account);
+            } else {
+                throw new SecurityException("This action is allowed only once");
+            }
         } else {
             throw new SecurityException(String.format("You are not eligible to change user=%d password", accountId));
         }
+    }
+
+    public void resetAccountPasswordFromRequest(@NotNull ResetPasswordRequest request) {
+        Objects.requireNonNull(request);
+
+        final Account account = getAccountByToken(request.getToken());
+
+        if (account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate())) {
+            throw new SecurityException(String.format("Token %s has expired", request.getToken()));
+        }
+
+        account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        account.setActionToken(null);
+        account.setActionTokenValidUntil(null);
+        accountDao.persist(account);
     }
 
     @RoleSecured(AccountRole.Administrator)
@@ -433,15 +484,13 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public boolean resetPassword(@NotNull Long accountId) throws MessageDeliveryException, TemplateException, IOException {
-        Objects.requireNonNull(accountId);
+    public boolean resetPasswordFromRequest(@NotNull AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException {
+        Objects.requireNonNull(request);
 
-        final ManagedEmployee account = managedEmployeeDao.findById(accountId);
-        
+        final Account account = getAccount(request.getEmail());
         setActionToken(account);
-
-        emailMessageSender.send(new ResetPasswordMessageTemplate(account));
+        accountDao.persist(account);
+//        emailMessageSender.send(new ResetPasswordMessageTemplate(account));
 
         return true;
     }
