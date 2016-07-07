@@ -27,7 +27,7 @@ public class SmsMessageSender {
     }
 
     /**
-     * Send SMS message to phone number.
+     * Sent SMS message to phone number.
      *
      * @param body SMS message text. Example: "Hello from Java"
      * @param recipientPhone SMS recipient phone number. Example: "+12345678901"

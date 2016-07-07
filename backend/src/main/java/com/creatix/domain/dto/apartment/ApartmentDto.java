@@ -4,24 +4,20 @@ import com.creatix.domain.dto.AddressDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-/**
- * Account data transfer object
- */
 @ApiModel
-@Data
-public class ApartmentDto {
-    @ApiModelProperty
-    private Long id;
-
+@Getter
+@Setter
+@NoArgsConstructor
+public class ApartmentDto extends BasicApartmentDto {
     @ApiModelProperty(value = "Full name", required = true)
     private String fullName;
 
     @ApiModelProperty(value = "Email address", required = true)
     private String primaryEmail;
-
-    @ApiModelProperty(value = "Unit number", required = true)
-    private String unitNumber;
 
     @ApiModelProperty(value = "Address", required = true)
     private AddressDto address;

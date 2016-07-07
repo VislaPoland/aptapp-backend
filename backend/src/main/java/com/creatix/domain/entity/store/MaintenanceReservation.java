@@ -1,6 +1,7 @@
 package com.creatix.domain.entity.store;
 
 import com.creatix.domain.entity.store.account.ManagedEmployee;
+import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;

@@ -3,11 +3,10 @@ package com.creatix.domain;
 import com.creatix.domain.dao.AssistantPropertyManagerDao;
 import com.creatix.domain.dao.ManagedEmployeeDao;
 import com.creatix.domain.dto.AddressDto;
-import com.creatix.domain.dto.property.PropertyPhotoDto;
-import com.creatix.domain.dto.property.slot.*;
-import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.account.*;
+import com.creatix.domain.dto.apartment.ApartmentDto;
+import com.creatix.domain.dto.apartment.BasicApartmentDto;
 import com.creatix.domain.dto.apartment.PersistApartmentRequest;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.notification.NotificationPhotoDto;
@@ -19,7 +18,9 @@ import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRe
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.PropertyPhotoDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
+import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.tenant.CreateTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
 import com.creatix.domain.dto.tenant.UpdateTenantRequest;
@@ -29,27 +30,18 @@ import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
-import com.creatix.domain.entity.store.EventSlot;
-import com.creatix.domain.entity.store.MaintenanceReservation;
-import com.creatix.domain.entity.store.MaintenanceSlot;
-import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
-import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
+import com.creatix.domain.entity.store.notification.*;
 import ma.glasnost.orika.CustomMapper;
-import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
-import ma.glasnost.orika.metadata.Type;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -169,7 +161,6 @@ public class Mapper {
 
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
                 .byDefault()
-                .field("targetApartment.id", "apartmentId")
                 .register();
 
         mapperFactory.classMap(NotificationPhoto.class, NotificationPhotoDto.class)
@@ -184,7 +175,6 @@ public class Mapper {
 
         mapperFactory.classMap(NeighborhoodNotification.class, NeighborhoodNotificationDto.class)
                 .byDefault()
-                .field("targetApartment.id", "apartmentId")
                 .register();
 
         mapperFactory.classMap(CreateSecurityNotificationRequest.class, SecurityNotification.class)
@@ -207,6 +197,10 @@ public class Mapper {
                 .byDefault()
                 .register();
         mapperFactory.classMap(PersistApartmentRequest.class, Apartment.class)
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(Apartment.class, BasicApartmentDto.class)
                 .byDefault()
                 .register();
 

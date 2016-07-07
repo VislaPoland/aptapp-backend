@@ -1,5 +1,6 @@
-package com.creatix.domain.entity.store;
+package com.creatix.domain.entity.store.notification;
 
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;

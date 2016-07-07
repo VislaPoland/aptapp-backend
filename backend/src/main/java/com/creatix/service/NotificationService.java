@@ -4,9 +4,10 @@ import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.NotificationRequestType;
-import com.creatix.domain.entity.store.*;
+import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.PropertyManager;
+import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
@@ -24,7 +25,6 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -54,24 +54,53 @@ public class NotificationService {
         return item;
     }
 
-    //TODO make filtering logic more effective
-    public PageableDataResponse<List<Notification>> getRelevantNotifications(Long pageNumber, Long pageSize, NotificationRequestType type) {
-        List<Notification> notifications = notificationDao.findAll().stream()
-                .filter(n -> relevantNotificationsFilter(n, authorizationManager.getCurrentAccount(), type))
-                .collect(Collectors.toList());
-        long totalItems = notifications.size();
-        long totalPages = totalItems / pageSize;
+    public PageableDataResponse<List<Notification>> filterNotifications(NotificationRequestType type, long pageNumber, long pageSize) {
+        final Account account = authorizationManager.getCurrentAccount();
 
-        return new PageableDataResponse<>(notifications.stream()
-                .limit(pageNumber * pageSize + pageSize)
-                .skip(pageNumber * pageSize)
-                .collect(Collectors.toList()), pageSize, totalItems, totalPages, pageNumber);
+        long totalItems = notificationDao.countByType(type, account);
+        long totalPages = (long) Math.ceil(totalItems / (double) pageSize);
+
+        List<Notification> data = notificationDao.findPageByType(type, account, pageNumber, pageSize);
+        return new PageableDataResponse<>(data, pageSize, totalItems, totalPages, pageNumber);
     }
 
-    public List<MaintenanceNotification> getMaintenanceNotificationsInDateRange(@NotNull Date beginDate, @NotNull Date endDate) {
+    public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@NotNull Date beginDate, @NotNull Date endDate) {
         Objects.requireNonNull(beginDate);
         Objects.requireNonNull(endDate);
         return maintenanceNotificationDao.findAllInDateRange(beginDate, endDate);
+    }
+
+    public PageableDataResponse<List<MaintenanceNotification>> filterMaintenanceNotifications(
+            NotificationRequestType type, NotificationStatus status, long pageNumber, long pageSize) {
+        final Account account = authorizationManager.getCurrentAccount();
+
+        long totalItems = maintenanceNotificationDao.countByStatusAndType(status, type, account);
+        long totalPages = (long) Math.ceil(totalItems / (double) pageSize);
+
+        List<MaintenanceNotification> data = maintenanceNotificationDao.findPageByStatusAndType(status, type, account, pageNumber, pageSize);
+        return new PageableDataResponse<>(data, pageSize, totalItems, totalPages, pageNumber);
+    }
+
+    public PageableDataResponse<List<NeighborhoodNotification>> filterNeighborhoodNotifications(
+            NotificationRequestType type, NotificationStatus status, long pageNumber, long pageSize) {
+        final Account account = authorizationManager.getCurrentAccount();
+
+        long totalItems = neighborhoodNotificationDao.countByStatusAndType(status, type, account);
+        long totalPages = (long) Math.ceil(totalItems / (double) pageSize);
+
+        List<NeighborhoodNotification> data = neighborhoodNotificationDao.findPageByStatusAndType(status, type, account, pageNumber, pageSize);
+        return new PageableDataResponse<>(data, pageSize, totalItems, totalPages, pageNumber);
+    }
+
+    public PageableDataResponse<List<SecurityNotification>> filterSecurityNotifications(
+            NotificationRequestType type, NotificationStatus status, long pageNumber, long pageSize) {
+        final Account account = authorizationManager.getCurrentAccount();
+
+        long totalItems = securityNotificationDao.countByStatusAndType(status, type, account);
+        long totalPages = (long) Math.ceil(totalItems / (double) pageSize);
+
+        List<SecurityNotification> data = securityNotificationDao.findPageByStatusAndType(status, type, account, pageNumber, pageSize);
+        return new PageableDataResponse<>(data, pageSize, totalItems, totalPages, pageNumber);
     }
 
     public SecurityNotification getSecurityNotification(@NotNull Long notificationId) {
@@ -139,36 +168,6 @@ public class NotificationService {
         return apartment;
     }
 
-    private boolean relevantNotificationsFilter(Notification n, Account a, NotificationRequestType type) {
-        switch (type) {
-            case Send:
-                return n.getAuthor().equals(a);
-            case Received:
-                switch (a.getRole()) {
-                    case PropertyManager:
-                        return ((PropertyManager) a).getManagedProperty().equals(n.getProperty());
-                    case AssistantPropertyManager:
-                        return authorizationManager.getCurrentProperty().equals(n.getProperty());
-                    case Maintenance:
-                        return authorizationManager.getCurrentProperty().equals(n.getProperty()) && n.getType().equals(NotificationType.Maintenance);
-                    case Security:
-                        return authorizationManager.getCurrentProperty().equals(n.getProperty()) && n.getType().equals(NotificationType.Security);
-                    case Tenant:
-                        if (n.getType().equals(NotificationType.Maintenance)) {
-                            return a.equals(((MaintenanceNotification) n).getTargetApartment().getTenant());
-                        }
-                        if (n.getType().equals(NotificationType.Neighborhood)) {
-                            return a.equals(((NeighborhoodNotification) n).getTargetApartment().getTenant());
-                        }
-                    default:
-                        return false;
-                }
-            default:
-                return false;
-        }
-    }
-
-    @RoleSecured
     public Notification storeNotificationPhotos(MultipartFile[] files, long notificationId) throws IOException {
 
         final Notification notification = notificationDao.findById(notificationId);
