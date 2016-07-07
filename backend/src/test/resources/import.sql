@@ -135,6 +135,9 @@ UPDATE public.apartment SET left_id = 36, below_id = 27 WHERE id = 37;
 -- tenant
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at) VALUES ('Tenant', 3, false, 'South Water Apartments', 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt@test.com', '(905) 545-0256', 'Tenant', 'Owner', 22, '123456', '2017-06-16 15:36:38', '2016-06-16 15:36:38');
 
+
+-- notification
+INSERT INTO public.notification (dtype, id, created_at, date, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id) VALUES ('MaintenanceNotification', 1, '2016-07-07 16:00:00', '2016-07-07 16:00:00', null, null, null, 'Pending', 'Maint. test 1', 'Maintenance', '2016-07-07 16:00:00', false, 3, 1, 22);
 -------------------
 -- /DEMO DATA
 -------------------

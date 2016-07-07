@@ -13,9 +13,9 @@ import java.util.List;
 public abstract class SlotDto {
     @ApiModelProperty(value = "Slot ID", required = true)
     private long id;
-    @ApiModelProperty(value = "Begin time of the slot", required = true)
+    @ApiModelProperty(value = "Begin time of the slot", required = true, dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
     private OffsetDateTime beginTime;
-    @ApiModelProperty(value = "Start time of the slot", required = true)
+    @ApiModelProperty(value = "Start time of the slot", required = true, dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
     private OffsetDateTime endTime;
     @ApiModelProperty(value = "Duration of the slot units", required = true)
     private int unitDurationMinutes;

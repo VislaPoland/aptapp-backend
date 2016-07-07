@@ -177,7 +177,9 @@ public class NotificationService {
         for (MultipartFile file : files) {
 
             // move uploaded file to file repository
-            final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename()));
+            final Path photoFilePath = Paths.get(
+                    uploadProperties.getRepositoryPath(),
+                    String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename()));
             file.transferTo(photoFilePath.toFile());
 
             final NotificationPhoto photo = new NotificationPhoto();
