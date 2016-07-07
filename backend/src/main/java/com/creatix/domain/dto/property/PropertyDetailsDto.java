@@ -41,6 +41,8 @@ public class PropertyDetailsDto {
     private List<AccountDto> employees;
     @ApiModelProperty(value = "Property schedule", required = true)
     private ScheduleDto schedule;
+    @ApiModelProperty(value = "Notification photo")
+    private List<PropertyPhotoDto> photos;
 
     @ApiModel
     @Data

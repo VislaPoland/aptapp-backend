@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @ApiModel
@@ -14,9 +14,9 @@ public abstract class SlotDto {
     @ApiModelProperty(value = "Slot ID", required = true)
     private long id;
     @ApiModelProperty(value = "Begin time of the slot", required = true)
-    private Date beginTime;
+    private OffsetDateTime beginTime;
     @ApiModelProperty(value = "Start time of the slot", required = true)
-    private Date endTime;
+    private OffsetDateTime endTime;
     @ApiModelProperty(value = "Duration of the slot units", required = true)
     private int unitDurationMinutes;
     @ApiModelProperty(value = "Slot units", required = true, dataType = "List[com.creatix.domain.dto.SlotUnitDto]")

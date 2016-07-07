@@ -5,12 +5,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
-import java.util.Date;
 
 @ApiModel
 @Data
 public class PersistEventSlotRequest {
-    @ApiModelProperty(value = "Time when slot starts", required = true)
+    @ApiModelProperty(value = "Time when slot starts", required = true, example = "2016-07-07T10:37:47.960Z")
     private OffsetDateTime beginTime;
     @ApiModelProperty(value = "Slot duration in minutes", required = true)
     private int durationMinutes;

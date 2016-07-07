@@ -1,11 +1,14 @@
 package com.creatix.service.property;
 
+import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.DaoBase;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.PropertyOwnerDao;
+import com.creatix.domain.dao.PropertyPhotoDao;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
+import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
@@ -18,9 +21,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -39,6 +46,10 @@ public class PropertyService {
     private Mapper mapper;
     @Autowired
     private AuthorizationManager authorizationManager;
+    @Autowired
+    private FileUploadProperties uploadProperties;
+    @Autowired
+    private PropertyPhotoDao propertyPhotoDao;
 
     private boolean isEligibleToReadProperty(Property property, Account account) {
         switch (account.getRole()) {
@@ -135,6 +146,40 @@ public class PropertyService {
         authorizationManager.checkAccess(property);
 
         return property;
+    }
+
+
+
+    public Property storePropertyPhotos(MultipartFile[] files, long propertyId) throws IOException {
+
+        final Property property = getProperty(propertyId);
+
+        for (MultipartFile file : files) {
+
+            // move uploaded file to file repository
+            final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), String.format("%d-%d-%s", property.getId(), property.getPhotos().size(), file.getOriginalFilename()));
+            file.transferTo(photoFilePath.toFile());
+
+            final PropertyPhoto photo = new PropertyPhoto();
+            photo.setProperty(property);
+            photo.setFileName(file.getOriginalFilename());
+            photo.setFilePath(photoFilePath.toString());
+            propertyPhotoDao.persist(photo);
+
+            property.getPhotos().add(photo);
+        }
+
+        return property;
+    }
+
+    public PropertyPhoto getPropertyPhoto(long propertyPhotoId) {
+
+        final PropertyPhoto photo = propertyPhotoDao.findById(propertyPhotoId);
+        if (photo == null) {
+            throw new EntityNotFoundException(String.format("Photo id=%d not found", propertyPhotoId));
+        }
+
+        return photo;
     }
 
 }

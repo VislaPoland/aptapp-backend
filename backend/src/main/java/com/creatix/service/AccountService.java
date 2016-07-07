@@ -151,7 +151,7 @@ public class AccountService {
     private Account getAccount(String email) {
         final Account account = accountDao.findByEmail(email);
         if (account == null) {
-            throw new EntityNotFoundException(String.format("Account with email=%s not found", email));
+            throw new EntityNotFoundException(String.format("Account email=%s not found", email));
         }
         return account;
     }

@@ -8,7 +8,9 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -60,5 +62,7 @@ public class Property {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private PropertySchedule schedule;
 
+    @OneToMany(mappedBy = "property")
+    private List<PropertyPhoto> photos = new ArrayList<>(1);
 
 }

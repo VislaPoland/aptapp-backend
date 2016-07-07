@@ -134,7 +134,7 @@ public class NotificationController {
     }
 
 
-    @ApiOperation(value = "upload notification photo")
+    @ApiOperation(value = "Upload notification photo")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),
@@ -145,7 +145,7 @@ public class NotificationController {
         return new DataResponse<>(mapper.toNotificationDto(notificationService.storeNotificationPhotos(files, notificationId)));
     }
 
-    @ApiOperation(value = "download notification photo")
+    @ApiOperation(value = "Download notification photo")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),

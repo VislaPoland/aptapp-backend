@@ -8,6 +8,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.SlotService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,8 +44,8 @@ public class EventController {
     @RoleSecured
     public DataResponse<List<EventSlotDto>> getEvents(
             @PathVariable Long propertyId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime beginDt,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDt) {
+            @ApiParam(example = "2016-07-07T10:37:47.960Z", required = true) @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime beginDt,
+            @ApiParam(example = "2016-07-07T10:37:47.960Z", required = true) @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDt) {
         return new DataResponse<>(slotService.getEventSlotsByPropertyIdAndTimeRange(propertyId, beginDt, endDt).stream()
         .map(e -> mapper.toEventSlotDto(e))
                 .collect(Collectors.toList()));

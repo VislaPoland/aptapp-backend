@@ -3,6 +3,7 @@ package com.creatix.domain;
 import com.creatix.domain.dao.AssistantPropertyManagerDao;
 import com.creatix.domain.dao.ManagedEmployeeDao;
 import com.creatix.domain.dto.AddressDto;
+import com.creatix.domain.dto.property.PropertyPhotoDto;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.PageableDataResponse;
@@ -36,12 +37,18 @@ import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import ma.glasnost.orika.CustomMapper;
+import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.converter.BidirectionalConverter;
+import ma.glasnost.orika.metadata.Type;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -103,6 +110,9 @@ public class Mapper {
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
                 .field("isDeleted", "deleted")
+                .register();
+        mapperFactory.classMap(PropertyPhoto.class, PropertyPhotoDto.class)
+                .byDefault()
                 .register();
         mapperFactory.classMap(Property.class, PropertyDetailsDto.class)
                 .byDefault()
@@ -311,6 +321,18 @@ public class Mapper {
         mapperFactory.classMap(EventSlot.class, EventSlotDto.class)
                 .byDefault()
                 .register();
+
+        mapperFactory.getConverterFactory().registerConverter(new BidirectionalConverter<OffsetDateTime, OffsetDateTime>() {
+            @Override
+            public OffsetDateTime convertTo(OffsetDateTime source, Type<OffsetDateTime> destinationType) {
+                return source;
+            }
+
+            @Override
+            public OffsetDateTime convertFrom(OffsetDateTime source, Type<OffsetDateTime> destinationType) {
+                return source;
+            }
+        });
     }
 
     public void fillApartment(@NotNull PersistApartmentRequest req, @NotNull Apartment ap) {
