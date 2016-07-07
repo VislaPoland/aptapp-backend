@@ -1,6 +1,6 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.account.EmployeeBase;
+import com.creatix.domain.entity.store.account.EmployeeBase;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

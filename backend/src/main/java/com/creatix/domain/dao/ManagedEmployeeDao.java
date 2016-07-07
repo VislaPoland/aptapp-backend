@@ -1,14 +1,13 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.account.ManagedEmployee;
-import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.entity.store.account.ManagedEmployee;
+import com.creatix.domain.entity.store.Property;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.creatix.domain.entity.account.QManagedEmployee.managedEmployee;
+import static com.creatix.domain.entity.store.account.QManagedEmployee.managedEmployee;
 
 @Repository
 @Transactional

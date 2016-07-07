@@ -1,7 +1,7 @@
 package com.creatix.security;
 
 import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.store.account.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

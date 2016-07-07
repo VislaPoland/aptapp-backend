@@ -4,7 +4,7 @@ import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
 import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.dto.apartment.ApartmentDto;
-import com.creatix.domain.entity.Apartment;
+import com.creatix.domain.entity.store.Apartment;
 import com.creatix.mock.WithMockCustomUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;

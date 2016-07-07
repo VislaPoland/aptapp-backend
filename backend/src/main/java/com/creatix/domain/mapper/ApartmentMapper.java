@@ -1,7 +1,7 @@
 package com.creatix.domain.mapper;
 
 import com.creatix.domain.dto.apartment.ApartmentDto;
-import com.creatix.domain.entity.account.TenantBase;
+import com.creatix.domain.entity.store.account.TenantBase;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.Notification;
+import com.creatix.domain.entity.store.Notification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

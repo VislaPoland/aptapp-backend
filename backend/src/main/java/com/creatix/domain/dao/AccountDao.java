@@ -1,21 +1,23 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
-import static com.creatix.domain.entity.account.QSecurityEmployee.securityEmployee;
-import static com.creatix.domain.entity.account.QMaintenanceEmployee.maintenanceEmployee;
-import static com.creatix.domain.entity.account.QTenant.tenant;
-import static com.creatix.domain.entity.account.QPropertyManager.propertyManager;
-import static com.creatix.domain.entity.account.QPropertyOwner.propertyOwner;
-import static com.creatix.domain.entity.account.QSubTenant.subTenant;
-import static com.creatix.domain.entity.account.QAccount.account;
-
+import static com.creatix.domain.entity.store.account.QAccount.account;
+import static com.creatix.domain.entity.store.account.QMaintenanceEmployee.maintenanceEmployee;
+import static com.creatix.domain.entity.store.account.QPropertyManager.propertyManager;
+import static com.creatix.domain.entity.store.account.QPropertyOwner.propertyOwner;
+import static com.creatix.domain.entity.store.account.QSecurityEmployee.securityEmployee;
+import static com.creatix.domain.entity.store.account.QSubTenant.subTenant;
+import static com.creatix.domain.entity.store.account.QTenant.tenant;
 
 @Repository
 @Transactional

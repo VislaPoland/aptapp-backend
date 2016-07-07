@@ -1,12 +1,12 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.SlotUnit;
+import com.creatix.domain.entity.store.SlotUnit;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.creatix.domain.entity.QSlotUnit.slotUnit;
+import static com.creatix.domain.entity.store.QSlotUnit.slotUnit;
 
 @Repository
 @Transactional

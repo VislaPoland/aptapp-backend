@@ -2,7 +2,7 @@ package com.creatix.domain.dao;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
-import com.creatix.domain.entity.account.Account;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.mock.WithMockCustomUser;
 import org.junit.Test;

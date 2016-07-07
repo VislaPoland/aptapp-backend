@@ -2,8 +2,11 @@ package com.creatix.service;
 
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.slot.PersistMaintenanceReservationRequest;
-import com.creatix.domain.entity.*;
-import com.creatix.domain.entity.account.ManagedEmployee;
+import com.creatix.domain.entity.store.MaintenanceReservation;
+import com.creatix.domain.entity.store.MaintenanceSlot;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.SlotUnit;
+import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;

@@ -1,5 +1,6 @@
 package com.creatix.configuration;
 
+import com.creatix.security.AccountDeviceFilter;
 import com.creatix.security.AuthenticationTokenFilter;
 import com.creatix.security.EntryPointUnauthorizedHandler;
 import com.creatix.security.TokenUtils;
@@ -64,6 +65,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return authenticationTokenFilter;
     }
 
+    @Bean
+    public AccountDeviceFilter deviceFilterBean() {
+        AccountDeviceFilter accountDeviceFilter = new AccountDeviceFilter();
+        return accountDeviceFilter;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -84,8 +91,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .disable();
 
         // JWT authentication
-        http
-            .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilter(authenticationTokenFilterBean());
+        http.addFilterAfter(deviceFilterBean(), UsernamePasswordAuthenticationFilter.class);
     }
 
 

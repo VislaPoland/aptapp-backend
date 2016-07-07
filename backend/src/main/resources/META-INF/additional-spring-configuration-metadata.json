@@ -39,6 +39,31 @@
       "name": "twilio.from",
       "type": "java.lang.String",
       "description": "Phone number to send SMS from."
-    }
+    },
+    {
+      "name": "device.udid.header",
+      "type": "java.lang.String",
+      "description": "Name of device UDID header in HTTP request."
+    },
+    {
+      "name": "device.platform.header",
+      "type": "java.lang.String",
+      "description": "Name of client platform header in HTTP request."
+    },
+    {
+      "name": "pushnotifications.apple-sandbox",
+      "type": "java.lang.Boolean",
+      "description": "Flag to indicate sandbox debug enviroments."
+    },
+    {
+      "name": "pushnotifications.apple-certificate-path",
+      "type": "java.lang.String",
+      "description": "Path of Apple push notification certificate."
+    },
+    {
+      "name": "pushnotifications.apple-certificate-password",
+      "type": "java.lang.String",
+      "description": "Password to encrypt Apple push notification certificate."
+    },
   ]
 }

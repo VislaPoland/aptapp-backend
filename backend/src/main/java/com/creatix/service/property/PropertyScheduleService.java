@@ -4,8 +4,8 @@ import com.creatix.domain.dao.DaoBase;
 import com.creatix.domain.dao.MaintenanceNotificationDao;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.PropertySchedule;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.PropertySchedule;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.RoleSecured;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.Objects;
 
 @Service
 @Transactional

@@ -2,8 +2,8 @@ package com.creatix.service.property;
 
 import com.creatix.domain.dao.EmployeeBaseDao;
 import com.creatix.domain.dao.PropertyDao;
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.account.EmployeeBase;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.EmployeeBase;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;

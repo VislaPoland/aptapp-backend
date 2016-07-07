@@ -29,8 +29,13 @@ import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
-import com.creatix.domain.entity.*;
-import com.creatix.domain.entity.account.*;
+import com.creatix.domain.entity.store.EventSlot;
+import com.creatix.domain.entity.store.MaintenanceReservation;
+import com.creatix.domain.entity.store.MaintenanceSlot;
+import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
+import com.creatix.domain.entity.store.account.ManagedEmployee;
+import com.creatix.domain.entity.store.*;
+import com.creatix.domain.entity.store.account.*;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -78,7 +83,7 @@ public class Mapper {
                                 accountDto.setProperty(toPropertyDetailsDto(managedProperty));
                             }
                         }
-                        else if ( account instanceof ManagedEmployee ) {
+                        else if ( account instanceof ManagedEmployee) {
                             final Property managedProperty = ((ManagedEmployee) account).getManager().getManagedProperty();
                             if ( managedProperty != null ) {
                                 accountDto.setProperty(toPropertyDetailsDto(managedProperty));

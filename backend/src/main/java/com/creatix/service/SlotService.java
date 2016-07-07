@@ -3,7 +3,7 @@ package com.creatix.service;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
 import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
-import com.creatix.domain.entity.*;
+import com.creatix.domain.entity.store.*;
 import com.creatix.security.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

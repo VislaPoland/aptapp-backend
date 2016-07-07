@@ -1,16 +1,14 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.MaintenanceSlot;
-import com.creatix.domain.entity.MaintenanceSlotSchedule;
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.Slot;
+import com.creatix.domain.entity.store.MaintenanceSlot;
+import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import static com.creatix.domain.entity.QMaintenanceSlot.maintenanceSlot;
+import static com.creatix.domain.entity.store.QMaintenanceSlot.maintenanceSlot;
 
 
 @Repository

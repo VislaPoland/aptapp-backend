@@ -3,10 +3,10 @@ package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
-import com.creatix.domain.entity.MaintenanceNotification;
+import com.creatix.domain.dto.property.slot.*;
+import com.creatix.domain.entity.store.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.MaintenanceReservationService;

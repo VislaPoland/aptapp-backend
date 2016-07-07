@@ -1,13 +1,13 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.EventSlot;
+import com.creatix.domain.entity.store.EventSlot;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import static com.creatix.domain.entity.QEventSlot.eventSlot;
+import static com.creatix.domain.entity.store.QEventSlot.eventSlot;
 
 
 @Repository

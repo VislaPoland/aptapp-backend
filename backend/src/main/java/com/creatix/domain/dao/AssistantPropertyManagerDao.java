@@ -1,13 +1,13 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.account.AssistantPropertyManager;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.AssistantPropertyManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.creatix.domain.entity.account.QAssistantPropertyManager.assistantPropertyManager;
+import static com.creatix.domain.entity.store.account.QAssistantPropertyManager.assistantPropertyManager;
 
 @Repository
 @Transactional

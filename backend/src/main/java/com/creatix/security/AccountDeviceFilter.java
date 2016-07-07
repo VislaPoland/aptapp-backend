@@ -1,0 +1,60 @@
+package com.creatix.security;
+
+import com.creatix.domain.entity.store.account.device.Device;
+import com.creatix.domain.enums.PlatformType;
+import com.creatix.service.AccountDeviceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.filter.GenericFilterBean;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+
+public class AccountDeviceFilter extends GenericFilterBean {
+
+    @Value("${device.platform.header}")
+    private String platformHeader;
+
+    @Value("${device.udid.header}")
+    private String deviceHeader;
+
+    @Autowired
+    private AccountDeviceService accountDeviceService;
+
+    @Autowired
+    private HttpSession httpSession;
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        final HttpServletRequest httpRequest = (HttpServletRequest) request;
+
+
+        String platformString = httpRequest.getHeader(this.platformHeader);
+        if (platformString == null) {
+            platformString = PlatformType.Web.toString();
+            //throw new SecurityException("Platform type is required for all requests.");
+        }
+        PlatformType platformType = PlatformType.valueOf(platformString);
+        if (platformType == null) {
+            throw new SecurityException("Platform type is required in valid format for all requests.");
+        }
+
+        if (platformType != PlatformType.Web) {
+            String deviceUDID = httpRequest.getHeader(this.deviceHeader);
+            if (deviceUDID == null) {
+                throw new SecurityException("Device identifier is required for all requests.");
+            }
+
+            final Device device = accountDeviceService.getOrCreateDevice(deviceUDID, platformType);
+            this.httpSession.setAttribute("device", device);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+}

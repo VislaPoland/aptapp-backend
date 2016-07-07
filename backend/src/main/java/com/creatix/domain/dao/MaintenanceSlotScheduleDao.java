@@ -1,13 +1,13 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.Property;
-import com.creatix.domain.entity.MaintenanceSlotSchedule;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.creatix.domain.entity.QMaintenanceSlotSchedule.maintenanceSlotSchedule;
+import static com.creatix.domain.entity.store.QMaintenanceSlotSchedule.maintenanceSlotSchedule;
 
 @Repository
 @Transactional

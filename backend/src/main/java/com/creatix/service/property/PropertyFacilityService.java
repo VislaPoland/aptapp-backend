@@ -4,8 +4,8 @@ import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.PropertyFacilityDao;
 import com.creatix.domain.dto.property.facility.CreatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.facility.UpdatePropertyFacilityRequest;
-import com.creatix.domain.entity.Facility;
-import com.creatix.domain.entity.Property;
+import com.creatix.domain.entity.store.Facility;
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.AuthorizationManager;
@@ -18,7 +18,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

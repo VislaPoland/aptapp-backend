@@ -1,11 +1,13 @@
 package com.creatix.security;
 
 import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.entity.*;
-import com.creatix.domain.entity.account.Account;
-import com.creatix.domain.entity.account.ManagedEmployee;
-import com.creatix.domain.entity.account.PropertyManager;
-import com.creatix.domain.entity.account.Tenant;
+import com.creatix.domain.entity.store.account.ManagedEmployee;
+import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.PropertyManager;
+import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -74,7 +76,7 @@ public class AuthorizationManager {
             case PropertyManager:
                 return ((PropertyManager) account).getManagedProperty();
             default:
-                if (account instanceof ManagedEmployee )
+                if (account instanceof ManagedEmployee)
                     return ((ManagedEmployee) account).getManager().getManagedProperty();
                 else
                     throw new SecurityException("Impossible to extract single linked apartment.");
@@ -82,7 +84,7 @@ public class AuthorizationManager {
     }
 
     public void checkManager(@NotNull Property property) {
-        if ( !(isManager(property)) ) {
+        if (!(isManager(property))) {
             throw new SecurityException("Not a apartment manager");
         }
     }
@@ -142,7 +144,7 @@ public class AuthorizationManager {
     }
 
     public void checkOwner(Property property) {
-        if ( !(isOwner(property)) ) {
+        if (!(isOwner(property))) {
             throw new SecurityException("Not owner of the property.");
         }
     }
@@ -151,4 +153,41 @@ public class AuthorizationManager {
         Objects.requireNonNull(property);
         return Objects.equals(property.getOwner(), getCurrentAccount());
     }
+
+    public boolean checkAccess(@NotNull Device device) {
+        Objects.requireNonNull(device);
+
+        if (device.getAccount() == null) {
+            return true;
+            //throw new SecurityException(String.format("You are not eligible to read unassigned device with id=%d", device.getId()));
+        }
+
+        if (device.getAccount().getId().equals(this.getCurrentAccount().getId())) {
+            return true;
+        }
+
+        throw new SecurityException(String.format("You are not eligible to read device with id=%d", device.getId()));
+    }
+
+    public boolean checkAccess(@NotNull Device device, @NotNull Account account) {
+        Objects.requireNonNull(device);
+        Objects.requireNonNull(account);
+
+        return true;
+
+        /*
+        TODO: implementation will be specified in future
+        if (device.getAccount() == null) {
+            return true;
+        }
+
+        if (this.getCurrentAccount().getRole() == AccountRole.Administrator ||
+                device.getAccount().getId().equals(account.getId())) {
+            return true;
+        }
+
+        throw new SecurityException(String.format("You are not eligible to read device with id=%d", device.getId()));
+        */
+    }
+
 }
