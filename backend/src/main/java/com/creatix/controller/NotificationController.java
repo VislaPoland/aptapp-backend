@@ -150,11 +150,10 @@ public class NotificationController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 404, message = "Not found")})
-    @RequestMapping(value = "/{notificationId}/photos/{photoId}", method = RequestMethod.GET)
-    @RoleSecured
+    @RequestMapping(value = "/{notificationId}/photos/{fileName:.+}", method = RequestMethod.GET)
     @ResponseBody
-    public HttpEntity<byte[]> getFile(@PathVariable Long notificationId, @PathVariable Long photoId) throws IOException {
-        final NotificationPhoto file = notificationService.getNotificationPhoto(photoId);
+    public HttpEntity<byte[]> getFile(@PathVariable Long notificationId, @PathVariable String fileName, @PathVariable Long photoId) throws IOException {
+        final NotificationPhoto file = notificationService.getNotificationPhoto(notificationId, fileName);
         final byte[] fileData = FileUtils.readFileToByteArray(new File(file.getFilePath()));
 
         final HttpHeaders headers = new HttpHeaders();

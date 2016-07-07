@@ -174,6 +174,12 @@ public class Mapper {
 
         mapperFactory.classMap(NotificationPhoto.class, NotificationPhotoDto.class)
                 .byDefault()
+                .customize(new CustomMapper<NotificationPhoto, NotificationPhotoDto>() {
+                    @Override
+                    public void mapAtoB(NotificationPhoto a, NotificationPhotoDto b, MappingContext context) {
+                        b.setFileUrl(String.format("/api/notifications/%d/photos/%s", a.getNotification().getId(), a.getFileName()));
+                    }
+                })
                 .register();
 
         mapperFactory.classMap(NeighborhoodNotification.class, NeighborhoodNotificationDto.class)
@@ -416,7 +422,6 @@ public class Mapper {
 
     public NotificationDto toNotificationDto(@NotNull Notification n) {
         Objects.requireNonNull(n);
-
         return mapperFactory.getMapperFacade().map(n, NotificationDto.class);
     }
 

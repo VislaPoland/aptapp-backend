@@ -10,6 +10,7 @@ import com.creatix.domain.entity.store.account.PropertyManager;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
+import com.creatix.security.RoleSecured;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,6 +168,7 @@ public class NotificationService {
         }
     }
 
+    @RoleSecured
     public Notification storeNotificationPhotos(MultipartFile[] files, long notificationId) throws IOException {
 
         final Notification notification = notificationDao.findById(notificationId);
@@ -177,14 +179,13 @@ public class NotificationService {
         for (MultipartFile file : files) {
 
             // move uploaded file to file repository
-            final Path photoFilePath = Paths.get(
-                    uploadProperties.getRepositoryPath(),
-                    String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename()));
+            final String fileName = String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename());
+            final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), fileName);
             file.transferTo(photoFilePath.toFile());
 
             final NotificationPhoto photo = new NotificationPhoto();
             photo.setNotification(notification);
-            photo.setFileName(file.getOriginalFilename());
+            photo.setFileName(fileName);
             photo.setFilePath(photoFilePath.toString());
             notificationPhotoDao.persist(photo);
 
@@ -194,11 +195,11 @@ public class NotificationService {
         return notification;
     }
 
-    public NotificationPhoto getNotificationPhoto(long notificationPhotoId) {
+    public NotificationPhoto getNotificationPhoto(Long notificationId, String fileName) {
 
-        final NotificationPhoto photo = notificationPhotoDao.findById(notificationPhotoId);
+        final NotificationPhoto photo = notificationPhotoDao.findByNotificationIdAndFileName(notificationId, fileName);
         if (photo == null) {
-            throw new EntityNotFoundException(String.format("Photo id=%d not found", notificationPhotoId));
+            throw new EntityNotFoundException(String.format("Photo id=%s not found", fileName));
         }
 
         return photo;
