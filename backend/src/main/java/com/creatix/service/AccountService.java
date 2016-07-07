@@ -490,7 +490,7 @@ public class AccountService {
         final Account account = getAccount(request.getEmail());
         setActionToken(account);
         accountDao.persist(account);
-//        emailMessageSender.send(new ResetPasswordMessageTemplate(account));
+        emailMessageSender.send(new ResetPasswordMessageTemplate(account));
 
         return true;
     }
