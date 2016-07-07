@@ -33,13 +33,13 @@ public class AccountDeviceService {
         Objects.requireNonNull(platformType);
 
         Device device = deviceDao.findByUDID(deviceUDID);
-        final Account account = this.getAccount(this.authorizationManager.getCurrentAccount().getId());
         if (device == null) {
             device = new Device();
             device.setUdid(deviceUDID);
             device.setPlatform(platformType);
             deviceDao.persist(device);
         }
+        final Account account = this.getAccount(this.authorizationManager.getCurrentAccount().getId());
         if (device.getAccount() == null || (device.getAccount() != null && device.getAccount().getId() != account.getId())) {
             device.setAccount(account);
             deviceDao.persist(device);

@@ -162,7 +162,7 @@ public class AuthorizationManager {
             //throw new SecurityException(String.format("You are not eligible to read unassigned device with id=%d", device.getId()));
         }
 
-        if (device.getAccount().getId() == this.getCurrentAccount().getId()) {
+        if (device.getAccount().getId().equals(this.getCurrentAccount().getId())) {
             return true;
         }
 
@@ -176,12 +176,13 @@ public class AuthorizationManager {
         return true;
 
         /*
+        TODO: implementation will be specified in future
         if (device.getAccount() == null) {
             return true;
         }
 
         if (this.getCurrentAccount().getRole() == AccountRole.Administrator ||
-                device.getAccount().getId() == account.getId()) {
+                device.getAccount().getId().equals(account.getId())) {
             return true;
         }
 

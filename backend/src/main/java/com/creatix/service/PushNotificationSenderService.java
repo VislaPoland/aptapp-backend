@@ -8,9 +8,11 @@ import com.notnoop.apns.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+import java.io.InputStream;
 
 @Service
 @Transactional
@@ -23,9 +25,13 @@ public class PushNotificationSenderService {
 
     @PostConstruct
     private void init() {
+        InputStream certificate = getClass().getClassLoader().getResourceAsStream(pushNotificationProperties.getAppleCertificatePath());
+        if (certificate == null) {
+            throw new ResourceAccessException("APNS certificate does not exists!");
+        }
         ApnsServiceBuilder builder = APNS.newService()
-                .withCert(getClass().getClassLoader().getResourceAsStream(pushNotificationProperties.getAppleCertificatePath()), pushNotificationProperties.getAppleCertificatePassword());
-        if (pushNotificationProperties.isAppleSandbox() == true) {
+                .withCert(certificate, pushNotificationProperties.getAppleCertificatePassword());
+        if (pushNotificationProperties.isAppleSandbox()) {
             builder.withSandboxDestination();
         }
         else {
@@ -65,7 +71,8 @@ public class PushNotificationSenderService {
     }
 
     private void sendGCM(@NotNull PushNotification notification, @NotNull Device device) {
-
+        //  TODO: temporary unavailable GCM / FCM
+        throw new UnsupportedOperationException("Temporary unavailable implementation of Android push notification delivering");
     }
 
 }
