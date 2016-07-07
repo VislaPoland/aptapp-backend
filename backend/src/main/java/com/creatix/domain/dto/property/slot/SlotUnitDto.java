@@ -26,15 +26,4 @@ public class SlotUnitDto {
     private int capacity;
     @ApiModelProperty(value = "Initial capacity", required = true)
     private int initialCapacity;
-    @ApiModelProperty(value = "Unit reservations")
-    private List<MaintenanceReservationDto> reservations;
-
-    @Transient
-    @JsonIgnore
-    public void addReservation(MaintenanceReservationDto reservation) {
-        if ( reservations == null ) {
-            reservations = new ArrayList<>();
-        }
-        reservations.add(reservation);
-    }
 }

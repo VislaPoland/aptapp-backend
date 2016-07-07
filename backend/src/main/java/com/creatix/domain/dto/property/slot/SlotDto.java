@@ -1,6 +1,5 @@
 package com.creatix.domain.dto.property.slot;
 
-import com.creatix.domain.enums.AccountRole;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,8 +18,6 @@ public abstract class SlotDto {
     private OffsetDateTime endTime;
     @ApiModelProperty(value = "Duration of the slot units", required = true)
     private int unitDurationMinutes;
-    @ApiModelProperty(value = "Slot units", required = true, dataType = "List[com.creatix.domain.dto.SlotUnitDto]")
+    @ApiModelProperty(value = "Slot units", required = true)
     private List<SlotUnitDto> units;
-    @ApiModelProperty(value = "Slot target role", required = true, dataType = "List[java.lang.Long]", notes = "Slots will be shown only to accounts with same role.")
-    private AccountRole targetRole;
 }
