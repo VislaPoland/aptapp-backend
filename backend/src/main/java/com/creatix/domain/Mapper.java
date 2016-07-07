@@ -37,10 +37,15 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -50,12 +55,15 @@ import java.util.stream.Collectors;
 @Component
 public class Mapper {
 
-    protected MapperFactory mapperFactory;
+    private MapperFactory mapperFactory;
 
     @Autowired
     private ManagedEmployeeDao managedEmployeeDao;
     @Autowired
     private AssistantPropertyManagerDao assistantPropertyManagerDao;
+    @Autowired
+    private HttpServletRequest httpRequest;
+
 
     @Autowired
     public Mapper(MapperFactory mapperFactory) {
@@ -63,7 +71,28 @@ public class Mapper {
         this.configure(mapperFactory);
     }
 
-    protected void configure(MapperFactory mapperFactory) {
+    private String createDownloadUrl(NotificationPhoto photo) throws MalformedURLException {
+
+        String host = httpRequest.getServerName();
+        int port = httpRequest.getServerPort();
+        if ( StringUtils.isNotEmpty(httpRequest.getHeader("Host")) ) {
+            final String hostHeader = httpRequest.getHeader("Host");
+            final String[] hostHeaderParts = hostHeader.split(":");
+            host = hostHeaderParts[0];
+            if ( hostHeaderParts.length > 1 ) {
+                port = Integer.valueOf(hostHeaderParts[1]);
+            }
+        }
+
+        return new URL(
+                httpRequest.getScheme(),
+                host,
+                port,
+                Paths.get(httpRequest.getContextPath(), String.format("/api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString())
+                .toString();
+    }
+
+    private void configure(MapperFactory mapperFactory) {
         mapperFactory.classMap(Account.class, AccountDto.class)
                 .byDefault()
                 .customize(new CustomMapper<Account, AccountDto>() {
@@ -168,7 +197,12 @@ public class Mapper {
                 .customize(new CustomMapper<NotificationPhoto, NotificationPhotoDto>() {
                     @Override
                     public void mapAtoB(NotificationPhoto a, NotificationPhotoDto b, MappingContext context) {
-                        b.setFileUrl(String.format("/api/notifications/%d/photos/%s", a.getNotification().getId(), a.getFileName()));
+                        try {
+                            b.setFileUrl(createDownloadUrl(a));
+                        }
+                        catch ( MalformedURLException e ) {
+                            throw new IllegalStateException("Cannot crete download URL", e);
+                        }
                     }
                 })
                 .register();

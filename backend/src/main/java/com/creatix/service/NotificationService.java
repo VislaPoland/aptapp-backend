@@ -18,8 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -48,7 +51,7 @@ public class NotificationService {
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
-        if (item == null) {
+        if ( item == null ) {
             throw ex;
         }
         return item;
@@ -162,7 +165,7 @@ public class NotificationService {
 
     private Apartment getApartmentByUnitNumber(String targetUnitNumber) {
         final Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty());
-        if (apartment == null) {
+        if ( apartment == null ) {
             throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
         }
         return apartment;
@@ -171,11 +174,11 @@ public class NotificationService {
     public Notification storeNotificationPhotos(MultipartFile[] files, long notificationId) throws IOException {
 
         final Notification notification = notificationDao.findById(notificationId);
-        if (notification == null) {
+        if ( notification == null ) {
             throw new EntityNotFoundException(String.format("Notification id=%d not found", notificationId));
         }
 
-        for (MultipartFile file : files) {
+        for ( MultipartFile file : files ) {
 
             // move uploaded file to file repository
             final String fileName = String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename());
@@ -197,7 +200,7 @@ public class NotificationService {
     public NotificationPhoto getNotificationPhoto(Long notificationId, String fileName) {
 
         final NotificationPhoto photo = notificationPhotoDao.findByNotificationIdAndFileName(notificationId, fileName);
-        if (photo == null) {
+        if ( photo == null ) {
             throw new EntityNotFoundException(String.format("Photo id=%s not found", fileName));
         }
 
