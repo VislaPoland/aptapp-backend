@@ -2,7 +2,7 @@ package com.creatix.service;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
-import com.creatix.domain.entity.store.Notification;
+import com.creatix.domain.entity.store.notification.Notification;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

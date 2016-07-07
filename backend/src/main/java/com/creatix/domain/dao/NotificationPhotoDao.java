@@ -4,7 +4,7 @@ import com.creatix.domain.entity.store.notification.NotificationPhoto;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.creatix.domain.entity.store.QNotificationPhoto.notificationPhoto;
+import static com.creatix.domain.entity.store.notification.QNotificationPhoto.notificationPhoto;
 
 @Repository
 @Transactional
