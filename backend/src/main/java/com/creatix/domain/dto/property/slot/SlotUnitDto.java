@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.beans.Transient;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,9 +19,9 @@ public class SlotUnitDto {
     @ApiModelProperty(value = "Slot ID", required = true)
     private long slotId;
     @ApiModelProperty(value = "Begin time of the slot unit", required = true)
-    private Date beginTime;
+    private OffsetDateTime beginTime;
     @ApiModelProperty(value = "Start time of the slot unit", required = true)
-    private Date endTime;
+    private OffsetDateTime endTime;
     @ApiModelProperty(value = "Current capacity (1 = 1 person capacity)", required = true)
     private int capacity;
     @ApiModelProperty(value = "Initial capacity", required = true)

@@ -41,6 +41,7 @@ import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
+import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import ma.glasnost.orika.metadata.Type;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -322,17 +323,19 @@ public class Mapper {
                 .byDefault()
                 .register();
 
-        mapperFactory.getConverterFactory().registerConverter(new BidirectionalConverter<OffsetDateTime, OffsetDateTime>() {
-            @Override
-            public OffsetDateTime convertTo(OffsetDateTime source, Type<OffsetDateTime> destinationType) {
-                return source;
-            }
+        mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(OffsetDateTime.class, OffsetDateTime.class));
 
-            @Override
-            public OffsetDateTime convertFrom(OffsetDateTime source, Type<OffsetDateTime> destinationType) {
-                return source;
-            }
-        });
+        mapperFactory.classMap(SlotUnit.class, SlotUnitDto.class)
+                .byDefault()
+                .field("slot.id", "slotId")
+                .customize(new CustomMapper<SlotUnit, SlotUnitDto>() {
+                    @Override
+                    public void mapAtoB(SlotUnit a, SlotUnitDto b, MappingContext context) {
+                        b.setBeginTime(a.getSlot().getBeginTime().plusMinutes(a.getSlot().getUnitDurationMinutes() * a.getOffset()));
+                        b.setEndTime(b.getBeginTime().plusMinutes(a.getSlot().getUnitDurationMinutes()));
+                    }
+                })
+                .register();
     }
 
     public void fillApartment(@NotNull PersistApartmentRequest req, @NotNull Apartment ap) {
