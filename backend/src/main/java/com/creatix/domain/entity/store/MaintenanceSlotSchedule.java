@@ -33,11 +33,11 @@ public class MaintenanceSlotSchedule {
     @Column(nullable = false)
     private int initialCapacity;
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.PERSIST)
-    private Set<Slot> slots;
+    private Set<MaintenanceSlot> slots;
     @Column(nullable = false)
     private String timeZone;
 
-    public void addSlot(Slot slot) {
+    public void addSlot(MaintenanceSlot slot) {
         if ( slots == null ) {
             slots = new HashSet<>();
         }

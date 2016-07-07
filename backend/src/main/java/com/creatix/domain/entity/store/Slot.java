@@ -59,10 +59,6 @@ public abstract class Slot {
     private int unitDurationMinutes;
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
     private Set<SlotUnit> units;
-    @OneToMany(mappedBy = "slot")
-    private Set<MaintenanceReservation> reservations;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private MaintenanceSlotSchedule schedule;
 
     public void addUnit(SlotUnit unit) {
         if ( unit.getSlot() == null ) {

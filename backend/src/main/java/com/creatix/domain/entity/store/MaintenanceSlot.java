@@ -5,8 +5,10 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,7 +17,9 @@ import java.util.Set;
 public class MaintenanceSlot extends Slot {
 
     @OneToMany(mappedBy = "slot")
-    private Set<MaintenanceReservation> reservations;
+    private List<MaintenanceReservation> reservations;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private MaintenanceSlotSchedule schedule;
 
 
 }
