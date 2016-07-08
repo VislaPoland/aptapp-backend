@@ -9,6 +9,8 @@ public class PushNotificationProperties {
     private String appleCertificatePath;
     private String appleCertificatePassword;
 
+    private String googleCloudMessagingKey;
+
     public boolean isAppleSandbox() {
         return appleSandbox;
     }
@@ -31,6 +33,14 @@ public class PushNotificationProperties {
 
     public void setAppleCertificatePassword(String appleCertificatePassword) {
         this.appleCertificatePassword = appleCertificatePassword;
+    }
+
+    public String getGoogleCloudMessagingKey() {
+        return googleCloudMessagingKey;
+    }
+
+    public void setGoogleCloudMessagingKey(String googleCloudMessagingKey) {
+        this.googleCloudMessagingKey = googleCloudMessagingKey;
     }
 
 }
