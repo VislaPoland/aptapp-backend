@@ -75,6 +75,7 @@ dependencies {
 	compile('org.freemarker:freemarker:2.3.23')
 	compile('com.twilio.sdk:twilio-java-sdk:7.0.0-rc-6')
 	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.5')
+    compile('com.googlecode.json-simple:json-simple:1.1')
 
 	//	APNS
 	compile('com.notnoop.apns:apns:1.0.0.Beta3')
