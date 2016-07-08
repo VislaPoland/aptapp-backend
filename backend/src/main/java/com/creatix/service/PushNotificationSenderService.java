@@ -1,9 +1,11 @@
 package com.creatix.service;
 
-import com.creatix.configuration.DeviceProperties;
 import com.creatix.configuration.PushNotificationProperties;
 import com.creatix.domain.entity.push.notification.PushNotification;
 import com.creatix.domain.entity.store.account.device.Device;
+import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.Result;
+import com.google.android.gcm.server.Sender;
 import com.notnoop.apns.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,9 @@ import org.springframework.web.client.ResourceAccessException;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -22,6 +26,7 @@ public class PushNotificationSenderService {
     private PushNotificationProperties pushNotificationProperties;
 
     private ApnsService apnsService;
+    private Sender gcmSender;
 
     @PostConstruct
     private void init() {
@@ -30,17 +35,22 @@ public class PushNotificationSenderService {
             throw new ResourceAccessException("APNS certificate does not exists!");
         }
         ApnsServiceBuilder builder = APNS.newService()
-                .withCert(certificate, pushNotificationProperties.getAppleCertificatePassword());
-        if (pushNotificationProperties.isAppleSandbox()) {
+                .withCert(certificate, this.pushNotificationProperties.getAppleCertificatePassword());
+        if (this.pushNotificationProperties.isAppleSandbox()) {
             builder.withSandboxDestination();
         }
         else {
             builder.withProductionDestination();
         }
-        apnsService = builder.build();
+        this.apnsService = builder.build();
+
+        if (this.pushNotificationProperties.getGoogleCloudMessagingKey() == null) {
+            throw new IllegalStateException("Google GCM key property is null");
+        }
+        this.gcmSender = new Sender(this.pushNotificationProperties.getGoogleCloudMessagingKey());
     }
 
-    public void sendNotification(@NotNull PushNotification notification, @NotNull Device toDevice) {
+    public void sendNotification(@NotNull PushNotification notification, @NotNull Device toDevice) throws IOException {
         switch (toDevice.getPlatform()) {
             case iOS: {
                 this.sendAPNS(notification, toDevice);
@@ -70,9 +80,24 @@ public class PushNotificationSenderService {
         ApnsNotification apnsNotification = this.apnsService.push(device.getPushToken(), payloadBuilder.build());
     }
 
-    private void sendGCM(@NotNull PushNotification notification, @NotNull Device device) {
-        //  TODO: temporary unavailable GCM / FCM
-        throw new UnsupportedOperationException("Temporary unavailable implementation of Android push notification delivering");
+    private void sendGCM(@NotNull PushNotification notification, @NotNull Device device) throws IOException {
+        Message.Builder messageBuilder = new Message.Builder();
+        if (notification.getBadgeCount() != null) {
+            messageBuilder.addData("badge", String.valueOf(notification.getBadgeCount()));
+        }
+        if (notification.getTitle() != null) {
+            messageBuilder.addData("title", notification.getTitle());
+        }
+        if (notification.getMessage() != null) {
+            messageBuilder.addData("body", notification.getMessage());
+        }
+        if (notification.getBuilder() != null) {
+            for (Map.Entry<String, String> entry : notification.getBuilder().notificationRepresentation().entrySet()) {
+                messageBuilder.addData(entry.getKey(), entry.getValue());
+            }
+        }
+        Message message = messageBuilder.build();
+        this.gcmSender.send(message, device.getPushToken(), 1);
     }
 
 }
