@@ -6,8 +6,10 @@ import com.creatix.security.EntryPointUnauthorizedHandler;
 import com.creatix.security.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,6 +21,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import javax.servlet.Filter;
 
 @Configuration
 @EnableWebSecurity
@@ -67,8 +71,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AccountDeviceFilter deviceFilterBean() {
-        AccountDeviceFilter accountDeviceFilter = new AccountDeviceFilter();
-        return accountDeviceFilter;
+        return new AccountDeviceFilter();
     }
 
     @Override
@@ -91,11 +94,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
                 .and()
             .csrf()
-                .disable();
-
-        // JWT authentication
-        http.addFilter(authenticationTokenFilterBean());
-        http.addFilterAfter(deviceFilterBean(), UsernamePasswordAuthenticationFilter.class);
+                .disable()
+            .addFilterBefore(deviceFilterBean(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(authenticationTokenFilterBean(), AccountDeviceFilter.class);
     }
 
 

@@ -3,6 +3,8 @@ package com.creatix.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -41,9 +43,9 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
 
         final String username = this.tokenUtils.getUsernameFromToken(authToken);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if ( username != null && isNotAuthenticated(SecurityContextHolder.getContext().getAuthentication()) ) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            if (this.tokenUtils.validateToken(authToken, userDetails)) {
+            if ( this.tokenUtils.validateToken(authToken, userDetails) ) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -51,6 +53,20 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
         }
 
         chain.doFilter(request, response);
+    }
+
+    private boolean isNotAuthenticated(Authentication authentication) {
+        if ( authentication == null ) {
+            return true;
+        }
+        if ( !(authentication.isAuthenticated()) ) {
+            return true;
+        }
+        if ( authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ANONYMOUS")) ) {
+            return true;
+        }
+
+        return false;
     }
 
     private static String extractAuthToken(String authHeader) {
