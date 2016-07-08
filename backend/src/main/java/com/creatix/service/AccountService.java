@@ -62,6 +62,8 @@ public class AccountService {
     private EmailMessageSender emailMessageSender;
     @Autowired
     private ManagedEmployeeDao managedEmployeeDao;
+    @Autowired
+    private AccountDeviceService accountDeviceService;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -134,6 +136,8 @@ public class AccountService {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        accountDeviceService.asssignDeviceToAccount(account);
     }
 
     public List<Account> getAccounts(AccountRole[] roles, Long propertyId) {
