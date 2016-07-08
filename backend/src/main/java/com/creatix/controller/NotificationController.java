@@ -225,7 +225,7 @@ public class NotificationController {
             @ApiResponse(code = 404, message = "Not found")})
     @RequestMapping(value = "/{notificationId}/photos/{fileName:.+}", method = RequestMethod.GET)
     @ResponseBody
-    public HttpEntity<byte[]> getFile(@PathVariable Long notificationId, @PathVariable String fileName, @PathVariable Long photoId) throws IOException {
+    public HttpEntity<byte[]> dowloadNotificationPhoto(@PathVariable Long notificationId, @PathVariable String fileName) throws IOException {
         final NotificationPhoto file = notificationService.getNotificationPhoto(notificationId, fileName);
         final byte[] fileData = FileUtils.readFileToByteArray(new File(file.getFilePath()));
 
