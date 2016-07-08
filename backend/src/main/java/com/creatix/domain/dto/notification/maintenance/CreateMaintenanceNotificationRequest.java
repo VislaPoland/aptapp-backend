@@ -20,7 +20,7 @@ public class CreateMaintenanceNotificationRequest {
     private String description;
     @ApiModelProperty(value = "Timestamp of notification")
     @NotNull
-    private Date date;
+    private Date scheduledAt;
     @ApiModelProperty(value = "Target apartment unit number", required = true)
     @NotNull
     private String unitNumber;

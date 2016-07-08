@@ -23,5 +23,5 @@ public class MaintenanceNotificationDto extends NotificationDto {
     @ApiModelProperty(value = "Maintenance reservation")
     private MaintenanceReservationDto reservation;
     @ApiModelProperty(value = "Timestamp of maintenance notification", required = true)
-    private Date date;
+    private Date scheduledAt;
 }

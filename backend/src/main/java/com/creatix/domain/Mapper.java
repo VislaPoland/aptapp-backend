@@ -190,6 +190,7 @@ public class Mapper {
 
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
                 .byDefault()
+                .field("date", "scheduledAt")
                 .exclude("reservation.notification")    // prevent recursive mapping
                 .register();
 
@@ -218,6 +219,7 @@ public class Mapper {
 
         mapperFactory.classMap(CreateMaintenanceNotificationRequest.class, MaintenanceNotification.class)
                 .byDefault()
+                .field("scheduledAt", "date")
                 .register();
 
         mapperFactory.classMap(CreateNeighborhoodNotificationRequest.class, NeighborhoodNotification.class)
