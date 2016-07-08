@@ -4,6 +4,6 @@ import java.util.Map;
 
 public interface PushNotificationBuilder {
 
-    Map<String, ?> notificationRepresentation();
+    Map<String, String> notificationRepresentation();
 
 }
