@@ -120,6 +120,7 @@ public class MaintenanceReservationService {
         return reservationDao.findByEmployeeAndEndTimeAfter(employee, OffsetDateTime.now());
     }
 
+    @RoleSecured(AccountRole.Maintenance)
     public MaintenanceReservation deleteById(long reservationId) {
         final MaintenanceReservation reservation = reservationDao.findById(reservationId);
         if ( reservation == null ) {

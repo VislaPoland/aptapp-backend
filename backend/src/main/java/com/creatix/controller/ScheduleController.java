@@ -40,7 +40,7 @@ public class ScheduleController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(path = "/slots", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
+    @RoleSecured
     public DataResponse<List<MaintenanceSlotDto>> getMaintenanceSlots(
             @PathVariable Long propertyId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime beginDt,
@@ -85,7 +85,7 @@ public class ScheduleController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(path = "/schedule", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(AccountRole.Maintenance)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<MaintenanceSlotScheduleDto> createMaintenanceSlotSchedule(
             @PathVariable Long propertyId,
             @RequestBody @Valid PersistMaintenanceSlotScheduleRequest request) {
@@ -99,7 +99,7 @@ public class ScheduleController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(path = "/schedule/{scheduleId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(AccountRole.Maintenance)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<MaintenanceSlotScheduleDto> deleteMaintenanceSlotSchedule(@PathVariable Long scheduleId) {
         return new DataResponse<>(mapper.toMaintenanceSlotScheduleDto(slotService.deleteScheduleById(scheduleId)));
     }

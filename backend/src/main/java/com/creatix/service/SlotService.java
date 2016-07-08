@@ -4,7 +4,9 @@ import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
 import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
 import com.creatix.domain.entity.store.*;
+import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
+import com.creatix.security.RoleSecured;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -137,10 +139,12 @@ public class SlotService {
         return (int) (offsetMinutes / slot.getUnitDurationMinutes());
     }
 
+    @RoleSecured
     public List<MaintenanceSlot> getMaintenanceSlotsByPropertyAndDateRange(long propertyId, OffsetDateTime beginDt, OffsetDateTime endDt) {
         return maintenanceSlotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
     }
 
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceSlotSchedule createSchedule(long propertyId, PersistMaintenanceSlotScheduleRequest request) {
         final Property property = propertyDao.findById(propertyId);
         authorizationManager.isManager(property);
@@ -161,6 +165,7 @@ public class SlotService {
         return schedule;
     }
 
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceSlotSchedule deleteScheduleById(long slotScheduleId) {
         final MaintenanceSlotSchedule schedule = maintenanceSlotScheduleDao.findById(slotScheduleId);
         if ( schedule == null ) {
@@ -181,13 +186,6 @@ public class SlotService {
         }
         maintenanceSlotScheduleDao.delete(schedule);
         return schedule;
-    }
-
-    public List<MaintenanceSlotSchedule> getSlotSchedulesByPropertyId(long propertyId) {
-        final Property property = propertyDao.findById(propertyId);
-        authorizationManager.isManager(property);
-
-        return maintenanceSlotScheduleDao.findByProperty(property);
     }
 
     @Scheduled(cron = "0 0 * * * *") // the top of every hour of every day
