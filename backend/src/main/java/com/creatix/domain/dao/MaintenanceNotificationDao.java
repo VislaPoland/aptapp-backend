@@ -10,6 +10,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -40,18 +41,22 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
                     case Tenant:
                         return predicate.and(maintenanceNotification.targetApartment.eq(((Tenant) a).getApartment()));
                     default:
-                        throw new IllegalStateException(String.format("Account type %s is not allowed to read maintenance notifications", a.getRole().toString()));
+                        return null;
                 }
             default:
-                throw new IllegalStateException();
+                return null;
         }
     }
 
     public long countByStatusAndType(NotificationStatus status, NotificationRequestType type, Account account) {
         final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;
 
+        Predicate predicate = filtersPredicate(maintenanceNotification, status, type, account);
+        if (predicate == null)
+            return 0;
+
         return queryFactory.selectFrom(maintenanceNotification)
-                .where(filtersPredicate(maintenanceNotification, status, type, account))
+                .where(predicate)
                 .fetchCount();
     }
 
@@ -59,8 +64,12 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
                                                                  Account account, long pageNumber, long pageSize) {
         final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;
 
+        Predicate predicate = filtersPredicate(maintenanceNotification, status, type, account);
+        if (predicate == null)
+            return Collections.emptyList();
+
         return queryFactory.selectFrom(maintenanceNotification)
-                .where(filtersPredicate(maintenanceNotification, status, type, account))
+                .where(predicate)
                 .orderBy(maintenanceNotification.createdAt.desc())
                 .limit(pageNumber * pageSize + pageSize)
                 .offset(pageNumber * pageSize)

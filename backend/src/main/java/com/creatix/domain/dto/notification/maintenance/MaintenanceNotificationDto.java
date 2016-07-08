@@ -17,4 +17,5 @@ public class MaintenanceNotificationDto extends NotificationDto {
     private BasicApartmentDto targetApartment;
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
     private Boolean accessIfNotAtHome;
+
 }

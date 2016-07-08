@@ -1,8 +1,11 @@
 package com.creatix.domain.dao;
 
 import com.creatix.domain.dto.notification.NotificationRequestType;
+import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.AssistantPropertyManager;
+import com.creatix.domain.entity.store.account.PropertyManager;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
-import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.QNeighborhoodNotification;
 import com.creatix.domain.enums.NotificationStatus;
 import com.querydsl.core.types.Predicate;
@@ -10,6 +13,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -30,26 +34,34 @@ public class NeighborhoodNotificationDao extends AbstractNotificationDao<Neighbo
                     case Tenant:
                         return predicate.and(neighborhoodNotification.targetApartment.eq(((Tenant) a).getApartment()));
                     default:
-                        throw new IllegalStateException(String.format("Account type %s is not allowed to read maintenance notifications", a.getRole().toString()));
+                        return null;
                 }
             default:
-                throw new IllegalStateException();
+                return null;
         }
     }
 
     public long countByStatusAndType(NotificationStatus status, NotificationRequestType type, Account account) {
-        final QNeighborhoodNotification maintenanceNotification = QNeighborhoodNotification.neighborhoodNotification;
+        final QNeighborhoodNotification neighborhoodNotification = QNeighborhoodNotification.neighborhoodNotification;
 
-        return queryFactory.selectFrom(maintenanceNotification)
-                .where(filtersPredicate(maintenanceNotification, status, type, account))
+        Predicate predicate = filtersPredicate(neighborhoodNotification, status, type, account);
+        if (predicate == null)
+            return 0;
+
+        return queryFactory.selectFrom(neighborhoodNotification)
+                .where(predicate)
                 .fetchCount();
     }
 
     public List<NeighborhoodNotification> findPageByStatusAndType(NotificationStatus status, NotificationRequestType type, Account account, long pageNumber, long pageSize) {
         final QNeighborhoodNotification neighborhoodNotification = QNeighborhoodNotification.neighborhoodNotification;
 
+        Predicate predicate = filtersPredicate(neighborhoodNotification, status, type, account);
+        if (predicate == null)
+            return Collections.emptyList();
+
         return queryFactory.selectFrom(neighborhoodNotification)
-                .where(filtersPredicate(neighborhoodNotification, status, type, account))
+                .where(predicate)
                 .orderBy(neighborhoodNotification.createdAt.desc())
                 .limit(pageNumber * pageSize + pageSize)
                 .offset(pageNumber * pageSize)

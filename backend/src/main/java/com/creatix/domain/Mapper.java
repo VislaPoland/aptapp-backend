@@ -181,6 +181,7 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(Notification.class, NotificationDto.class)
+                .field("createdAt", "date")
                 .byDefault()
                 .register();
 
