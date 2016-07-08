@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
@@ -26,8 +27,9 @@ public class AccountDeviceService {
     private AccountDao accountDao;
     @Autowired
     private AuthorizationManager authorizationManager;
+    @Autowired
+    private HttpSession httpSession;
 
-    @RoleSecured()
     public Device getOrCreateDevice(@NotNull String deviceUDID, @NotNull PlatformType platformType) {
         Objects.requireNonNull(deviceUDID);
         Objects.requireNonNull(platformType);
@@ -39,10 +41,12 @@ public class AccountDeviceService {
             device.setPlatform(platformType);
             deviceDao.persist(device);
         }
-        final Account account = this.getAccount(this.authorizationManager.getCurrentAccount().getId());
-        if (device.getAccount() == null || (device.getAccount() != null && device.getAccount().getId() != account.getId())) {
-            device.setAccount(account);
-            deviceDao.persist(device);
+        if (this.authorizationManager.hasCurrentAccount() == true) {
+            final Account account = this.getAccount(this.authorizationManager.getCurrentAccount().getId());
+            if (device.getAccount() == null || (device.getAccount() != null && device.getAccount().getId() != account.getId())) {
+                device.setAccount(account);
+                deviceDao.persist(device);
+            }
         }
 
         return device;
@@ -65,6 +69,23 @@ public class AccountDeviceService {
 
         return device;
     }
+
+    @RoleSecured()
+    public Device asssignDeviceToAccount(@NotNull Account account) {
+        Objects.requireNonNull(account);
+
+        Object deviceObject = httpSession.getAttribute("device");
+        if (deviceObject instanceof Device == false) {
+            throw new SecurityException("Device is not recognized.");
+        }
+
+        final Device device = this.getDevice(((Device) deviceObject).getId());
+        device.setAccount(account);
+        deviceDao.persist(device);
+
+        return device;
+    }
+
 
     private Device getDevice(@NotNull Long deviceId) {
         Objects.requireNonNull(deviceId);
