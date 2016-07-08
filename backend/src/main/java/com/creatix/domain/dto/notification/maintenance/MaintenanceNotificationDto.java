@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @ApiModel
 @Getter
 @Setter
@@ -20,4 +22,6 @@ public class MaintenanceNotificationDto extends NotificationDto {
     private Boolean accessIfNotAtHome;
     @ApiModelProperty(value = "Maintenance reservation")
     private MaintenanceReservationDto reservation;
+    @ApiModelProperty(value = "Timestamp of maintenance notification", required = true)
+    private Date date;
 }

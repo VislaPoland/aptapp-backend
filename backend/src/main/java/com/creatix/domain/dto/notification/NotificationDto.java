@@ -24,8 +24,8 @@ public class NotificationDto {
     private String description;
     @ApiModelProperty(value = "Notification status", required = true)
     private NotificationStatus status;
-    @ApiModelProperty(value = "Timestamp of notification", required = true)
-    private Date date;
+    @ApiModelProperty(value = "Timestamp of notification creation", required = true)
+    private Date createdAt;
     @ApiModelProperty(value = "Response message")
     private String response;
     @ApiModelProperty(value = "Notification type", required = true)
