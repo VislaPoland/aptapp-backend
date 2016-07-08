@@ -18,6 +18,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -40,6 +41,8 @@ public class MaintenanceReservationService {
     private PropertyDao propertyDao;
     @Autowired
     private ManagedEmployeeDao managedEmployeeDao;
+    @Autowired
+    private MaintenanceNotificationDao maintenanceNotificationDao;
 
     @RoleSecured(AccountRole.Maintenance)
     public MaintenanceReservation createMaintenanceReservation(Long propertyId, PersistMaintenanceReservationRequest reservationRequest) {
@@ -53,13 +56,8 @@ public class MaintenanceReservationService {
         if ( employee == null ) {
             throw new IllegalStateException("Account is not employee assigned");
         }
-        if ( reservationRequest.getBeginTime().isBefore(LocalTime.now()) ) {
+        if ( reservationRequest.getBeginTime().isBefore(OffsetDateTime.now()) ) {
             throw new IllegalArgumentException("Cannot create reservation in the past");
-        }
-
-        final int unitCount = slotService.calculateUnitCount(reservationRequest.getDurationMinutes(), slot.getUnitDurationMinutes());
-        if ( unitCount == 0 ) {
-            throw new IllegalArgumentException("Invalid duration of zero minutes");
         }
 
         final MaintenanceReservation reservation = new MaintenanceReservation();
@@ -69,7 +67,15 @@ public class MaintenanceReservationService {
         reservation.setCapacity(reservationRequest.getCapacity());
         reservation.setEmployee(employee);
         reservation.setNote(reservationRequest.getNote());
+        if ( reservationRequest.getNotificationId() != null ) {
+            reservation.setNotification(maintenanceNotificationDao.findById(reservationRequest.getNotificationId()));
+        }
 
+
+        final int unitCount = slotService.calculateUnitCount(reservationRequest.getDurationMinutes(), slot.getUnitDurationMinutes());
+        if ( unitCount == 0 ) {
+            throw new IllegalArgumentException("Invalid duration of zero minutes");
+        }
         synchronized ( syncLock ) {
             // assign slots units to reservation
             final int unitOffsetLft = slotService.calculateUnitOffset(slot, reservation.getBeginTime());
@@ -77,6 +83,9 @@ public class MaintenanceReservationService {
             slot.getUnits().stream()
                     .filter(u -> ((unitOffsetLft <= u.getOffset()) && (u.getOffset() <= unitOffsetRgt)))
                     .forEach(reservation::addUnit);
+            if ( (reservation.getUnits() == null) || (reservation.getUnits().size() != unitCount) ) {
+                throw new IllegalArgumentException("Reservation does not fit into slot.");
+            }
             // update slot unit capacity
             reservation.getUnits().stream()
                     .forEach(unit -> {

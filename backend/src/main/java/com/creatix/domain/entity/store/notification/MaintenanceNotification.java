@@ -1,19 +1,18 @@
 package com.creatix.domain.entity.store.notification;
 
 import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.MaintenanceReservation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MaintenanceNotification extends Notification {
+
     @ManyToOne
     @JoinColumn
     @NotNull
@@ -22,4 +21,7 @@ public class MaintenanceNotification extends Notification {
     @Column
     @NotNull
     private Boolean accessIfNotAtHome;
+
+    @OneToOne(mappedBy = "notification")
+    private MaintenanceReservation reservation;
 }

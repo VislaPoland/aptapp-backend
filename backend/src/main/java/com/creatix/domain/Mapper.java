@@ -191,6 +191,7 @@ public class Mapper {
 
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
                 .byDefault()
+                .exclude("reservation.notification")    // prevent recursive mapping
                 .register();
 
         mapperFactory.classMap(NotificationPhoto.class, NotificationPhotoDto.class)
@@ -350,6 +351,7 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(MaintenanceReservation.class, MaintenanceReservationDto.class)
                 .byDefault()
+                .exclude("notification.reservation")    // prevent recursive mapping
                 .register();
         mapperFactory.classMap(MaintenanceSlotSchedule.class, MaintenanceSlotScheduleDto.class)
                 .byDefault()

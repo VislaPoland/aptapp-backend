@@ -52,12 +52,6 @@ public class MaintenanceReservation {
     @Column(nullable = false)
     private int durationMinutes;
     @Column(length = 2048)
-    private String transferLog;
-    @Column(nullable = false, precision = 8, scale = 2)
-    private BigDecimal price;
-    @Column(unique = true)
-    private String stripeChargeId;
-    @Column(length = 2048)
     private String note;
 
     @OneToOne

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -13,8 +14,10 @@ import java.util.Date;
 public class PersistMaintenanceReservationRequest {
     @ApiModelProperty(required = true)
     private Long slotId;
-    @ApiModelProperty(required = true)
-    private LocalTime beginTime;
+    @ApiModelProperty("Maintenance notification ID")
+    private Long notificationId;
+    @ApiModelProperty(required = true, dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
+    private OffsetDateTime beginTime;
     @ApiModelProperty(required = true)
     private int durationMinutes;
     @ApiModelProperty(required = true)

@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @ApiModel
@@ -21,10 +21,10 @@ public class MaintenanceReservationDto {
     private List<SlotUnitDto> units;
     @ApiModelProperty(value = "Reserved slot", required = true)
     private SlotDto slot;
-    @ApiModelProperty(value = "Reservation begin time", required = true)
-    private Date beginTime;
-    @ApiModelProperty(value = "Reservation end time", required = true)
-    private Date endTime;
+    @ApiModelProperty(value = "Reservation begin time", required = true, dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
+    private OffsetDateTime beginTime;
+    @ApiModelProperty(value = "Reservation end time", required = true, dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
+    private OffsetDateTime endTime;
     @ApiModelProperty(value = "Reserved capacity", required = true)
     private int capacity;
     @ApiModelProperty(value = "Reservation duration in minutes", required = true)
