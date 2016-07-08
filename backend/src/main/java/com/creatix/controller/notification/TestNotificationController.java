@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 @RestController
 @Transactional
@@ -41,7 +42,7 @@ public class TestNotificationController {
     })
     @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
-    public DataResponse<Void> getNotifications(@RequestParam(required = false, defaultValue = "TEST") String message) {
+    public DataResponse<Void> getNotifications(@RequestParam(required = false, defaultValue = "TEST") String message) throws IOException {
         Object deviceObject = httpSession.getAttribute("device");
         if (deviceObject instanceof Device == false) {
             throw new SecurityException("Device is not recognized.");
