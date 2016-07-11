@@ -67,7 +67,7 @@ public class AccountService {
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
-        if (item == null) {
+        if ( item == null ) {
             throw ex;
         }
         return item;
@@ -88,7 +88,7 @@ public class AccountService {
 
         final Long accountId = request.getAccountId();
         final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
-        if (isEligibleToResetCode(authorizationManager.getCurrentAccount(), account)) {
+        if ( isEligibleToResetCode(authorizationManager.getCurrentAccount(), account) ) {
             setActionToken(account);
             return account.getActionToken();
         }
@@ -98,7 +98,7 @@ public class AccountService {
     private boolean isEligibleToResetCode(Account principal, Account target) {
         final Property targetProperty = authorizationManager.getCurrentProperty(target);
 
-        switch (principal.getRole()) {
+        switch ( principal.getRole() ) {
             case Administrator:
                 return true;
             case PropertyOwner:
@@ -127,7 +127,7 @@ public class AccountService {
 
     public void authenticate(String email, String password) throws AuthenticationException {
         Account account = getAccount(email);
-        if (!account.getActive()) {
+        if ( !account.getActive() ) {
             throw new SecurityException("Account not activated");
         }
 
@@ -154,7 +154,7 @@ public class AccountService {
 
     private Account getAccount(String email) {
         final Account account = accountDao.findByEmail(email);
-        if (account == null) {
+        if ( account == null ) {
             throw new EntityNotFoundException(String.format("Account email=%s not found", email));
         }
         return account;
@@ -166,7 +166,7 @@ public class AccountService {
 
     public Account getAccountByToken(String actionToken) {
         final Account account = accountDao.findByActionToken(actionToken);
-        if (account == null) {
+        if ( account == null ) {
             throw new SecurityException(String.format("Action token=%s is not valid", actionToken));
         }
         return account;
@@ -174,11 +174,11 @@ public class AccountService {
 
     public Account activateAccount(String activationCode) {
         final Account account = getAccountByToken(activationCode);
-        if (account.getActive()) {
+        if ( account.getActive() ) {
             return account;
         }
 
-        if (account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate())) {
+        if ( account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate()) ) {
             throw new SecurityException("Activation code has expired");
         }
 
@@ -204,7 +204,7 @@ public class AccountService {
         Objects.requireNonNull(request);
 
         Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
-        if (authorizationManager.isSelf(account)) {
+        if ( authorizationManager.isSelf(account) ) {
             mapper.fillAccount(request, account);
             accountDao.persist(account);
             return account;
@@ -217,11 +217,12 @@ public class AccountService {
         Objects.requireNonNull(request);
 
         final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
-        if (authorizationManager.isSelf(account)) {
+        if ( authorizationManager.isSelf(account) ) {
             authenticate(account.getPrimaryEmail(), request.getOldPassword());
             account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
             accountDao.persist(account);
-        } else {
+        }
+        else {
             throw new SecurityException(String.format("You are not eligible to change user=%d password", accountId));
         }
     }
@@ -231,15 +232,14 @@ public class AccountService {
         Objects.requireNonNull(request);
 
         final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
-        if (authorizationManager.isSelf(account)) {
-            if (account.getPasswordHash() == null) {
+        if ( authorizationManager.isSelf(account) ) {
+            if ( account.getPasswordHash() == null ) {
                 account.setPasswordHash(passwordEncoder.encode(request.getPassword()));
                 accountDao.persist(account);
-            } else {
-                throw new SecurityException("This action is allowed only once");
             }
-        } else {
-            throw new SecurityException(String.format("You are not eligible to change user=%d password", accountId));
+        }
+        else {
+            throw new SecurityException(String.format("You are not eligible to change user id=%d password", accountId));
         }
     }
 
@@ -248,7 +248,7 @@ public class AccountService {
 
         final Account account = getAccountByToken(request.getToken());
 
-        if (account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate())) {
+        if ( account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate()) ) {
             throw new SecurityException(String.format("Token %s has expired", request.getToken()));
         }
 
@@ -327,7 +327,7 @@ public class AccountService {
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         Property managedProperty = null;
-        if (authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner) {
+        if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
             Objects.requireNonNull(request.getManagedPropertyId());
 
             managedProperty = propertyDao.findById(request.getManagedPropertyId());
@@ -357,7 +357,7 @@ public class AccountService {
 
         Property managedProperty = null;
         PropertyManager account = null;
-        if (authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner) {
+        if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
             Objects.requireNonNull(request.getManagedPropertyId());
 
             managedProperty = propertyDao.findById(request.getManagedPropertyId());
