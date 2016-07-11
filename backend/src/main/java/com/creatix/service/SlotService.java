@@ -94,6 +94,7 @@ public class SlotService {
 
         // create parent slot
         final MaintenanceSlot slot = new MaintenanceSlot();
+        slot.setSchedule(schedule);
         slot.setBeginTime(beginDt);
         slot.setEndTime(endDt);
         slot.setUnitDurationMinutes(schedule.getUnitDurationMinutes());
