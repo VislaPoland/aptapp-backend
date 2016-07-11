@@ -96,9 +96,8 @@ public class AccountController {
     })
     @RequestMapping(value = "/{accountId}/password", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<Void> changePassword(@PathVariable long accountId, @RequestBody @Valid UpdatePasswordRequest request) {
-        accountService.updateAccountPasswordFromRequest(accountId, request);
-        return new DataResponse<>();
+    public DataResponse<AccountDto> changePassword(@PathVariable long accountId, @RequestBody @Valid UpdatePasswordRequest request) {
+        return new DataResponse<>(mapper.toAccountDto(accountService.updateAccountPasswordFromRequest(accountId, request)));
     }
 
     @ApiOperation(value = "First time set password")
@@ -109,9 +108,8 @@ public class AccountController {
     })
     @RequestMapping(value = "/{accountId}/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<Void> setPassword(@PathVariable long accountId, @RequestBody @Valid CreatePasswordRequest request) {
-        accountService.createAccountPasswordFromRequest(accountId, request);
-        return new DataResponse<>();
+    public DataResponse<AccountDto> setPassword(@PathVariable long accountId, @RequestBody @Valid CreatePasswordRequest request) {
+        return new DataResponse<>(mapper.toAccountDto(accountService.createAccountPasswordFromRequest(accountId, request)));
     }
 
     @ApiOperation(value = "Update user profile information")
