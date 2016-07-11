@@ -90,7 +90,7 @@ public class TenantService {
 
         accountService.setActionToken(tenant);
 
-        emailMessageSender.send(new TenantActivationMessageTemplate(tenant, applicationProperties.getBaseUrl()));
+        emailMessageSender.send(new TenantActivationMessageTemplate(tenant, applicationProperties.getBackendUrl()));
 
         return tenant;
     }

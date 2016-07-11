@@ -142,7 +142,7 @@ public class AccountService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        accountDeviceService.asssignDeviceToAccount(account);
+        accountDeviceService.assignDeviceToAccount(account);
     }
 
     public List<Account> getAccounts(AccountRole[] roles, Long propertyId) {
@@ -307,7 +307,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new PropertyOwnerActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
+        emailMessageSender.send(new PropertyOwnerActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
 
         return account;
     }
@@ -352,7 +352,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
 
         return account;
     }
@@ -402,7 +402,7 @@ public class AccountService {
         managedEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
 
         return account;
     }
@@ -438,7 +438,7 @@ public class AccountService {
         managedEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
 
         return account;
     }
@@ -474,7 +474,7 @@ public class AccountService {
         managedEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
 
         return account;
     }
@@ -501,7 +501,7 @@ public class AccountService {
         final Account account = getAccount(request.getEmail());
         setActionToken(account);
         accountDao.persist(account);
-        emailMessageSender.send(new ResetPasswordMessageTemplate(account, applicationProperties.getBaseUrl()));
+        emailMessageSender.send(new ResetPasswordMessageTemplate(account, applicationProperties.getBackendUrl()));
 
         return true;
     }

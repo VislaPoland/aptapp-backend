@@ -81,9 +81,14 @@
       "description": "Authentification key to Google GCM service."
     },
     {
-      "name": "application.base-url",
+      "name": "application.backend-url",
       "type": "java.net.URL",
-      "description": "Base URL of the application."
+      "description": "Backend URL of the application."
+    },
+    {
+      "name": "application.frontend-url",
+      "type": "java.net.URL",
+      "description": "Frontend URL of the application."
     }
   ]
 }

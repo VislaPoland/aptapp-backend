@@ -44,7 +44,7 @@ public class AccountDeviceService {
             device.setPlatform(platformType);
             deviceDao.persist(device);
         }
-        if (this.authorizationManager.hasCurrentAccount() == true) {
+        if ( this.authorizationManager.hasCurrentAccount() ) {
             final Account account = this.getAccount(this.authorizationManager.getCurrentAccount().getId());
             if (device.getAccount() == null || (device.getAccount() != null && device.getAccount().getId().equals(account.getId()))) {
                 device.setAccount(account);
@@ -55,7 +55,7 @@ public class AccountDeviceService {
         return device;
     }
 
-    @RoleSecured()
+    @RoleSecured
     public Device register(@NotNull Long accountId, @NotNull Long deviceId, @NotNull AccountDeviceDto request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(deviceId);

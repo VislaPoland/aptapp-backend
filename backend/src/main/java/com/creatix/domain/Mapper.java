@@ -45,8 +45,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -88,7 +86,7 @@ public class Mapper {
             }
         }
 
-        return applicationProperties.buildAbsoluteUrl(String.format("/api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
+        return applicationProperties.buildBackendUrl(String.format("/api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
     }
 
     private void configure(MapperFactory mapperFactory) {
