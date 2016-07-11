@@ -41,22 +41,22 @@
       "description": "Phone number to send SMS from."
     },
     {
-      "name": "device.udid.header",
+      "name": "device.udid-header",
       "type": "java.lang.String",
       "description": "Name of device UDID header in HTTP request."
     },
     {
-      "name": "device.platform.header",
+      "name": "device.platform-header",
       "type": "java.lang.String",
       "description": "Name of client platform header in HTTP request."
     },
     {
-      "name": "device.key.session.device",
+      "name": "device.session-key-device",
       "type": "java.lang.String",
       "description": "Session key for recognized device."
     },
     {
-      "name": "device.key.session.platform",
+      "name": "device.session-key-platform",
       "type": "java.lang.String",
       "description": "Session key for recognized client platform."
     },
