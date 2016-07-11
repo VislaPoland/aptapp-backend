@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,17 +17,17 @@ public class MaintenanceSlotSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    @ManyToOne(optional = false)
+    @NotNull
+    @OneToOne(mappedBy = "schedule")
     private Property property;
+    @NotNull
     @Column(nullable = false)
     private LocalTime beginTime;
+    @NotNull
     @Column(nullable = false)
     private LocalTime endTime;
     @Column(nullable = false)
     private int unitDurationMinutes;
-    @Enumerated(EnumType.STRING)
-    @Column
-    private AccountRole targetRole;
     @Enumerated(EnumType.STRING)
     @ElementCollection
     private Set<DayOfWeek> daysOfWeek = new HashSet<>();

@@ -2,10 +2,11 @@ package com.creatix.controller;
 
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
+import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.property.PropertyScheduleService;
+import com.creatix.service.SlotService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -21,7 +22,7 @@ import javax.validation.Valid;
 @RequestMapping("/api/properties/{propertyId}/schedule")
 public class PropertyScheduleController {
     @Autowired
-    private PropertyScheduleService propertyScheduleService;
+    private SlotService slotService;
     @Autowired
     private PropertyMapper propertyMapper;
 
@@ -35,8 +36,8 @@ public class PropertyScheduleController {
     })
     @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<MaintenanceSlotScheduleDto> createPropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid MaintenanceSlotScheduleDto request) {
-        return new DataResponse<>(propertyMapper.toPropertyScheduleDto(propertyScheduleService.createPropertyScheduleFromRequest(propertyId, request)));
+    public DataResponse<MaintenanceSlotScheduleDto> createPropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid PersistMaintenanceSlotScheduleRequest request) {
+        return new DataResponse<>(propertyMapper.toMaintenanceSlotScheduleDto(slotService.createSchedule(propertyId, request)));
     }
 
     @ApiOperation(value = "Update property schedule")
@@ -49,8 +50,8 @@ public class PropertyScheduleController {
     })
     @RequestMapping(path = "", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<MaintenanceSlotScheduleDto> updatePropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid MaintenanceSlotScheduleDto request) {
-        return new DataResponse<>(propertyMapper.toPropertyScheduleDto(propertyScheduleService.updatePropertyScheduleFromRequest(propertyId, request)));
+    public DataResponse<MaintenanceSlotScheduleDto> updatePropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid PersistMaintenanceSlotScheduleRequest request) {
+        return new DataResponse<>(propertyMapper.toMaintenanceSlotScheduleDto(slotService.createSchedule(propertyId, request)));
     }
 
 

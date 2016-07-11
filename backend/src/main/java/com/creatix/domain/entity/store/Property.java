@@ -60,7 +60,7 @@ public class Property {
     private Set<Contact> contacts;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    private PropertySchedule schedule;
+    private MaintenanceSlotSchedule schedule;
 
     @OneToMany(mappedBy = "property")
     private List<PropertyPhoto> photos = new ArrayList<>(1);

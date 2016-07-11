@@ -1,6 +1,7 @@
 package com.creatix.domain.dto.property;
 
 import com.creatix.domain.dto.AddressDto;
+import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.CommunicationType;
 import com.creatix.domain.enums.ContactType;
@@ -40,7 +41,7 @@ public class PropertyDetailsDto {
     @ApiModelProperty(value = "Property employees")
     private List<AccountDto> employees;
     @ApiModelProperty(value = "Property schedule", required = true)
-    private ScheduleDto schedule;
+    private MaintenanceSlotScheduleDto schedule;
     @ApiModelProperty(value = "Notification photo")
     private List<PropertyPhotoDto> photos;
 
@@ -106,20 +107,4 @@ public class PropertyDetailsDto {
         private Boolean deleted;
     }
 
-    @ApiModel
-    @Data
-    public static class ScheduleDto {
-        @ApiModelProperty(value = "Start hour of schedule time", required = true, notes = "24-hour clock")
-        private Integer startHour;
-        @ApiModelProperty(value = "Start minute of schedule time", required = true)
-        private Integer startMinute;
-        @ApiModelProperty(value = "End hour of schedule time", required = true, notes = "24-hour clock")
-        private Integer endHour;
-        @ApiModelProperty(value = "End minute of schedule time", required = true)
-        private Integer endMinute;
-        @ApiModelProperty(value = "Length of the period in minutes", required = true, notes = "This needs to be a divisor of the working time")
-        private Integer periodLength;
-        @ApiModelProperty(value = "Number of slots per period", required = true)
-        private Integer slotsPerPeriod;
-    }
 }

@@ -47,6 +47,7 @@ import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -156,10 +157,6 @@ public class Mapper {
                             }
                         }
                 )
-                .register();
-
-        mapperFactory.classMap(PropertySchedule.class, PropertyDetailsDto.ScheduleDto.class)
-                .byDefault()
                 .register();
 
         mapperFactory.classMap(Facility.class, PropertyDetailsDto.FacilityDto.class)
@@ -360,6 +357,7 @@ public class Mapper {
                 .register();
 
         mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(OffsetDateTime.class, OffsetDateTime.class));
+        mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(LocalTime.class, LocalTime.class));
 
         mapperFactory.classMap(SlotUnit.class, SlotUnitDto.class)
                 .byDefault()

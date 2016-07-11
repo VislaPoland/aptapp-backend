@@ -12,16 +12,14 @@ import java.util.Set;
 @ApiModel
 @Data
 public class PersistMaintenanceSlotScheduleRequest {
-    @ApiModelProperty(value = "Time when slot starts", required = true)
+    @ApiModelProperty(value = "Time when slot starts", required = true, dataType = "java.lang.String", example = "09:00:00.000")
     private LocalTime beginTime;
-    @ApiModelProperty(value = "Time when slot ends", required = true)
+    @ApiModelProperty(value = "Time when slot ends", required = true, dataType = "java.lang.String", example = "17:00:00.000")
     private LocalTime endTime;
-    @ApiModelProperty(value = "Days of week", required = true)
+    @ApiModelProperty(value = "Days of week")
     private Set<DayOfWeek> daysOfWeek;
     @ApiModelProperty(value = "Slot unit duration in minutes", required = true)
     private int unitDurationMinutes;
     @ApiModelProperty(value = "Initial slot unit capacity (1 = 1 employee capacity)", required = true)
     private int initialCapacity;
-    @ApiModelProperty(value = "Slot schedule target role", required = true, dataType = "List[java.lang.Long]", notes = "Scheduled slots will be shown only to accounts with same role.")
-    private AccountRole targetRole;
 }

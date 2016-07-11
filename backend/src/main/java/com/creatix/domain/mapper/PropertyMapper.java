@@ -6,10 +6,7 @@ import com.creatix.domain.dto.property.contact.UpdatePropertyContactRequest;
 import com.creatix.domain.dto.property.facility.CreatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.facility.UpdatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
-import com.creatix.domain.entity.store.Contact;
-import com.creatix.domain.entity.store.Facility;
-import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.PropertySchedule;
+import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.EmployeeBase;
 import ma.glasnost.orika.MapperFactory;
@@ -64,10 +61,10 @@ public final class PropertyMapper extends ConfigurableMapper {
         //endregion
 
         //region Schedule
-        mapperFactory.classMap(MaintenanceSlotScheduleDto.class, PropertySchedule.class)
+        mapperFactory.classMap(MaintenanceSlotScheduleDto.class, MaintenanceSlotSchedule.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(PropertySchedule.class, MaintenanceSlotScheduleDto.class)
+        mapperFactory.classMap(MaintenanceSlotSchedule.class, MaintenanceSlotScheduleDto.class)
                 .byDefault()
                 .register();
         //endregion
@@ -130,19 +127,18 @@ public final class PropertyMapper extends ConfigurableMapper {
     //endregion
 
     //region Schedule
-    public MaintenanceSlotScheduleDto toPropertyScheduleDto(@NotNull PropertySchedule schedule) {
+    public MaintenanceSlotScheduleDto toMaintenanceSlotScheduleDto(@NotNull MaintenanceSlotSchedule schedule) {
         Objects.requireNonNull(schedule);
 
         return this.map(schedule, MaintenanceSlotScheduleDto.class);
     }
 
-    public PropertySchedule toPropertySchedule(@NotNull MaintenanceSlotScheduleDto request) {
+    public MaintenanceSlotSchedule toMaintenanceSlotSchedule(@NotNull MaintenanceSlotScheduleDto request) {
         Objects.requireNonNull(request);
-
-        return this.map(request, PropertySchedule.class);
+        return this.map(request, MaintenanceSlotSchedule.class);
     }
 
-    public void fillPropertySchedule(@NotNull MaintenanceSlotScheduleDto request, @NotNull PropertySchedule schedule) {
+    public void fillMaintenanceSlotSchedule(@NotNull MaintenanceSlotScheduleDto request, @NotNull MaintenanceSlotSchedule schedule) {
         Objects.requireNonNull(request);
         Objects.requireNonNull(schedule);
 

@@ -89,9 +89,6 @@ public class SlotService {
         Objects.requireNonNull(date);
         Objects.requireNonNull(schedule);
 
-        if ( schedule.getBeginTime().isBefore(LocalTime.now()) ) {
-            throw new IllegalArgumentException("Cannot create slot in the past");
-        }
 
         final OffsetDateTime beginDt = date.atTime(schedule.getBeginTime()).atOffset(schedule.getZoneOffset(date.atTime(schedule.getBeginTime())));
         final OffsetDateTime endDt = date.atTime(schedule.getEndTime()).atOffset(schedule.getZoneOffset(date.atTime(schedule.getEndTime())));
@@ -122,7 +119,7 @@ public class SlotService {
 
     private int calculateUnitCount(OffsetDateTime beginDt, OffsetDateTime endDt, int unitDurationMinutes) {
         final Duration slotDuration = Duration.between(beginDt, endDt);
-        return (int) (slotDuration.get(ChronoUnit.MINUTES) / unitDurationMinutes);
+        return (int) (slotDuration.toMinutes() / unitDurationMinutes);
     }
 
     int calculateUnitCount(int durationMinutes, int unitDurationMinutes) {
@@ -149,16 +146,17 @@ public class SlotService {
         final Property property = propertyDao.findById(propertyId);
         authorizationManager.isManager(property);
 
-        final MaintenanceSlotSchedule schedule = new MaintenanceSlotSchedule();
+        final MaintenanceSlotSchedule schedule = property.getSchedule() != null ? property.getSchedule() : new MaintenanceSlotSchedule();
         schedule.setBeginTime(request.getBeginTime());
         schedule.setEndTime(request.getEndTime());
         schedule.setDaysOfWeek(request.getDaysOfWeek());
         schedule.setProperty(property);
-        schedule.setTimeZone(schedule.getProperty().getTimeZone());
-        schedule.setInitialCapacity(schedule.getInitialCapacity());
-        schedule.setUnitDurationMinutes(schedule.getUnitDurationMinutes());
-        schedule.setTargetRole(schedule.getTargetRole());
+        schedule.setTimeZone(property.getTimeZone());
+        schedule.setInitialCapacity(request.getInitialCapacity());
+        schedule.setUnitDurationMinutes(request.getUnitDurationMinutes());
         maintenanceSlotScheduleDao.persist(schedule);
+        property.setSchedule(schedule);
+        propertyDao.persist(property);
 
         scheduleSlots(schedule);
 
