@@ -7,6 +7,8 @@ public class DeviceProperties {
 
     private String udidHeader;
     private String platformHeader;
+    private String sessionKeyDevice;
+    private String sessionKeyPlatform;
 
     public String getUdidHeader() {
         return udidHeader;
@@ -22,6 +24,22 @@ public class DeviceProperties {
 
     public void setPlatformHeader(String platformHeader) {
         this.platformHeader = platformHeader;
+    }
+
+    public String getSessionKeyDevice() {
+        return sessionKeyDevice;
+    }
+
+    public void setSessionKeyDevice(String sessionKeyDevice) {
+        this.sessionKeyDevice = sessionKeyDevice;
+    }
+
+    public String getSessionKeyPlatform() {
+        return sessionKeyPlatform;
+    }
+
+    public void setSessionKeyPlatform(String sessionKeyPlatform) {
+        this.sessionKeyPlatform = sessionKeyPlatform;
     }
 
 }

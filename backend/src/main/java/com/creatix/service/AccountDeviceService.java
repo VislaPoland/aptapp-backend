@@ -1,5 +1,6 @@
 package com.creatix.service;
 
+import com.creatix.configuration.DeviceProperties;
 import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dao.DeviceDao;
 import com.creatix.domain.dto.account.device.AccountDeviceDto;
@@ -22,6 +23,8 @@ import java.util.Objects;
 public class AccountDeviceService {
 
     @Autowired
+    private DeviceProperties deviceProperties;
+    @Autowired
     private DeviceDao deviceDao;
     @Autowired
     private AccountDao accountDao;
@@ -43,7 +46,7 @@ public class AccountDeviceService {
         }
         if (this.authorizationManager.hasCurrentAccount() == true) {
             final Account account = this.getAccount(this.authorizationManager.getCurrentAccount().getId());
-            if (device.getAccount() == null || (device.getAccount() != null && device.getAccount().getId() != account.getId())) {
+            if (device.getAccount() == null || (device.getAccount() != null && device.getAccount().getId().equals(account.getId()))) {
                 device.setAccount(account);
                 deviceDao.persist(device);
             }
@@ -73,6 +76,11 @@ public class AccountDeviceService {
     @RoleSecured()
     public Device asssignDeviceToAccount(@NotNull Account account) {
         Objects.requireNonNull(account);
+
+        PlatformType platformType = (PlatformType) httpSession.getAttribute(this.deviceProperties.getSessionKeyPlatform());
+        if (platformType == PlatformType.Web) {
+            return null;
+        }
 
         Object deviceObject = httpSession.getAttribute("device");
         if (deviceObject instanceof Device == false) {

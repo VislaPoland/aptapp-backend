@@ -51,6 +51,16 @@
       "description": "Name of client platform header in HTTP request."
     },
     {
+      "name": "device.key.session.device",
+      "type": "java.lang.String",
+      "description": "Session key for recognized device."
+    },
+    {
+      "name": "device.key.session.platform",
+      "type": "java.lang.String",
+      "description": "Session key for recognized client platform."
+    },
+    {
       "name": "pushnotifications.apple-sandbox",
       "type": "java.lang.Boolean",
       "description": "Flag to indicate sandbox debug enviroments."
