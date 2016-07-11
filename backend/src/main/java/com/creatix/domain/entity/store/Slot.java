@@ -58,6 +58,7 @@ public abstract class Slot {
     @Column(nullable = false)
     private int unitDurationMinutes;
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
+    @OrderBy("offset ASC")
     private Set<SlotUnit> units;
 
     public void addUnit(SlotUnit unit) {

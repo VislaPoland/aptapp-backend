@@ -7,6 +7,7 @@ import com.creatix.domain.entity.store.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.property.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -37,16 +38,14 @@ public class SlotService {
     private MaintenanceSlotDao maintenanceSlotDao;
     @Autowired
     private EventSlotDao eventSlotDao;
+    @Autowired
+    private PropertyService propertyService;
 
     public EventSlot createEventSlot(@NotNull Long propertyId, @NotNull PersistEventSlotRequest request) {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(request);
 
-        final Property property = propertyDao.findById(propertyId);
-        if ( property == null ) {
-            throw new EntityNotFoundException(String.format("Property id=%d not found", propertyId));
-        }
-
+        final Property property = propertyService.getProperty(propertyId);
         final EventSlot slot = new EventSlot();
         slot.setBeginTime(request.getBeginTime());
         slot.setEndTime(slot.getBeginTime().plusMinutes(request.getDurationMinutes()));
@@ -137,7 +136,10 @@ public class SlotService {
     }
 
     @RoleSecured
-    public List<MaintenanceSlot> getMaintenanceSlotsByPropertyAndDateRange(long propertyId, OffsetDateTime beginDt, OffsetDateTime endDt) {
+    public List<MaintenanceSlot> getMaintenanceSlotsByPropertyAndDay(long propertyId, LocalDate day) {
+        final Property property = propertyService.getProperty(propertyId);
+        final OffsetDateTime beginDt = day.atStartOfDay(property.getZoneOffset(day.atStartOfDay())).toOffsetDateTime();
+        final OffsetDateTime endDt = beginDt.withHour(23).withMinute(59).withSecond(59);
         return maintenanceSlotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
     }
 

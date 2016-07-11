@@ -8,6 +8,9 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -65,4 +68,13 @@ public class Property {
     @OneToMany(mappedBy = "property")
     private List<PropertyPhoto> photos = new ArrayList<>(1);
 
+    @Transient
+    public ZoneOffset getZoneOffset(LocalDateTime dt) {
+        return getZoneId().getRules().getOffset(dt);
+    }
+
+    @Transient
+    private ZoneId getZoneId() {
+        return ZoneId.of(getTimeZone());
+    }
 }

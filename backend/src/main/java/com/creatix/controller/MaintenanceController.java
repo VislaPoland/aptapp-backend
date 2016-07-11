@@ -18,14 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @Transactional
 @RequestMapping("/api/properties/{propertyId}/maintenance")
-public class ScheduleController {
+public class MaintenanceController {
     @Autowired
     private SlotService slotService;
     @Autowired
@@ -43,9 +43,8 @@ public class ScheduleController {
     @RoleSecured
     public DataResponse<List<MaintenanceSlotDto>> getMaintenanceSlots(
             @PathVariable Long propertyId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime beginDt,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDt) {
-        return new DataResponse<>(slotService.getMaintenanceSlotsByPropertyAndDateRange(propertyId, beginDt, endDt)
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate day) {
+        return new DataResponse<>(slotService.getMaintenanceSlotsByPropertyAndDay(propertyId, day)
                 .stream()
                 .map(s -> mapper.toMaintenanceSlotDto(s))
                 .collect(Collectors.toList()));

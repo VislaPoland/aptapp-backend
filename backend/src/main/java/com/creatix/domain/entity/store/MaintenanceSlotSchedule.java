@@ -59,7 +59,7 @@ public class MaintenanceSlotSchedule {
     }
 
     @Transient
-    public ZoneId getZoneId() {
+    private ZoneId getZoneId() {
         return ZoneId.of(getTimeZone());
     }
 }

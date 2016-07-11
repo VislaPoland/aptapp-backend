@@ -48,18 +48,19 @@ public class AuthorizationManager {
         Account current = null;
 
         final SecurityContext securityContext = SecurityContextHolder.getContext();
-        if (securityContext != null) {
+        if ( securityContext != null ) {
             final Authentication authentication = securityContext.getAuthentication();
-            if (authentication != null) {
-                if (authentication instanceof AuthenticatedUserDetails) {
+            if ( authentication != null ) {
+                if ( authentication instanceof AuthenticatedUserDetails ) {
                     current = ((AuthenticatedUserDetails) authentication).getAccount();
-                } else if (authentication.getPrincipal() instanceof AuthenticatedUserDetails) {
+                }
+                else if ( authentication.getPrincipal() instanceof AuthenticatedUserDetails ) {
                     current = ((AuthenticatedUserDetails) authentication.getPrincipal()).getAccount();
                 }
             }
         }
 
-        if ((current == null) && !(suppressException)) {
+        if ( (current == null) && !(suppressException) ) {
             throw new SecurityException("No authenticated account found in session.");
         }
 
@@ -74,21 +75,23 @@ public class AuthorizationManager {
     public Property getCurrentProperty(Account account) throws SecurityException {
         assert account != null;
 
-        switch (account.getRole()) {
+        switch ( account.getRole() ) {
             case Tenant:
                 return ((Tenant) account).getApartment().getProperty();
             case PropertyManager:
                 return ((PropertyManager) account).getManagedProperty();
             default:
-                if (account instanceof ManagedEmployee)
+                if ( account instanceof ManagedEmployee ) {
                     return ((ManagedEmployee) account).getManager().getManagedProperty();
-                else
+                }
+                else {
                     throw new SecurityException("Impossible to extract single linked apartment.");
+                }
         }
     }
 
     public void checkManager(@NotNull Property property) {
-        if (!(isManager(property))) {
+        if ( !(isManager(property)) ) {
             throw new SecurityException("Not a apartment manager");
         }
     }
@@ -99,10 +102,10 @@ public class AuthorizationManager {
         return Objects.equals(property, ((PropertyManager) getCurrentAccount()).getManagedProperty());
     }
 
-    public boolean checkAccess(@NotNull Property property) {
+    public void checkAccess(@NotNull Property property) {
         Objects.requireNonNull(property);
         boolean allowed = false;
-        switch (this.getCurrentAccount().getRole()) {
+        switch ( getCurrentAccount().getRole() ) {
             case Administrator:
                 allowed = true;
                 break;
@@ -114,19 +117,23 @@ public class AuthorizationManager {
                 allowed = property.getManagers().contains(this.getCurrentAccount());
                 break;
             case AssistantPropertyManager:
+            case Security:
+            case Maintenance:
                 allowed = property.getManagers().contains(((ManagedEmployee) this.getCurrentAccount()).getManager());
                 break;
+            case Tenant:
+                allowed = Objects.equals(property, ((Tenant) getCurrentAccount()).getApartment().getProperty());
+                break;
         }
-        if (allowed) {
-            return allowed;
+        if ( !(allowed) ) {
+            throw new SecurityException(String.format("You are not eligible to read info about property with id=%d", property.getId()));
         }
-        throw new SecurityException(String.format("You are not eligible to read info about property with id=%d", property.getId()));
     }
 
     public boolean checkAccess(@NotNull Apartment apartment) {
         Objects.requireNonNull(apartment);
         boolean allowed = false;
-        switch (this.getCurrentAccount().getRole()) {
+        switch ( this.getCurrentAccount().getRole() ) {
             case Administrator:
                 allowed = true;
                 break;
@@ -141,14 +148,14 @@ public class AuthorizationManager {
                 allowed = apartment.getProperty().getManagers().contains(((ManagedEmployee) this.getCurrentAccount()).getManager());
                 break;
         }
-        if (allowed) {
+        if ( allowed ) {
             return allowed;
         }
         throw new SecurityException(String.format("You are not eligible to read info about apartment with id=%d", apartment.getId()));
     }
 
     public void checkOwner(Property property) {
-        if (!(isOwner(property))) {
+        if ( !(isOwner(property)) ) {
             throw new SecurityException("Not owner of the property.");
         }
     }
@@ -161,12 +168,12 @@ public class AuthorizationManager {
     public boolean checkAccess(@NotNull Device device) {
         Objects.requireNonNull(device);
 
-        if (device.getAccount() == null) {
+        if ( device.getAccount() == null ) {
             return true;
             //throw new SecurityException(String.format("You are not eligible to read unassigned device with id=%d", device.getId()));
         }
 
-        if (device.getAccount().getId().equals(this.getCurrentAccount().getId())) {
+        if ( device.getAccount().getId().equals(this.getCurrentAccount().getId()) ) {
             return true;
         }
 
