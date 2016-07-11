@@ -73,17 +73,17 @@ public class AccountDeviceService {
         return device;
     }
 
-    @RoleSecured()
-    public Device asssignDeviceToAccount(@NotNull Account account) {
+    @RoleSecured
+    public Device assignDeviceToAccount(@NotNull Account account) {
         Objects.requireNonNull(account);
 
-        PlatformType platformType = (PlatformType) httpSession.getAttribute(this.deviceProperties.getSessionKeyPlatform());
+        PlatformType platformType = (PlatformType) httpSession.getAttribute(deviceProperties.getSessionKeyPlatform());
         if (platformType == PlatformType.Web) {
             return null;
         }
 
-        Object deviceObject = httpSession.getAttribute("device");
-        if (deviceObject instanceof Device == false) {
+        Object deviceObject = httpSession.getAttribute(deviceProperties.getSessionKeyDevice());
+        if ( !(deviceObject instanceof Device) ) {
             throw new SecurityException("Device is not recognized.");
         }
 
