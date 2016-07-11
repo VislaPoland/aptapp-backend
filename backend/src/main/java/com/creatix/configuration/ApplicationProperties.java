@@ -8,18 +8,17 @@ import java.net.URL;
 @ConfigurationProperties(prefix = "application")
 public class ApplicationProperties {
 
-    private String baseUrl;
+    private URL baseUrl;
 
-    public String getBaseUrl() {
+    public URL getBaseUrl() {
         return baseUrl;
     }
 
-    public void setBaseUrl(String baseUrl) {
+    public void setBaseUrl(URL baseUrl) {
         this.baseUrl = baseUrl;
     }
 
     public URL buildAbsoluteUrl(String relativePath) throws MalformedURLException {
-        final URL baseUrl = new URL(getBaseUrl());
         return new URL(baseUrl, relativePath);
     }
 }

@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -44,7 +45,7 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<TenantDto> createTenant(@RequestBody @Valid CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public DataResponse<TenantDto> createTenant(@RequestBody @Valid CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toTenantDto(tenantService.createTenantFromRequest(request)));
     }
 

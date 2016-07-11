@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -155,7 +156,7 @@ public class AccountController {
     })
     @RoleSecured(AccountRole.Administrator)
     @RequestMapping(value = "/property-owners", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createPropertyOwner(@RequestBody @Valid PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public DataResponse<AccountDto> createPropertyOwner(@RequestBody @Valid PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createPropertyOwner(request)));
     }
 
@@ -179,7 +180,7 @@ public class AccountController {
     })
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     @RequestMapping(value = "/property-managers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createPropertyManager(@RequestBody @Valid PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public DataResponse<AccountDto> createPropertyManager(@RequestBody @Valid PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createPropertyManager(request)));
     }
 
@@ -203,7 +204,7 @@ public class AccountController {
     })
     @RoleSecured({AccountRole.PropertyManager})
     @RequestMapping(value = "/security-guys", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createSecurityGuy(@RequestBody @Valid PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public DataResponse<AccountDto> createSecurityGuy(@RequestBody @Valid PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createSecurityGuy(request)));
     }
 
@@ -227,7 +228,7 @@ public class AccountController {
     })
     @RoleSecured({AccountRole.PropertyManager})
     @RequestMapping(value = "/maintenance-guys", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createMaintenanceGuy(@RequestBody @Valid PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public DataResponse<AccountDto> createMaintenanceGuy(@RequestBody @Valid PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createMaintenanceGuy(request)));
     }
 
@@ -251,7 +252,7 @@ public class AccountController {
     })
     @RoleSecured({AccountRole.PropertyManager})
     @RequestMapping(value = "/assistant-property-managers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createAssistantPropertyManager(@RequestBody @Valid PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public DataResponse<AccountDto> createAssistantPropertyManager(@RequestBody @Valid PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createAssistantPropertyManager(request)));
     }
 

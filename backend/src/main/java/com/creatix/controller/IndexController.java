@@ -1,14 +1,22 @@
 package com.creatix.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.Data;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,7 +30,11 @@ import org.springframework.web.servlet.view.RedirectView;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
 
 /**
  * Controller for HTML pages.
@@ -37,6 +49,31 @@ class IndexController implements ErrorController {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private ObjectMapper jsonMapper;
+
+    @ApiOperation(value = "Download static file")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found")})
+    @RequestMapping(value = "/static/{filePath:.+}", method = RequestMethod.GET)
+    @ResponseBody
+    public HttpEntity<byte[]> dowloadNotificationPhoto(@PathVariable @NotEmpty String filePath) throws IOException {
+        final ClassLoader classLoader = getClass().getClassLoader();
+        final String absolutePath = Paths.get("static", filePath).toString();
+        final byte[] fileData;
+        try ( final InputStream templateResourceStream = classLoader.getResourceAsStream(absolutePath) ) {
+            if ( templateResourceStream == null ) {
+                throw new IOException("Resource " + absolutePath + " not found.");
+            }
+
+            fileData = IOUtils.toByteArray(templateResourceStream);
+        }
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentLength(fileData.length);
+
+        return new HttpEntity<>(fileData, headers);
+    }
 
     @RequestMapping(value = { "/app", "/app/" }, method = RequestMethod.GET)
     public RedirectView redirectApp() {

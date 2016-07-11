@@ -56,7 +56,7 @@
       "description": "Session key for recognized device."
     },
     {
-      "name": "device.session-key-platform",
+      "name": "device.session-key-platform  ",
       "type": "java.lang.String",
       "description": "Session key for recognized client platform."
     },
@@ -82,7 +82,7 @@
     },
     {
       "name": "application.base-url",
-      "type": "java.lang.String",
+      "type": "java.net.URL",
       "description": "Base URL of the application."
     }
   ]

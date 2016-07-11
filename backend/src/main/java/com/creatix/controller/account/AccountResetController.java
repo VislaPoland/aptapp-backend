@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
 
@@ -50,7 +51,7 @@ public class AccountResetController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/request-reset/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<Void> askPasswordReset(@RequestBody @Valid AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public DataResponse<Void> askPasswordReset(@RequestBody @Valid AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         accountService.resetPasswordFromRequest(request);
         return new DataResponse<>();
     }

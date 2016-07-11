@@ -1,5 +1,6 @@
 package com.creatix.service;
 
+import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.LoginResponse;
@@ -12,7 +13,8 @@ import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.EmailMessageSender;
 import com.creatix.message.MessageDeliveryException;
-import com.creatix.message.template.ActivationMessageTemplate;
+import com.creatix.message.template.EmployeeActivationMessageTemplate;
+import com.creatix.message.template.PropertyOwnerActivationMessageTemplate;
 import com.creatix.message.template.ResetPasswordMessageTemplate;
 import com.creatix.security.*;
 import freemarker.template.TemplateException;
@@ -29,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -64,6 +67,8 @@ public class AccountService {
     private ManagedEmployeeDao managedEmployeeDao;
     @Autowired
     private AccountDeviceService accountDeviceService;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -292,7 +297,7 @@ public class AccountService {
     }
 
     @RoleSecured(AccountRole.Administrator)
-    public Account createPropertyOwner(@NotNull PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public Account createPropertyOwner(@NotNull PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
@@ -303,7 +308,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new ActivationMessageTemplate(account));
+        emailMessageSender.send(new PropertyOwnerActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
 
         return account;
     }
@@ -325,7 +330,7 @@ public class AccountService {
     }
 
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public PropertyManager createPropertyManager(@NotNull PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public PropertyManager createPropertyManager(@NotNull PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
@@ -348,7 +353,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new ActivationMessageTemplate(account));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
 
         return account;
     }
@@ -384,7 +389,7 @@ public class AccountService {
     }
 
     @RoleSecured({AccountRole.PropertyManager})
-    public ManagedEmployee createSecurityGuy(@NotNull PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public ManagedEmployee createSecurityGuy(@NotNull PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
@@ -398,7 +403,7 @@ public class AccountService {
         managedEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new ActivationMessageTemplate(account));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
 
         return account;
     }
@@ -420,7 +425,7 @@ public class AccountService {
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
-    public ManagedEmployee createMaintenanceGuy(@NotNull PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public ManagedEmployee createMaintenanceGuy(@NotNull PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
@@ -434,7 +439,7 @@ public class AccountService {
         managedEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new ActivationMessageTemplate(account));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
 
         return account;
     }
@@ -456,7 +461,7 @@ public class AccountService {
     }
 
     @RoleSecured({AccountRole.PropertyManager})
-    public ManagedEmployee createAssistantPropertyManager(@NotNull PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public ManagedEmployee createAssistantPropertyManager(@NotNull PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
@@ -470,7 +475,7 @@ public class AccountService {
         managedEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new ActivationMessageTemplate(account));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBaseUrl()));
 
         return account;
     }
@@ -491,13 +496,13 @@ public class AccountService {
         return account;
     }
 
-    public boolean resetPasswordFromRequest(@NotNull AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public boolean resetPasswordFromRequest(@NotNull AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
 
         final Account account = getAccount(request.getEmail());
         setActionToken(account);
         accountDao.persist(account);
-        emailMessageSender.send(new ResetPasswordMessageTemplate(account));
+        emailMessageSender.send(new ResetPasswordMessageTemplate(account, applicationProperties.getBaseUrl()));
 
         return true;
     }

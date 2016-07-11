@@ -49,7 +49,7 @@
                     <table style="box-sizing: border-box; border-collapse: separate !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                         <tr>
                             <td class="align-center" style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top; text-align: center;" valign="top" align="center">
-                                <a href="$(apt_url)" style="box-sizing: border-box; color: #348eda; text-decoration: underline;"><img src="http://rajnic.eu/img/aptapp_logo.png" height="100" alt="AptApp" style="-ms-interpolation-mode: bicubic; max-width: 100%;"></a>
+                                <a href="${applicationUrl}" style="box-sizing: border-box; color: #348eda; text-decoration: underline;"><img src="${logoUrl}" height="100" alt="AptApp" style="-ms-interpolation-mode: bicubic; max-width: 100%;"></a>
                             </td>
                         </tr>
                     </table>
@@ -60,17 +60,17 @@
                             <table style="box-sizing: border-box; border-collapse: separate !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                                 <tr>
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
-                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Hello $(user),</p>
+                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Hello ${name},</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Welcome to Apt. - a resourceful and reliable app, which will bridge the communication gap between tenants and property staff.</p>
-                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Here is the code you will need to activate your account: <br>$(activation_code)</p>
+                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Here is the code you will need to activate your account: <br>${activationToken}</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">We look forward to helping you to find quicker resolutions to regain valuable time.</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">-Apt.</p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
-                                        <p class="bottom" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; color: #031821; margin-bottom: 0; text-align: center; padding-bottom: 5px;"><img src="http://rajnic.eu/img/aptapp_icon.png" height="40" style="-ms-interpolation-mode: bicubic; max-width: 100%;"></p>
-                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. an app you can't live without. If you see ways we can do better, we would love to hear from you on our customer care page at </p>
+                                        <p class="bottom" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; color: #031821; margin-bottom: 0; text-align: center; padding-bottom: 5px;"><img src="${iconUrl}" height="40" style="-ms-interpolation-mode: bicubic; max-width: 100%;"></p>
+                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. an app you can't live without. If you see ways we can do better, we would love to hear from you on our customer care page at ${applicationUrl}</p>
                                     </td>
                                 </tr>
                             </table>
@@ -81,7 +81,7 @@
                     <table style="box-sizing: border-box; border-collapse: separate !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; color: #999999; font-size: 12px;" width="100%">
                         <tr style="color: #999999; font-size: 12px;">
                             <td class="align-center" style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; vertical-align: top; font-size: 12px; color: #999999; text-align: center; padding: 20px 0;" valign="top" align="center">
-                                <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-weight: normal; margin: 0; margin-bottom: 15px; font-size: 12px; color: #031821; text-align: center;"><a href="$(apt_url)" style="box-sizing: border-box; text-decoration: underline; color: #999999; font-size: 12px;">Visit AptApp site</a></p>
+                                <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-weight: normal; margin: 0; margin-bottom: 15px; font-size: 12px; color: #031821; text-align: center;"><a href="${applicationUrl}" style="box-sizing: border-box; text-decoration: underline; color: #999999; font-size: 12px;">Visit AptApp site</a></p>
                             </td>
                         </tr>
                     </table>

@@ -1,5 +1,6 @@
 package com.creatix.service;
 
+import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.tenant.CreateTenantRequest;
@@ -16,7 +17,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.TenantType;
 import com.creatix.message.EmailMessageSender;
 import com.creatix.message.MessageDeliveryException;
-import com.creatix.message.template.ActivationMessageTemplate;
+import com.creatix.message.template.TenantActivationMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import freemarker.template.TemplateException;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -55,6 +57,8 @@ public class TenantService {
     private AccountService accountService;
     @Autowired
     private EmailMessageSender emailMessageSender;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -65,7 +69,7 @@ public class TenantService {
     }
 
     @RoleSecured(AccountRole.PropertyManager)
-    public Tenant createTenantFromRequest(@NotNull CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException {
+    public Tenant createTenantFromRequest(@NotNull CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
@@ -86,7 +90,7 @@ public class TenantService {
 
         accountService.setActionToken(tenant);
 
-        emailMessageSender.send(new ActivationMessageTemplate(tenant));
+        emailMessageSender.send(new TenantActivationMessageTemplate(tenant, applicationProperties.getBaseUrl()));
 
         return tenant;
     }
