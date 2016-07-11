@@ -7,12 +7,15 @@ import com.creatix.domain.enums.AccountRole;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Account data transfer object
  */
 @ApiModel
-@Data
+@Getter
+@Setter
 public class AccountDto {
 
     @ApiModelProperty(value = "Account ID", required = true)

@@ -264,7 +264,6 @@ public class Mapper {
         mapperFactory.classMap(Tenant.class, TenantDto.class)
                 .byDefault()
                 .field("apartment.property", "property")
-                .field("subTenants", "subs")
                 .register();
 
         mapperFactory.classMap(Vehicle.class, VehicleDto.class)
