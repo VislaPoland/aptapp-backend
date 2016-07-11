@@ -1,5 +1,6 @@
 package com.creatix.domain;
 
+import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.dao.AssistantPropertyManagerDao;
 import com.creatix.domain.dao.ManagedEmployeeDao;
 import com.creatix.domain.dto.AddressDto;
@@ -63,6 +64,8 @@ public class Mapper {
     private AssistantPropertyManagerDao assistantPropertyManagerDao;
     @Autowired
     private HttpServletRequest httpRequest;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
 
     @Autowired
@@ -84,12 +87,7 @@ public class Mapper {
             }
         }
 
-        return new URL(
-                httpRequest.getScheme(),
-                host,
-                port,
-                Paths.get(httpRequest.getContextPath(), String.format("/api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString())
-                .toString();
+        return applicationProperties.buildAbsoluteUrl(String.format("/api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
     }
 
     private void configure(MapperFactory mapperFactory) {

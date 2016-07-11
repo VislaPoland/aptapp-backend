@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         MethodSecurityConfiguration.class,
         JpaConfiguration.class,
         SwaggerConfiguration.class,
+        ApplicationProperties.class,
 })
 @EnableConfigurationProperties({
         MailProperties.class,

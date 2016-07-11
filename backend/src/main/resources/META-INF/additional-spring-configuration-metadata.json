@@ -76,9 +76,14 @@
       "description": "Password to encrypt Apple push notification certificate."
     },
     {
-      "name": "pushnotifications.google-gcm-key",
+      "name": "pushnotifications.google-cloud-messaging-key",
       "type": "java.lang.String",
       "description": "Authentification key to Google GCM service."
     },
+    {
+      "name": "application.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL of the application."
+    }
   ]
 }
