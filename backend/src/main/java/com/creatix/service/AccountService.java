@@ -228,7 +228,7 @@ public class AccountService {
     }
 
     @RoleSecured
-    public void createAccountPasswordFromRequest(long accountId, @NotNull CreatePasswordRequest request) {
+    public Account createAccountPasswordFromRequest(long accountId, @NotNull CreatePasswordRequest request) {
         Objects.requireNonNull(request);
 
         final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
@@ -236,7 +236,9 @@ public class AccountService {
             if ( account.getPasswordHash() == null ) {
                 account.setPasswordHash(passwordEncoder.encode(request.getPassword()));
                 accountDao.persist(account);
+                return account;
             }
+            return null;
         }
         else {
             throw new SecurityException(String.format("You are not eligible to change user id=%d password", accountId));

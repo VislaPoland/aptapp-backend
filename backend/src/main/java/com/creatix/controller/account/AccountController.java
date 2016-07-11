@@ -109,9 +109,8 @@ public class AccountController {
     })
     @RequestMapping(value = "/{accountId}/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<Void> setPassword(@PathVariable long accountId, @RequestBody @Valid CreatePasswordRequest request) {
-        accountService.createAccountPasswordFromRequest(accountId, request);
-        return new DataResponse<>();
+    public DataResponse<AccountDto> setPassword(@PathVariable long accountId, @RequestBody @Valid CreatePasswordRequest request) {
+        return new DataResponse<>(mapper.toAccountDto(accountService.createAccountPasswordFromRequest(accountId, request)));
     }
 
     @ApiOperation(value = "Update user profile information")
