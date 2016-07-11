@@ -213,7 +213,7 @@ public class AccountService {
     }
 
     @RoleSecured
-    public void updateAccountPasswordFromRequest(long accountId, @NotNull UpdatePasswordRequest request) {
+    public Account updateAccountPasswordFromRequest(long accountId, @NotNull UpdatePasswordRequest request) {
         Objects.requireNonNull(request);
 
         final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
@@ -221,6 +221,7 @@ public class AccountService {
             authenticate(account.getPrimaryEmail(), request.getOldPassword());
             account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
             accountDao.persist(account);
+            return account;
         }
         else {
             throw new SecurityException(String.format("You are not eligible to change user=%d password", accountId));
