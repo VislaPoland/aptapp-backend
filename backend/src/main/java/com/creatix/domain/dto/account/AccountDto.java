@@ -45,9 +45,6 @@ public class AccountDto {
     @ApiModelProperty(value = "Company name")
     private String companyName;
 
-    @ApiModelProperty(value = "Address", required = true)
-    private AddressDto address;
-
     @ApiModelProperty(value = "Associated property details", notes = "This is required for tenant and property manager")
     private PropertyDetailsDto property;
 

@@ -19,9 +19,6 @@ public class ApartmentDto extends BasicApartmentDto {
     @ApiModelProperty(value = "Email address", required = true)
     private String primaryEmail;
 
-    @ApiModelProperty(value = "Address", required = true)
-    private AddressDto address;
-
     @ApiModelProperty(value = "Associated property ID", notes = "This is required for tenant and property manager")
     private Long propertyId;
 
