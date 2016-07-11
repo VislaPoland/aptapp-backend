@@ -8,7 +8,6 @@ public class PushNotificationProperties {
     private boolean appleSandbox;
     private String appleCertificatePath;
     private String appleCertificatePassword;
-
     private String googleCloudMessagingKey;
 
     public boolean isAppleSandbox() {
