@@ -242,9 +242,8 @@ public class AccountService {
             if ( account.getPasswordHash() == null ) {
                 account.setPasswordHash(passwordEncoder.encode(request.getPassword()));
                 accountDao.persist(account);
-                return account;
             }
-            return null;
+            return account;
         }
         else {
             throw new SecurityException(String.format("You are not eligible to change user id=%d password", accountId));
