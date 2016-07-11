@@ -1,5 +1,6 @@
 package com.creatix.controller.account.device;
 
+import com.creatix.configuration.DeviceProperties;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.account.device.AccountDeviceDto;
 import com.creatix.domain.entity.store.account.device.Device;
@@ -22,6 +23,9 @@ import javax.validation.Valid;
 public class AccountDeviceController {
 
     @Autowired
+    private DeviceProperties deviceProperties;
+
+    @Autowired
     private AccountDeviceService accountDeviceService;
 
     @Autowired
@@ -36,7 +40,7 @@ public class AccountDeviceController {
     @RoleSecured()
     @RequestMapping(value = "/notifications", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<Boolean> register(@PathVariable Long accountId, @RequestBody @Valid AccountDeviceDto request) {
-        Object deviceObject = httpSession.getAttribute("device");
+        Object deviceObject = httpSession.getAttribute(this.deviceProperties.getSessionKeyDevice());
         if (deviceObject instanceof Device == false) {
             throw new SecurityException("Device is not recognized.");
         }
