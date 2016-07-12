@@ -10,9 +10,11 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 @Transactional
@@ -24,9 +26,9 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
                 .fetch();
     }
 
-    private Predicate filtersPredicate(final QMaintenanceNotification maintenanceNotification, NotificationStatus status,
-                                       NotificationRequestType type, Account a) {
-        final BooleanExpression predicate = maintenanceNotification.status.eq(status);
+    private Predicate filtersPredicate(@NotNull QMaintenanceNotification maintenanceNotification, NotificationStatus status,
+                                       @NotNull NotificationRequestType type, @NotNull Account a) {
+        final BooleanExpression predicate = (status != null ? maintenanceNotification.status.eq(status) : maintenanceNotification.status.isNotNull());
         switch (type) {
             case Sent:
                 return predicate.and(maintenanceNotification.author.eq(a));
@@ -48,7 +50,10 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
         }
     }
 
-    public long countByStatusAndType(NotificationStatus status, NotificationRequestType type, Account account) {
+    public long countByStatusAndType(NotificationStatus status, @NotNull NotificationRequestType type, @NotNull Account account) {
+        Objects.requireNonNull(type);
+        Objects.requireNonNull(account);
+
         final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;
 
         Predicate predicate = filtersPredicate(maintenanceNotification, status, type, account);
