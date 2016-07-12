@@ -542,6 +542,11 @@ public class Mapper {
         return mapperFactory.getMapperFacade().map(slot, EventSlotDto.class);
     }
 
+    public SlotDto toSlotDto(@NotNull Slot slot) {
+        Objects.requireNonNull(slot);
+        return mapperFactory.getMapperFacade().map(slot, SlotDto.class);
+    }
+
     public <T, R> PageableDataResponse<List<R>> toPageableDataResponse(@NotNull PageableDataResponse<List<T>> response, @NotNull Function<T, R> mappingFunction) {
         Objects.requireNonNull(response);
         Objects.requireNonNull(mappingFunction);

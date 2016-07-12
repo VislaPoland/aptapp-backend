@@ -6,16 +6,21 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
+import com.creatix.domain.dto.property.slot.EventSlotDto;
+import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
 import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.SlotService;
 import com.creatix.service.apartment.ApartmentService;
 import com.creatix.service.property.PropertyService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,6 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +44,8 @@ public class PropertyController {
     private Mapper mapper;
     @Autowired
     private PropertyService propertyService;
+    @Autowired
+    private SlotService slotService;
     @Autowired
     private ApartmentService apartmentService;
 
@@ -142,5 +151,23 @@ public class PropertyController {
         headers.setContentLength(fileData.length);
 
         return new HttpEntity<>(fileData, headers);
+    }
+
+    @ApiOperation(value = "Get events", notes = "Get all events for single property")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RequestMapping(path = "/{propertyId}/schedule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<ScheduledSlotsResponse> getEvents(
+            @PathVariable Long propertyId,
+            @ApiParam(example = "2016-07-07") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDt,
+            @ApiParam(example = "2016-07-07") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDt,
+            @ApiParam @RequestParam(required = false) Long startId,
+            @ApiParam @RequestParam(required = false) Integer pageSize) {
+
+        return new DataResponse<>(slotService.getSlotsByFilter(propertyId, beginDt, endDt, startId, pageSize));
     }
 }

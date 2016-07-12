@@ -1,8 +1,10 @@
 package com.creatix.service;
 
+import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
 import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
+import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
@@ -16,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -40,6 +41,57 @@ public class SlotService {
     private EventSlotDao eventSlotDao;
     @Autowired
     private PropertyService propertyService;
+    @Autowired
+    private SlotDao slotDao;
+    @Autowired
+    private Mapper mapper;
+
+    public ScheduledSlotsResponse getSlotsByFilter(@NotNull Long propertyId, LocalDate beginDate, LocalDate endDate, Long startId, Integer pageSize) {
+        Objects.requireNonNull(propertyId, "Property id is required");
+
+        final Property property = propertyService.getProperty(propertyId);
+
+        final List<Slot> slots;
+
+        if ( (beginDate != null) && (endDate != null) ) {
+            final OffsetDateTime beginDt = beginDate.atStartOfDay(property.getZoneOffset(beginDate.atStartOfDay())).toOffsetDateTime();
+            final OffsetDateTime endDt = endDate.atStartOfDay(property.getZoneOffset(endDate.atStartOfDay())).toOffsetDateTime()
+                    .withHour(23).withMinute(59).withSecond(59);
+            slots = slotDao.findByPropertyAndDateRange(property, beginDt, endDt);
+        }
+        else if ( (startId != null) && (pageSize != null) ) {
+            final Slot slot = slotDao.findById(startId);
+            if ( slot == null ) {
+                throw new EntityNotFoundException(String.format("Slot id=%d not found", startId));
+            }
+
+            slots = slotDao.findByPropertyAndBeginTime(property, slot.getBeginTime(), pageSize + 1);
+        }
+        else {
+            if ( pageSize == null ) {
+                throw new IllegalArgumentException("Page size is required");
+            }
+            slots = slotDao.findByPropertyAndBeginTime(property, OffsetDateTime.now(), pageSize + 1);
+        }
+
+        final ScheduledSlotsResponse result = new ScheduledSlotsResponse();
+        if ( pageSize != null ) {
+            result.setSlots(slots.stream()
+                    .limit(pageSize)
+                    .map(s -> mapper.toSlotDto(s))
+                    .collect(Collectors.toList()));
+            if ( slots.size() > pageSize ) {
+                result.setNextId(slots.get(pageSize).getId());
+            }
+        }
+        else {
+            result.setSlots(slots.stream()
+                    .map(s -> mapper.toSlotDto(s))
+                    .collect(Collectors.toList()));
+        }
+
+        return result;
+    }
 
     public EventSlot createEventSlot(@NotNull Long propertyId, @NotNull PersistEventSlotRequest request) {
         Objects.requireNonNull(propertyId);

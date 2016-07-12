@@ -10,8 +10,13 @@ import java.util.List;
 @ApiModel
 @Data
 public abstract class SlotDto {
+
+    public enum SlotType {
+        Event, Maintenance
+    }
+
     @ApiModelProperty(value = "Slot ID", required = true)
-    private long id;
+    private Long id;
     @ApiModelProperty(value = "Begin time of the slot", required = true, dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
     private OffsetDateTime beginTime;
     @ApiModelProperty(value = "Start time of the slot", required = true, dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
@@ -20,4 +25,7 @@ public abstract class SlotDto {
     private int unitDurationMinutes;
     @ApiModelProperty(value = "Slot units", required = true)
     private List<SlotUnitDto> units;
+
+    @ApiModelProperty(value = "Slot type", required = true)
+    public abstract SlotType getType();
 }

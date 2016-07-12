@@ -13,4 +13,9 @@ public class EventSlotDto extends SlotDto {
     private String title;
     @ApiModelProperty(value = "Description")
     private String description;
+
+    @Override
+    public SlotType getType() {
+        return SlotType.Event;
+    }
 }

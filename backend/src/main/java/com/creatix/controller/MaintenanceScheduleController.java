@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @RestController
 @Transactional
 @RequestMapping("/api/properties/{propertyId}/schedule")
-public class PropertyScheduleController {
+public class MaintenanceScheduleController {
     @Autowired
     private SlotService slotService;
     @Autowired

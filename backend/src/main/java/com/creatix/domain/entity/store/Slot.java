@@ -2,6 +2,7 @@ package com.creatix.domain.entity.store;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.FilterDefs;
@@ -25,6 +26,7 @@ import java.util.Set;
 )
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(of = {"id", "beginTime", "endTime"})
 @FilterDefs({
         @FilterDef(name= Slot.SLOT_BEGIN_TIME_BETWEEN, parameters={
                 @ParamDef(name="fromDt", type="java.util.Date" ),

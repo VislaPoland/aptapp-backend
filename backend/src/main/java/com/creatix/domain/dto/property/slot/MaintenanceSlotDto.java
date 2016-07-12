@@ -13,4 +13,9 @@ import java.util.List;
 public class MaintenanceSlotDto extends SlotDto {
     @ApiModelProperty(value = "Slot reservations")
     private List<MaintenanceReservationDto> reservations;
+
+    @Override
+    public SlotType getType() {
+        return SlotType.Maintenance;
+    }
 }
