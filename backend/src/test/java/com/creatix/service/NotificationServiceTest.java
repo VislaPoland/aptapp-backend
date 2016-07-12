@@ -7,6 +7,7 @@ import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotifi
 import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
 import com.creatix.domain.entity.store.notification.Notification;
 import com.creatix.mock.WithMockCustomUser;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class NotificationServiceTest {
         assertNotNull(notification.getPhotos());
         assertEquals(1, notification.getPhotos().size());
         assertNotNull(notification.getPhotos().get(0).getId());
-        assertEquals("test.jpg", notification.getPhotos().get(0).getFileName());
+        assertTrue(StringUtils.endsWith(notification.getPhotos().get(0).getFileName(), "test.jpg"));
     }
 
     @Test
