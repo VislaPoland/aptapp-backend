@@ -60,7 +60,7 @@ public class ApartmentService {
         return apartment;
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.Administrator})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public Apartment createApartment(@NotNull Long propertyId, @NotNull PersistApartmentRequest request) {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(request);
@@ -79,7 +79,7 @@ public class ApartmentService {
         return apartment;
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.Administrator})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public Apartment updateApartment(@NotNull Long apartmentId, @NotNull PersistApartmentRequest request) {
         Objects.requireNonNull(apartmentId);
         Objects.requireNonNull(request);
