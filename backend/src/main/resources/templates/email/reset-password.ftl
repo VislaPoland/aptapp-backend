@@ -69,7 +69,7 @@
                                                     <table cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: separate !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
                                                         <tr>
                                                             <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #F2C900;" valign="top" bgcolor="#F2C900" align="center">
-                                                                <a href="${resetUrl}" style="box-sizing: border-box; display: inline-block; text-decoration: none; text-transform: capitalize; border: solid 1px #348eda; border-radius: 5px; cursor: pointer; padding: 12px 25px; font-size: 14px; font-weight: bold; margin: 0; color: #031821; background-color: #F2C900; border-color: #F2C900;">Reset password</a>
+                                                                <a href="${resetPasswordPageUrl}" style="box-sizing: border-box; display: inline-block; text-decoration: none; text-transform: capitalize; border: solid 1px #348eda; border-radius: 5px; cursor: pointer; padding: 12px 25px; font-size: 14px; font-weight: bold; margin: 0; color: #031821; background-color: #F2C900; border-color: #F2C900;">Reset password</a>
                                                             </td>
                                                         </tr>
                                                     </table>

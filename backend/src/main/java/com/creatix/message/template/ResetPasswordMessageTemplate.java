@@ -8,11 +8,13 @@ import java.net.URL;
 public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
 
     private final Account account;
-    private final URL baseUrl;
+    private final URL backendUrl;
+    private final URL frontendUrl;
 
-    public ResetPasswordMessageTemplate(Account account, URL baseUrl) {
+    public ResetPasswordMessageTemplate(Account account, URL backendUrl, URL frontendUrl) {
         this.account = account;
-        this.baseUrl = baseUrl;
+        this.backendUrl = backendUrl;
+        this.frontendUrl = frontendUrl;
     }
 
     @Override
@@ -38,16 +40,16 @@ public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
         return account.getActionToken();
     }
 
-    public String getApplicationUrl() {
-        return baseUrl.toString();
+    public String getResetPasswordPageUrl() throws MalformedURLException {
+        return new URL(frontendUrl, String.format("/reset-password/token/%s", account.getActionToken())).toString();
     }
 
     public String getLogoUrl() throws MalformedURLException {
-        return new URL(baseUrl, "/static/images/aptapp_logo.png").toString();
+        return new URL(backendUrl, "/static/images/aptapp_logo.png").toString();
     }
 
     public String getIconUrl() throws MalformedURLException {
-        return new URL(baseUrl, "/static/images/aptapp_icon.png").toString();
+        return new URL(backendUrl, "/static/images/aptapp_icon.png").toString();
     }
 }
 
