@@ -95,10 +95,10 @@ public class AccountController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(value = "/{accountId}/password", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/me/password", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<AccountDto> changePassword(@PathVariable long accountId, @RequestBody @Valid UpdatePasswordRequest request) {
-        return new DataResponse<>(mapper.toAccountDto(accountService.updateAccountPasswordFromRequest(accountId, request)));
+    public DataResponse<AccountDto> changePassword(@RequestBody @Valid UpdatePasswordRequest request) {
+        return new DataResponse<>(mapper.toAccountDto(accountService.updateAccountPasswordFromRequest(request)));
     }
 
     @ApiOperation(value = "First time set password")
@@ -107,10 +107,10 @@ public class AccountController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(value = "/{accountId}/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/me/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<AccountDto> setPassword(@PathVariable long accountId, @RequestBody @Valid CreatePasswordRequest request) {
-        return new DataResponse<>(mapper.toAccountDto(accountService.createAccountPasswordFromRequest(accountId, request)));
+    public DataResponse<AccountDto> setPassword(@RequestBody @Valid CreatePasswordRequest request) {
+        return new DataResponse<>(mapper.toAccountDto(accountService.createAccountPasswordFromRequest(request)));
     }
 
     @ApiOperation(value = "Update user profile information")

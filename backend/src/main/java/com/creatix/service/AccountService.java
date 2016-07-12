@@ -218,36 +218,26 @@ public class AccountService {
     }
 
     @RoleSecured
-    public Account updateAccountPasswordFromRequest(long accountId, @NotNull UpdatePasswordRequest request) {
+    public Account updateAccountPasswordFromRequest(@NotNull UpdatePasswordRequest request) {
         Objects.requireNonNull(request);
 
-        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
-        if ( authorizationManager.isSelf(account) ) {
-            authenticate(account.getPrimaryEmail(), request.getOldPassword());
-            account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-            accountDao.persist(account);
-            return account;
-        }
-        else {
-            throw new SecurityException(String.format("You are not eligible to change user=%d password", accountId));
-        }
+        final Account account = authorizationManager.getCurrentAccount();
+        authenticate(account.getPrimaryEmail(), request.getOldPassword());
+        account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        accountDao.persist(account);
+        return account;
     }
 
     @RoleSecured
-    public Account createAccountPasswordFromRequest(long accountId, @NotNull CreatePasswordRequest request) {
+    public Account createAccountPasswordFromRequest(@NotNull CreatePasswordRequest request) {
         Objects.requireNonNull(request);
 
-        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
-        if ( authorizationManager.isSelf(account) ) {
-            if ( account.getPasswordHash() == null ) {
-                account.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-                accountDao.persist(account);
-            }
-            return account;
+        final Account account = authorizationManager.getCurrentAccount();
+        if ( account.getPasswordHash() == null ) {
+            account.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+            accountDao.persist(account);
         }
-        else {
-            throw new SecurityException(String.format("You are not eligible to change user id=%d password", accountId));
-        }
+        return account;
     }
 
     public void resetAccountPasswordFromRequest(@NotNull ResetPasswordRequest request) {
