@@ -8,10 +8,8 @@ import com.creatix.domain.dao.PropertyOwnerDao;
 import com.creatix.domain.dao.PropertyPhotoDao;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
-import com.creatix.domain.entity.store.PropertyPhoto;
-import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.PropertyStatus;
@@ -51,30 +49,10 @@ public class PropertyService {
     @Autowired
     private PropertyPhotoDao propertyPhotoDao;
 
-    private boolean isEligibleToReadProperty(Property property, Account account) {
-        switch (account.getRole()) {
-            case Administrator:
-                return true;
-            case PropertyOwner:
-                return property.getOwner().equals(account);
-            case PropertyManager:
-                //noinspection SuspiciousMethodCalls
-                return property.getManagers().contains(account);
-            case AssistantPropertyManager:
-                return property.getManagers().contains(((ManagedEmployee) account).getManager());
-            default:
-                return false;
-        }
-    }
-
-    // same as read accessibility except Administrator
-    private boolean isEligibleToUpdateProperty(Property property, Account account) {
-        return !account.getRole().equals(AccountRole.Administrator) && isEligibleToReadProperty(property, account);
-    }
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
-        if (item == null) {
+        if ( item == null ) {
             throw ex;
         }
         return item;
@@ -83,7 +61,7 @@ public class PropertyService {
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public List<Property> getAllProperties() {
         return propertyDao.findAll().stream()
-                .filter(p -> isEligibleToReadProperty(p, authorizationManager.getCurrentAccount()))
+                .filter(p -> authorizationManager.isEligibleToReadProperty(p))
                 .collect(Collectors.toList());
     }
 
@@ -109,10 +87,10 @@ public class PropertyService {
 
         final Property property = getOrElseThrow(propertyId, propertyDao, new EntityNotFoundException(String.format("Property %d not found", propertyId)));
 
-        if (isEligibleToUpdateProperty(property, authorizationManager.getCurrentAccount())) {
-            if (request.getPropertyOwnerId() != null) {
+        if ( authorizationManager.isEligibleToUpdateProperty(property) ) {
+            if ( request.getPropertyOwnerId() != null ) {
                 final PropertyOwner propertyOwner = propertyOwnerDao.findById(request.getPropertyOwnerId());
-                if (propertyOwner == null) {
+                if ( propertyOwner == null ) {
                     throw new EntityNotFoundException(String.format("Property owner %d not found", request.getPropertyOwnerId()));
                 }
                 property.setOwner(propertyOwner);
@@ -140,7 +118,7 @@ public class PropertyService {
     public Property getProperty(@NotNull Long propertyId) {
         Objects.requireNonNull(propertyId);
         final Property property = this.propertyDao.findById(propertyId);
-        if (property == null) {
+        if ( property == null ) {
             throw new EntityNotFoundException(String.format("Property id=%d not found", propertyId));
         }
         authorizationManager.checkAccess(property);
@@ -149,12 +127,11 @@ public class PropertyService {
     }
 
 
-
     public Property storePropertyPhotos(MultipartFile[] files, long propertyId) throws IOException {
 
         final Property property = getProperty(propertyId);
 
-        for (MultipartFile file : files) {
+        for ( MultipartFile file : files ) {
 
             // move uploaded file to file repository
             final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), String.format("%d-%d-%s", property.getId(), property.getPhotos().size(), file.getOriginalFilename()));
@@ -175,7 +152,7 @@ public class PropertyService {
     public PropertyPhoto getPropertyPhoto(long propertyPhotoId) {
 
         final PropertyPhoto photo = propertyPhotoDao.findById(propertyPhotoId);
-        if (photo == null) {
+        if ( photo == null ) {
             throw new EntityNotFoundException(String.format("Photo id=%d not found", propertyPhotoId));
         }
 

@@ -73,7 +73,7 @@ public class PropertyController {
     })
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator})
-    public DataResponse<PropertyDetailsDto> createProperty(@Valid @RequestBody CreatePropertyRequest request) {
+    public DataResponse<PropertyDetailsDto> createProperty(@RequestBody @Valid CreatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.createFromRequest(request)));
     }
 
@@ -85,7 +85,7 @@ public class PropertyController {
     })
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<PropertyDetailsDto> updateProperty(@PathVariable Long propertyId, @Valid @RequestBody UpdatePropertyRequest request) {
+    public DataResponse<PropertyDetailsDto> updateProperty(@PathVariable Long propertyId, @RequestBody @Valid UpdatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.updateFromRequest(propertyId, request)));
     }
 

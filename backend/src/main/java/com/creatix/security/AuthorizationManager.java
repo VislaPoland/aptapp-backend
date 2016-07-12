@@ -201,4 +201,26 @@ public class AuthorizationManager {
         */
     }
 
+    public boolean isEligibleToReadProperty(Property property) {
+        final Account account = getCurrentAccount();
+        switch ( account.getRole() ) {
+            case Administrator:
+                return true;
+            case PropertyOwner:
+                return property.getOwner().equals(account);
+            case PropertyManager:
+                //noinspection SuspiciousMethodCalls
+                return property.getManagers().contains(account);
+            case AssistantPropertyManager:
+                return property.getManagers().contains(((ManagedEmployee) account).getManager());
+            default:
+                return false;
+        }
+    }
+
+    // same as read accessibility except Administrator
+    public boolean isEligibleToUpdateProperty(Property property) {
+        final Account account = getCurrentAccount();
+        return !account.getRole().equals(AccountRole.Administrator) && isEligibleToReadProperty(property);
+    }
 }

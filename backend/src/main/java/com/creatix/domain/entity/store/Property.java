@@ -53,6 +53,10 @@ public class Property {
     @NotNull
     private PropertyOwner owner;
 
+    @Column
+    @NotNull
+    private Boolean enableSms;
+
     @OneToMany(mappedBy = "managedProperty")
     private Set<PropertyManager> managers;
 

@@ -26,4 +26,7 @@ public class CreatePropertyRequest {
 
     @ApiModelProperty(value = "Time zone of the property")
     private String timeZone;
+
+    @ApiModelProperty(value = "Enable/disable sms notifications", required = true, notes = "Indicate that sms message notifications are enabled/disabled")
+    private Boolean enableSms;
 }
