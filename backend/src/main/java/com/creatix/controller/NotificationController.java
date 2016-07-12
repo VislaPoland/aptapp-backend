@@ -17,8 +17,10 @@ import com.creatix.domain.entity.store.notification.NotificationPhoto;
 import com.creatix.domain.entity.store.notification.SecurityNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
+import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.NotificationService;
+import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -201,9 +203,8 @@ public class NotificationController {
     })
     @RequestMapping(path = "/neighborhood", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
-    public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@RequestBody @Valid CreateNeighborhoodNotificationRequest dto) {
-        NeighborhoodNotification n = mapper.fromNeighborhoodNotificationRequest(dto);
-        return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(dto.getUnitNumber(), n)));
+    public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@RequestBody @Valid CreateNeighborhoodNotificationRequest dto) throws MessageDeliveryException, TemplateException, IOException {
+        return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(dto.getUnitNumber(), mapper.fromNeighborhoodNotificationRequest(dto))));
     }
 
 

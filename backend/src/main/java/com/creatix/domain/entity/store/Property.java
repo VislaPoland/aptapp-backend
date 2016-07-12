@@ -53,7 +53,7 @@ public class Property {
     @NotNull
     private PropertyOwner owner;
 
-    @Column
+    @Column(nullable = false)
     @NotNull
     private Boolean enableSms;
 

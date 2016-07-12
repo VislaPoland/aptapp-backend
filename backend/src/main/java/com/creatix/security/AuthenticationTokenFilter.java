@@ -2,8 +2,10 @@ package com.creatix.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +55,9 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+        else if ( SecurityContextHolder.getContext().getAuthentication() == null ) {
+            SecurityContextHolder.getContext().setAuthentication(new AnonymousAuthenticationToken("anonymousToken", "anonymous", anonymousAuthority()));
+        }
 
         chain.doFilter(request, response);
     }
@@ -79,5 +86,11 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
         }
 
         return null;
+    }
+
+    private static List<GrantedAuthority> anonymousAuthority() {
+        final List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS"));
+        return authorities;
     }
 }

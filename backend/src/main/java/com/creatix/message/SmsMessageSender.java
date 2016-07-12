@@ -7,6 +7,7 @@ import com.twilio.sdk.type.PhoneNumber;
 import com.twilio.sdk.resource.api.v2010.account.Message;
 import com.twilio.sdk.creator.api.v2010.account.MessageCreator;
 import freemarker.template.TemplateException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,17 @@ public class SmsMessageSender {
      * @param body SMS message text. Example: "Hello from Java"
      * @param recipientPhone SMS recipient phone number. Example: "+12345678901"
      */
-    public void send(String body, String recipientPhone) throws MessageDeliveryException {
+    private void send(String body, String recipientPhone) throws MessageDeliveryException {
+
+        if ( StringUtils.isBlank(twilioProperties.getAccountSid()) ) {
+            throw new IllegalStateException("Missing account sid configuration");
+        }
+        if ( StringUtils.isBlank(twilioProperties.getAuthToken()) ) {
+            throw new IllegalStateException("Missing auth token configuration");
+        }
+        if ( StringUtils.isBlank(twilioProperties.getFrom()) ) {
+            throw new IllegalStateException("Missing from number configuration");
+        }
 
         if ( !(isInitialized) ) {
             Twilio.init(twilioProperties.getAccountSid(), twilioProperties.getAuthToken());

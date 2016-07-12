@@ -2,7 +2,11 @@ package com.creatix.service;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
+import com.creatix.domain.Mapper;
+import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
+import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
 import com.creatix.domain.entity.store.notification.Notification;
+import com.creatix.mock.WithMockCustomUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Date;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -26,6 +33,8 @@ public class NotificationServiceTest {
 
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private Mapper mapper;
 
     @Test
     public void storeNotificationPhotos() throws Exception {
@@ -40,4 +49,19 @@ public class NotificationServiceTest {
         assertEquals("test.jpg", notification.getPhotos().get(0).getFileName());
     }
 
+    @Test
+    @WithMockCustomUser("apt@test.com")
+    public void saveNeighborhoodNotification() throws Exception {
+        final CreateNeighborhoodNotificationRequest request = new CreateNeighborhoodNotificationRequest();
+        request.setDate(new Date());
+        request.setTitle("Complaint");
+        request.setDescription("Your dog is too loud!");
+        request.setUnitNumber("21");
+        final NeighborhoodNotification notification = notificationService.saveNeighborhoodNotification(request.getUnitNumber(), mapper.fromNeighborhoodNotificationRequest(request));
+        assertNotNull(notification);
+        assertNotNull(notification.getId());
+        assertEquals("Complaint", notification.getTitle());
+        assertEquals("Your dog is too loud!", notification.getDescription());
+        assertTrue((notification.getPhotos() == null) || notification.getPhotos().isEmpty());
+    }
 }

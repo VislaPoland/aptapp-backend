@@ -14,10 +14,10 @@ INSERT INTO public.account (dtype, id, active, company_name, first_name, last_na
 INSERT INTO public.address (id, house_number, state, street_name, town, zip_code) VALUES (1, '747', 'IL', 'Main Street', 'Chicago', '606609');
 
 -- property schedule
-INSERT INTO public.property_schedule(id, start_hour, start_minute, end_hour, end_minute, slots_per_period, period_length) VALUES (1, 9, 0, 17, 0, 8, 30);
+INSERT INTO public.maintenance_slot_schedule(id, begin_time, end_time, initial_capacity, time_zone, unit_duration_minutes) VALUES (1, '09:00', '17:00', 1, 'UTC', 30);
 
 -- property
-INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id, time_zone) VALUES (1, 'South Water Apartments', 'Active', 1, 1, 1, 'America/Chicago');
+INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id, time_zone, enable_sms) VALUES (1, 'South Water Apartments', 'Active', 1, 1, 1, 'America/Chicago', true);
 
 -- property contacts
 INSERT INTO public.contact (id, communication_type, type, value) VALUES (1, 'Email', 'OtherUseful', 'southwater@apartments.com');
@@ -133,7 +133,8 @@ UPDATE public.apartment SET left_id = 35, right_id = 37, below_id = 26 WHERE id 
 UPDATE public.apartment SET left_id = 36, below_id = 27 WHERE id = 37;
 
 -- tenant
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at) VALUES ('Tenant', 3, false, 'South Water Apartments', 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt@test.com', '(905) 545-0256', 'Tenant', 'Owner', 22, '123456', '2017-06-16 15:36:38', '2016-06-16 15:36:38');
+INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 3, false, 'South Water Apartments', 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt@test.com', '(905) 545-0256', 'Tenant', 'Owner', 22, '123456', '2017-06-16 15:36:38', '2016-06-16 15:36:38', false);
+INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 451, true, 'South Water Apartments', 'Tomas', 'Sedlak', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'tomas.sedlak@thinkcreatix.com', '+421948519283', 'Tenant', 'Owner', 21, null, null, '2016-06-16 15:36:38', true);
 
 
 -- notification

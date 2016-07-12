@@ -6,23 +6,25 @@ import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.NotificationRequestType;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.PropertyManager;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
+import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.SmsMessageSender;
+import com.creatix.message.template.NeighborNotification;
 import com.creatix.security.AuthorizationManager;
-import com.creatix.security.RoleSecured;
+import com.twilio.sdk.exception.ApiException;
+import freemarker.template.TemplateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -32,6 +34,9 @@ import java.util.Objects;
 @Service
 @Transactional
 public class NotificationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+
     @Autowired
     private NotificationDao notificationDao;
     @Autowired
@@ -48,6 +53,8 @@ public class NotificationService {
     private FileUploadProperties uploadProperties;
     @Autowired
     private NotificationPhotoDao notificationPhotoDao;
+    @Autowired
+    private SmsMessageSender smsMessageSender;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -150,7 +157,7 @@ public class NotificationService {
         return notification;
     }
 
-    public NeighborhoodNotification saveNeighborhoodNotification(@NotNull String targetUnitNumber, @NotNull NeighborhoodNotification notification) {
+    public NeighborhoodNotification saveNeighborhoodNotification(@NotNull String targetUnitNumber, @NotNull NeighborhoodNotification notification) throws MessageDeliveryException, TemplateException, IOException {
         Objects.requireNonNull(targetUnitNumber);
         Objects.requireNonNull(notification);
 
@@ -158,8 +165,17 @@ public class NotificationService {
         notification.setAuthor(authorizationManager.getCurrentAccount());
         notification.setProperty(authorizationManager.getCurrentProperty());
         notification.setStatus(NotificationStatus.Pending);
-        notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
+        final Apartment targetApartment = getApartmentByUnitNumber(targetUnitNumber);
+        notification.setTargetApartment(targetApartment);
         neighborhoodNotificationDao.persist(notification);
+
+        try {
+            smsMessageSender.send(new NeighborNotification(targetApartment.getTenant()));
+        }
+        catch ( ApiException ex ) {
+            logger.warn("Failed to send sms notification", ex);
+        }
+
         return notification;
     }
 
