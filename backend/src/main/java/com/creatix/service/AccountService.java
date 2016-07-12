@@ -166,7 +166,7 @@ public class AccountService {
         return getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
     }
 
-    public Account getAccountByToken(String actionToken) {
+    private Account getAccountByToken(String actionToken) {
         final Account account = accountDao.findByActionToken(actionToken);
         if ( account == null ) {
             throw new SecurityException(String.format("Action token=%s is not valid", actionToken));
@@ -229,10 +229,15 @@ public class AccountService {
         Objects.requireNonNull(request);
 
         final Account account = authorizationManager.getCurrentAccount();
-        authenticate(account.getPrimaryEmail(), request.getOldPassword());
-        account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-        accountDao.persist(account);
-        return account;
+        if ( passwordEncoder.matches(request.getOldPassword(), account.getPasswordHash()) ) {
+            authenticate(account.getPrimaryEmail(), request.getOldPassword());
+            account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+            accountDao.persist(account);
+            return account;
+        }
+        else {
+            throw new IllegalArgumentException("Old password is not correct");
+        }
     }
 
     @RoleSecured
@@ -330,7 +335,7 @@ public class AccountService {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
-        Property managedProperty = null;
+        Property managedProperty;
         if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
             Objects.requireNonNull(request.getManagedPropertyId());
 
@@ -359,8 +364,8 @@ public class AccountService {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
 
-        Property managedProperty = null;
-        PropertyManager account = null;
+        Property managedProperty;
+        PropertyManager account;
         if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
             Objects.requireNonNull(request.getManagedPropertyId());
 
