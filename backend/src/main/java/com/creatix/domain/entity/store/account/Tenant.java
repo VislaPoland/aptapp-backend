@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
@@ -29,6 +30,10 @@ public class Tenant extends TenantBase {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Apartment apartment;
+
+    @Column
+    @NotNull
+    private Boolean enableSms;
 
     @Transient
     public Address getAddress() {

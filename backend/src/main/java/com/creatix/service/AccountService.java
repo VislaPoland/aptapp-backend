@@ -6,10 +6,7 @@ import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.*;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.ManagedEmployee;
-import com.creatix.domain.entity.store.account.PropertyManager;
-import com.creatix.domain.entity.store.account.PropertyOwner;
+import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.EmailMessageSender;
 import com.creatix.message.MessageDeliveryException;
@@ -195,10 +192,20 @@ public class AccountService {
         return account;
     }
 
-    public Account updateAccount(Account account, UpdateAccountProfileRequest accountDto) {
-        account.setSecondaryEmail(accountDto.getSecondaryEmail());
-        account.setSecondaryPhone(accountDto.getSecondaryPhone());
+    @RoleSecured
+    public Account updateAccount(@NotNull Account account, @NotNull UpdateAccountProfileRequest request) {
+        Objects.requireNonNull(account, "Account is null");
+        Objects.requireNonNull(request, "Request is null");
 
+        if ( account instanceof Tenant ) {
+            if ( request.getEnableSms() == null ) {
+                throw new IllegalArgumentException("Enable sms parameter is required");
+            }
+            final Tenant tenant = (Tenant) account;
+            tenant.setEnableSms(request.getEnableSms());
+        }
+
+        mapper.fillAccount(request, account);
         accountDao.persist(account);
 
         return account;
@@ -208,13 +215,13 @@ public class AccountService {
     public Account updateAccountFromRequest(long accountId, @NotNull UpdateAccountProfileRequest request) {
         Objects.requireNonNull(request);
 
-        Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        final Account account = getAccount(accountId);
         if ( authorizationManager.isSelf(account) ) {
-            mapper.fillAccount(request, account);
-            accountDao.persist(account);
-            return account;
+            return updateAccount(account, request);
         }
-        throw new SecurityException(String.format("You are not eligible to change user=%d password", accountId));
+        else {
+            throw new SecurityException(String.format("You are not eligible to change user=%d password", accountId));
+        }
     }
 
     @RoleSecured

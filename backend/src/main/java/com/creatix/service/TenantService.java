@@ -84,6 +84,7 @@ public class TenantService {
         tenant.setApartment(apartment);
         tenant.setActive(false);
         tenant.setRole(AccountRole.Tenant);
+        tenant.setEnableSms(true);
         tenantDao.persist(tenant);
         apartment.setTenant(tenant);
         apartmentDao.persist(apartment);

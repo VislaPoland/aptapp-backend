@@ -71,8 +71,7 @@ public class AccountController {
     @RequestMapping(value = "/{accountId}/profile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<AccountDto> getProfile(@PathVariable Long accountId) {
-        Account account = accountService.getAccount(accountId);
-        return new DataResponse<>(mapper.toAccountDto(account));
+        return new DataResponse<>(mapper.toAccountDto(accountService.getAccount(accountId)));
     }
 
     @ApiOperation(value = "Update self profile information")
@@ -83,10 +82,7 @@ public class AccountController {
     })
     @RequestMapping(value = "/me/profile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> updateSelfProfile(@RequestBody @Valid UpdateAccountProfileRequest request) {
-        Account account = authorizationManager.getCurrentAccount();
-        account = accountService.updateAccount(account, request);
-
-        return new DataResponse<>(mapper.toAccountDto(account));
+        return new DataResponse<>(mapper.toAccountDto(accountService.updateAccount(authorizationManager.getCurrentAccount(), request)));
     }
 
     @ApiOperation(value = "Change password")

@@ -20,6 +20,9 @@ import java.util.List;
 @Setter
 public class TenantDto extends AccountDto {
 
+    @ApiModelProperty(value = "Indicate that sms message notifications are enabled/disabled")
+    private Boolean enableSms;
+
     @ApiModelProperty(value = "Tenant type", required = true)
     private TenantType type;
 
