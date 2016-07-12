@@ -57,7 +57,7 @@ public class ApartmentController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(value = "/apartments/{apartmentId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/apartments/{apartmentId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.Administrator})
     public DataResponse<ApartmentDto> updateApartment(@PathVariable Long apartmentId, @Valid @RequestBody PersistApartmentRequest request) {
         return new DataResponse<>(mapper.toApartmentDto(apartmentService.updateApartment(apartmentId, request)));
