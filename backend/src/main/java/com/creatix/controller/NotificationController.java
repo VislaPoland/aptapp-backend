@@ -78,7 +78,7 @@ public class NotificationController {
             @RequestParam(required = false, defaultValue = "0") Long page,
             @RequestParam(required = false, defaultValue = "20") Long size,
             @RequestParam NotificationRequestType type,
-            @RequestParam NotificationStatus status) {
+            @RequestParam(required = false) NotificationStatus status) {
         return mapper.toPageableDataResponse(notificationService.filterMaintenanceNotifications(type, status, page, size), n -> mapper.toMaintenanceNotificationDto(n));
     }
 

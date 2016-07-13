@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class NotificationService {
     }
 
     public PageableDataResponse<List<MaintenanceNotification>> filterMaintenanceNotifications(
-            NotificationRequestType type, NotificationStatus status, long pageNumber, long pageSize) {
+            @NotNull NotificationRequestType type, @Nullable NotificationStatus status, long pageNumber, long pageSize) {
         final Account account = authorizationManager.getCurrentAccount();
 
         long totalItems = maintenanceNotificationDao.countByStatusAndType(status, type, account);

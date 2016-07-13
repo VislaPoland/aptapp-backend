@@ -10,6 +10,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Date;
@@ -26,7 +27,7 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
                 .fetch();
     }
 
-    private Predicate filtersPredicate(@NotNull QMaintenanceNotification maintenanceNotification, NotificationStatus status,
+    private Predicate filtersPredicate(@NotNull QMaintenanceNotification maintenanceNotification, @Nullable NotificationStatus status,
                                        @NotNull NotificationRequestType type, @NotNull Account a) {
         final BooleanExpression predicate = (status != null ? maintenanceNotification.status.eq(status) : maintenanceNotification.status.isNotNull());
         switch (type) {
@@ -50,7 +51,7 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
         }
     }
 
-    public long countByStatusAndType(NotificationStatus status, @NotNull NotificationRequestType type, @NotNull Account account) {
+    public long countByStatusAndType(@Nullable NotificationStatus status, @NotNull NotificationRequestType type, @NotNull Account account) {
         Objects.requireNonNull(type);
         Objects.requireNonNull(account);
 
@@ -65,8 +66,8 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
                 .fetchCount();
     }
 
-    public List<MaintenanceNotification> findPageByStatusAndType(NotificationStatus status, NotificationRequestType type,
-                                                                 Account account, long pageNumber, long pageSize) {
+    public List<MaintenanceNotification> findPageByStatusAndType(@Nullable NotificationStatus status, @NotNull NotificationRequestType type,
+                                                                 @NotNull Account account, long pageNumber, long pageSize) {
         final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;
 
         Predicate predicate = filtersPredicate(maintenanceNotification, status, type, account);
