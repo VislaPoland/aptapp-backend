@@ -6,8 +6,8 @@ import java.net.URL;
 
 public class EmployeeActivationMessageTemplate extends ActivationMessageTemplate {
 
-    public EmployeeActivationMessageTemplate(Account account, URL baseUrl) {
-        super(account, baseUrl);
+    public EmployeeActivationMessageTemplate(Account account, URL backendUrl, URL frontendUrl) {
+        super(account, backendUrl, frontendUrl);
     }
 
     @Override

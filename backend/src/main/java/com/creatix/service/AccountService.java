@@ -309,7 +309,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new PropertyOwnerActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
+        emailMessageSender.send(new PropertyOwnerActivationMessageTemplate(account, applicationProperties.getBackendUrl(), applicationProperties.getFrontendUrl()));
 
         return account;
     }
@@ -354,7 +354,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl(), applicationProperties.getFrontendUrl()));
 
         return account;
     }
@@ -404,7 +404,7 @@ public class AccountService {
         managedEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl(), applicationProperties.getFrontendUrl()));
 
         return account;
     }
@@ -440,7 +440,7 @@ public class AccountService {
         managedEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl(), applicationProperties.getFrontendUrl()));
 
         return account;
     }
@@ -476,7 +476,7 @@ public class AccountService {
         managedEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl()));
+        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties.getBackendUrl(), applicationProperties.getFrontendUrl()));
 
         return account;
     }

@@ -6,8 +6,8 @@ import java.net.URL;
 
 public class PropertyOwnerActivationMessageTemplate extends ActivationMessageTemplate {
 
-    public PropertyOwnerActivationMessageTemplate(Account account, URL baseUrl) {
-        super(account, baseUrl);
+    public PropertyOwnerActivationMessageTemplate(Account account, URL backendUrl, URL frontendUrl) {
+        super(account, backendUrl, frontendUrl);
     }
 
     @Override

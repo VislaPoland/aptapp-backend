@@ -8,11 +8,13 @@ import java.net.URL;
 public abstract class ActivationMessageTemplate implements EmailMessageTemplate {
 
     private final Account account;
-    private final URL baseUrl;
+    private final URL backendUrl;
+    private final URL frontendUrl;
 
-    public ActivationMessageTemplate(Account account, URL baseUrl) {
+    public ActivationMessageTemplate(Account account, URL backendUrl, URL frontendUrl) {
         this.account = account;
-        this.baseUrl = baseUrl;
+        this.backendUrl = backendUrl;
+        this.frontendUrl = frontendUrl;
     }
 
     @Override
@@ -34,14 +36,14 @@ public abstract class ActivationMessageTemplate implements EmailMessageTemplate 
     }
 
     public String getApplicationUrl() {
-        return baseUrl.toString();
+        return frontendUrl.toString();
     }
 
     public String getLogoUrl() throws MalformedURLException {
-        return new URL(baseUrl, "/static/images/aptapp_logo.png").toString();
+        return new URL(backendUrl, "/static/images/aptapp_logo.png").toString();
     }
 
     public String getIconUrl() throws MalformedURLException {
-        return new URL(baseUrl, "/static/images/aptapp_icon.png").toString();
+        return new URL(backendUrl, "/static/images/aptapp_icon.png").toString();
     }
 }
