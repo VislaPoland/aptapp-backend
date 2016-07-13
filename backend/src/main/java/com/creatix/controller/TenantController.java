@@ -4,6 +4,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.tenant.CreateTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
+import com.creatix.domain.dto.tenant.UpdateTenantRequest;
 import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
 import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
@@ -47,6 +48,20 @@ public class TenantController {
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<TenantDto> createTenant(@RequestBody @Valid CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toTenantDto(tenantService.createTenantFromRequest(request)));
+    }
+
+    @ApiOperation(value = "Update tenant")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 422, message = "Unprocessable")
+    })
+    @RequestMapping(value = "/{tenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(value = {AccountRole.Tenant})
+    public DataResponse<TenantDto> updateTenant(@PathVariable Long tenantId, @Valid @RequestBody UpdateTenantRequest request) {
+        return new DataResponse<>(mapper.toTenantDto(tenantService.updateTenantFromRequest(tenantId, request)));
     }
 
     @ApiOperation(value = "Get tenant profile")
