@@ -21,6 +21,14 @@ public class SlotDao extends DaoBase<Slot, Long> {
                 .fetch();
     }
 
+    public List<Slot> findByPropertyAndSlotIdGreaterOrEqual(Property property, Long slotId, Integer pageSize) {
+        return queryFactory.selectFrom(slot)
+                .where(slot.property.eq(property).and(slot.id.goe(slotId)))
+                .orderBy(slot.beginTime.asc())
+                .limit(pageSize)
+                .fetch();
+    }
+
     public List<Slot> findByPropertyAndBeginTime(Property property, OffsetDateTime beginTime, Integer pageSize) {
         return queryFactory.selectFrom(slot)
                 .where(slot.property.eq(property).and(slot.beginTime.eq(beginTime).or(slot.beginTime.after(beginTime))))

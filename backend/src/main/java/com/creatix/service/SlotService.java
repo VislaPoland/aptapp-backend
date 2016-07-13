@@ -65,7 +65,7 @@ public class SlotService {
                 throw new EntityNotFoundException(String.format("Slot id=%d not found", startId));
             }
 
-            slots = slotDao.findByPropertyAndBeginTime(property, slot.getBeginTime(), pageSize + 1);
+            slots = slotDao.findByPropertyAndSlotIdGreaterOrEqual(property, slot.getId(), pageSize + 1);
         }
         else {
             if ( pageSize == null ) {
