@@ -16,7 +16,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.Month;
 
 import static org.junit.Assert.*;
 
@@ -36,29 +35,28 @@ public class SlotServiceTest {
     public void getSlotsByFilter() throws Exception {
         ScheduledSlotsResponse result;
         final Long propertyId = 1L;
-        LocalDate beginDate = LocalDate.of(2016, Month.JULY, 1);
-        LocalDate endDate = LocalDate.of(2016, Month.AUGUST, 31);
+        LocalDate beginDate = LocalDate.of(2016, 7, 1);
+        LocalDate endDate = LocalDate.of(2016, 8, 31);
         result = slotService.getSlotsByFilter(propertyId, beginDate, endDate, null, null);
         assertNotNull(result);
-        assertEquals(12, result.getSlots().size());
+        assertEquals(3, result.getSlots().size());
 
-        Long startId = 455L;
+        Long startId = 100L;
         int pageSize = 4;
         result = slotService.getSlotsByFilter(propertyId, null, null, startId, pageSize);
         assertNotNull(result);
         assertEquals(pageSize, result.getSlots().size());
         assertEquals(startId, result.getSlots().get(0).getId());
-        assertEquals(506L, (long) result.getNextId());
+        assertEquals(104L, (long) result.getNextId());
 
-        startId = 540L;
+        startId = 421L;
         result = slotService.getSlotsByFilter(propertyId, null, null, startId, pageSize);
         assertNotNull(result);
-        assertEquals(3, result.getSlots().size());
+        assertEquals(2, result.getSlots().size());
         assertEquals(startId, result.getSlots().get(0).getId());
         assertNull(result.getNextId());
 
-        result.getSlots().stream()
-                .forEach(s -> assertTrue(s.getType() == SlotDto.SlotType.Maintenance));
+        result.getSlots().forEach(s -> assertTrue(s.getType() == SlotDto.SlotType.Event));
     }
 
 }
