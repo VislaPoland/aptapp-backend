@@ -22,10 +22,4 @@ public class ApartmentNeighbors {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private ApartmentNeighbor right;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private ApartmentNeighbor opposite;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private ApartmentNeighbor behind;
-
 }

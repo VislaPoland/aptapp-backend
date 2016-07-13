@@ -24,29 +24,25 @@ public class PersistApartmentRequest {
 
     @ApiModelProperty(required = true)
     @NotNull
-    private Neighbors neighbors;
+    private NeighborsDto neighbors;
 
     @ApiModel
     @Data
-    public static class Neighbors {
+    public static class NeighborsDto {
         @ApiModelProperty
-        private NeighborApartment above;
+        private NeighborApartmentDto above;
         @ApiModelProperty
-        private NeighborApartment below;
+        private NeighborApartmentDto below;
         @ApiModelProperty
-        private NeighborApartment left;
+        private NeighborApartmentDto left;
         @ApiModelProperty
-        private NeighborApartment right;
-        @ApiModelProperty
-        private NeighborApartment opposite;
-        @ApiModelProperty
-        private NeighborApartment behind;
+        private NeighborApartmentDto right;
     }
 
 
     @ApiModel
     @Data
-    public static class NeighborApartment {
+    public static class NeighborApartmentDto {
         @ApiModelProperty(required = true)
         private String unitNumber;
     }

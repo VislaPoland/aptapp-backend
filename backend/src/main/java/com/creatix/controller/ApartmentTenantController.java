@@ -34,7 +34,7 @@ public class ApartmentTenantController {
     })
     @RequestMapping(value = "/{tenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<ApartmentDto.Tenant> removeApartmentTenant(@PathVariable Long apartmentId, @PathVariable Long tenantId) {
+    public DataResponse<ApartmentDto.TenantDto> removeApartmentTenant(@PathVariable Long apartmentId, @PathVariable Long tenantId) {
         return new DataResponse<>(mapper.toApartmentTenant(apartmentTenantService.delete(apartmentId, tenantId)));
     }
 

@@ -50,9 +50,9 @@ public class ApartmentServiceTest extends TestContext {
         final PersistApartmentRequest req = new PersistApartmentRequest();
         req.setFloor(2);
         req.setUnitNumber("28");
-        final PersistApartmentRequest.Neighbors neighbors = new PersistApartmentRequest.Neighbors();
+        final PersistApartmentRequest.NeighborsDto neighbors = new PersistApartmentRequest.NeighborsDto();
         req.setNeighbors(neighbors);
-        final PersistApartmentRequest.NeighborApartment above = new PersistApartmentRequest.NeighborApartment();
+        final PersistApartmentRequest.NeighborApartmentDto above = new PersistApartmentRequest.NeighborApartmentDto();
         neighbors.setAbove(above);
         above.setUnitNumber("37");
 
@@ -90,12 +90,12 @@ public class ApartmentServiceTest extends TestContext {
         final PersistApartmentRequest req = new PersistApartmentRequest();
         req.setFloor(apartment31.getFloor());
         req.setUnitNumber(apartment31.getUnitNumber());
-        final PersistApartmentRequest.Neighbors neighbors = new PersistApartmentRequest.Neighbors();
+        final PersistApartmentRequest.NeighborsDto neighbors = new PersistApartmentRequest.NeighborsDto();
         req.setNeighbors(neighbors);
-        final PersistApartmentRequest.NeighborApartment above = new PersistApartmentRequest.NeighborApartment();
+        final PersistApartmentRequest.NeighborApartmentDto above = new PersistApartmentRequest.NeighborApartmentDto();
         neighbors.setAbove(above);
         above.setUnitNumber("33");
-        final PersistApartmentRequest.NeighborApartment below = new PersistApartmentRequest.NeighborApartment();
+        final PersistApartmentRequest.NeighborApartmentDto below = new PersistApartmentRequest.NeighborApartmentDto();
         neighbors.setBelow(below);
         below.setUnitNumber(apartment21.getUnitNumber());
 
@@ -131,7 +131,7 @@ public class ApartmentServiceTest extends TestContext {
         final PersistApartmentRequest req = new PersistApartmentRequest();
         req.setFloor(apartment31.getFloor());
         req.setUnitNumber(apartment31.getUnitNumber());
-        req.setNeighbors(new PersistApartmentRequest.Neighbors());
+        req.setNeighbors(new PersistApartmentRequest.NeighborsDto());
 
         final Apartment apartment = apartmentService.updateApartment(apartment31.getId(), req);
         assertNull(apartment.getNeighbors().getAbove());

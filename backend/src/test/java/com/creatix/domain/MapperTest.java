@@ -37,13 +37,10 @@ public class MapperTest {
         final Apartment apartment22 = apartmentDao.findById(22L);
         assertNotNull(apartment22.getNeighbors().getBelow());
         assertNotNull(apartment22.getNeighbors().getLeft());
-        assertNull(apartment22.getNeighbors().getOpposite());
         final ApartmentDto dto = mapper.toApartmentDto(apartment22);
         assertNotNull(dto.getNeighbors());
         assertNotNull(dto.getNeighbors().getBelow());
         assertNotNull(dto.getNeighbors().getLeft());
-        assertNull(dto.getNeighbors().getOpposite());
-
     }
 
 }

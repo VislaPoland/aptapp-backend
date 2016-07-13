@@ -1,6 +1,5 @@
 package com.creatix.domain.dto.apartment;
 
-import com.creatix.domain.dto.AddressDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,29 +28,25 @@ public class ApartmentDto extends BasicApartmentDto {
     private Long tenantId;
 
     @ApiModelProperty(required = true)
-    private Neighbors neighbors;
+    private NeighborsDto neighbors;
 
     @ApiModel
     @Data
-    public static class Neighbors {
+    public static class NeighborsDto {
         @ApiModelProperty
-        private NeighborApartment above;
+        private NeighborApartmentDto above;
         @ApiModelProperty
-        private NeighborApartment below;
+        private NeighborApartmentDto below;
         @ApiModelProperty
-        private NeighborApartment left;
+        private NeighborApartmentDto left;
         @ApiModelProperty
-        private NeighborApartment right;
-        @ApiModelProperty
-        private NeighborApartment opposite;
-        @ApiModelProperty
-        private NeighborApartment behind;
+        private NeighborApartmentDto right;
     }
 
 
     @ApiModel
     @Data
-    public static class NeighborApartment {
+    public static class NeighborApartmentDto {
         @ApiModelProperty(required = true)
         private long id;
         @ApiModelProperty(required = true)
@@ -62,7 +57,7 @@ public class ApartmentDto extends BasicApartmentDto {
 
     @ApiModel
     @Data
-    public static class Tenant {
+    public static class TenantDto {
         @ApiModelProperty(required = true)
         private Long id;
         @ApiModelProperty(required = true)

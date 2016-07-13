@@ -110,9 +110,7 @@ public class ApartmentService {
                 neighbors.getLeft(),
                 neighbors.getRight(),
                 neighbors.getBelow(),
-                neighbors.getAbove(),
-                neighbors.getOpposite(),
-                neighbors.getBehind());
+                neighbors.getAbove());
     }
 
     private void linkNeighbors(@NotNull Apartment apartment, ApartmentNeighbor... neighbors) {

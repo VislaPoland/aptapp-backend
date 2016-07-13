@@ -218,12 +218,12 @@ public class Mapper {
         mapperFactory.classMap(CreateNeighborhoodNotificationRequest.class, NeighborhoodNotification.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(ApartmentNeighbor.class, ApartmentDto.NeighborApartment.class)
+        mapperFactory.classMap(ApartmentNeighbor.class, ApartmentDto.NeighborApartmentDto.class)
                 .byDefault()
                 .field("apartment.id", "id")
                 .field("apartment.floor", "floor")
                 .register();
-        mapperFactory.classMap(ApartmentNeighbors.class, ApartmentDto.Neighbors.class)
+        mapperFactory.classMap(ApartmentNeighbors.class, ApartmentDto.NeighborsDto.class)
                 .byDefault()
                 .register();
         mapperFactory.classMap(PersistApartmentRequest.class, Apartment.class)

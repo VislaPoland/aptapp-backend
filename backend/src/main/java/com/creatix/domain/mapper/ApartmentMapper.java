@@ -16,7 +16,7 @@ public final class ApartmentMapper extends ConfigurableMapper {
         super.configure(mapperFactory);
 
         //region Tenant
-        mapperFactory.classMap(TenantBase.class, ApartmentDto.Tenant.class)
+        mapperFactory.classMap(TenantBase.class, ApartmentDto.TenantDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -26,10 +26,10 @@ public final class ApartmentMapper extends ConfigurableMapper {
     }
 
     //region Account
-    public ApartmentDto.Tenant toApartmentTenant(@NotNull TenantBase tenant) {
+    public ApartmentDto.TenantDto toApartmentTenant(@NotNull TenantBase tenant) {
         Objects.requireNonNull(tenant);
 
-        return this.map(tenant, ApartmentDto.Tenant.class);
+        return this.map(tenant, ApartmentDto.TenantDto.class);
     }
     //endregion
 
