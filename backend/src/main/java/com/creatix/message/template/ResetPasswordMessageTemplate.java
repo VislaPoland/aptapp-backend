@@ -36,6 +36,10 @@ public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
         return account.getFullName();
     }
 
+    public String getApplicationUrl() {
+        return frontendUrl.toString();
+    }
+
     public String getActivationToken() {
         return account.getActionToken();
     }
