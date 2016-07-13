@@ -2,6 +2,7 @@ package com.creatix.domain.entity.store;
 
 import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
+import com.querydsl.core.annotations.QueryInit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
@@ -41,7 +42,7 @@ public class MaintenanceReservation {
             }
     )
     private Set<SlotUnit> units;
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private MaintenanceSlot slot;
     @Column(nullable = false)
     private OffsetDateTime beginTime;
@@ -54,6 +55,7 @@ public class MaintenanceReservation {
     @Column(length = 2048)
     private String note;
 
+    @QueryInit("targetApartment.tenant")
     @OneToOne
     private MaintenanceNotification notification;
 

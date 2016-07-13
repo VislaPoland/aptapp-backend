@@ -4,7 +4,6 @@ import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
 import com.creatix.domain.entity.store.MaintenanceSlot;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.Slot;
 import com.creatix.mock.WithMockCustomUser;
 import com.creatix.security.AuthorizationManager;
 import org.junit.FixMethodOrder;
@@ -26,7 +25,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -35,31 +33,51 @@ import static org.junit.Assert.*;
 @SpringBootTest(classes = AptAppBackendApplication.class)
 @ActiveProfiles(TestContext.PROFILE)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@Transactional
 @Component
-public class SlotDaoTest {
+public class MaintenanceSlotDaoTest {
 
     @Autowired
-    private SlotDao slotDao;
+    private MaintenanceSlotDao slotDao;
     @Autowired
     private PropertyDao propertyDao;
+    @PersistenceContext
+    private EntityManager em;
     @Autowired
     private AuthorizationManager authorizationManager;
 
+    private final OffsetDateTime beginDt = LocalDateTime.of(2016, 5, 1, 10, 0, 0, 0).atOffset(ZoneOffset.ofHours(-2));
+    private final OffsetDateTime endDt = LocalDateTime.of(2016, 5, 1, 10, 0, 0, 0).atOffset(ZoneOffset.ofHours(3));
+
     @Test
-    @WithMockCustomUser("apt@test.com")
-    public void findByPropertyAndBeginTimeAndAccount() throws Exception {
-        final int pageSize = 2;
+    @Transactional
+    @Commit
+    public void testPersist() {
+
         final Property property = propertyDao.findById(1L);
         assertNotNull(property);
 
-        final List<Slot> slots = slotDao.findByPropertyAndBeginTimeAndAccount(
-                property,
-                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZoneOffset.UTC),
-                pageSize,
-                authorizationManager.getCurrentAccount());
-        assertNotNull(slots);
-        assertEquals(pageSize, slots.size());
+        MaintenanceSlot s = new MaintenanceSlot();
+        s.setProperty(property);
+        s.setUnitDurationMinutes(30);
+        s.setBeginTime(beginDt);
+        s.setEndTime(endDt);
+        slotDao.persist(s);
+        assertSame(beginDt, s.getBeginTime());
+        assertSame(endDt, s.getEndTime());
+        assertNotNull(s.getId());
+
+        em.flush();
+        em.detach(s);
+        s.setBeginTime(null);
+        s.setEndTime(null);
+
+        assertNotNull(s.getId());
+        s = slotDao.findById(s.getId());
+        assertNotNull(s);
+        assertNotSame(beginDt, s.getBeginTime());
+        assertEquals(beginDt.atZoneSameInstant(ZoneId.systemDefault()), s.getBeginTime().atZoneSameInstant(ZoneId.systemDefault()));
+        assertNotSame(endDt, s.getEndTime());
+        assertEquals(endDt.atZoneSameInstant(ZoneId.systemDefault()), s.getEndTime().atZoneSameInstant(ZoneId.systemDefault()));
     }
 
 }

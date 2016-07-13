@@ -154,6 +154,14 @@ INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes,
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 557, '2016-08-22 15:00:00.000000', '2016-08-22 23:00:00.000000', 30, 1, null, null, null);
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 574, '2016-08-29 15:00:00.000000', '2016-08-29 23:00:00.000000', 30, 1, null, null, null);
 
+-- slots for SlotDaoTest
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 600, '2016-02-01 19:00:00', '2016-02-01 19:00:00', 30, 1, null, 'Event slot 1', 'Event 1');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 601, '2016-02-01 19:00:00', '2016-02-01 19:30:00', 30, 1, null, 'Event slot 2', 'Event 2');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 602, '2016-02-01 19:00:00', '2016-02-01 20:00:00', 30, 1, null, 'Event slot 3', 'Event 3');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 603, '2016-02-01 19:00:00', '2016-02-01 20:30:00', 30, 1, null, 'Event slot 4', 'Event 4');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 604, '2016-02-01 19:00:00', '2016-02-01 21:00:00', 30, 1, null, 'Event slot 5', 'Event 5');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 605, '2016-02-01 19:00:00', '2016-02-01 21:30:00', 30, 1, null, 'Event slot 6', 'Event 6');
+
 -- slot units
 INSERT INTO public.slot_unit (id, capacity, initial_capacity, "offset", version, slot_id) VALUES (1, 1, 1, 0, 1, 1);
 INSERT INTO public.slot_unit (id, capacity, initial_capacity, "offset", version, slot_id) VALUES (2, 1, 1, 0, 0, 2);

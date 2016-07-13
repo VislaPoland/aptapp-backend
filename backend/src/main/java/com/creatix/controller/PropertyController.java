@@ -153,7 +153,7 @@ public class PropertyController {
         return new HttpEntity<>(fileData, headers);
     }
 
-    @ApiOperation(value = "Get events", notes = "Get all events for single property")
+    @ApiOperation(value = "Get scheduled events", notes = "Get all scheduled events for single property")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
