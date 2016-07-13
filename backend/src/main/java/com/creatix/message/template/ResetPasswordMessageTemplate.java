@@ -41,7 +41,7 @@ public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
     }
 
     public String getResetPasswordPageUrl() throws MalformedURLException {
-        return new URL(frontendUrl, String.format("/reset-password/token/%s", account.getActionToken())).toString();
+        return new URL(frontendUrl, String.format("/set-password?token=%s", account.getActionToken())).toString();
     }
 
     public String getLogoUrl() throws MalformedURLException {
