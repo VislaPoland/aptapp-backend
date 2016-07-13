@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class TenantService {
     @Autowired
+    private AccountDao accountDao;
+    @Autowired
     private TenantDao tenantDao;
     @Autowired
     private VehicleDao vehicleDao;
@@ -190,6 +192,8 @@ public class TenantService {
     public SubTenant createSubTenant(Long tenantId, @NotNull CreateSubTenantRequest request) {
         Objects.requireNonNull(request);
 
+        preventAccountDuplicity(request.getEmail(), null);
+
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         if (authorizationManager.isSelf(tenant)) {
             final SubTenant subTenant = mapper.toSubTenant(request);
@@ -217,6 +221,7 @@ public class TenantService {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         if (authorizationManager.isSelf(tenant)) {
             final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
+            preventAccountDuplicity(request.getEmail(), subTenant.getPrimaryEmail());
 
             if (tenant.getSubTenants().contains(subTenant)) {
                 mapper.fillSubTenant(request, subTenant);
@@ -241,6 +246,17 @@ public class TenantService {
             }
         } else {
             throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
+        }
+    }
+
+    private void preventAccountDuplicity(String email, String emailExisting) {
+        if ( Objects.equals(email, emailExisting) ) {
+            // email will not change, assume account is not a duplicate
+            return;
+        }
+
+        if ( accountDao.findByEmail(email) != null ) {
+            throw new IllegalArgumentException(String.format("Account %s already exists.", email));
         }
     }
 }
