@@ -4,6 +4,7 @@ import com.creatix.domain.entity.store.account.Tenant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = { "unitNumber", "property_id" })
 })
+@BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "id")
 @ToString(of = { "id", "unitNumber" })

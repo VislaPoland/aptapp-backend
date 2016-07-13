@@ -7,12 +7,14 @@ import com.creatix.domain.entity.store.Vehicle;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
+@BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})
 @ToString(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})

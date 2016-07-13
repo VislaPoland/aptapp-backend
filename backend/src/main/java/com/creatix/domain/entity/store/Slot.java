@@ -24,6 +24,7 @@ import java.util.Set;
                 @Index(columnList = "endTime"),
         }
 )
+@BatchSize(size = 80)
 @Data
 @EqualsAndHashCode(of = "id")
 @ToString(of = {"id", "beginTime", "endTime"})
@@ -36,7 +37,6 @@ import java.util.Set;
                 @ParamDef(name="fromDt", type="java.util.Date" )
         })
 })
-@BatchSize(size = 80)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Slot {
     public static final String SLOT_BEGIN_TIME_BETWEEN = "slotBeginTimeBetween";

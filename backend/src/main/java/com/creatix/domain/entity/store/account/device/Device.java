@@ -12,9 +12,9 @@ import java.util.Date;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "id")
-@BatchSize(size = 80)
 public class Device {
 
     @Id

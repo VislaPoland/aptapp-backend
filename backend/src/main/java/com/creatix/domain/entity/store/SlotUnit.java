@@ -18,9 +18,9 @@ import java.util.Set;
         indexes = {
                 @Index(columnList = "slot_id")
         })
+@BatchSize(size = 80)
 @Data
 @EqualsAndHashCode(of = "id")
-@BatchSize(size = 80)
 public class SlotUnit {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

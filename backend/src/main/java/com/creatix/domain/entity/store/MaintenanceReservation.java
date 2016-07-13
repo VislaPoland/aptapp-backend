@@ -22,9 +22,9 @@ import java.util.Set;
                 @Index(columnList = "employee_id")
         }
 )
+@BatchSize(size = 80)
 @Data
 @EqualsAndHashCode(of = "id")
-@BatchSize(size = 80)
 public class MaintenanceReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -3,11 +3,13 @@ package com.creatix.domain.entity.store;
 import com.creatix.domain.entity.store.account.Tenant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "licensePlate")
 public class Vehicle {
