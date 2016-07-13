@@ -40,10 +40,10 @@ public abstract class ActivationMessageTemplate implements EmailMessageTemplate 
     }
 
     public String getLogoUrl() throws MalformedURLException {
-        return new URL(backendUrl, "/static/images/aptapp_logo.png").toString();
+        return new URL(backendUrl, "/static/aptapp_logo.png").toString();
     }
 
     public String getIconUrl() throws MalformedURLException {
-        return new URL(backendUrl, "/static/images/aptapp_icon.png").toString();
+        return new URL(backendUrl, "/static/aptapp_icon.png").toString();
     }
 }

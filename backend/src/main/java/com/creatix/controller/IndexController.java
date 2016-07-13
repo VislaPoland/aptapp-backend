@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.Data;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -30,10 +29,10 @@ import org.springframework.web.servlet.view.RedirectView;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -54,22 +53,23 @@ class IndexController implements ErrorController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found")})
-    @RequestMapping(value = "/static/{filePath:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/static/{fileName:.+}", method = RequestMethod.GET)
     @ResponseBody
-    public HttpEntity<byte[]> dowloadNotificationPhoto(@PathVariable @NotEmpty String filePath) throws IOException {
+    public HttpEntity<byte[]> dowloadNotificationPhoto(@PathVariable @NotEmpty String fileName) throws IOException {
         final ClassLoader classLoader = getClass().getClassLoader();
-        final String absolutePath = Paths.get("static", filePath).toString();
+        final Path absolutePath = Paths.get("static", fileName);
+        final String strAbsolutePath = absolutePath.toString();
         final byte[] fileData;
-        try ( final InputStream templateResourceStream = classLoader.getResourceAsStream(absolutePath) ) {
+        try ( final InputStream templateResourceStream = classLoader.getResourceAsStream(strAbsolutePath) ) {
             if ( templateResourceStream == null ) {
-                throw new IOException("Resource " + absolutePath + " not found.");
+                throw new IOException("Resource " + strAbsolutePath + " not found.");
             }
 
             fileData = IOUtils.toByteArray(templateResourceStream);
         }
 
         final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentType(MediaType.valueOf(Files.probeContentType(absolutePath)));
         headers.setContentLength(fileData.length);
 
         return new HttpEntity<>(fileData, headers);

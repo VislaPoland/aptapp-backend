@@ -497,15 +497,13 @@ public class AccountService {
         return account;
     }
 
-    public boolean resetPasswordFromRequest(@NotNull AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public void resetPasswordFromRequest(@NotNull AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
 
         final Account account = getAccount(request.getEmail());
         setActionToken(account);
         accountDao.persist(account);
         emailMessageSender.send(new ResetPasswordMessageTemplate(account, applicationProperties.getBackendUrl(), applicationProperties.getFrontendUrl()));
-
-        return true;
     }
 
     private void preventAccountDuplicity(String email, String emailExisting) {
