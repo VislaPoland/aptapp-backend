@@ -34,6 +34,7 @@ import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
+import com.creatix.security.AuthorizationManager;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -65,7 +66,8 @@ public class Mapper {
     private HttpServletRequest httpRequest;
     @Autowired
     private ApplicationProperties applicationProperties;
-
+    @Autowired
+    private AuthorizationManager  authorizationManager;
 
     @Autowired
     public Mapper(MapperFactory mapperFactory) {
@@ -341,6 +343,21 @@ public class Mapper {
 
         mapperFactory.classMap(MaintenanceSlot.class, MaintenanceSlotDto.class)
                 .byDefault()
+                .exclude("reservations")
+                .customize(new CustomMapper<MaintenanceSlot, MaintenanceSlotDto>() {
+                    @Override
+                    public void mapAtoB(MaintenanceSlot slot, MaintenanceSlotDto slotDto, MappingContext context) {
+                        if ( slot.getReservations() == null ) {
+                            slotDto.setReservations(null);
+                        }
+                        else {
+                            slotDto.setReservations(slot.getReservations().stream()
+                                    .filter(r -> authorizationManager.canRead(r))
+                            .map(r -> toMaintenanceReservationDto(r))
+                            .collect(Collectors.toList()));
+                        }
+                    }
+                })
                 .register();
         mapperFactory.classMap(MaintenanceReservation.class, MaintenanceReservationDto.class)
                 .byDefault()

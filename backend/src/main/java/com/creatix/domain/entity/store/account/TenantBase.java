@@ -3,6 +3,7 @@ package com.creatix.domain.entity.store.account;
 import com.creatix.domain.enums.TenantType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Column;
@@ -14,6 +15,7 @@ import javax.persistence.Enumerated;
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public abstract class TenantBase extends Account {
 
     @Column

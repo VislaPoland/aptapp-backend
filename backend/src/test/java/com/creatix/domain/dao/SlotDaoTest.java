@@ -2,11 +2,8 @@ package com.creatix.domain.dao;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
-import com.creatix.domain.entity.store.MaintenanceSlot;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.Slot;
-import com.creatix.mock.WithMockCustomUser;
-import com.creatix.security.AuthorizationManager;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,21 +11,18 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.TimeZone;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -44,22 +38,120 @@ public class SlotDaoTest {
     @Autowired
     private PropertyDao propertyDao;
     @Autowired
-    private AuthorizationManager authorizationManager;
+    private AccountDao accountDao;
+
+    private static final ZoneOffset ZONE_OFFSET = ZoneOffset.ofHours(TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (7200 * 1000));
 
     @Test
-    @WithMockCustomUser("apt@test.com")
-    public void findByPropertyAndBeginTimeAndAccount() throws Exception {
+    public void findByPropertyAndAccountAndBeginTime() throws Exception {
         final int pageSize = 2;
         final Property property = propertyDao.findById(1L);
         assertNotNull(property);
 
-        final List<Slot> slots = slotDao.findByPropertyAndBeginTimeAndAccount(
+        List<Slot> slots = slotDao.findByPropertyAndAccountAndBeginTime(
                 property,
-                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZoneOffset.UTC),
-                pageSize,
-                authorizationManager.getCurrentAccount());
+                accountDao.findByEmail("apt@test.com"),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                pageSize
+        );
         assertNotNull(slots);
         assertEquals(pageSize, slots.size());
+
+
+        slots = slotDao.findByPropertyAndAccountAndBeginTime(
+                property,
+                accountDao.findByEmail("apt@test.com"),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                9999
+        );
+        assertNotNull(slots);
+        assertEquals(10, slots.size());
+
+
+        slots = slotDao.findByPropertyAndAccountAndBeginTime(
+                property,
+                accountDao.findByEmail("tomas.sedlak@thinkcreatix.com"),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                9999
+        );
+        assertNotNull(slots);
+        assertEquals(10, slots.size());
+
+
+        slots = slotDao.findByPropertyAndAccountAndBeginTime(
+                property,
+                accountDao.findByEmail("martin.maintenance@apartments.com"),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                9999
+        );
+        assertNotNull(slots);
+        assertEquals(10, slots.size());
+
+
+        slots = slotDao.findByPropertyAndAccountAndBeginTime(
+                property,
+                accountDao.findByEmail("martin.security@apartments.com"),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                9999
+        );
+        assertNotNull(slots);
+        assertEquals(9, slots.size());
     }
 
+
+    @Test
+    public void findByPropertyAndAccountAndDateRange() {
+        final Property property = propertyDao.findById(1L);
+        assertNotNull(property);
+
+        List<Slot> slots = slotDao.findByPropertyAndAccountAndDateRange(
+                property,
+                accountDao.findByEmail("martin.security@apartments.com"),
+                OffsetDateTime.of(2016, 7, 18, 0, 0, 0, 0, ZONE_OFFSET),
+                OffsetDateTime.of(2016, 7, 18, 23, 59, 59, 999, ZONE_OFFSET));
+        assertNotNull(slots);
+        assertEquals(0, slots.size());
+
+        slots = slotDao.findByPropertyAndAccountAndDateRange(
+                property,
+                accountDao.findByEmail("martin.maintenance@apartments.com"),
+                OffsetDateTime.of(2016, 2, 1, 0, 0, 0, 0, ZONE_OFFSET),
+                OffsetDateTime.of(2016, 2, 1, 23, 59, 59, 999, ZONE_OFFSET));
+        assertNotNull(slots);
+        assertEquals(4, slots.size());
+    }
+
+
+    @Test
+    public void findByPropertyAndAccountAndSlotIdGreaterOrEqual() {
+        final Property property = propertyDao.findById(1L);
+        assertNotNull(property);
+
+        List<Slot> slots = slotDao.findByPropertyAndAccountAndSlotIdGreaterOrEqual(
+                property,
+                accountDao.findByEmail("tomas.sedlak@thinkcreatix.com"),
+                102L,
+                1);
+        assertNotNull(slots);
+        assertEquals(1, slots.size());
+        assertEquals(102L, slots.get(0).getId());
+
+        slots = slotDao.findByPropertyAndAccountAndSlotIdGreaterOrEqual(
+                property,
+                accountDao.findByEmail("tomas.sedlak@thinkcreatix.com"),
+                200L,
+                1);
+        assertNotNull(slots);
+        assertEquals(1, slots.size());
+        assertEquals(201L, slots.get(0).getId());
+
+        slots = slotDao.findByPropertyAndAccountAndSlotIdGreaterOrEqual(
+                property,
+                accountDao.findByEmail("tomas.sedlak@thinkcreatix.com"),
+                201L,
+                1);
+        assertNotNull(slots);
+        assertEquals(1, slots.size());
+        assertEquals(201L, slots.get(0).getId());
+    }
 }

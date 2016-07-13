@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -200,6 +201,7 @@ public class NotificationService {
             // move uploaded file to file repository
             final String fileName = String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename());
             final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), fileName);
+            Files.createDirectories(photoFilePath.getParent());
             file.transferTo(photoFilePath.toFile());
 
             final NotificationPhoto photo = new NotificationPhoto();

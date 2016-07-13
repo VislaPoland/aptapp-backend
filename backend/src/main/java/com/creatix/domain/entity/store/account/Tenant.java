@@ -17,7 +17,7 @@ import java.util.Set;
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})
-@ToString(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})
+@ToString(callSuper = true, exclude = {"vehicles", "subTenants", "apartment", "parkingStalls"})
 public class Tenant extends TenantBase {
 
     @OneToMany(mappedBy = "usingTenant")

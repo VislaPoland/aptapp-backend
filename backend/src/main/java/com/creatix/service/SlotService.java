@@ -57,7 +57,7 @@ public class SlotService {
             final OffsetDateTime beginDt = beginDate.atStartOfDay(property.getZoneOffset(beginDate.atStartOfDay())).toOffsetDateTime();
             final OffsetDateTime endDt = endDate.atStartOfDay(property.getZoneOffset(endDate.atStartOfDay())).toOffsetDateTime()
                     .withHour(23).withMinute(59).withSecond(59);
-            slots = slotDao.findByPropertyAndDateRange(property, beginDt, endDt);
+            slots = slotDao.findByPropertyAndAccountAndDateRange(property, authorizationManager.getCurrentAccount(), beginDt, endDt);
         }
         else if ( (startId != null) && (pageSize != null) ) {
             final Slot slot = slotDao.findById(startId);
@@ -65,13 +65,13 @@ public class SlotService {
                 throw new EntityNotFoundException(String.format("Slot id=%d not found", startId));
             }
 
-            slots = slotDao.findByPropertyAndSlotIdGreaterOrEqual(property, slot.getId(), pageSize + 1);
+            slots = slotDao.findByPropertyAndAccountAndSlotIdGreaterOrEqual(property, authorizationManager.getCurrentAccount(), slot.getId(), pageSize + 1);
         }
         else {
             if ( pageSize == null ) {
                 throw new IllegalArgumentException("Page size is required");
             }
-            slots = slotDao.findByPropertyAndBeginTime(property, OffsetDateTime.now(), pageSize + 1);
+            slots = slotDao.findByPropertyAndAccountAndBeginTime(property, authorizationManager.getCurrentAccount(), OffsetDateTime.now(), pageSize + 1);
         }
 
         final ScheduledSlotsResponse result = new ScheduledSlotsResponse();

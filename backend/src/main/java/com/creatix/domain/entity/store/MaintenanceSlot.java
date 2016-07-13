@@ -15,7 +15,7 @@ import java.util.List;
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = { "schedule", "reservations" })
 public class MaintenanceSlot extends Slot {
 
     @OneToMany(mappedBy = "slot")

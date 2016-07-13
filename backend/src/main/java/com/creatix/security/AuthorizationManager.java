@@ -1,12 +1,10 @@
 package com.creatix.security;
 
 import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.entity.store.account.ManagedEmployee;
+import com.creatix.domain.entity.store.MaintenanceReservation;
+import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.PropertyManager;
-import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,5 +220,23 @@ public class AuthorizationManager {
     public boolean isEligibleToUpdateProperty(Property property) {
         final Account account = getCurrentAccount();
         return !account.getRole().equals(AccountRole.Administrator) && isEligibleToReadProperty(property);
+    }
+
+    public boolean canRead(@NotNull MaintenanceReservation reservation) {
+        Objects.requireNonNull(reservation, "Maintenance reservation is null");
+
+        final Account account = getCurrentAccount();
+        if ( account instanceof Tenant ) {
+            final Tenant tenant = (Tenant) account;
+            if ( reservation.getNotification() != null ) {
+                return Objects.equals(tenant, reservation.getNotification().getTargetApartment().getTenant());
+            }
+        }
+        else if ( account instanceof MaintenanceEmployee ) {
+            final MaintenanceEmployee maintenance = (MaintenanceEmployee) account;
+            return Objects.equals(maintenance, reservation.getEmployee());
+        }
+
+        return false;
     }
 }

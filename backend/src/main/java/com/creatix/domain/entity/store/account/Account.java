@@ -4,6 +4,7 @@ import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.validator.constraints.Email;
 
@@ -16,6 +17,7 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(of = { "id", "primaryEmail" })
 @BatchSize(size = 80)
 public class Account {
     @Id
