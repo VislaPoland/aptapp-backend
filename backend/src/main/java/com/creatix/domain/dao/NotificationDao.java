@@ -17,12 +17,33 @@ import java.util.List;
 @Repository
 @Transactional
 public class NotificationDao extends AbstractNotificationDao<Notification> {
-    private Predicate filtersPredicate(final QNotification notification, NotificationRequestType type, Account a) {
-        switch (type) {
+
+    public long countByType(NotificationRequestType type, Account account) {
+        final QNotification notification = QNotification.notification;
+
+        return queryFactory.selectFrom(notification)
+                .where(createNotificationFilterPredicateForAccount(notification, type, account))
+                .fetchCount();
+    }
+
+    public List<Notification> findPageByType(NotificationRequestType type, Account account, long pageNumber, long pageSize) {
+        final QNotification notification = QNotification.notification;
+
+        return queryFactory.selectFrom(notification)
+                .where(createNotificationFilterPredicateForAccount(notification, type, account))
+                .orderBy(notification.createdAt.desc())
+                .limit(pageNumber * pageSize + pageSize)
+                .offset(pageNumber * pageSize)
+                .fetch();
+    }
+
+
+    private static Predicate createNotificationFilterPredicateForAccount(final QNotification notification, NotificationRequestType type, Account a) {
+        switch ( type ) {
             case Sent:
                 return notification.author.eq(a);
             case Received:
-                switch (a.getRole()) {
+                switch ( a.getRole() ) {
                     case PropertyManager:
                         return notification.property.eq(((PropertyManager) a).getManagedProperty());
                     case AssistantPropertyManager:
@@ -45,24 +66,5 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             default:
                 throw new IllegalStateException();
         }
-    }
-
-    public long countByType(NotificationRequestType type, Account account) {
-        final QNotification notification = QNotification.notification;
-
-        return queryFactory.selectFrom(notification)
-                .where(filtersPredicate(notification, type, account))
-                .fetchCount();
-    }
-
-    public List<Notification> findPageByType(NotificationRequestType type, Account account, long pageNumber, long pageSize) {
-        final QNotification notification = QNotification.notification;
-
-        return queryFactory.selectFrom(notification)
-                .where(filtersPredicate(notification, type, account))
-                .orderBy(notification.createdAt.desc())
-                .limit(pageNumber * pageSize + pageSize)
-                .offset(pageNumber * pageSize)
-                .fetch();
     }
 }
