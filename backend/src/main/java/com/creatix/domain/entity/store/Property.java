@@ -5,6 +5,7 @@ import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.domain.enums.PropertyStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Entity
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(of = { "id", "name" })
 public class Property {
 
     @Id

@@ -69,6 +69,9 @@ public class ApartmentService {
         if ( property == null ) {
             throw new EntityNotFoundException(String.format("Property id=%d not found", propertyId));
         }
+        if ( apartmentDao.findByUnitNumberWithinProperty(request.getUnitNumber(), property) != null ) {
+            throw new IllegalArgumentException(String.format("Apartment %s already exists", request.getUnitNumber()));
+        }
 
         final Apartment apartment = new Apartment();
         mapper.fillApartment(request, apartment);
@@ -85,6 +88,12 @@ public class ApartmentService {
         Objects.requireNonNull(request);
 
         final Apartment apartment = getApartment(apartmentId);
+        if ( !(Objects.equals(apartment.getUnitNumber(), request.getUnitNumber())) ) {
+            // apartment unit number has changed, we have to insure unit number uniqueness
+            if ( apartmentDao.findByUnitNumberWithinProperty(request.getUnitNumber(), apartment.getProperty()) != null ) {
+                throw new IllegalArgumentException(String.format("Apartment %s already exists", request.getUnitNumber()));
+            }
+        }
         mapper.fillApartment(request, apartment);
 
         apartmentDao.persist(apartment);
@@ -97,7 +106,7 @@ public class ApartmentService {
         Objects.requireNonNull(apartment);
 
         final ApartmentNeighbors neighbors = apartment.getNeighbors();
-        linkNeighbors(apartment.getProperty(),
+        linkNeighbors(apartment,
                 neighbors.getLeft(),
                 neighbors.getRight(),
                 neighbors.getBelow(),
@@ -106,8 +115,10 @@ public class ApartmentService {
                 neighbors.getBehind());
     }
 
-    private void linkNeighbors(@NotNull Property property, ApartmentNeighbor... neighbors) {
-        Objects.requireNonNull(property);
+    private void linkNeighbors(@NotNull Apartment apartment, ApartmentNeighbor... neighbors) {
+        Objects.requireNonNull(apartment);
+
+        final Property property = apartment.getProperty();
 
         for ( ApartmentNeighbor neighbor : neighbors ) {
             if ( neighbor == null ) {
@@ -117,16 +128,13 @@ public class ApartmentService {
             if ( neighbor.getUnitNumber() != null ) {
                 // unit number is set, we are going to create or update link
 
-                if ( neighbor.getApartment() != null ) {
-                    // update link to new apartment
-                    neighbor.setApartment(apartmentDao.findByUnitNumberWithinProperty(neighbor.getUnitNumber(), property));
-                    apartmentNeighborDao.persist(neighbor);
+                final Apartment apartmentNeighbor = apartmentDao.findByUnitNumberWithinProperty(neighbor.getUnitNumber(), property);
+                if ( Objects.equals(apartment, apartmentNeighbor) ) {
+                    throw new IllegalArgumentException("Cannot link apartment to itself");
                 }
-                else {
-                    // create new link to neighbor apartment
-                    neighbor.setApartment(apartmentDao.findByUnitNumberWithinProperty(neighbor.getUnitNumber(), property));
-                    apartmentNeighborDao.persist(neighbor);
-                }
+
+                neighbor.setApartment(apartmentNeighbor);
+                apartmentNeighborDao.persist(neighbor);
             }
             else {
                 // unit number is not set

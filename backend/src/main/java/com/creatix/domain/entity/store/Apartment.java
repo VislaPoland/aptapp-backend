@@ -3,13 +3,18 @@ package com.creatix.domain.entity.store;
 import com.creatix.domain.entity.store.account.Tenant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "unitNumber", "property_id" })
+})
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(of = { "id", "unitNumber" })
 public class Apartment {
     @Id
     @GeneratedValue
