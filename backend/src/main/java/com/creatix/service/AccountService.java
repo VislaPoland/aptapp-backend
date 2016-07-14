@@ -18,6 +18,7 @@ import freemarker.template.TemplateException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -255,8 +256,11 @@ public class AccountService {
         if ( account.getPasswordHash() == null ) {
             account.setPasswordHash(passwordEncoder.encode(request.getPassword()));
             accountDao.persist(account);
+            return account;
         }
-        return account;
+        else {
+            throw new AccessDeniedException("Password already set");
+        }
     }
 
     public void resetAccountPasswordFromRequest(@NotNull ResetPasswordRequest request) {
