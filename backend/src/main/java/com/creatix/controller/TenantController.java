@@ -46,6 +46,7 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public DataResponse<TenantDto> createTenant(@RequestBody @Valid CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toTenantDto(tenantService.createTenantFromRequest(request)));
     }
@@ -59,7 +60,7 @@ public class TenantController {
             @ApiResponse(code = 422, message = "Unprocessable")
     })
     @RequestMapping(value = "/{tenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public DataResponse<TenantDto> updateTenant(@PathVariable Long tenantId, @Valid @RequestBody UpdateTenantRequest request) {
         return new DataResponse<>(mapper.toTenantDto(tenantService.updateTenantFromRequest(tenantId, request)));
     }
@@ -100,7 +101,7 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(value = "/{tenantId}/vehicles/{vehicleId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant})
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager})
     public DataResponse<Void> deleteTenantVehicle(@PathVariable Long tenantId, @PathVariable Long vehicleId) {
         tenantService.deleteVehicle(tenantId, vehicleId);
         return new DataResponse<>();
