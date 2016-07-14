@@ -35,11 +35,9 @@ public class MapperTest {
     @WithMockCustomUser("apt@test.com")
     public void toApartmentDto() throws Exception {
         final Apartment apartment22 = apartmentDao.findById(22L);
-        assertNotNull(apartment22.getNeighbors().getBelow());
         assertNotNull(apartment22.getNeighbors().getLeft());
         final ApartmentDto dto = mapper.toApartmentDto(apartment22);
         assertNotNull(dto.getNeighbors());
-        assertNotNull(dto.getNeighbors().getBelow());
         assertNotNull(dto.getNeighbors().getLeft());
     }
 

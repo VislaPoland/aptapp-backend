@@ -321,6 +321,9 @@ public class Mapper {
                 .byDefault()
                 .register();
 
+        mapperFactory.classMap(PersistEventSlotRequest.class, EventSlot.class)
+                .byDefault()
+                .register();
         mapperFactory.classMap(MaintenanceSlot.class, MaintenanceSlotDto.class)
                 .exclude("reservations")
                 .byDefault()
@@ -538,6 +541,12 @@ public class Mapper {
     public EventSlotDto toEventSlotDto(@NotNull EventSlot slot) {
         Objects.requireNonNull(slot);
         return mapperFactory.getMapperFacade().map(slot, EventSlotDto.class);
+    }
+
+    public void fillEventSlot(@NotNull PersistEventSlotRequest req, @NotNull EventSlot slot) {
+        Objects.requireNonNull(req);
+        Objects.requireNonNull(slot);
+        mapperFactory.getMapperFacade().map(req, slot);
     }
 
     public SlotDto toSlotDto(@NotNull Slot slot) {

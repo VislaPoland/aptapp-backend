@@ -40,7 +40,7 @@ public class SlotDaoTest {
     @Autowired
     private AccountDao accountDao;
 
-    private static final ZoneOffset ZONE_OFFSET = ZoneOffset.ofHours(TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (7200 * 1000));
+    private static final ZoneOffset LOCAL_ZONE_OFFSET = ZoneOffset.ofHours(TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (7200 * 1000));
 
     @Test
     public void findByPropertyAndAccountAndBeginTime() throws Exception {
@@ -51,7 +51,7 @@ public class SlotDaoTest {
         List<Slot> slots = slotDao.findByPropertyAndAccountAndBeginTime(
                 property,
                 accountDao.findByEmail("apt@test.com"),
-                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, LOCAL_ZONE_OFFSET),
                 pageSize
         );
         assertNotNull(slots);
@@ -61,41 +61,41 @@ public class SlotDaoTest {
         slots = slotDao.findByPropertyAndAccountAndBeginTime(
                 property,
                 accountDao.findByEmail("apt@test.com"),
-                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, LOCAL_ZONE_OFFSET),
                 9999
         );
         assertNotNull(slots);
-        assertEquals(10, slots.size());
+        assertEquals(9, slots.size());
 
 
         slots = slotDao.findByPropertyAndAccountAndBeginTime(
                 property,
                 accountDao.findByEmail("tomas.sedlak@thinkcreatix.com"),
-                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, LOCAL_ZONE_OFFSET),
                 9999
         );
         assertNotNull(slots);
-        assertEquals(10, slots.size());
+        assertEquals(9, slots.size());
 
 
         slots = slotDao.findByPropertyAndAccountAndBeginTime(
                 property,
                 accountDao.findByEmail("martin.maintenance@apartments.com"),
-                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, LOCAL_ZONE_OFFSET),
                 9999
         );
         assertNotNull(slots);
-        assertEquals(10, slots.size());
+        assertEquals(9, slots.size());
 
 
         slots = slotDao.findByPropertyAndAccountAndBeginTime(
                 property,
                 accountDao.findByEmail("martin.security@apartments.com"),
-                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, ZONE_OFFSET),
+                OffsetDateTime.of(2016, 2, 1, 4, 0, 0, 0, LOCAL_ZONE_OFFSET),
                 9999
         );
         assertNotNull(slots);
-        assertEquals(9, slots.size());
+        assertEquals(8, slots.size());
     }
 
 
@@ -107,16 +107,16 @@ public class SlotDaoTest {
         List<Slot> slots = slotDao.findByPropertyAndAccountAndDateRange(
                 property,
                 accountDao.findByEmail("martin.security@apartments.com"),
-                OffsetDateTime.of(2016, 7, 18, 0, 0, 0, 0, ZONE_OFFSET),
-                OffsetDateTime.of(2016, 7, 18, 23, 59, 59, 999, ZONE_OFFSET));
+                OffsetDateTime.of(2016, 7, 18, 0, 0, 0, 0, LOCAL_ZONE_OFFSET),
+                OffsetDateTime.of(2016, 7, 18, 23, 59, 59, 999, LOCAL_ZONE_OFFSET));
         assertNotNull(slots);
         assertEquals(0, slots.size());
 
         slots = slotDao.findByPropertyAndAccountAndDateRange(
                 property,
                 accountDao.findByEmail("martin.maintenance@apartments.com"),
-                OffsetDateTime.of(2016, 2, 1, 0, 0, 0, 0, ZONE_OFFSET),
-                OffsetDateTime.of(2016, 2, 1, 23, 59, 59, 999, ZONE_OFFSET));
+                OffsetDateTime.of(2016, 2, 1, 0, 0, 0, 0, LOCAL_ZONE_OFFSET),
+                OffsetDateTime.of(2016, 2, 1, 23, 59, 59, 999, LOCAL_ZONE_OFFSET));
         assertNotNull(slots);
         assertEquals(4, slots.size());
     }
@@ -153,5 +153,14 @@ public class SlotDaoTest {
         assertNotNull(slots);
         assertEquals(1, slots.size());
         assertEquals(201L, slots.get(0).getId());
+
+        slots = slotDao.findByPropertyAndAccountAndSlotIdGreaterOrEqual(
+                property,
+                accountDao.findByEmail("martin.security@apartments.com"),
+                201L,
+                1);
+        assertNotNull(slots);
+        assertEquals(1, slots.size());
+        assertEquals(421L, slots.get(0).getId());
     }
 }

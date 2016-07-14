@@ -2,6 +2,7 @@ package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
+import com.creatix.domain.enums.AudienceType;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.stereotype.Repository;
@@ -82,6 +83,17 @@ public class SlotDao extends DaoBase<Slot, Long> {
         }
         else {
             env.predicate = env.predicate.and(env.slot.instanceOf(EventSlot.class));
+        }
+
+        if ( account instanceof EmployeeBase ) {
+            env.predicate = env.predicate.and(env.slot.instanceOf(MaintenanceSlot.class)
+                    .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
+                    .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Employees)));
+        }
+        else if ( account instanceof TenantBase ) {
+            env.predicate = env.predicate.and(env.slot.instanceOf(MaintenanceSlot.class)
+                    .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
+                    .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Tenants)));
         }
 
         return env;

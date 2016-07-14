@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store;
 
+import com.creatix.domain.enums.AudienceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.FilterDefs;
 import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Objects;
@@ -28,35 +30,20 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = "id")
 @ToString(of = {"id", "beginTime", "endTime"})
-@FilterDefs({
-        @FilterDef(name= Slot.SLOT_BEGIN_TIME_BETWEEN, parameters={
-                @ParamDef(name="fromDt", type="java.util.Date" ),
-                @ParamDef(name="toDt", type="java.util.Date" ),
-        }),
-        @FilterDef(name= Slot.SLOT_BEGIN_TIME_FROM, parameters={
-                @ParamDef(name="fromDt", type="java.util.Date" )
-        })
-})
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Slot {
-    public static final String SLOT_BEGIN_TIME_BETWEEN = "slotBeginTimeBetween";
-    public static final String SLOT_BEGIN_TIME_FROM = "slotBeginTimeFrom";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Property property;
+    @NotNull
     @Column(nullable = false)
     private OffsetDateTime beginTime;
+    @NotNull
     @Column(nullable = false)
     private OffsetDateTime endTime;
-    @JoinTable(
-            indexes = {
-                    @Index(columnList = "Slot_id"),
-                    @Index(columnList = "amenities_id")
-            }
-    )
     @Column(nullable = false)
     private int unitDurationMinutes;
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)

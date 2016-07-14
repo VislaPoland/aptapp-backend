@@ -115,6 +115,8 @@ UPDATE public.apartment SET left_id = 13, right_id = 24, above_id = 34 WHERE id 
 UPDATE public.apartment SET left_id = 14, right_id = 25, above_id = 35 WHERE id = 15;
 UPDATE public.apartment SET left_id = 15, right_id = 26, above_id = 36 WHERE id = 16;
 UPDATE public.apartment SET left_id = 16, right_id = 27, above_id = 37 WHERE id = 17;
+UPDATE public.apartment SET below_id = 11 WHERE id = 31;
+UPDATE public.apartment SET left_id = 12 WHERE id = 22;
 
 
 -- tenant
@@ -127,13 +129,12 @@ INSERT INTO public.account (dtype, id, active, company_name, first_name, last_na
 INSERT INTO public.notification (dtype, id, created_at, date, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id) VALUES ('MaintenanceNotification', 1, '2016-07-07 16:00:00', '2016-07-07 16:00:00', null, null, null, 'Pending', 'Maint. test 1', 'Maintenance', '2016-07-07 16:00:00', false, 3, 1, 22);
 
 -- slots
--- slots for SlotDaoTest
-INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 100, '2016-02-01 18:30:00', '2016-02-01 19:00:00', 30, 1, null, 'Event slot 1', 'Event 1');
-INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 101, '2016-02-01 19:00:00', '2016-02-01 19:30:00', 30, 1, null, 'Event slot 2', 'Event 2');
-INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 102, '2016-02-01 19:30:00', '2016-02-01 20:00:00', 30, 1, null, 'Event slot 3', 'Event 3');
-INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 103, '2016-02-02 20:00:00', '2016-02-02 20:30:00', 30, 1, null, 'Event slot 4', 'Event 4');
-INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 104, '2016-02-02 20:30:00', '2016-02-02 21:00:00', 30, 1, null, 'Event slot 5', 'Event 5');
-INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 105, '2016-02-03 21:00:00', '2016-02-03 21:30:00', 30, 1, null, 'Event slot 6', 'Event 6');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 100, '2016-02-01 18:30:00', '2016-02-01 19:00:00', 30, 1, null, 'Event slot 1', 'Event 1', 'Everyone');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 101, '2016-02-01 19:00:00', '2016-02-01 19:30:00', 30, 1, null, 'Event slot 2', 'Event 2', 'Everyone');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 102, '2016-02-01 19:30:00', '2016-02-01 20:00:00', 30, 1, null, 'Event slot 3', 'Event 3', 'Everyone');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 103, '2016-02-02 20:00:00', '2016-02-02 20:30:00', 30, 1, null, 'Event slot 4', 'Event 4', 'Everyone');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 104, '2016-02-02 20:30:00', '2016-02-02 21:00:00', 30, 1, null, 'Event slot 5', 'Event 5', 'Everyone');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 105, '2016-02-03 21:00:00', '2016-02-03 21:30:00', 30, 1, null, 'Event slot 6', 'Event 6', 'Everyone');
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 200, '2016-02-01 18:30:00', '2016-02-01 19:00:00', 30, 1, null, null, null);
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 201, '2016-02-01 19:00:00', '2016-02-01 19:30:00', 30, 1, null, null, null);
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 202, '2016-02-01 19:30:00', '2016-02-01 20:00:00', 30, 1, null, null, null);
@@ -141,9 +142,9 @@ INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes,
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 204, '2016-02-02 20:30:00', '2016-02-02 21:00:00', 30, 1, null, null, null);
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 205, '2016-02-03 21:00:00', '2016-02-03 21:30:00', 30, 1, null, null, null);
 
-INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 420, '2016-07-07 15:00:00.000000', '2016-07-07 18:00:00.000000', 180, 1, null, 'everybody is welcome', 'Domova schodza');
-INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 421, '2016-07-09 16:00:00.000000', '2016-07-09 17:00:00.000000', 60, 1, null, 'please bring adidas with at least 3 stripes', 'Slavsquat training');
-INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('EventSlot', 422, '2016-07-09 18:00:00.000000', '2016-07-09 19:00:00.000000', 60, 1, null, 'only russian sabaka allowed', 'Dog walking competition');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 420, '2016-07-07 15:00:00.000000', '2016-07-07 18:00:00.000000', 180, 1, null, 'everybody is welcome', 'Domova schodza', 'Tenants');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 421, '2016-07-09 16:00:00.000000', '2016-07-09 17:00:00.000000', 60, 1, null, 'please bring adidas with at least 3 stripes', 'Slavsquat training', 'Everyone');
+INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 422, '2016-07-09 18:00:00.000000', '2016-07-09 19:00:00.000000', 60, 1, null, 'only russian sabaka allowed', 'Dog walking competition', 'Employees');
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 455, '2016-07-11 15:00:00.000000', '2016-07-11 23:00:00.000000', 30, 1, null, null, null);
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 458, '2016-07-16 13:30:00.000000', '2016-07-16 14:00:00.000000', 30, 1, null, null, null);
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 472, '2016-07-18 15:00:00.000000', '2016-07-18 23:00:00.000000', 30, 1, null, null, null);
