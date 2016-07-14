@@ -1,7 +1,7 @@
 package com.creatix.controller;
 
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.dto.property.facility.CreatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.facility.UpdatePropertyFacilityRequest;
 import com.creatix.domain.enums.AccountRole;
@@ -37,7 +37,7 @@ public class PropertyFacilityController {
     })
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<List<PropertyDetailsDto.FacilityDto>> getAllPropertyFacilities(@PathVariable Long propertyId) {
+    public DataResponse<List<PropertyDto.FacilityDto>> getAllPropertyFacilities(@PathVariable Long propertyId) {
         return new DataResponse<>(propertyFacilityService.details(propertyId).stream()
                 .map(f -> mapper.toPropertyFacility(f))
                 .collect(Collectors.toList()));
@@ -51,7 +51,7 @@ public class PropertyFacilityController {
     })
     @RequestMapping(value = "/{facilityId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<PropertyDetailsDto.FacilityDto> getPropertyFacilty(@PathVariable Long propertyId, @PathVariable Long facilityId) {
+    public DataResponse<PropertyDto.FacilityDto> getPropertyFacilty(@PathVariable Long propertyId, @PathVariable Long facilityId) {
         return new DataResponse<>(mapper.toPropertyFacility(propertyFacilityService.detail(propertyId, facilityId)));
     }
 
@@ -63,7 +63,7 @@ public class PropertyFacilityController {
     })
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<PropertyDetailsDto.FacilityDto> createPropertyFacility(@PathVariable Long propertyId, @Valid @RequestBody CreatePropertyFacilityRequest request) {
+    public DataResponse<PropertyDto.FacilityDto> createPropertyFacility(@PathVariable Long propertyId, @Valid @RequestBody CreatePropertyFacilityRequest request) {
         return new DataResponse<>(mapper.toPropertyFacility(propertyFacilityService.create(propertyId, request)));
     }
 
@@ -75,7 +75,7 @@ public class PropertyFacilityController {
     })
     @RequestMapping(value = "/{facilityId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<PropertyDetailsDto.FacilityDto> updatePropertyFacility(@PathVariable Long propertyId, @PathVariable Long facilityId, @Valid @RequestBody UpdatePropertyFacilityRequest request) {
+    public DataResponse<PropertyDto.FacilityDto> updatePropertyFacility(@PathVariable Long propertyId, @PathVariable Long facilityId, @Valid @RequestBody UpdatePropertyFacilityRequest request) {
         return new DataResponse<>(mapper.toPropertyFacility(propertyFacilityService.update(propertyId, facilityId, request)));
     }
 
@@ -87,7 +87,7 @@ public class PropertyFacilityController {
     })
     @RequestMapping(value = "/{facilityId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
-    public DataResponse<PropertyDetailsDto.FacilityDto> deletePropertyFacility(@PathVariable Long propertyId, @PathVariable Long facilityId) {
+    public DataResponse<PropertyDto.FacilityDto> deletePropertyFacility(@PathVariable Long propertyId, @PathVariable Long facilityId) {
         return new DataResponse<>(mapper.toPropertyFacility(propertyFacilityService.delete(propertyId, facilityId)));
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
 
 @ApiModel
 @Data
-public class PropertyDetailsDto {
+public class PropertyDto {
 
     @ApiModelProperty(value = "Property ID", required = true)
     private Long id;
@@ -44,6 +44,8 @@ public class PropertyDetailsDto {
     private MaintenanceSlotScheduleDto schedule;
     @ApiModelProperty(value = "Notification photo")
     private List<PropertyPhotoDto> photos;
+    @ApiModelProperty(value = "Enable/disable sms notifications", required = true, notes = "Indicate that sms message notifications are enabled/disabled")
+    private Boolean enableSms;
 
     @ApiModel
     @Data

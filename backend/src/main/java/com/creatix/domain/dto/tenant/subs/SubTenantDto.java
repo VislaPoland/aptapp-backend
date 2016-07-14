@@ -2,7 +2,7 @@ package com.creatix.domain.dto.tenant.subs;
 
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.apartment.ApartmentDto;
-import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.enums.TenantType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -42,7 +42,7 @@ public class SubTenantDto {
     private AddressDto address;
 
     @ApiModelProperty(value = "Associated property details", required = true)
-    private PropertyDetailsDto property;
+    private PropertyDto property;
 
     @ApiModelProperty(value = "Associated apartment", required = true)
     private ApartmentDto apartment;

@@ -1,7 +1,7 @@
 package com.creatix.controller;
 
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.property.PropertyEmployeeService;
@@ -34,7 +34,7 @@ public class PropertyEmployeeController {
     })
     @RequestMapping(value = "/{employeeId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<PropertyDetailsDto.AccountDto> removePropertyEmployee(@PathVariable Long propertyId, @PathVariable Long employeeId) {
+    public DataResponse<PropertyDto.AccountDto> removePropertyEmployee(@PathVariable Long propertyId, @PathVariable Long employeeId) {
         return new DataResponse<>(mapper.toPropertyAccount(propertyEmployeeService.delete(propertyId, employeeId)));
     }
 

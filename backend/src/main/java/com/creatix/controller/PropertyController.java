@@ -2,12 +2,10 @@ package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
-import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
-import com.creatix.domain.dto.property.slot.EventSlotDto;
 import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
 import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.enums.AccountRole;
@@ -34,7 +32,6 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,9 +55,9 @@ public class PropertyController {
     })
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<List<PropertyDetailsDto>> getAllProperties() {
+    public DataResponse<List<PropertyDto>> getAllProperties() {
         return new DataResponse<>(propertyService.getAllProperties().stream()
-                .map(p -> mapper.toPropertyDetailsDto(p))
+                .map(p -> mapper.toPropertyDto(p))
                 .collect(Collectors.toList()));
     }
 
@@ -72,8 +69,8 @@ public class PropertyController {
     })
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<PropertyDetailsDto> getPropertyDetails(@PathVariable long propertyId) {
-        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.getProperty(propertyId)));
+    public DataResponse<PropertyDto> getPropertyDetails(@PathVariable long propertyId) {
+        return new DataResponse<>(mapper.toPropertyDto(propertyService.getProperty(propertyId)));
     }
 
     @ApiOperation(value = "Create new property")
@@ -84,8 +81,8 @@ public class PropertyController {
     })
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator})
-    public DataResponse<PropertyDetailsDto> createProperty(@RequestBody @Valid CreatePropertyRequest request) {
-        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.createFromRequest(request)));
+    public DataResponse<PropertyDto> createProperty(@RequestBody @Valid CreatePropertyRequest request) {
+        return new DataResponse<>(mapper.toPropertyDto(propertyService.createFromRequest(request)));
     }
 
     @ApiOperation(value = "Update property", notes = "Update existing property. This endpoint can only be called by account with Administrator role.")
@@ -96,8 +93,8 @@ public class PropertyController {
     })
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<PropertyDetailsDto> updateProperty(@PathVariable Long propertyId, @RequestBody @Valid UpdatePropertyRequest request) {
-        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.updateFromRequest(propertyId, request)));
+    public DataResponse<PropertyDto> updateProperty(@PathVariable Long propertyId, @RequestBody @Valid UpdatePropertyRequest request) {
+        return new DataResponse<>(mapper.toPropertyDto(propertyService.updateFromRequest(propertyId, request)));
     }
 
     @ApiOperation(value = "Delete property", notes = "Delete existing property.")
@@ -108,8 +105,8 @@ public class PropertyController {
     })
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator})
-    public DataResponse<PropertyDetailsDto> deleteProperty(@PathVariable Long propertyId) {
-        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.deleteProperty(propertyId)));
+    public DataResponse<PropertyDto> deleteProperty(@PathVariable Long propertyId) {
+        return new DataResponse<>(mapper.toPropertyDto(propertyService.deleteProperty(propertyId)));
     }
 
     @ApiOperation(value = "Upload property photo")
@@ -119,8 +116,8 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found")})
     @RequestMapping(value = "/{propertyId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<PropertyDetailsDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long propertyId) throws IOException {
-        return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.storePropertyPhotos(files, propertyId)));
+    public DataResponse<PropertyDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long propertyId) throws IOException {
+        return new DataResponse<>(mapper.toPropertyDto(propertyService.storePropertyPhotos(files, propertyId)));
     }
 
     @ApiOperation(value = "Download property photo")

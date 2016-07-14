@@ -1,6 +1,6 @@
 package com.creatix.domain.mapper;
 
-import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.dto.property.contact.CreatePropertyContactRequest;
 import com.creatix.domain.dto.property.contact.UpdatePropertyContactRequest;
 import com.creatix.domain.dto.property.facility.CreatePropertyFacilityRequest;
@@ -22,13 +22,13 @@ public final class PropertyMapper extends ConfigurableMapper {
     protected void configure(MapperFactory mapperFactory) {
         super.configure(mapperFactory);
 
-        mapperFactory.classMap(Property.class, PropertyDetailsDto.class)
+        mapperFactory.classMap(Property.class, PropertyDto.class)
                 .byDefault()
                 .field("address.fullAddress", "address")
                 .register();
 
         //region Account
-        mapperFactory.classMap(EmployeeBase.class, PropertyDetailsDto.AccountDto.class)
+        mapperFactory.classMap(EmployeeBase.class, PropertyDto.AccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -36,7 +36,7 @@ public final class PropertyMapper extends ConfigurableMapper {
         //endregion
 
         //region Contact
-        mapperFactory.classMap(Contact.class, PropertyDetailsDto.ContactDto.class)
+        mapperFactory.classMap(Contact.class, PropertyDto.ContactDto.class)
                 .byDefault()
                 .register();
         mapperFactory.classMap(CreatePropertyContactRequest.class, Contact.class)
@@ -48,7 +48,7 @@ public final class PropertyMapper extends ConfigurableMapper {
         //endregion
 
         //region Facility
-        mapperFactory.classMap(Facility.class, PropertyDetailsDto.FacilityDto.class)
+        mapperFactory.classMap(Facility.class, PropertyDto.FacilityDto.class)
                 .byDefault()
                 .register();
         mapperFactory.classMap(CreatePropertyFacilityRequest.class, Facility.class)
@@ -69,25 +69,25 @@ public final class PropertyMapper extends ConfigurableMapper {
         //endregion
     }
 
-    public PropertyDetailsDto toPropertyDetailsDto(@NotNull Property property) {
+    public PropertyDto toPropertyDetailsDto(@NotNull Property property) {
         Objects.requireNonNull(property);
 
-        return this.map(property, PropertyDetailsDto.class);
+        return this.map(property, PropertyDto.class);
     }
 
     //region Account
-    public PropertyDetailsDto.AccountDto toPropertyAccount(@NotNull Account account) {
+    public PropertyDto.AccountDto toPropertyAccount(@NotNull Account account) {
         Objects.requireNonNull(account);
 
-        return this.map(account, PropertyDetailsDto.AccountDto.class);
+        return this.map(account, PropertyDto.AccountDto.class);
     }
     //endregion
 
     //region Contact
-    public PropertyDetailsDto.ContactDto toPropertyContact(@NotNull Contact contact) {
+    public PropertyDto.ContactDto toPropertyContact(@NotNull Contact contact) {
         Objects.requireNonNull(contact);
 
-        return this.map(contact, PropertyDetailsDto.ContactDto.class);
+        return this.map(contact, PropertyDto.ContactDto.class);
     }
 
     public Contact toPropertyContact(@NotNull CreatePropertyContactRequest request) {
@@ -105,10 +105,10 @@ public final class PropertyMapper extends ConfigurableMapper {
     //endregion
 
     //region Facility
-    public PropertyDetailsDto.FacilityDto toPropertyFacility(@NotNull Facility facility) {
+    public PropertyDto.FacilityDto toPropertyFacility(@NotNull Facility facility) {
         Objects.requireNonNull(facility);
 
-        return this.map(facility, PropertyDetailsDto.FacilityDto.class);
+        return this.map(facility, PropertyDto.FacilityDto.class);
     }
 
     public Facility toPropertyFacility(@NotNull CreatePropertyFacilityRequest request) {

@@ -1,12 +1,10 @@
 package com.creatix.domain.dto.account;
 
-import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.apartment.ApartmentDto;
-import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.enums.AccountRole;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,7 +47,7 @@ public class AccountDto {
     private String companyName;
 
     @ApiModelProperty(value = "Associated property details", notes = "This is required for tenant and property manager")
-    private PropertyDetailsDto property;
+    private PropertyDto property;
 
     @ApiModelProperty(value = "Associated apartment")
     private ApartmentDto apartment;

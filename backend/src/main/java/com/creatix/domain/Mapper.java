@@ -18,7 +18,7 @@ import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotification
 import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
-import com.creatix.domain.dto.property.PropertyDetailsDto;
+import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.dto.property.PropertyPhotoDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.dto.property.slot.*;
@@ -98,32 +98,32 @@ public class Mapper {
                         if (account instanceof Tenant) {
                             final Apartment apartment = ((Tenant) account).getApartment();
                             final Property property = apartment.getProperty();
-                            PropertyDetailsDto details = toPropertyDetailsDto(property);
+                            PropertyDto details = toPropertyDto(property);
                             accountDto.setProperty(details);
                             accountDto.setApartment(toApartmentDto(apartment));
                         }
                         else if (account instanceof PropertyManager) {
                             final Property managedProperty = ((PropertyManager) account).getManagedProperty();
                             if ( managedProperty != null ) {
-                                accountDto.setProperty(toPropertyDetailsDto(managedProperty));
+                                accountDto.setProperty(toPropertyDto(managedProperty));
                             }
                         }
                         else if ( account instanceof ManagedEmployee) {
                             final Property managedProperty = ((ManagedEmployee) account).getManager().getManagedProperty();
                             if ( managedProperty != null ) {
-                                accountDto.setProperty(toPropertyDetailsDto(managedProperty));
+                                accountDto.setProperty(toPropertyDto(managedProperty));
                             }
                         }
                     }
                 })
                 .register();
 
-        mapperFactory.classMap(ManagedEmployee.class, PropertyDetailsDto.AccountDto.class)
+        mapperFactory.classMap(ManagedEmployee.class, PropertyDto.AccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
                 .register();
-        mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.AccountDto.class)
+        mapperFactory.classMap(PropertyManager.class, PropertyDto.AccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -131,23 +131,23 @@ public class Mapper {
         mapperFactory.classMap(PropertyPhoto.class, PropertyPhotoDto.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(Property.class, PropertyDetailsDto.class)
+        mapperFactory.classMap(Property.class, PropertyDto.class)
                 .byDefault()
                 .field("address.fullAddress", "fullAddress")
                 .customize(
-                        new CustomMapper<Property, PropertyDetailsDto>() {
+                        new CustomMapper<Property, PropertyDto>() {
                             @Override
-                            public void mapAtoB(Property property, PropertyDetailsDto propertyDetailsDto, MappingContext context) {
-                                super.mapAtoB(property, propertyDetailsDto, context);
+                            public void mapAtoB(Property property, PropertyDto propertyDto, MappingContext context) {
+                                super.mapAtoB(property, propertyDto, context);
 
-                                propertyDetailsDto.setAssistantManagers(
+                                propertyDto.setAssistantManagers(
                                         assistantPropertyManagerDao.findByProperty(property).stream()
-                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.AccountDto.class))
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDto.AccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
-                                propertyDetailsDto.setEmployees(
+                                propertyDto.setEmployees(
                                         managedEmployeeDao.findByProperty(property).stream()
-                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDetailsDto.AccountDto.class))
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDto.AccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
                             }
@@ -155,15 +155,15 @@ public class Mapper {
                 )
                 .register();
 
-        mapperFactory.classMap(Facility.class, PropertyDetailsDto.FacilityDto.class)
+        mapperFactory.classMap(Facility.class, PropertyDto.FacilityDto.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(Contact.class, PropertyDetailsDto.ContactDto.class)
+        mapperFactory.classMap(Contact.class, PropertyDto.ContactDto.class)
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(PropertyOwner.class, PropertyDetailsDto.OwnerDto.class)
+        mapperFactory.classMap(PropertyOwner.class, PropertyDto.OwnerDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -441,9 +441,9 @@ public class Mapper {
         return mapperFactory.getMapperFacade().map(account, AccountDto.class);
     }
 
-    public PropertyDetailsDto toPropertyDetailsDto(@NotNull Property property) {
+    public PropertyDto toPropertyDto(@NotNull Property property) {
         Objects.requireNonNull(property);
-        return mapperFactory.getMapperFacade().map(property, PropertyDetailsDto.class);
+        return mapperFactory.getMapperFacade().map(property, PropertyDto.class);
     }
 
     public NotificationDto toNotificationDto(@NotNull Notification n) {
