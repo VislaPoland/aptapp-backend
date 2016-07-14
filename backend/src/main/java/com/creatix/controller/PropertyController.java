@@ -112,19 +112,6 @@ public class PropertyController {
         return new DataResponse<>(mapper.toPropertyDetailsDto(propertyService.deleteProperty(propertyId)));
     }
 
-    @ApiOperation(value = "Get apartments")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found")
-    })
-    @RequestMapping(value = "/{propertyId}/apartments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Administrator})
-    public DataResponse<List<ApartmentDto>> getApartments(@PathVariable Long propertyId) {
-        return new DataResponse<>(apartmentService.getApartmentsByPropertyId(propertyId).stream()
-                .map(a -> mapper.toApartmentDto(a)).collect(Collectors.toList()));
-    }
-
     @ApiOperation(value = "Upload property photo")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),

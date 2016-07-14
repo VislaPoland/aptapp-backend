@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Transactional
@@ -26,6 +28,19 @@ public class ApartmentController {
     private Mapper mapper;
     @Autowired
     private ApartmentService apartmentService;
+
+    @ApiOperation(value = "Get apartments")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/apartments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Administrator})
+    public DataResponse<List<ApartmentDto>> getApartments(@PathVariable Long propertyId) {
+        return new DataResponse<>(apartmentService.getApartmentsByPropertyId(propertyId).stream()
+                .map(a -> mapper.toApartmentDto(a)).collect(Collectors.toList()));
+    }
 
     @ApiOperation(value = "Get apartment details")
     @ApiResponses(value = {
