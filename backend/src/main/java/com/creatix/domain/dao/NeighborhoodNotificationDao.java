@@ -13,15 +13,17 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 
 @Repository
 @Transactional
 public class NeighborhoodNotificationDao extends AbstractNotificationDao<NeighborhoodNotification> {
-    private Predicate filtersPredicate(final QNeighborhoodNotification neighborhoodNotification, NotificationStatus status,
-                                       NotificationRequestType type, Account a) {
-        final BooleanExpression predicate = neighborhoodNotification.status.eq(status);
+    private Predicate filtersPredicate(@NotNull QNeighborhoodNotification neighborhoodNotification, @Nullable NotificationStatus status,
+                                       @NotNull NotificationRequestType type, @NotNull Account a) {
+        final BooleanExpression predicate = (status != null ? neighborhoodNotification.status.eq(status) : neighborhoodNotification.status.isNotNull());
         switch (type) {
             case Sent:
                 return predicate.and(neighborhoodNotification.author.eq(a));
