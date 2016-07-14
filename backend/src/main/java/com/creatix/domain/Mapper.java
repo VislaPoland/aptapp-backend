@@ -366,7 +366,7 @@ public class Mapper {
                         else {
                             slotDto.setReservations(slot.getReservations().stream()
                                     .filter(r -> authorizationManager.canRead(r))
-                            .map(r -> mapperFactory.getMapperFacade().map(r, MaintenanceReservationDto.class))
+                            .map(r -> toMaintenanceReservationDto(r))
                             .collect(Collectors.toList()));
                         }
                     }
