@@ -5,6 +5,7 @@ import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.querydsl.core.annotations.QueryInit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
@@ -26,6 +27,7 @@ import java.util.Set;
 @BatchSize(size = 80)
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(of = { "id", "beginTime", "endTime" })
 public class MaintenanceReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

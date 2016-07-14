@@ -40,6 +40,7 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -184,9 +185,20 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
-                .byDefault()
                 .field("date", "scheduledAt")
-                .exclude("reservation.notification")    // prevent recursive mapping
+                .exclude("reservation")    // prevent recursive mapping
+                .byDefault()
+                .customize(new CustomMapper<MaintenanceNotification, MaintenanceNotificationDto>() {
+                    @Override
+                    public void mapAtoB(MaintenanceNotification notification, MaintenanceNotificationDto notificationDto, MappingContext context) {
+                        if ( notification.getReservation() != null ) {
+                            final MaintenanceReservation reservation = notification.getReservation();
+                            final MaintenanceReservationDto reservationDto = new MaintenanceReservationDto();
+                            BeanUtils.copyProperties(reservation, reservationDto);
+                            notificationDto.setReservation(reservationDto);
+                        }
+                    }
+                })
                 .register();
 
         mapperFactory.classMap(NotificationPhoto.class, NotificationPhotoDto.class)
@@ -342,8 +354,9 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(MaintenanceSlot.class, MaintenanceSlotDto.class)
-                .byDefault()
                 .exclude("reservations")
+                .exclude("units.reservations")
+                .byDefault()
                 .customize(new CustomMapper<MaintenanceSlot, MaintenanceSlotDto>() {
                     @Override
                     public void mapAtoB(MaintenanceSlot slot, MaintenanceSlotDto slotDto, MappingContext context) {
@@ -360,8 +373,9 @@ public class Mapper {
                 })
                 .register();
         mapperFactory.classMap(MaintenanceReservation.class, MaintenanceReservationDto.class)
+                .exclude("slot")                        // prevent recursive mapping
+                .exclude("units")                       // prevent recursive mapping
                 .byDefault()
-                .exclude("notification.reservation")    // prevent recursive mapping
                 .register();
         mapperFactory.classMap(MaintenanceSlotSchedule.class, MaintenanceSlotScheduleDto.class)
                 .byDefault()
