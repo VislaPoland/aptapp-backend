@@ -28,6 +28,7 @@ import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -245,6 +246,18 @@ public class TenantService {
         } else {
             throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
         }
+    }
+
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public void deleteTenant(@NotNull Tenant tenant) {
+        Objects.requireNonNull(tenant);
+        authorizationManager.checkWrite(tenant);
+
+        tenant.setDeletedAt(new Date());
+        tenant.setActive(Boolean.FALSE);
+        tenant.setApartment(null);
+
+        tenantDao.persist(tenant);
     }
 
     private void preventAccountDuplicity(String email, String emailExisting) {

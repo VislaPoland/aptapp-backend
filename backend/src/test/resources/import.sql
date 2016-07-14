@@ -108,33 +108,19 @@ INSERT INTO public.apartment_neighbor (id, unit_number, apartment_id) VALUES (36
 INSERT INTO public.apartment_neighbor (id, unit_number, apartment_id) VALUES (37, '37', 37);
 
 
-UPDATE public.apartment SET right_id = 12, above_id = 21 WHERE id = 11;
-UPDATE public.apartment SET left_id = 11, right_id = 13, above_id = 22 WHERE id = 12;
-UPDATE public.apartment SET left_id = 12, right_id = 14, above_id = 23 WHERE id = 13;
-UPDATE public.apartment SET left_id = 13, right_id = 15, above_id = 24 WHERE id = 14;
-UPDATE public.apartment SET left_id = 14, right_id = 16, above_id = 25 WHERE id = 15;
-UPDATE public.apartment SET left_id = 15, right_id = 17, above_id = 26 WHERE id = 16;
-UPDATE public.apartment SET left_id = 16, above_id = 27 WHERE id = 17;
+UPDATE public.apartment SET right_id = 21, above_id = 31 WHERE id = 11;
+UPDATE public.apartment SET left_id = 11, right_id = 22, above_id = 32 WHERE id = 12;
+UPDATE public.apartment SET left_id = 12, right_id = 23, above_id = 33 WHERE id = 13;
+UPDATE public.apartment SET left_id = 13, right_id = 24, above_id = 34 WHERE id = 14;
+UPDATE public.apartment SET left_id = 14, right_id = 25, above_id = 35 WHERE id = 15;
+UPDATE public.apartment SET left_id = 15, right_id = 26, above_id = 36 WHERE id = 16;
+UPDATE public.apartment SET left_id = 16, right_id = 27, above_id = 37 WHERE id = 17;
 
-UPDATE public.apartment SET right_id = 22, below_id = 11, above_id = 31 WHERE id = 21;
-UPDATE public.apartment SET left_id = 21, right_id = 23, below_id = 12, above_id = 32 WHERE id = 22;
-UPDATE public.apartment SET left_id = 22, right_id = 24, below_id = 13, above_id = 33 WHERE id = 23;
-UPDATE public.apartment SET left_id = 23, right_id = 25, below_id = 14, above_id = 34 WHERE id = 24;
-UPDATE public.apartment SET left_id = 24, right_id = 26, below_id = 15, above_id = 35 WHERE id = 25;
-UPDATE public.apartment SET left_id = 25, right_id = 27, below_id = 16, above_id = 36 WHERE id = 26;
-UPDATE public.apartment SET left_id = 26, below_id = 17, above_id = 37 WHERE id = 27;
-
-UPDATE public.apartment SET right_id = 32, below_id = 21 WHERE id = 31;
-UPDATE public.apartment SET left_id = 31, right_id = 33, below_id = 22 WHERE id = 32;
-UPDATE public.apartment SET left_id = 32, right_id = 34, below_id = 23 WHERE id = 33;
-UPDATE public.apartment SET left_id = 33, right_id = 35, below_id = 24 WHERE id = 34;
-UPDATE public.apartment SET left_id = 34, right_id = 36, below_id = 25 WHERE id = 35;
-UPDATE public.apartment SET left_id = 35, right_id = 37, below_id = 26 WHERE id = 36;
-UPDATE public.apartment SET left_id = 36, below_id = 27 WHERE id = 37;
 
 -- tenant
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 3, false, 'South Water Apartments', 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt@test.com', '(905) 545-0256', 'Tenant', 'Owner', 22, '123456', '2017-06-16 15:36:38', '2016-06-16 15:36:38', false);
 INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 451, true, 'South Water Apartments', 'Tomas', 'Sedlak', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'tomas.sedlak@thinkcreatix.com', '+421948519283', 'Tenant', 'Owner', 21, null, null, '2016-06-16 15:36:38', true);
+INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 434, false, 'South Water Apartments', 'Peter', 'Pan', null, 'inactive.tenant@test.com', '', 'Tenant', 'Owner', 33, null, null, '2016-06-16 15:36:38', true);
 
 
 -- notification

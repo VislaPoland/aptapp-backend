@@ -31,7 +31,7 @@ public class PropertyEmployeeService {
         Objects.requireNonNull(propertyId);
 
         final Property property = this.getProperty(propertyId);
-        this.authorizationManager.checkAccess(property);
+        this.authorizationManager.checkRead(property);
 
         final EmployeeBase employee = this.getEmployee(employeeId);
         if (employee.isDeleted() == false) {

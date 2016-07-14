@@ -33,6 +33,16 @@ public class AuthorizationManager {
         return getCurrentAccount().getRole() == AccountRole.Administrator;
     }
 
+    public boolean hasAnyOfRoles(AccountRole... roles) {
+        for ( AccountRole role : roles ) {
+            if ( getCurrentAccount().getRole() == role ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public Account getCurrentAccount() throws SecurityException {
         return getCurrentAccount(false);
     }
@@ -97,10 +107,10 @@ public class AuthorizationManager {
     @RoleSecured(AccountRole.PropertyManager)
     public boolean isManager(@NotNull Property property) {
         Objects.requireNonNull(property);
-        return Objects.equals(property, ((PropertyManager) getCurrentAccount()).getManagedProperty());
+        return ((getCurrentAccount() instanceof PropertyManager) && Objects.equals(property, ((PropertyManager) getCurrentAccount()).getManagedProperty()));
     }
 
-    public void checkAccess(@NotNull Property property) {
+    public void checkRead(@NotNull Property property) {
         Objects.requireNonNull(property);
         boolean allowed = false;
         switch ( getCurrentAccount().getRole() ) {
@@ -147,8 +157,9 @@ public class AuthorizationManager {
                 break;
         }
         if ( allowed ) {
-            return allowed;
+            return true;
         }
+
         throw new SecurityException(String.format("You are not eligible to read info about apartment with id=%d", apartment.getId()));
     }
 
@@ -161,21 +172,6 @@ public class AuthorizationManager {
     public boolean isOwner(@NotNull Property property) {
         Objects.requireNonNull(property);
         return Objects.equals(property.getOwner(), getCurrentAccount());
-    }
-
-    public boolean checkAccess(@NotNull Device device) {
-        Objects.requireNonNull(device);
-
-        if ( device.getAccount() == null ) {
-            return true;
-            //throw new SecurityException(String.format("You are not eligible to read unassigned device with id=%d", device.getId()));
-        }
-
-        if ( device.getAccount().getId().equals(this.getCurrentAccount().getId()) ) {
-            return true;
-        }
-
-        throw new SecurityException(String.format("You are not eligible to read device with id=%d", device.getId()));
     }
 
     public boolean checkAccess(@NotNull Device device, @NotNull Account account) {
@@ -199,7 +195,7 @@ public class AuthorizationManager {
         */
     }
 
-    public boolean isEligibleToReadProperty(Property property) {
+    public boolean canWrite(Property property) {
         final Account account = getCurrentAccount();
         switch ( account.getRole() ) {
             case Administrator:
@@ -207,8 +203,7 @@ public class AuthorizationManager {
             case PropertyOwner:
                 return property.getOwner().equals(account);
             case PropertyManager:
-                //noinspection SuspiciousMethodCalls
-                return property.getManagers().contains(account);
+                return property.getManagers().contains((PropertyManager) account);
             case AssistantPropertyManager:
                 return property.getManagers().contains(((ManagedEmployee) account).getManager());
             default:
@@ -217,9 +212,9 @@ public class AuthorizationManager {
     }
 
     // same as read accessibility except Administrator
-    public boolean isEligibleToUpdateProperty(Property property) {
+    public boolean canUpdateProperty(Property property) {
         final Account account = getCurrentAccount();
-        return !account.getRole().equals(AccountRole.Administrator) && isEligibleToReadProperty(property);
+        return !account.getRole().equals(AccountRole.Administrator) && canWrite(property);
     }
 
     public boolean canRead(@NotNull MaintenanceReservation reservation) {
@@ -238,5 +233,26 @@ public class AuthorizationManager {
         }
 
         return false;
+    }
+
+    public void checkWrite(@NotNull Tenant tenant) {
+        Objects.requireNonNull(tenant);
+
+        if ( !(canWrite(tenant)) ) {
+            throw new SecurityException(String.format("Cannot modify tenant id=%d", tenant.getId()));
+        }
+    }
+
+    private boolean canWrite(@NotNull Tenant tenant) {
+        if ( isAdministrator() ) {
+            return true;
+        }
+        if ( tenant.getApartment() == null ) {
+            return hasAnyOfRoles(AccountRole.PropertyOwner, AccountRole.PropertyManager);
+        }
+        else {
+            final Property property = tenant.getApartment().getProperty();
+            return isManager(property) || isOwner(property);
+        }
     }
 }

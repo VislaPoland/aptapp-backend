@@ -20,7 +20,6 @@ public final class ApartmentMapper extends ConfigurableMapper {
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
-                .field("isDeleted", "deleted")
                 .register();
         //endregion
     }

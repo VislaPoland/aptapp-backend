@@ -122,13 +122,11 @@ public class Mapper {
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
-                .field("isDeleted", "deleted")
                 .register();
         mapperFactory.classMap(PropertyManager.class, PropertyDetailsDto.AccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
-                .field("isDeleted", "deleted")
                 .register();
         mapperFactory.classMap(PropertyPhoto.class, PropertyPhotoDto.class)
                 .byDefault()
@@ -169,7 +167,6 @@ public class Mapper {
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
-                .field("isDeleted", "deleted")
                 .field("website", "web")
                 .register();
 

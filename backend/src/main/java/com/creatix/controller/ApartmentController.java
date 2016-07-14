@@ -77,4 +77,16 @@ public class ApartmentController {
     public DataResponse<ApartmentDto> updateApartment(@PathVariable Long apartmentId, @Valid @RequestBody PersistApartmentRequest request) {
         return new DataResponse<>(mapper.toApartmentDto(apartmentService.updateApartment(apartmentId, request)));
     }
+
+    @ApiOperation(value = "Delete apartment")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/apartments/{apartmentId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public DataResponse<ApartmentDto> deleteApartment(@PathVariable Long apartmentId) {
+        return new DataResponse<>(mapper.toApartmentDto(apartmentService.deleteApartment(apartmentId)));
+    }
 }

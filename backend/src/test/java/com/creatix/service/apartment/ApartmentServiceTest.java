@@ -7,17 +7,23 @@ import com.creatix.domain.dto.apartment.PersistApartmentRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ApartmentNeighbor;
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.mock.WithMockCustomUser;
 import com.creatix.service.property.PropertyService;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import static org.junit.Assert.*;
 
@@ -33,11 +39,15 @@ public class ApartmentServiceTest extends TestContext {
     private ApartmentService apartmentService;
     @Autowired
     private PropertyService propertyService;
-
     @Autowired
     private ApartmentDao apartmentDao;
+    @PersistenceContext
+    protected EntityManager em;
 
-
+    @After
+    public void after() {
+        em.flush();
+    }
 
     @Test
     @WithMockCustomUser("helen.owner@apartments.com")
@@ -138,5 +148,16 @@ public class ApartmentServiceTest extends TestContext {
         assertNull(apartment.getNeighbors().getBelow());
         assertNull(apartment.getNeighbors().getLeft());
         assertNull(apartment.getNeighbors().getRight());
+    }
+
+    @Test
+    @WithMockCustomUser("helen.owner@apartments.com")
+    public void deleteApartment() throws Exception {
+        final Apartment apartment = apartmentService.deleteApartment(33L);
+        assertNotNull(apartment);
+        final Tenant tenant = apartment.getTenant();
+        assertNotNull(tenant);
+        assertTrue(tenant.isDeleted());
+        assertFalse(tenant.getActive());
     }
 }

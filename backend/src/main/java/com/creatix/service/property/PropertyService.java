@@ -61,7 +61,7 @@ public class PropertyService {
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public List<Property> getAllProperties() {
         return propertyDao.findAll().stream()
-                .filter(p -> authorizationManager.isEligibleToReadProperty(p))
+                .filter(p -> authorizationManager.canWrite(p))
                 .collect(Collectors.toList());
     }
 
@@ -87,7 +87,7 @@ public class PropertyService {
 
         final Property property = getOrElseThrow(propertyId, propertyDao, new EntityNotFoundException(String.format("Property %d not found", propertyId)));
 
-        if ( authorizationManager.isEligibleToUpdateProperty(property) ) {
+        if ( authorizationManager.canUpdateProperty(property) ) {
             if ( request.getPropertyOwnerId() != null ) {
                 final PropertyOwner propertyOwner = propertyOwnerDao.findById(request.getPropertyOwnerId());
                 if ( propertyOwner == null ) {
@@ -121,7 +121,7 @@ public class PropertyService {
         if ( property == null ) {
             throw new EntityNotFoundException(String.format("Property id=%d not found", propertyId));
         }
-        authorizationManager.checkAccess(property);
+        authorizationManager.checkRead(property);
 
         return property;
     }

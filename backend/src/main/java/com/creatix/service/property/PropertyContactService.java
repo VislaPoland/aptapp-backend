@@ -36,7 +36,7 @@ public class PropertyContactService {
     public List<Contact> details(@NotNull Long propertyId) {
         Objects.requireNonNull(propertyId);
 
-        authorizationManager.checkAccess(this.getProperty(propertyId));
+        authorizationManager.checkRead(this.getProperty(propertyId));
 
         return propertyContactDao
                 .findAllByProperty(propertyId).stream()
@@ -47,7 +47,7 @@ public class PropertyContactService {
     public Contact detail(@NotNull Long propertyId, @NotNull Long contactId) {
         Objects.requireNonNull(propertyId);
 
-        authorizationManager.checkAccess(this.getProperty(propertyId));
+        authorizationManager.checkRead(this.getProperty(propertyId));
 
         final Contact contact = this.getContact(propertyId, contactId);
 
@@ -60,7 +60,7 @@ public class PropertyContactService {
         Objects.requireNonNull(request);
 
         final Property property = this.getProperty(propertyId);
-        authorizationManager.checkAccess(property);
+        authorizationManager.checkRead(property);
 
         final Contact contact = propertyMapper.toPropertyContact(request);
         property.getContacts().add(contact);
@@ -75,7 +75,7 @@ public class PropertyContactService {
         Objects.requireNonNull(request);
 
         final Property property = this.getProperty(propertyId);
-        authorizationManager.checkAccess(property);
+        authorizationManager.checkRead(property);
 
         final Contact contact = this.getContact(propertyId, contactId);
         propertyMapper.fillPropertyContact(request, contact);
@@ -89,7 +89,7 @@ public class PropertyContactService {
         Objects.requireNonNull(propertyId);
 
         final Property property = this.getProperty(propertyId);
-        authorizationManager.checkAccess(property);
+        authorizationManager.checkRead(property);
 
         final Contact contact = this.getContact(propertyId, contactId);
         property.getContacts().remove(contact);

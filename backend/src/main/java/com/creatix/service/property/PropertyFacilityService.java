@@ -36,7 +36,7 @@ public class PropertyFacilityService {
     public List<Facility> details(@NotNull Long propertyId) {
         Objects.requireNonNull(propertyId);
 
-        authorizationManager.checkAccess(this.getProperty(propertyId));
+        authorizationManager.checkRead(this.getProperty(propertyId));
 
         return propertyFacilityDao
                 .findAllByProperty(propertyId).stream()
@@ -47,7 +47,7 @@ public class PropertyFacilityService {
     public Facility detail(@NotNull Long propertyId, @NotNull Long facilityId) {
         Objects.requireNonNull(propertyId);
 
-        authorizationManager.checkAccess(this.getProperty(propertyId));
+        authorizationManager.checkRead(this.getProperty(propertyId));
 
         final Facility facilty = this.getFacilty(propertyId, facilityId);
 
@@ -60,7 +60,7 @@ public class PropertyFacilityService {
         Objects.requireNonNull(request);
 
         final Property property = this.getProperty(propertyId);
-        authorizationManager.checkAccess(property);
+        authorizationManager.checkRead(property);
 
         final Facility facility = propertyMapper.toPropertyFacility(request);
         facility.setProperty(property);
@@ -75,7 +75,7 @@ public class PropertyFacilityService {
         Objects.requireNonNull(request);
 
         final Property property = this.getProperty(propertyId);
-        authorizationManager.checkAccess(property);
+        authorizationManager.checkRead(property);
 
         final Facility facility = this.getFacilty(propertyId, facilityId);
         propertyMapper.fillPropertyFacility(request, facility);
@@ -89,7 +89,7 @@ public class PropertyFacilityService {
         Objects.requireNonNull(propertyId);
 
         final Property property = this.getProperty(propertyId);
-        authorizationManager.checkAccess(property);
+        authorizationManager.checkRead(property);
 
         final Facility facility = this.getFacilty(propertyId, facilityId);
         propertyFacilityDao.delete(facility);

@@ -9,9 +9,11 @@ import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ApartmentNeighbor;
 import com.creatix.domain.entity.store.ApartmentNeighbors;
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.TenantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,8 @@ public class ApartmentService {
     private Mapper mapper;
     @Autowired
     private ApartmentNeighborDao apartmentNeighborDao;
+    @Autowired
+    private TenantService tenantService;
 
     public Apartment getApartment(Long apartmentId) {
         Apartment apartment = apartmentDao.findById(apartmentId);
@@ -44,6 +48,31 @@ public class ApartmentService {
 
         return apartment;
     }
+
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public Apartment deleteApartment(@NotNull Long apartmentId) {
+        Objects.requireNonNull(apartmentId);
+
+        final Apartment apartment = getApartment(apartmentId);
+
+        final Tenant tenant = apartment.getTenant();
+        if ( tenant != null ) {
+            if ( tenant.getActive() == Boolean.TRUE ) {
+                throw new IllegalArgumentException("Cannot delete apartment with active tenant");
+            }
+            else {
+                tenantService.deleteTenant(tenant);
+            }
+        }
+
+        apartmentNeighborDao.deleteByApartment(apartment);
+
+        apartmentDao.delete(apartment);
+
+
+        return apartment;
+    }
+
 
     public List<Apartment> getApartmentsByPropertyId(long propertyId) {
         final Property property = propertyDao.findById(propertyId);

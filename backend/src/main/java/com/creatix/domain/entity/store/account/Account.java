@@ -93,11 +93,6 @@ public class Account {
     }
 
     @Transient
-    public boolean getIsDeleted() {
-        return this.isDeleted();
-    }
-
-    @Transient
     public String getFullName() {
         return String.format("%s %s", getFirstName(), getLastName());
     }
