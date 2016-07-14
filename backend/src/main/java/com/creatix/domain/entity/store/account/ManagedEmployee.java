@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"manager"})
 @ToString(callSuper = true, exclude = {"manager"})
-public class ManagedEmployee extends EmployeeBase {
+public abstract class ManagedEmployee extends EmployeeBase {
 
     @ManyToOne
     private PropertyManager manager;

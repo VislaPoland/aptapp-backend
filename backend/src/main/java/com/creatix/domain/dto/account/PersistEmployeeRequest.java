@@ -7,6 +7,6 @@ import lombok.Setter;
 @ApiModel
 @Getter
 @Setter
-public class PersistEmployeeRequest extends PersistAccountRequest {
+public abstract class PersistEmployeeRequest extends PersistAccountRequest {
 
 }

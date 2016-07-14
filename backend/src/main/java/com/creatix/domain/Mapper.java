@@ -307,25 +307,19 @@ public class Mapper {
         mapperFactory.classMap(PersistAdministratorRequest.class, Account.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(PersistPropertyOwnerRequest.class, Account.class)
+        mapperFactory.classMap(PersistPropertyOwnerRequest.class, PropertyOwner.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(PersistPropertyManagerRequest.class, Account.class)
+        mapperFactory.classMap(PersistPropertyManagerRequest.class, PropertyManager.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(PersistEmployeeRequest.class, Account.class)
+        mapperFactory.classMap(PersistSecurityGuyRequest.class, SecurityEmployee.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(PersistEmployeeRequest.class, Account.class)
+        mapperFactory.classMap(PersistMaintenanceGuyRequest.class, MaintenanceEmployee.class)
                 .byDefault()
                 .register();
-        mapperFactory.classMap(PersistSecurityGuyRequest.class, Account.class)
-                .byDefault()
-                .register();
-        mapperFactory.classMap(PersistMaintenanceGuyRequest.class, Account.class)
-                .byDefault()
-                .register();
-        mapperFactory.classMap(PersistAssistantPropertyManagerRequest.class, Account.class)
+        mapperFactory.classMap(PersistAssistantPropertyManagerRequest.class, AssistantPropertyManager.class)
                 .byDefault()
                 .register();
 
@@ -388,15 +382,15 @@ public class Mapper {
         mapperFactory.getMapperFacade().map(req, acc);
     }
 
-    public void fillAccount(PersistAssistantPropertyManagerRequest req, Account acc) {
+    public void fillAccount(PersistAssistantPropertyManagerRequest req, AssistantPropertyManager acc) {
         mapperFactory.getMapperFacade().map(req, acc);
     }
 
-    public void fillAccount(PersistSecurityGuyRequest req, Account acc) {
+    public void fillAccount(PersistSecurityGuyRequest req, SecurityEmployee acc) {
         mapperFactory.getMapperFacade().map(req, acc);
     }
 
-    public void fillAccount(PersistMaintenanceGuyRequest req, Account acc) {
+    public void fillAccount(PersistMaintenanceGuyRequest req, MaintenanceEmployee acc) {
         mapperFactory.getMapperFacade().map(req, acc);
     }
 
