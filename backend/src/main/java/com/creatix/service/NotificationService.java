@@ -5,7 +5,9 @@ import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.NotificationRequestType;
 import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
@@ -171,11 +173,10 @@ public class NotificationService {
         notification.setTargetApartment(targetApartment);
         neighborhoodNotificationDao.persist(notification);
 
-        try {
-            smsMessageSender.send(new NeighborNotification(targetApartment.getTenant()));
-        }
-        catch ( ApiException ex ) {
-            logger.warn("Failed to send sms notification", ex);
+        final Property property = targetApartment.getProperty();
+        final Tenant tenant = targetApartment.getTenant();
+        if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) ) {
+            smsMessageSender.send(new NeighborNotification(tenant));
         }
 
         return notification;
