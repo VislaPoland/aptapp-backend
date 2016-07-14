@@ -186,19 +186,8 @@ public class Mapper {
 
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
                 .field("date", "scheduledAt")
-                .exclude("reservation")    // prevent recursive mapping
+                .exclude("reservation") // prevent recursive mapping
                 .byDefault()
-                .customize(new CustomMapper<MaintenanceNotification, MaintenanceNotificationDto>() {
-                    @Override
-                    public void mapAtoB(MaintenanceNotification notification, MaintenanceNotificationDto notificationDto, MappingContext context) {
-                        if ( notification.getReservation() != null ) {
-                            final MaintenanceReservation reservation = notification.getReservation();
-                            final MaintenanceReservationDto reservationDto = new MaintenanceReservationDto();
-                            BeanUtils.copyProperties(reservation, reservationDto);
-                            notificationDto.setReservation(reservationDto);
-                        }
-                    }
-                })
                 .register();
 
         mapperFactory.classMap(NotificationPhoto.class, NotificationPhotoDto.class)
@@ -355,7 +344,6 @@ public class Mapper {
 
         mapperFactory.classMap(MaintenanceSlot.class, MaintenanceSlotDto.class)
                 .exclude("reservations")
-                .exclude("units.reservations")
                 .byDefault()
                 .customize(new CustomMapper<MaintenanceSlot, MaintenanceSlotDto>() {
                     @Override
@@ -373,8 +361,8 @@ public class Mapper {
                 })
                 .register();
         mapperFactory.classMap(MaintenanceReservation.class, MaintenanceReservationDto.class)
-                .exclude("slot")                        // prevent recursive mapping
-                .exclude("units")                       // prevent recursive mapping
+                .exclude("slot")    // prevent recursive mapping
+                .exclude("units")   // prevent recursive mapping
                 .byDefault()
                 .register();
         mapperFactory.classMap(MaintenanceSlotSchedule.class, MaintenanceSlotScheduleDto.class)

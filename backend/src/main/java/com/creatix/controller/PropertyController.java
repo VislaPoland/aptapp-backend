@@ -1,6 +1,7 @@
 package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
@@ -14,6 +15,7 @@ import com.creatix.security.RoleSecured;
 import com.creatix.service.SlotService;
 import com.creatix.service.apartment.ApartmentService;
 import com.creatix.service.property.PropertyService;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -159,6 +161,7 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/{propertyId}/schedule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<ScheduledSlotsResponse> getEvents(

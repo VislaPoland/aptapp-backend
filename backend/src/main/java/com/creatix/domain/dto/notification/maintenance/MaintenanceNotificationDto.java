@@ -1,8 +1,10 @@
 package com.creatix.domain.dto.notification.maintenance;
 
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.apartment.BasicApartmentDto;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.property.slot.MaintenanceReservationDto;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -20,6 +22,7 @@ public class MaintenanceNotificationDto extends NotificationDto {
     private BasicApartmentDto targetApartment;
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
     private Boolean accessIfNotAtHome;
+    @JsonView(Views.MaintenanceSlotWithReservations.class)
     @ApiModelProperty(value = "Maintenance reservation")
     private MaintenanceReservationDto reservation;
     @ApiModelProperty(value = "Timestamp of maintenance notification", required = true)
