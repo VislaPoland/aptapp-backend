@@ -70,7 +70,7 @@ public class TenantService {
         return item;
     }
 
-    @RoleSecured(AccountRole.PropertyManager)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public Tenant createTenantFromRequest(@NotNull CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
 
@@ -98,7 +98,7 @@ public class TenantService {
         return tenant;
     }
 
-    @RoleSecured(AccountRole.PropertyManager)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public Tenant updateTenantFromRequest(long tenantId, @NotNull UpdateTenantRequest request) {
         Objects.requireNonNull(request);
 
@@ -168,7 +168,7 @@ public class TenantService {
         throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
     }
 
-    @RoleSecured({AccountRole.Tenant})
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager})
     public void deleteVehicle(Long tenantId, Long id) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
 
