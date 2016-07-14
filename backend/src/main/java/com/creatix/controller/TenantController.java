@@ -63,6 +63,20 @@ public class TenantController {
         return new DataResponse<>(mapper.toTenantDto(tenantService.updateTenantFromRequest(tenantId, request)));
     }
 
+    @ApiOperation(value = "Delete tenant")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @RequestMapping(value = "/{tenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
+    public DataResponse<TenantDto> updateTenant(@PathVariable Long tenantId) {
+        return new DataResponse<>(mapper.toTenantDto(tenantService.deleteTenant(tenantId)));
+    }
+
+
     @ApiOperation(value = "Get tenant profile")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),

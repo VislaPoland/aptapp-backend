@@ -63,7 +63,7 @@ public class TenantService {
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
-        if (item == null) {
+        if ( item == null ) {
             throw ex;
         }
         return item;
@@ -149,11 +149,11 @@ public class TenantService {
         Objects.requireNonNull(request);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if (authorizationManager.isSelf(tenant)) {
+        if ( authorizationManager.isSelf(tenant) ) {
             final ParkingStall parkingStall = parkingStallDao.findById(parkingStallId);
-            if (tenant.getParkingStalls().contains(parkingStall)) {
+            if ( tenant.getParkingStalls().contains(parkingStall) ) {
                 //TODO refactor this code to make it more readable and clean
-                Vehicle vehicle = (parkingStall.getParkingVehicle() == null)? new Vehicle() : parkingStall.getParkingVehicle();
+                Vehicle vehicle = (parkingStall.getParkingVehicle() == null) ? new Vehicle() : parkingStall.getParkingVehicle();
                 mapper.fillVehicle(request, vehicle);
                 vehicle.setParkingStall(parkingStall);
                 vehicle.setOwner(tenant);
@@ -171,12 +171,13 @@ public class TenantService {
     public void deleteVehicle(Long tenantId, Long id) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
 
-        if (authorizationManager.isSelf(tenant)) {
+        if ( authorizationManager.isSelf(tenant) ) {
             final Vehicle vehicle = getOrElseThrow(id, vehicleDao, new EntityNotFoundException(String.format("Vehicle id=%s not found", id)));
             final ParkingStall parkingStall = vehicle.getParkingStall();
             parkingStall.setParkingVehicle(null);
             parkingStallDao.persist(parkingStall);
-        } else {
+        }
+        else {
             throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
         }
     }
@@ -194,7 +195,7 @@ public class TenantService {
         preventAccountDuplicity(request.getEmail(), null);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if (authorizationManager.isSelf(tenant)) {
+        if ( authorizationManager.isSelf(tenant) ) {
             final SubTenant subTenant = mapper.toSubTenant(request);
             subTenant.setCompanyName(tenant.getCompanyName());
             subTenant.setRole(AccountRole.SubTenant);
@@ -218,11 +219,11 @@ public class TenantService {
         Objects.requireNonNull(request);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if (authorizationManager.isSelf(tenant)) {
+        if ( authorizationManager.isSelf(tenant) ) {
             final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
             preventAccountDuplicity(request.getEmail(), subTenant.getPrimaryEmail());
 
-            if (tenant.getSubTenants().contains(subTenant)) {
+            if ( tenant.getSubTenants().contains(subTenant) ) {
                 mapper.fillSubTenant(request, subTenant);
                 subTenantDao.persist(subTenant);
                 return subTenant;
@@ -235,21 +236,28 @@ public class TenantService {
     @RoleSecured({AccountRole.Tenant})
     public void deleteSubTenant(Long tenantId, Long subTenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if (authorizationManager.isSelf(tenant)) {
+        if ( authorizationManager.isSelf(tenant) ) {
             final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
 
-            if (tenant.getSubTenants().contains(subTenant)) {
+            if ( tenant.getSubTenants().contains(subTenant) ) {
                 subTenantDao.delete(subTenant);
-            } else {
+            }
+            else {
                 throw new SecurityException(String.format("You are not eligible to edit sub-tenant=%d profile", subTenantId));
             }
-        } else {
+        }
+        else {
             throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
         }
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
-    public void deleteTenant(@NotNull Tenant tenant) {
+    public Tenant deleteTenant(@NotNull Long tenantId) {
+        return deleteTenant(getTenant(tenantId));
+    }
+
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public Tenant deleteTenant(@NotNull Tenant tenant) {
         Objects.requireNonNull(tenant);
         authorizationManager.checkWrite(tenant);
 
@@ -258,6 +266,8 @@ public class TenantService {
         tenant.setApartment(null);
 
         tenantDao.persist(tenant);
+
+        return tenant;
     }
 
     private void preventAccountDuplicity(String email, String emailExisting) {
