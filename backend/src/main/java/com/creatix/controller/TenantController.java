@@ -2,13 +2,11 @@ package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.tenant.CreateTenantRequest;
+import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
-import com.creatix.domain.dto.tenant.UpdateTenantRequest;
 import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
-import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
-import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
+import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.enums.AccountRole;
@@ -47,7 +45,7 @@ public class TenantController {
     })
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public DataResponse<TenantDto> createTenant(@RequestBody @Valid CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public DataResponse<TenantDto> createTenant(@RequestBody @Valid PersistTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toTenantDto(tenantService.createTenantFromRequest(request)));
     }
 
@@ -61,7 +59,7 @@ public class TenantController {
     })
     @RequestMapping(value = "/{tenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public DataResponse<TenantDto> updateTenant(@PathVariable Long tenantId, @Valid @RequestBody UpdateTenantRequest request) {
+    public DataResponse<TenantDto> updateTenant(@PathVariable Long tenantId, @Valid @RequestBody PersistTenantRequest request) {
         return new DataResponse<>(mapper.toTenantDto(tenantService.updateTenantFromRequest(tenantId, request)));
     }
 
@@ -163,7 +161,7 @@ public class TenantController {
     })
     @RequestMapping(value = "/{tenantId}/subs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
-    public DataResponse<SubTenantDto> createSubTenant(@PathVariable Long tenantId, @RequestBody @Valid CreateSubTenantRequest request) {
+    public DataResponse<SubTenantDto> createSubTenant(@PathVariable Long tenantId, @RequestBody @Valid PersistSubTenantRequest request) {
         return new DataResponse<>(mapper.toSubTenantDto(tenantService.createSubTenant(tenantId, request)));
     }
 
@@ -190,7 +188,7 @@ public class TenantController {
     })
     @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
-    public DataResponse<SubTenantDto> updateSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId, @RequestBody @Valid UpdateSubTenantRequest request) {
+    public DataResponse<SubTenantDto> updateSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId, @RequestBody @Valid PersistSubTenantRequest request) {
         return new DataResponse<>(mapper.toSubTenantDto(tenantService.updateSubTenant(tenantId, subTenantId, request)));
     }
 

@@ -22,13 +22,11 @@ import com.creatix.domain.dto.property.PropertyDetailsDto;
 import com.creatix.domain.dto.property.PropertyPhotoDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.dto.property.slot.*;
-import com.creatix.domain.dto.tenant.CreateTenantRequest;
+import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
-import com.creatix.domain.dto.tenant.UpdateTenantRequest;
 import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
-import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
-import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
+import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.entity.store.*;
@@ -40,7 +38,6 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -256,11 +253,7 @@ public class Mapper {
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(CreateTenantRequest.class, Tenant.class)
-                .byDefault()
-                .register();
-
-        mapperFactory.classMap(UpdateTenantRequest.class, Tenant.class)
+        mapperFactory.classMap(PersistTenantRequest.class, Tenant.class)
                 .byDefault()
                 .register();
 
@@ -302,13 +295,7 @@ public class Mapper {
                 .field("primaryEmail", "email")
                 .register();
 
-        mapperFactory.classMap(CreateSubTenantRequest.class, SubTenant.class)
-                .byDefault()
-                .field("phone", "primaryPhone")
-                .field("email", "primaryEmail")
-                .register();
-
-        mapperFactory.classMap(UpdateSubTenantRequest.class, SubTenant.class)
+        mapperFactory.classMap(PersistSubTenantRequest.class, SubTenant.class)
                 .byDefault()
                 .field("phone", "primaryPhone")
                 .field("email", "primaryEmail")
@@ -425,12 +412,12 @@ public class Mapper {
         mapperFactory.getMapperFacade().map(req, acc);
     }
 
-    public Tenant toTenant(@NotNull CreateTenantRequest request) {
+    public Tenant toTenant(@NotNull PersistTenantRequest request) {
         Objects.requireNonNull(request);
         return mapperFactory.getMapperFacade().map(request, Tenant.class);
     }
 
-    public void fillTenant(@NotNull UpdateTenantRequest dto, @NotNull Tenant entity) {
+    public void fillTenant(@NotNull PersistTenantRequest dto, @NotNull Tenant entity) {
         Objects.requireNonNull(dto);
         Objects.requireNonNull(entity);
 
@@ -528,13 +515,13 @@ public class Mapper {
         return mapperFactory.getMapperFacade().map(subTenant, com.creatix.domain.dto.tenant.subs.SubTenantDto.class);
     }
 
-    public SubTenant toSubTenant(@NotNull CreateSubTenantRequest request) {
+    public SubTenant toSubTenant(@NotNull PersistSubTenantRequest request) {
         Objects.requireNonNull(request);
 
         return mapperFactory.getMapperFacade().map(request, SubTenant.class);
     }
 
-    public void fillSubTenant(@NotNull UpdateSubTenantRequest request, @NotNull SubTenant entity) {
+    public void fillSubTenant(@NotNull PersistSubTenantRequest request, @NotNull SubTenant entity) {
         Objects.requireNonNull(request);
         Objects.requireNonNull(entity);
 

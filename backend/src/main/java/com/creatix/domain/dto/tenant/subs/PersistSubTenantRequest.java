@@ -9,7 +9,8 @@ import javax.validation.constraints.NotNull;
 
 @ApiModel
 @Data
-public class CreateSubTenantRequest {
+public class PersistSubTenantRequest {
+
     @ApiModelProperty(value = "First name", required = true)
     @NotNull
     private String firstName;

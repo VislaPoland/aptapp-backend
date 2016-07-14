@@ -3,10 +3,8 @@ package com.creatix.service;
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
-import com.creatix.domain.dto.tenant.CreateTenantRequest;
-import com.creatix.domain.dto.tenant.UpdateTenantRequest;
-import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
-import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
+import com.creatix.domain.dto.tenant.PersistTenantRequest;
+import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
 import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ParkingStall;
@@ -71,7 +69,7 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public Tenant createTenantFromRequest(@NotNull CreateTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public Tenant createTenantFromRequest(@NotNull PersistTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
@@ -99,7 +97,7 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public Tenant updateTenantFromRequest(long tenantId, @NotNull UpdateTenantRequest request) {
+    public Tenant updateTenantFromRequest(long tenantId, @NotNull PersistTenantRequest request) {
         Objects.requireNonNull(request);
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
@@ -189,7 +187,7 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.Tenant})
-    public SubTenant createSubTenant(Long tenantId, @NotNull CreateSubTenantRequest request) {
+    public SubTenant createSubTenant(Long tenantId, @NotNull PersistSubTenantRequest request) {
         Objects.requireNonNull(request);
 
         preventAccountDuplicity(request.getEmail(), null);
@@ -215,7 +213,7 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.Tenant})
-    public SubTenant updateSubTenant(Long tenantId, Long subTenantId, @NotNull UpdateSubTenantRequest request) {
+    public SubTenant updateSubTenant(Long tenantId, Long subTenantId, @NotNull PersistSubTenantRequest request) {
         Objects.requireNonNull(request);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
