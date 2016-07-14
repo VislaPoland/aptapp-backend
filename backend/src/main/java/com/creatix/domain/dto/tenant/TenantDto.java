@@ -35,6 +35,9 @@ public class TenantDto extends AccountDto {
     @ApiModelProperty(value = "Sub-tenants")
     private List<SubTenantDto> subTenants;
 
+    @ApiModelProperty(value = "Id of the assigned apartment")
+    private Long apartmentId;
+
     @ApiModel
     @Data
     public static class SubTenantDto {
