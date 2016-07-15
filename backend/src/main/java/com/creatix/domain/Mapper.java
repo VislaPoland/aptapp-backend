@@ -105,10 +105,12 @@ public class Mapper {
 
                         if ( account instanceof Tenant ) {
                             final Apartment apartment = ((Tenant) account).getApartment();
-                            final Property property = apartment.getProperty();
-                            PropertyDto details = toPropertyDto(property);
-                            accountDto.setProperty(details);
-                            accountDto.setApartment(toApartmentDto(apartment));
+                            if ( apartment != null ) {
+                                final Property property = apartment.getProperty();
+                                PropertyDto details = toPropertyDto(property);
+                                accountDto.setProperty(details);
+                                accountDto.setApartment(toApartmentDto(apartment));
+                            }
                         }
                         else if ( account instanceof PropertyManager ) {
                             final Property managedProperty = ((PropertyManager) account).getManagedProperty();
