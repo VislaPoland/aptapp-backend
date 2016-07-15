@@ -25,8 +25,8 @@ import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
 import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
-import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
+import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.entity.store.*;
@@ -48,6 +48,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class Mapper {
     @Autowired
     private ApplicationProperties applicationProperties;
     @Autowired
-    private AuthorizationManager  authorizationManager;
+    private AuthorizationManager authorizationManager;
 
     @Autowired
     public Mapper(MapperFactory mapperFactory) {
@@ -90,28 +91,43 @@ public class Mapper {
     }
 
     private void configure(MapperFactory mapperFactory) {
+
+        mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(OffsetDateTime.class, OffsetDateTime.class));
+        mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(LocalTime.class, LocalTime.class));
+
+
         mapperFactory.classMap(Account.class, AccountDto.class)
                 .byDefault()
                 .customize(new CustomMapper<Account, AccountDto>() {
                     @Override
                     public void mapAtoB(Account account, AccountDto accountDto, MappingContext context) {
-                        if (account instanceof Tenant) {
+                        super.mapAtoB(account, accountDto, context);
+
+                        if ( account instanceof Tenant ) {
                             final Apartment apartment = ((Tenant) account).getApartment();
                             final Property property = apartment.getProperty();
                             PropertyDto details = toPropertyDto(property);
                             accountDto.setProperty(details);
                             accountDto.setApartment(toApartmentDto(apartment));
                         }
-                        else if (account instanceof PropertyManager) {
+                        else if ( account instanceof PropertyManager ) {
                             final Property managedProperty = ((PropertyManager) account).getManagedProperty();
                             if ( managedProperty != null ) {
                                 accountDto.setProperty(toPropertyDto(managedProperty));
                             }
                         }
-                        else if ( account instanceof ManagedEmployee) {
+                        else if ( account instanceof ManagedEmployee ) {
                             final Property managedProperty = ((ManagedEmployee) account).getManager().getManagedProperty();
                             if ( managedProperty != null ) {
                                 accountDto.setProperty(toPropertyDto(managedProperty));
+                            }
+                        }
+                        else if ( account instanceof PropertyOwner ) {
+                            final Set<Property> ownedProperties = ((PropertyOwner) account).getOwnedProperties();
+                            if ( ownedProperties != null ) {
+                                accountDto.setOwnedProperties(ownedProperties.stream()
+                                        .map(p -> toPropertyDto(p))
+                                        .collect(Collectors.toList()));
                             }
                         }
                     }
@@ -336,8 +352,8 @@ public class Mapper {
                         else {
                             slotDto.setReservations(slot.getReservations().stream()
                                     .filter(r -> authorizationManager.canRead(r))
-                            .map(r -> toMaintenanceReservationDto(r))
-                            .collect(Collectors.toList()));
+                                    .map(r -> toMaintenanceReservationDto(r))
+                                    .collect(Collectors.toList()));
                         }
                     }
                 })
@@ -353,9 +369,6 @@ public class Mapper {
         mapperFactory.classMap(EventSlot.class, EventSlotDto.class)
                 .byDefault()
                 .register();
-
-        mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(OffsetDateTime.class, OffsetDateTime.class));
-        mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(LocalTime.class, LocalTime.class));
 
         mapperFactory.classMap(SlotUnit.class, SlotUnitDto.class)
                 .byDefault()

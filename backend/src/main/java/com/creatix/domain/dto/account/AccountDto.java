@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * Account data transfer object
  */
@@ -51,4 +53,7 @@ public class AccountDto {
 
     @ApiModelProperty(value = "Associated apartment")
     private ApartmentDto apartment;
+
+    @ApiModelProperty(value = "Owned properties")
+    private List<PropertyDto> ownedProperties;
 }

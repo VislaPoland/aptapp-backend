@@ -25,14 +25,9 @@ import javax.validation.Valid;
 @Transactional
 @RequestMapping("/api/auth")
 public class AuthController {
+
     @Autowired
     private AccountService accountService;
-
-    @Autowired
-    private AuthorizationManager authorizationManager;
-
-    @Autowired
-    private Mapper mapper;
 
     @ApiOperation(value = "Verify authentication code")
     @ApiResponses(value = {
