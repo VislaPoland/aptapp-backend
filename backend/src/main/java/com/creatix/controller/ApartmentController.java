@@ -39,7 +39,7 @@ public class ApartmentController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/apartments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Administrator})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Administrator, AccountRole.PropertyOwner})
     public DataResponse<List<ApartmentDto>> getApartments(@PathVariable Long propertyId) {
         return new DataResponse<>(apartmentService.getApartmentsByPropertyId(propertyId).stream()
                 .map(a -> mapper.toApartmentDto(a)).collect(Collectors.toList()));
