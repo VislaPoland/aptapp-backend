@@ -1,6 +1,6 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.dto.notification.NotificationRequestType;
+import com.creatix.domain.enums.NotificationRequestType;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.AssistantPropertyManager;
 import com.creatix.domain.entity.store.account.PropertyManager;

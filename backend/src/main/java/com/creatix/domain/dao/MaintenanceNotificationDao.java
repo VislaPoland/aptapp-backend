@@ -1,9 +1,9 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.dto.notification.NotificationRequestType;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.entity.store.notification.QMaintenanceNotification;
+import com.creatix.domain.enums.NotificationRequestType;
 import com.creatix.domain.enums.NotificationStatus;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;

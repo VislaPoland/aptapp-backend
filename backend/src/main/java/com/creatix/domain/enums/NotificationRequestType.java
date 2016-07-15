@@ -1,4 +1,4 @@
-package com.creatix.domain.dto.notification;
+package com.creatix.domain.enums;
 
 /**
  * Sent or Received notification

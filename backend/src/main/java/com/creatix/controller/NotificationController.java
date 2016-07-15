@@ -4,7 +4,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.NotificationDto;
-import com.creatix.domain.dto.notification.NotificationRequestType;
+import com.creatix.domain.enums.NotificationRequestType;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
 import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
@@ -12,11 +12,11 @@ import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotification
 import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
-import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
 import com.creatix.domain.entity.store.notification.NotificationPhoto;
 import com.creatix.domain.entity.store.notification.SecurityNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
+import com.creatix.domain.enums.NotificationType;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.NotificationService;
@@ -59,10 +59,12 @@ public class NotificationController {
     @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public PageableDataResponse<List<NotificationDto>> getNotifications(
-            @RequestParam(required = false, defaultValue = "0") Long page,
-            @RequestParam(required = false, defaultValue = "20") Long size,
-            @RequestParam NotificationRequestType type) {
-        return mapper.toPageableDataResponse(notificationService.filterNotifications(type, page, size), n -> mapper.toNotificationDto(n));
+            @RequestParam NotificationRequestType requestType,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) Long startId,
+            @RequestParam(required = false) NotificationStatus notificationStatus,
+            @RequestParam(required = false) NotificationType notificationType) {
+        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, pageSize), n -> mapper.toNotificationDto(n));
     }
 
     //maintenance

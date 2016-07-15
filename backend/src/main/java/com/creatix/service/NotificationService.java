@@ -3,7 +3,7 @@ package com.creatix.service;
 import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
-import com.creatix.domain.dto.notification.NotificationRequestType;
+import com.creatix.domain.enums.NotificationRequestType;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
@@ -15,7 +15,6 @@ import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.NeighborNotification;
 import com.creatix.security.AuthorizationManager;
-import com.twilio.sdk.exception.ApiException;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +66,30 @@ public class NotificationService {
         }
         return item;
     }
+
+
+    public PageableDataResponse<List<Notification>> filterNotifications(
+            @NotNull NotificationRequestType requestType,
+            @Nullable NotificationStatus notificationStatus,
+            @Nullable NotificationType notificationType,
+            @Nullable Long startId,
+            int pageSize) {
+        final Account account = authorizationManager.getCurrentAccount();
+
+        final List<Notification> notifications = notificationDao.findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
+                requestType,
+                notificationStatus,
+                notificationType,
+                startId,
+                account,
+                pageSize + 1);
+
+        final Long nextId = notifications.size() > pageSize ? notifications.get(pageSize).getId() : null;
+
+        return new PageableDataResponse<>(notifications, (long) pageSize, nextId);
+    }
+
+
 
     public PageableDataResponse<List<Notification>> filterNotifications(NotificationRequestType type, long pageNumber, long pageSize) {
         final Account account = authorizationManager.getCurrentAccount();

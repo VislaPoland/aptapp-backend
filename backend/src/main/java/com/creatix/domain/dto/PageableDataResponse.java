@@ -1,12 +1,21 @@
 package com.creatix.domain.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+@ApiModel
 @Getter
 @Setter
 public class PageableDataResponse<T> extends DataResponse<T> {
+
+    public PageableDataResponse(T data, Long pageSize, Long nextId) {
+        super(data);
+        this.pageSize = pageSize;
+        this.nextId = nextId;
+    }
+
     public PageableDataResponse(Long pageSize, Long totalItems, Long totalPages, Long pageNumber) {
         this.pageSize = pageSize;
         this.totalItems = totalItems;
@@ -30,4 +39,6 @@ public class PageableDataResponse<T> extends DataResponse<T> {
     private Long totalPages;
     @ApiModelProperty(value = "Serial number of the page")
     private Long pageNumber;
+    @ApiModelProperty(value = "Next id where to start the search")
+    private Long nextId;
 }
