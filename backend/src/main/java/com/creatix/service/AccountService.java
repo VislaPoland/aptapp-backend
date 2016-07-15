@@ -33,6 +33,7 @@ import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -515,6 +516,29 @@ public class AccountService {
         setActionToken(account);
         accountDao.persist(account);
         emailMessageSender.send(new ResetPasswordMessageTemplate(account, applicationProperties.getBackendUrl(), applicationProperties.getFrontendUrl()));
+    }
+
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    public Account deleteAccount(@NotNull Long accountId) {
+        Objects.requireNonNull(accountId);
+        return deleteAccount(getAccount(accountId));
+    }
+
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public Account deleteAccount(@NotNull Account account) {
+        Objects.requireNonNull(account);
+        if ( account instanceof Tenant ) {
+            throw new IllegalArgumentException("Cannot delete tenant by using this API call");
+        }
+
+        authorizationManager.checkWrite(account);
+
+        account.setDeletedAt(new Date());
+        account.setActive(Boolean.FALSE);
+
+        accountDao.persist(account);
+
+        return account;
     }
 
     private void preventAccountDuplicity(String email, String emailExisting) {

@@ -49,8 +49,6 @@ public class TenantService {
     @Autowired
     private SubTenantDao subTenantDao;
     @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
     private AuthorizationManager authorizationManager;
     @Autowired
     private Mapper mapper;

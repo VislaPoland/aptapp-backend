@@ -248,11 +248,39 @@ public class AuthorizationManager {
             return true;
         }
         if ( tenant.getApartment() == null ) {
-            return hasAnyOfRoles(AccountRole.PropertyOwner, AccountRole.PropertyManager);
+            return hasAnyOfRoles(AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.Administrator, AccountRole.AssistantPropertyManager);
         }
         else {
             final Property property = tenant.getApartment().getProperty();
-            return isManager(property) || isOwner(property);
+            return isManager(property) || isOwner(property) || hasAnyOfRoles(AccountRole.Administrator);
+        }
+    }
+
+    public void checkWrite(@NotNull Account account) {
+        Objects.requireNonNull(account);
+
+        if ( !(canWrite(account)) ) {
+            throw new SecurityException(String.format("Cannot modify account id=%d", account.getId()));
+        }
+    }
+
+    private boolean canWrite(@NotNull Account account) {
+        if ( account instanceof Tenant ) {
+            return canWrite((Tenant) account);
+        }
+        else if ( account instanceof ManagedEmployee ) {
+            ManagedEmployee employee = (ManagedEmployee) account;
+            return canWrite(employee.getManager().getManagedProperty());
+        }
+        else if ( account instanceof AssistantPropertyManager ) {
+            AssistantPropertyManager assistant = (AssistantPropertyManager) account;
+            return canWrite(assistant.getManager().getManagedProperty());
+        }
+        else if ( account instanceof PropertyManager ) {
+            return hasAnyOfRoles(AccountRole.Administrator, AccountRole.PropertyOwner);
+        }
+        else {
+            return hasAnyOfRoles(AccountRole.Administrator);
         }
     }
 

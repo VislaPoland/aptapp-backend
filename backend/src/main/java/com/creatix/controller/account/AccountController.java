@@ -130,6 +130,19 @@ public class AccountController {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateAccountFromRequest(accountId, request)));
     }
 
+    @ApiOperation(value = "Delete account")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{accountId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    public DataResponse<AccountDto> deleteAccount(@PathVariable Long accountId) {
+        return new DataResponse<>(mapper.toAccountDto(accountService.deleteAccount(accountId)));
+    }
+
     @ApiOperation(value = "Create administrator account")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
