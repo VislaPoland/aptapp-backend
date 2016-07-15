@@ -120,6 +120,13 @@ public class Mapper {
                                         .collect(Collectors.toList()));
                             }
                         }
+                        else if ( account instanceof SubTenant ) {
+                            final Apartment apartment = ((SubTenant) account).getApartment();
+                            if ( apartment != null ) {
+                                accountDto.setProperty(toPropertyDto(apartment.getProperty()));
+                                accountDto.setApartment(toApartmentDto(apartment));
+                            }
+                        }
                     }
                 })
                 .register();
