@@ -255,4 +255,13 @@ public class AuthorizationManager {
             return isManager(property) || isOwner(property);
         }
     }
+
+    public boolean canModifyAllProfileInfo() {
+        return hasAnyOfRoles(
+                AccountRole.Administrator,
+                AccountRole.PropertyOwner,
+                AccountRole.PropertyManager,
+                AccountRole.Security,
+                AccountRole.Maintenance);
+    }
 }

@@ -37,7 +37,7 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +48,6 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -306,7 +305,19 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(UpdateAccountProfileRequest.class, Account.class)
+                .exclude("firstName")
+                .exclude("lastName")
+                .exclude("companyName")
+                .exclude("primaryPhone")
                 .byDefault()
+                .customize(new CustomMapper<UpdateAccountProfileRequest, Account>() {
+                    @Override
+                    public void mapAtoB(UpdateAccountProfileRequest request, Account account, MappingContext context) {
+                        if ( authorizationManager.canModifyAllProfileInfo() ) {
+                            BeanUtils.copyProperties(request, account);
+                        }
+                    }
+                })
                 .register();
         mapperFactory.classMap(PersistAdministratorRequest.class, Account.class)
                 .byDefault()
