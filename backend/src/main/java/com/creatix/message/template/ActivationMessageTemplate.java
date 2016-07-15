@@ -40,14 +40,14 @@ public abstract class ActivationMessageTemplate implements EmailMessageTemplate 
     }
 
     public String getActivationPageUrl() throws MalformedURLException {
-        return new URL(frontendUrl, String.format("/activate-account?token=%s", account.getActionToken())).toString();
+        return new URL(frontendUrl, String.format("activate-account?token=%s", account.getActionToken())).toString();
     }
 
     public String getLogoUrl() throws MalformedURLException {
-        return new URL(backendUrl, "/static/aptapp_logo.png").toString();
+        return new URL(backendUrl, "static/aptapp_logo.png").toString();
     }
 
     public String getIconUrl() throws MalformedURLException {
-        return new URL(backendUrl, "/static/aptapp_icon.png").toString();
+        return new URL(backendUrl, "static/aptapp_icon.png").toString();
     }
 }

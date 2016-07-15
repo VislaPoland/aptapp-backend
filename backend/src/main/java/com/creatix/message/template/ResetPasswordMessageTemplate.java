@@ -45,15 +45,15 @@ public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
     }
 
     public String getResetPasswordPageUrl() throws MalformedURLException {
-        return new URL(frontendUrl, String.format("/set-password?token=%s", account.getActionToken())).toString();
+        return new URL(frontendUrl, String.format("set-password?token=%s", account.getActionToken())).toString();
     }
 
     public String getLogoUrl() throws MalformedURLException {
-        return new URL(backendUrl, "/static/aptapp_logo.png").toString();
+        return new URL(backendUrl, "static/aptapp_logo.png").toString();
     }
 
     public String getIconUrl() throws MalformedURLException {
-        return new URL(backendUrl, "/static/aptapp_icon.png").toString();
+        return new URL(backendUrl, "static/aptapp_icon.png").toString();
     }
 }
 
