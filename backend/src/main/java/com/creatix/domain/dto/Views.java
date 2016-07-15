@@ -1,9 +1,11 @@
 package com.creatix.domain.dto;
 
-public class Views {
+public interface Views {
 
-    public class Public {}
+    interface Public {}
 
-    public class MaintenanceSlotWithReservations {}
+    interface SlotsWithReservations {}
+
+    interface NotificationsWithReservation {}
 
 }

@@ -41,7 +41,7 @@ public class MaintenanceController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
-    @JsonView(Views.MaintenanceSlotWithReservations.class)
+    @JsonView
     @RequestMapping(path = "/slots", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<MaintenanceSlotDto>> getMaintenanceSlots(
@@ -60,7 +60,7 @@ public class MaintenanceController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(path = "/reservations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @JsonView(Views.MaintenanceSlotWithReservations.class)
+    @JsonView
     @RoleSecured(AccountRole.Maintenance)
     public DataResponse<MaintenanceReservationDto> createMaintenanceReservation(
             @PathVariable Long propertyId,
@@ -75,7 +75,7 @@ public class MaintenanceController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(path = "/reservations/{reservationId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @JsonView(Views.MaintenanceSlotWithReservations.class)
+    @JsonView
     @RoleSecured(AccountRole.Maintenance)
     public DataResponse<MaintenanceReservationDto> deleteMaintenanceReservation(@PathVariable Long reservationId) {
         return new DataResponse<>(mapper.toMaintenanceReservationDto(maintenanceReservationService.deleteById(reservationId)));
@@ -89,7 +89,7 @@ public class MaintenanceController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(path = "/schedule", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @JsonView(Views.MaintenanceSlotWithReservations.class)
+    @JsonView
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<MaintenanceSlotScheduleDto> createMaintenanceSlotSchedule(
             @PathVariable Long propertyId,
@@ -104,7 +104,7 @@ public class MaintenanceController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @RequestMapping(path = "/schedule/{scheduleId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @JsonView(Views.MaintenanceSlotWithReservations.class)
+    @JsonView
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<MaintenanceSlotScheduleDto> deleteMaintenanceSlotSchedule(@PathVariable Long scheduleId) {
         return new DataResponse<>(mapper.toMaintenanceSlotScheduleDto(slotService.deleteScheduleById(scheduleId)));

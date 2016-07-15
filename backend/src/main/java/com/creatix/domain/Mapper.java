@@ -178,14 +178,14 @@ public class Mapper {
         mapperFactory.classMap(Notification.class, NotificationDto.class)
                 .byDefault()
                 .register();
-
         mapperFactory.classMap(SecurityNotification.class, SecurityNotificationDto.class)
                 .byDefault()
                 .register();
-
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
                 .field("date", "scheduledAt")
-                .exclude("reservation") // prevent recursive mapping
+                .byDefault()
+                .register();
+        mapperFactory.classMap(NeighborhoodNotification.class, NeighborhoodNotificationDto.class)
                 .byDefault()
                 .register();
 
@@ -204,9 +204,7 @@ public class Mapper {
                 })
                 .register();
 
-        mapperFactory.classMap(NeighborhoodNotification.class, NeighborhoodNotificationDto.class)
-                .byDefault()
-                .register();
+
 
         mapperFactory.classMap(CreateSecurityNotificationRequest.class, SecurityNotification.class)
                 .byDefault()

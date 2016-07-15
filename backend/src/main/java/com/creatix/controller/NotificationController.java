@@ -3,6 +3,7 @@ package com.creatix.controller;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.PageableDataResponse;
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.enums.NotificationRequestType;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
@@ -20,6 +21,7 @@ import com.creatix.domain.enums.NotificationType;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.NotificationService;
+import com.fasterxml.jackson.annotation.JsonView;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -56,6 +58,7 @@ public class NotificationController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.NotificationsWithReservation.class)
     @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public PageableDataResponse<List<NotificationDto>> getNotifications(

@@ -20,11 +20,9 @@ public class MaintenanceNotification extends Notification {
     @ManyToOne
     @NotNull
     private Apartment targetApartment;
-
     @Column
     @NotNull
     private Boolean accessIfNotAtHome;
-
     @OneToOne(mappedBy = "notification")
     private MaintenanceReservation reservation;
 }

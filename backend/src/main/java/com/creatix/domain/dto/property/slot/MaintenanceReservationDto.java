@@ -1,6 +1,8 @@
 package com.creatix.domain.dto.property.slot;
 
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -31,6 +33,7 @@ public class MaintenanceReservationDto {
     private int durationMinutes;
     @ApiModelProperty(value = "Reservation note")
     private String note;
+    @JsonView(Views.SlotsWithReservations.class)
     @ApiModelProperty(value = "Notification", required = true)
     private MaintenanceNotificationDto notification;
 }

@@ -145,7 +145,7 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
-    @JsonView(Views.Public.class)
+    @JsonView(Views.SlotsWithReservations.class)
     @RequestMapping(path = "/{propertyId}/schedule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<ScheduledSlotsResponse> getEvents(

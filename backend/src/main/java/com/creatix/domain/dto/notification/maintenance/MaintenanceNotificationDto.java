@@ -22,7 +22,7 @@ public class MaintenanceNotificationDto extends NotificationDto {
     private BasicApartmentDto targetApartment;
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
     private Boolean accessIfNotAtHome;
-    @JsonView(Views.MaintenanceSlotWithReservations.class)
+    @JsonView(Views.NotificationsWithReservation.class)
     @ApiModelProperty(value = "Maintenance reservation")
     private MaintenanceReservationDto reservation;
     @ApiModelProperty(value = "Timestamp of maintenance notification", required = true)
