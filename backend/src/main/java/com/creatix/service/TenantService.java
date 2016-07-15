@@ -201,7 +201,6 @@ public class TenantService {
             subTenant.setRole(AccountRole.SubTenant);
             subTenant.setActive(false);
             accountService.setActionToken(subTenant);
-            subTenant.setType(TenantType.Sub);
             subTenant.setParentTenant(tenant);
             subTenantDao.persist(subTenant);
             return subTenant;
