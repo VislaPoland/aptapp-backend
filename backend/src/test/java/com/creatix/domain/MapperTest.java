@@ -2,10 +2,19 @@ package com.creatix.domain;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
+import com.creatix.domain.dao.AccountDao;
 import com.creatix.domain.dao.ApartmentDao;
+import com.creatix.domain.dto.account.AccountDto;
+import com.creatix.domain.dto.account.PropertyOwnerDto;
 import com.creatix.domain.dto.apartment.ApartmentDto;
+import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.mock.WithMockCustomUser;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +39,8 @@ public class MapperTest {
     private Mapper mapper;
     @Autowired
     private ApartmentDao apartmentDao;
+    @Autowired
+    private AccountDao accountDao;
 
     @Test
     @WithMockCustomUser("apt@test.com")
@@ -41,4 +52,19 @@ public class MapperTest {
         assertNotNull(dto.getNeighbors().getLeft());
     }
 
+    @Test
+    public void toAccountDto() {
+        final Account owner = accountDao.findById(1L);
+        assertNotNull(owner);
+        assertTrue(owner instanceof PropertyOwner);
+        final PropertyOwner asOwner = (PropertyOwner) owner;
+
+        final AccountDto accountDto = mapper.toAccountDto(owner);
+        assertNotNull(accountDto);
+        assertTrue("Account is instance of " + accountDto.getClass(), accountDto instanceof PropertyOwnerDto);
+        final PropertyOwnerDto ownerDto = (PropertyOwnerDto) accountDto;
+        assertNotNull(ownerDto.getOwnedProperties());
+        assertEquals(asOwner.getOwnedProperties().size(), ownerDto.getOwnedProperties().size());
+        assertEquals(owner.getPrimaryEmail(), ownerDto.getPrimaryEmail());
+    }
 }

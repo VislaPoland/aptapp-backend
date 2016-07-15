@@ -112,14 +112,6 @@ public class Mapper {
                                 accountDto.setProperty(toPropertyDto(managedProperty));
                             }
                         }
-                        else if ( account instanceof PropertyOwner ) {
-                            final Set<Property> ownedProperties = ((PropertyOwner) account).getOwnedProperties();
-                            if ( ownedProperties != null ) {
-                                accountDto.setOwnedProperties(ownedProperties.stream()
-                                        .map(p -> toPropertyDto(p))
-                                        .collect(Collectors.toList()));
-                            }
-                        }
                         else if ( account instanceof SubTenant ) {
                             final Apartment apartment = ((SubTenant) account).getApartment();
                             if ( apartment != null ) {
@@ -130,6 +122,7 @@ public class Mapper {
                     }
                 })
                 .register();
+        mapperFactory.classMap(PropertyOwner.class, PropertyOwnerDto.class).byDefault().register();
 
         mapperFactory.classMap(ManagedEmployee.class, PropertyDto.AccountDto.class)
                 .byDefault()

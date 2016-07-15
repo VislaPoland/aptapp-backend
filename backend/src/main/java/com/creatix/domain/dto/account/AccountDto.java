@@ -54,6 +54,4 @@ public class AccountDto {
     @ApiModelProperty(value = "Associated apartment")
     private ApartmentDto apartment;
 
-    @ApiModelProperty(value = "Owned properties")
-    private List<PropertyDto> ownedProperties;
 }
