@@ -75,7 +75,7 @@ public class Mapper {
     }
 
     private String createDownloadUrl(NotificationPhoto photo) throws MalformedURLException {
-        return applicationProperties.buildBackendUrl(String.format("/api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
+        return applicationProperties.buildBackendUrl(String.format("api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
     }
 
     private void configure(MapperFactory mapperFactory) {
