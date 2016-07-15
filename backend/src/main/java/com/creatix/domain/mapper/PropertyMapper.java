@@ -10,10 +10,13 @@ import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.EmployeeBase;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @Component
@@ -21,6 +24,9 @@ public final class PropertyMapper extends ConfigurableMapper {
 
     protected void configure(MapperFactory mapperFactory) {
         super.configure(mapperFactory);
+
+        mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(OffsetDateTime.class, OffsetDateTime.class));
+        mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(LocalTime.class, LocalTime.class));
 
         mapperFactory.classMap(Property.class, PropertyDto.class)
                 .byDefault()
