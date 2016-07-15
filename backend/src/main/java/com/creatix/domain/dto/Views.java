@@ -4,8 +4,8 @@ public interface Views {
 
     interface Public {}
 
-    interface SlotsWithReservations {}
+    interface SlotsWithReservations extends Public {}
 
-    interface NotificationsWithReservation {}
+    interface NotificationsWithReservation extends Public {}
 
 }
