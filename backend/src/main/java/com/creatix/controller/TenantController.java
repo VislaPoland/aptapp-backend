@@ -2,6 +2,7 @@ package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
 import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
@@ -13,6 +14,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.TenantService;
+import com.fasterxml.jackson.annotation.JsonView;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -43,6 +45,7 @@ public class TenantController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public DataResponse<TenantDto> createTenant(@RequestBody @Valid PersistTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
@@ -57,6 +60,7 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 422, message = "Unprocessable")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public DataResponse<TenantDto> updateTenant(@PathVariable Long tenantId, @Valid @RequestBody PersistTenantRequest request) {
@@ -70,6 +74,7 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public DataResponse<TenantDto> deleteTenant(@PathVariable Long tenantId) {
@@ -84,6 +89,7 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<TenantDto> getTenant(@PathVariable Long tenantId) {
@@ -97,6 +103,7 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/vehicles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<VehicleDto>> getTenantVehicles(@PathVariable Long tenantId) {
@@ -112,6 +119,7 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/vehicles/{vehicleId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager})
     public DataResponse<Void> deleteTenantVehicle(@PathVariable Long tenantId, @PathVariable Long vehicleId) {
@@ -126,6 +134,7 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/parking-stalls", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<ParkingStallDto>> getAssignedParkingStalls(@PathVariable Long tenantId) {
@@ -142,6 +151,7 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 422, message = "Unprocessable")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/parking-stalls/{parkingStallId}", method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
@@ -157,6 +167,7 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/subs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<SubTenantDto>> getSubTenants(@PathVariable Long tenantId) {
@@ -173,6 +184,7 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 422, message = "Unprocessable")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/subs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
     public DataResponse<SubTenantDto> createSubTenant(@PathVariable Long tenantId, @RequestBody @Valid PersistSubTenantRequest request) {
@@ -186,6 +198,7 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<SubTenantDto> getSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId) {
@@ -200,6 +213,7 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 422, message = "Unprocessable")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
     public DataResponse<SubTenantDto> updateSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId, @RequestBody @Valid PersistSubTenantRequest request) {
@@ -213,6 +227,7 @@ public class TenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
     public DataResponse<Void> deleteSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId) {

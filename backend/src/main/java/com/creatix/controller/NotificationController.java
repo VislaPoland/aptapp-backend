@@ -77,6 +77,7 @@ public class NotificationController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
     public PageableDataResponse<List<MaintenanceNotificationDto>> getMaintenanceNotifications(
@@ -93,6 +94,7 @@ public class NotificationController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance/{notificationId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
     public DataResponse<MaintenanceNotificationDto> getMaintenanceNotificationDetail(@PathVariable Long notificationId) {
@@ -105,6 +107,7 @@ public class NotificationController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
     public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@RequestBody @Valid CreateMaintenanceNotificationRequest dto) {
@@ -118,6 +121,7 @@ public class NotificationController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance/calendar", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
     public DataResponse<List<MaintenanceNotificationDto>> getMaintenanceNotificationsInDateRange(
@@ -136,6 +140,7 @@ public class NotificationController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/security", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
     public PageableDataResponse<List<SecurityNotificationDto>> getSecurityNotifications(
@@ -152,6 +157,7 @@ public class NotificationController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/security/{notificationId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
     public DataResponse<SecurityNotificationDto> getSecurityNotificationDetail(@PathVariable Long notificationId) {
@@ -164,6 +170,7 @@ public class NotificationController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/security", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
     public DataResponse<SecurityNotificationDto> saveSecurityNotification(@RequestBody @Valid CreateSecurityNotificationRequest dto) {
@@ -178,6 +185,7 @@ public class NotificationController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
     public PageableDataResponse<List<NeighborhoodNotificationDto>> getNeighborhoodNotifications(
@@ -194,6 +202,7 @@ public class NotificationController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood/{notificationId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public DataResponse<NeighborhoodNotificationDto> getNeighborhoodNotificationDetail(@PathVariable Long notificationId) {
@@ -206,6 +215,7 @@ public class NotificationController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@RequestBody @Valid CreateNeighborhoodNotificationRequest dto) throws MessageDeliveryException, TemplateException, IOException {
@@ -217,7 +227,9 @@ public class NotificationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Not found")})
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/{notificationId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<NotificationDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long notificationId) throws IOException {
@@ -228,7 +240,9 @@ public class NotificationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Not found")})
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{notificationId}/photos/{fileName:.+}", method = RequestMethod.GET)
     @ResponseBody
     public HttpEntity<byte[]> dowloadNotificationPhoto(@PathVariable Long notificationId, @PathVariable String fileName) throws IOException {

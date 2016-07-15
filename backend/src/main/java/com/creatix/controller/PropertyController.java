@@ -53,6 +53,7 @@ public class PropertyController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<List<PropertyDto>> getAllProperties() {
@@ -67,6 +68,7 @@ public class PropertyController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<PropertyDto> getPropertyDetails(@PathVariable long propertyId) {
@@ -79,6 +81,7 @@ public class PropertyController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator})
     public DataResponse<PropertyDto> createProperty(@RequestBody @Valid CreatePropertyRequest request) {
@@ -91,6 +94,7 @@ public class PropertyController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<PropertyDto> updateProperty(@PathVariable Long propertyId, @RequestBody @Valid UpdatePropertyRequest request) {
@@ -103,6 +107,7 @@ public class PropertyController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator})
     public DataResponse<PropertyDto> deleteProperty(@PathVariable Long propertyId) {
@@ -113,7 +118,9 @@ public class PropertyController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Not found")})
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<PropertyDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long propertyId) throws IOException {
@@ -124,7 +131,9 @@ public class PropertyController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Not found")})
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}/photos/{photoId}", method = RequestMethod.GET)
     @RoleSecured
     @ResponseBody

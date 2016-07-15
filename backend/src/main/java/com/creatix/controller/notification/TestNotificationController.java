@@ -1,12 +1,14 @@
 package com.creatix.controller.notification;
 
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.entity.push.notification.PushNotification;
 import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.PushNotificationSenderService;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -28,18 +30,15 @@ public class TestNotificationController {
 
     @Autowired
     private PushNotificationSenderService notificationSenderService;
-
     @Autowired
     private HttpSession httpSession;
-
-    @Autowired
-    private AuthorizationManager authorizationManager;
 
     @ApiOperation(value = "Sending test notification")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public DataResponse<Void> getNotifications(@RequestParam(required = false, defaultValue = "TEST") String message) throws IOException {

@@ -1,10 +1,12 @@
 package com.creatix.controller;
 
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.property.PropertyEmployeeService;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -32,6 +34,7 @@ public class PropertyEmployeeController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{employeeId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<PropertyDto.AccountDto> removePropertyEmployee(@PathVariable Long propertyId, @PathVariable Long employeeId) {

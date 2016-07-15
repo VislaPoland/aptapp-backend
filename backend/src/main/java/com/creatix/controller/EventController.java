@@ -3,10 +3,12 @@ package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.SlotService;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -40,6 +42,7 @@ public class EventController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<EventSlotDto>> getEvents(
@@ -57,6 +60,7 @@ public class EventController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<EventSlotDto> createEventSlot(@PathVariable Long propertyId, @RequestBody @Valid PersistEventSlotRequest request) {
@@ -69,6 +73,7 @@ public class EventController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(path = "/{eventSlotId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<EventSlotDto> deleteEventSlot(@PathVariable Long eventSlotId) {

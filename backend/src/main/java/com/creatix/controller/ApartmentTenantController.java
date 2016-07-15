@@ -1,10 +1,12 @@
 package com.creatix.controller;
 
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.mapper.ApartmentMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.apartment.ApartmentTenantService;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -32,6 +34,7 @@ public class ApartmentTenantController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<ApartmentDto.TenantDto> removeApartmentTenant(@PathVariable Long apartmentId, @PathVariable Long tenantId) {

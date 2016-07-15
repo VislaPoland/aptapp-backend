@@ -1,12 +1,14 @@
 package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.apartment.PersistApartmentRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.apartment.ApartmentService;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -35,6 +37,7 @@ public class ApartmentController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/apartments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Administrator})
     public DataResponse<List<ApartmentDto>> getApartments(@PathVariable Long propertyId) {
@@ -48,6 +51,7 @@ public class ApartmentController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/apartments/{apartmentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<ApartmentDto> getApartment(@PathVariable Long apartmentId) {
@@ -60,6 +64,7 @@ public class ApartmentController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/apartments", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public DataResponse<ApartmentDto> createApartment(@PathVariable Long propertyId, @Valid @RequestBody PersistApartmentRequest request) {
@@ -72,6 +77,7 @@ public class ApartmentController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/apartments/{apartmentId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public DataResponse<ApartmentDto> updateApartment(@PathVariable Long apartmentId, @Valid @RequestBody PersistApartmentRequest request) {
@@ -84,6 +90,7 @@ public class ApartmentController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/apartments/{apartmentId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public DataResponse<ApartmentDto> deleteApartment(@PathVariable Long apartmentId) {

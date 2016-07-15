@@ -1,6 +1,7 @@
 package com.creatix.controller.account;
 
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.account.AskResetPasswordRequest;
 import com.creatix.domain.dto.account.ResetCodeRequest;
 import com.creatix.domain.dto.account.ResetPasswordRequest;
@@ -8,6 +9,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.AccountService;
+import com.fasterxml.jackson.annotation.JsonView;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -38,6 +40,7 @@ public class AccountResetController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     @RequestMapping(value = "/reset/code", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<String> resetCode(@RequestBody @Valid ResetCodeRequest request) {
@@ -50,6 +53,7 @@ public class AccountResetController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/request-reset/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<Void> askPasswordReset(@RequestBody @Valid AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         accountService.resetPasswordFromRequest(request);
@@ -62,6 +66,7 @@ public class AccountResetController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/reset/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<Void> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
         accountService.resetAccountPasswordFromRequest(request);

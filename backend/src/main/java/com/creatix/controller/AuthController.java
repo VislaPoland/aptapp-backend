@@ -1,13 +1,11 @@
 package com.creatix.controller;
 
 import com.creatix.domain.Mapper;
-import com.creatix.domain.dto.ActivationCode;
-import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.LoginRequest;
-import com.creatix.domain.dto.LoginResponse;
+import com.creatix.domain.dto.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.service.AccountService;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -35,6 +33,7 @@ public class AuthController {
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/verify-code", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<LoginResponse> verifyCode(@RequestBody @Valid ActivationCode codeRequest) {
         Account activatedAccount = accountService.activateAccount(codeRequest.getCode());
@@ -47,6 +46,7 @@ public class AuthController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized")
     })
+    @JsonView(Views.Public.class)
     @RequestMapping(value = "/attempt", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<LoginResponse> signIn(@RequestBody @Valid LoginRequest loginRequest) {
         accountService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
