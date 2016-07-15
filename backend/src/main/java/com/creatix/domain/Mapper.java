@@ -75,18 +75,6 @@ public class Mapper {
     }
 
     private String createDownloadUrl(NotificationPhoto photo) throws MalformedURLException {
-
-        String host = httpRequest.getServerName();
-        int port = httpRequest.getServerPort();
-        if ( StringUtils.isNotEmpty(httpRequest.getHeader("Host")) ) {
-            final String hostHeader = httpRequest.getHeader("Host");
-            final String[] hostHeaderParts = hostHeader.split(":");
-            host = hostHeaderParts[0];
-            if ( hostHeaderParts.length > 1 ) {
-                port = Integer.valueOf(hostHeaderParts[1]);
-            }
-        }
-
         return applicationProperties.buildBackendUrl(String.format("/api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
     }
 
