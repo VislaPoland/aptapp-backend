@@ -1,7 +1,6 @@
 package com.creatix;
 
 import com.creatix.configuration.*;
-import com.creatix.service.PushNotificationSenderService;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.boot.SpringApplication;

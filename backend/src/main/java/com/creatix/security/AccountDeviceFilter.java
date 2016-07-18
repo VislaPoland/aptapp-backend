@@ -32,19 +32,18 @@ public class AccountDeviceFilter extends GenericFilterBean {
 
 
         String platformString = httpRequest.getHeader(this.deviceProperties.getPlatformHeader());
-        if (platformString == null) {
+        if ( platformString == null ) {
             platformString = PlatformType.Web.toString();
-            //throw new SecurityException("Platform type is required for all requests.");
         }
         PlatformType platformType = PlatformType.valueOf(platformString);
-        if (platformType == null) {
+        if ( platformType == null ) {
             throw new SecurityException("Platform type is required in valid format for all requests.");
         }
         httpSession.setAttribute(this.deviceProperties.getSessionKeyPlatform(), platformType);
 
-        if (platformType != PlatformType.Web) {
+        if ( platformType != PlatformType.Web ) {
             String deviceUDID = httpRequest.getHeader(this.deviceProperties.getUdidHeader());
-            if (deviceUDID == null) {
+            if ( deviceUDID == null ) {
                 throw new SecurityException("Device identifier is required for all requests.");
             }
 

@@ -64,8 +64,6 @@ public class AccountService {
     @Autowired
     private EmailMessageSender emailMessageSender;
     @Autowired
-    private ManagedEmployeeDao managedEmployeeDao;
-    @Autowired
     private AccountDeviceService accountDeviceService;
     @Autowired
     private ApplicationProperties applicationProperties;
