@@ -16,6 +16,7 @@ import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.NeighborNotification;
 import com.creatix.security.AuthorizationManager;
 import freemarker.template.TemplateException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,7 +199,7 @@ public class NotificationService {
 
         final Property property = targetApartment.getProperty();
         final Tenant tenant = targetApartment.getTenant();
-        if ( (tenant != null) && (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) ) {
+        if ( (tenant != null) && (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
             smsMessageSender.send(new NeighborNotification(tenant));
         }
 
