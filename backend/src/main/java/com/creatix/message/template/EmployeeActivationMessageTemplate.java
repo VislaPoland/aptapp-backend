@@ -1,13 +1,12 @@
 package com.creatix.message.template;
 
+import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.EmployeeBase;
-
-import java.net.URL;
 
 public class EmployeeActivationMessageTemplate extends ActivationMessageTemplate {
 
-    public EmployeeActivationMessageTemplate(EmployeeBase account, URL backendUrl, URL frontendUrl) {
-        super(account, backendUrl, frontendUrl);
+    public EmployeeActivationMessageTemplate(EmployeeBase account, ApplicationProperties properties) {
+        super(account, properties);
     }
 
     @Override

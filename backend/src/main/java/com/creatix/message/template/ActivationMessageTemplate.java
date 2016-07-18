@@ -1,5 +1,6 @@
 package com.creatix.message.template;
 
+import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.Account;
 
 import java.net.MalformedURLException;
@@ -8,13 +9,11 @@ import java.net.URL;
 public abstract class ActivationMessageTemplate implements EmailMessageTemplate {
 
     private final Account account;
-    private final URL backendUrl;
-    private final URL frontendUrl;
+    private final ApplicationProperties properties;
 
-    public ActivationMessageTemplate(Account account, URL backendUrl, URL frontendUrl) {
+    public ActivationMessageTemplate(Account account, ApplicationProperties properties) {
         this.account = account;
-        this.backendUrl = backendUrl;
-        this.frontendUrl = frontendUrl;
+        this.properties = properties;
     }
 
     @Override
@@ -36,18 +35,22 @@ public abstract class ActivationMessageTemplate implements EmailMessageTemplate 
     }
 
     public String getApplicationUrl() {
-        return frontendUrl.toString();
+        return properties.getAdminUrl().toString();
+    }
+
+    public String getWebPageUrl() {
+        return properties.getFrontendUrl().toString();
     }
 
     public String getActivationPageUrl() throws MalformedURLException {
-        return new URL(frontendUrl, String.format("activate-account?token=%s", account.getActionToken())).toString();
+        return properties.buildAdminUrl(String.format("new-user/%s", account.getActionToken())).toString();
     }
 
     public String getLogoUrl() throws MalformedURLException {
-        return new URL(backendUrl, "static/aptapp_logo.png").toString();
+        return properties.buildBackendUrl("static/aptapp_logo.png").toString();
     }
 
     public String getIconUrl() throws MalformedURLException {
-        return new URL(backendUrl, "static/aptapp_icon.png").toString();
+        return properties.buildBackendUrl("static/aptapp_icon.png").toString();
     }
 }

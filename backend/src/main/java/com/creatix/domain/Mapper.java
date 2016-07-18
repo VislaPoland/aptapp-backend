@@ -44,6 +44,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -73,7 +74,7 @@ public class Mapper {
         this.configure(mapperFactory);
     }
 
-    private String createDownloadUrl(NotificationPhoto photo) throws MalformedURLException {
+    private String createDownloadUrl(NotificationPhoto photo) throws MalformedURLException, URISyntaxException {
         return applicationProperties.buildBackendUrl(String.format("api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
     }
 
@@ -197,7 +198,7 @@ public class Mapper {
                         try {
                             b.setFileUrl(createDownloadUrl(a));
                         }
-                        catch ( MalformedURLException e ) {
+                        catch ( MalformedURLException | URISyntaxException e ) {
                             throw new IllegalStateException("Cannot crete download URL", e);
                         }
                     }

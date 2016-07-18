@@ -71,7 +71,7 @@
                                 <tr>
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
                                         <p class="bottom" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; color: #031821; margin-bottom: 0; text-align: center; padding-bottom: 5px;"><img src="${iconUrl}" height="40" style="-ms-interpolation-mode: bicubic; max-width: 100%;"></p>
-                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. an app you can't live without. If you see ways we can do better, we would love to hear from you on our customer care page at ${applicationUrl}</p>
+                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. an app you can't live without. If you see ways we can do better, we would love to hear from you on our customer care page at ${webPageUrl}</p>
                                     </td>
                                 </tr>
                             </table>

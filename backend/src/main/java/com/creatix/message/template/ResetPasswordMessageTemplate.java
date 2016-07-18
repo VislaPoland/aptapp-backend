@@ -1,5 +1,6 @@
 package com.creatix.message.template;
 
+import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.Account;
 
 import java.net.MalformedURLException;
@@ -8,13 +9,11 @@ import java.net.URL;
 public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
 
     private final Account account;
-    private final URL backendUrl;
-    private final URL frontendUrl;
+    private final ApplicationProperties properties;
 
-    public ResetPasswordMessageTemplate(Account account, URL backendUrl, URL frontendUrl) {
+    public ResetPasswordMessageTemplate(Account account, ApplicationProperties properties) {
         this.account = account;
-        this.backendUrl = backendUrl;
-        this.frontendUrl = frontendUrl;
+        this.properties = properties;
     }
 
     @Override
@@ -36,24 +35,28 @@ public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
         return account.getFullName();
     }
 
-    public String getApplicationUrl() {
-        return frontendUrl.toString();
-    }
-
     public String getActivationToken() {
         return account.getActionToken();
     }
 
+    public String getApplicationUrl() {
+        return properties.getAdminUrl().toString();
+    }
+
+    public String getWebPageUrl() {
+        return properties.getFrontendUrl().toString();
+    }
+
     public String getResetPasswordPageUrl() throws MalformedURLException {
-        return new URL(frontendUrl, String.format("set-password?token=%s", account.getActionToken())).toString();
+        return properties.buildAdminUrl(String.format("set-password?token=%s", account.getActionToken())).toString();
     }
 
     public String getLogoUrl() throws MalformedURLException {
-        return new URL(backendUrl, "static/aptapp_logo.png").toString();
+        return properties.buildBackendUrl("static/aptapp_logo.png").toString();
     }
 
     public String getIconUrl() throws MalformedURLException {
-        return new URL(backendUrl, "static/aptapp_icon.png").toString();
+        return properties.buildBackendUrl("static/aptapp_icon.png").toString();
     }
 }
 

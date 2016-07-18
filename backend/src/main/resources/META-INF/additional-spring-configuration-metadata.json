@@ -78,7 +78,7 @@
     {
       "name": "pushnotifications.google-cloud-messaging-key",
       "type": "java.lang.String",
-      "description": "Authentification key to Google GCM service."
+      "description": "Authentication key to Google GCM service."
     },
     {
       "name": "application.backend-url",
@@ -89,6 +89,11 @@
       "name": "application.frontend-url",
       "type": "java.net.URL",
       "description": "Frontend URL of the application."
+    },
+    {
+      "name": "application.admin-url",
+      "type": "java.net.URL",
+      "description": "Administrative interface URL."
     }
   ]
 }
