@@ -15,6 +15,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -33,11 +35,14 @@ public class AccountDaoTest {
     @Test
     @WithMockCustomUser("apt@test.com")
     public void findByRolesAndPropertyId() throws Exception {
-        final List<Account> accounts = accountDao.findByRolesAndPropertyId(AccountRole.values(), 1L);
+        List<Long> propertyIdList = new ArrayList<>();
+        propertyIdList.add(1L);
+
+        final List<Account> accounts = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), propertyIdList);
         assertNotNull(accounts);
         assertEquals(7, accounts.size());
 
-        final List<Account> accountsAll = accountDao.findByRolesAndPropertyId(AccountRole.values(), null);
+        final List<Account> accountsAll = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), Collections.emptyList());
         assertNotNull(accountsAll);
         assertEquals(8, accountsAll.size());
     }
