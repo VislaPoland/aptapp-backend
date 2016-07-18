@@ -2,10 +2,7 @@ package com.creatix.domain.dto.property;
 
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
-import com.creatix.domain.enums.AccountRole;
-import com.creatix.domain.enums.CommunicationType;
-import com.creatix.domain.enums.ContactType;
-import com.creatix.domain.enums.FacilityType;
+import com.creatix.domain.enums.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -46,6 +43,8 @@ public class PropertyDto {
     private List<PropertyPhotoDto> photos;
     @ApiModelProperty(value = "Enable/disable sms notifications", required = true, notes = "Indicate that sms message notifications are enabled/disabled")
     private Boolean enableSms;
+    @ApiModelProperty(value = "Property status")
+    private PropertyStatus status;
 
     @ApiModel
     @Data
