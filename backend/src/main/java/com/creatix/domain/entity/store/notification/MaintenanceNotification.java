@@ -9,6 +9,7 @@ import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @BatchSize(size = 40)
@@ -23,6 +24,6 @@ public class MaintenanceNotification extends Notification {
     @Column
     @NotNull
     private Boolean accessIfNotAtHome;
-    @OneToOne(mappedBy = "notification")
-    private MaintenanceReservation reservation;
+    @OneToMany(mappedBy = "notification")
+    private List<MaintenanceReservation> reservations;
 }

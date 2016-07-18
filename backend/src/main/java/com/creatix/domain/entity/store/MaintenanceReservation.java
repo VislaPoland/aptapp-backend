@@ -57,7 +57,7 @@ public class MaintenanceReservation {
     private String note;
 
     @QueryInit("targetApartment.tenant")
-    @OneToOne
+    @ManyToOne
     private MaintenanceNotification notification;
 
     @Transient
