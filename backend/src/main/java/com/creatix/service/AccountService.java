@@ -360,7 +360,7 @@ public class AccountService {
 
         Property managedProperty;
         if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
-            Objects.requireNonNull(request.getManagedPropertyId());
+            Objects.requireNonNull(request.getManagedPropertyId(), "Managed property id is null");
 
             managedProperty = propertyDao.findById(request.getManagedPropertyId());
             authorizationManager.checkOwner(managedProperty);
