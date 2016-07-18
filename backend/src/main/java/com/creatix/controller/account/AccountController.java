@@ -280,7 +280,7 @@ public class AccountController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @RoleSecured({AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     @RequestMapping(value = "/assistant-property-managers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> createAssistantPropertyManager(@RequestBody @Valid PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createAssistantPropertyManager(request)));
@@ -293,7 +293,7 @@ public class AccountController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner})
     @RequestMapping(value = "/assistant-property-managers/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AccountDto> updateAssistantPropertyManager(@PathVariable Long accountId, @RequestBody @Valid PersistAssistantPropertyManagerRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateAssistantPropertyManager(accountId, request)));

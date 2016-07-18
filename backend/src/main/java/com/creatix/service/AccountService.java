@@ -484,12 +484,27 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public AssistantPropertyManager createAssistantPropertyManager(@NotNull PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
-        final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
+        final Account currentAccount = authorizationManager.getCurrentAccount();
+        final PropertyManager manager;
+        if ( currentAccount instanceof PropertyManager ) {
+            manager = (PropertyManager) currentAccount;
+        }
+        else if ( currentAccount instanceof PropertyOwner ) {
+            Objects.requireNonNull(request.getManagerId(), "Manager is is null");
+            manager = propertyManagerDao.findById(request.getManagerId());
+            if ( manager == null ) {
+                throw new EntityNotFoundException(String.format("Property manager id=%d not found", request.getManagerId()));
+            }
+            authorizationManager.checkOwner(manager.getManagedProperty());
+        }
+        else {
+            throw new SecurityException("Not allowed to perform action");
+        }
 
         final AssistantPropertyManager account = new AssistantPropertyManager();
         account.setRole(AccountRole.AssistantPropertyManager);
@@ -504,7 +519,7 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner})
     public AssistantPropertyManager updateAssistantPropertyManager(@NotNull Long accountId, @NotNull PersistAssistantPropertyManagerRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
