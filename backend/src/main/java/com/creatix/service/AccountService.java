@@ -495,7 +495,7 @@ public class AccountService {
             manager = (PropertyManager) currentAccount;
         }
         else if ( currentAccount instanceof PropertyOwner ) {
-            Objects.requireNonNull(request.getManagerId(), "Manager is is null");
+            Objects.requireNonNull(request.getManagerId(), "Manager is null");
             manager = propertyManagerDao.findById(request.getManagerId());
             if ( manager == null ) {
                 throw new EntityNotFoundException(String.format("Property manager id=%d not found", request.getManagerId()));
