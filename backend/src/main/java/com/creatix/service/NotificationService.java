@@ -90,55 +90,10 @@ public class NotificationService {
         return new PageableDataResponse<>(notifications, (long) pageSize, nextId);
     }
 
-
-
-    public PageableDataResponse<List<Notification>> filterNotifications(NotificationRequestType type, long pageNumber, long pageSize) {
-        final Account account = authorizationManager.getCurrentAccount();
-
-        long totalItems = notificationDao.countByType(type, account);
-        long totalPages = (long) Math.ceil(totalItems / (double) pageSize);
-
-        List<Notification> data = notificationDao.findPageByType(type, account, pageNumber, pageSize);
-        return new PageableDataResponse<>(data, pageSize, totalItems, totalPages, pageNumber);
-    }
-
     public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@NotNull Date beginDate, @NotNull Date endDate) {
         Objects.requireNonNull(beginDate);
         Objects.requireNonNull(endDate);
         return maintenanceNotificationDao.findAllInDateRange(beginDate, endDate);
-    }
-
-    public PageableDataResponse<List<MaintenanceNotification>> filterMaintenanceNotifications(
-            @NotNull NotificationRequestType type, @Nullable NotificationStatus status, long pageNumber, long pageSize) {
-        final Account account = authorizationManager.getCurrentAccount();
-
-        long totalItems = maintenanceNotificationDao.countByStatusAndType(status, type, account);
-        long totalPages = (long) Math.ceil(totalItems / (double) pageSize);
-
-        List<MaintenanceNotification> data = maintenanceNotificationDao.findPageByStatusAndType(status, type, account, pageNumber, pageSize);
-        return new PageableDataResponse<>(data, pageSize, totalItems, totalPages, pageNumber);
-    }
-
-    public PageableDataResponse<List<NeighborhoodNotification>> filterNeighborhoodNotifications(
-            NotificationRequestType type, NotificationStatus status, long pageNumber, long pageSize) {
-        final Account account = authorizationManager.getCurrentAccount();
-
-        long totalItems = neighborhoodNotificationDao.countByStatusAndType(status, type, account);
-        long totalPages = (long) Math.ceil(totalItems / (double) pageSize);
-
-        List<NeighborhoodNotification> data = neighborhoodNotificationDao.findPageByStatusAndType(status, type, account, pageNumber, pageSize);
-        return new PageableDataResponse<>(data, pageSize, totalItems, totalPages, pageNumber);
-    }
-
-    public PageableDataResponse<List<SecurityNotification>> filterSecurityNotifications(
-            NotificationRequestType type, NotificationStatus status, long pageNumber, long pageSize) {
-        final Account account = authorizationManager.getCurrentAccount();
-
-        long totalItems = securityNotificationDao.countByStatusAndType(status, type, account);
-        long totalPages = (long) Math.ceil(totalItems / (double) pageSize);
-
-        List<SecurityNotification> data = securityNotificationDao.findPageByStatusAndType(status, type, account, pageNumber, pageSize);
-        return new PageableDataResponse<>(data, pageSize, totalItems, totalPages, pageNumber);
     }
 
     public SecurityNotification getSecurityNotification(@NotNull Long notificationId) {

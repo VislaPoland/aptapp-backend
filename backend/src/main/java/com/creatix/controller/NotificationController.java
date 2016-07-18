@@ -70,24 +70,6 @@ public class NotificationController {
         return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, pageSize), n -> mapper.toNotificationDto(n));
     }
 
-    //maintenance
-    @ApiOperation(value = "Filter maintenance notifications")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(path = "/maintenance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
-    public PageableDataResponse<List<MaintenanceNotificationDto>> getMaintenanceNotifications(
-            @RequestParam(required = false, defaultValue = "0") Long page,
-            @RequestParam(required = false, defaultValue = "20") Long size,
-            @RequestParam NotificationRequestType type,
-            @RequestParam(required = false) NotificationStatus status) {
-        return mapper.toPageableDataResponse(notificationService.filterMaintenanceNotifications(type, status, page, size), n -> mapper.toMaintenanceNotificationDto(n));
-    }
-
     @ApiOperation(value = "Get single maintenance notification")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -133,24 +115,6 @@ public class NotificationController {
         return new DataResponse<>(data);
     }
 
-    //security
-    @ApiOperation(value = "Filter security notifications")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(path = "/security", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
-    public PageableDataResponse<List<SecurityNotificationDto>> getSecurityNotifications(
-            @RequestParam(required = false, defaultValue = "0") Long page,
-            @RequestParam(required = false, defaultValue = "20") Long size,
-            @RequestParam NotificationRequestType type,
-            @RequestParam NotificationStatus status) {
-        return mapper.toPageableDataResponse(notificationService.filterSecurityNotifications(type, status, page, size), n -> mapper.toSecurityNotificationDto(n));
-    }
-
     @ApiOperation(value = "Get single security notification")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -176,24 +140,6 @@ public class NotificationController {
     public DataResponse<SecurityNotificationDto> saveSecurityNotification(@RequestBody @Valid CreateSecurityNotificationRequest dto) {
         SecurityNotification n = mapper.fromSecurityNotificationRequest(dto);
         return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.saveSecurityNotification(n)));
-    }
-
-    //neighborhood
-    @ApiOperation(value = "Filter neighborhood notifications")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(path = "/neighborhood", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
-    public PageableDataResponse<List<NeighborhoodNotificationDto>> getNeighborhoodNotifications(
-            @RequestParam(required = false, defaultValue = "0") Long page,
-            @RequestParam(required = false, defaultValue = "20") Long size,
-            @RequestParam NotificationRequestType type,
-            @RequestParam NotificationStatus status) {
-        return mapper.toPageableDataResponse(notificationService.filterNeighborhoodNotifications(type, status, page, size), n -> mapper.toNeighborhoodNotificationDto(n));
     }
 
     @ApiOperation(value = "Get single neighborhood notification")
