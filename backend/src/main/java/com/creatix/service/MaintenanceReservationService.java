@@ -8,6 +8,7 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.SlotUnit;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.ReservationStatus;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,15 @@ public class MaintenanceReservationService {
             throw new IllegalArgumentException("Cannot create reservation in the past");
         }
 
+        if ( (reservationRequest.getStatus() == ReservationStatus.Rescheduled) && (reservationRequest.getRescheduleTime() == null) ) {
+            throw new IllegalArgumentException("Rescheduled status is set but no reschedule time is specified");
+        }
+
         final MaintenanceReservation reservation = new MaintenanceReservation();
+        reservation.setStatus(reservationRequest.getStatus());
+        if ( reservationRequest.getStatus() == ReservationStatus.Rescheduled ) {
+            reservation.setRescheduleTime(reservationRequest.getRescheduleTime());
+        }
         reservation.setDurationMinutes(reservationRequest.getDurationMinutes());
         reservation.setBeginTime(slot.getBeginTime().with(reservationRequest.getBeginTime()));
         reservation.setEndTime(reservation.getBeginTime().plusMinutes(slot.getUnitDurationMinutes()));

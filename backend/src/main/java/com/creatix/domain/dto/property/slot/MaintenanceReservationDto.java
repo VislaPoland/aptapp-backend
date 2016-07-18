@@ -2,11 +2,13 @@ package com.creatix.domain.dto.property.slot;
 
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
+import com.creatix.domain.enums.ReservationStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -34,6 +36,10 @@ public class MaintenanceReservationDto {
     @ApiModelProperty(value = "Reservation note")
     private String note;
     @JsonView(Views.SlotsWithReservations.class)
-    @ApiModelProperty(value = "Notification", required = true)
+    @ApiModelProperty(value = "Notification")
     private MaintenanceNotificationDto notification;
+    @ApiModelProperty(required = true)
+    private ReservationStatus status;
+    @ApiModelProperty(dataType = "java.lang.String", example = "2016-07-09T11:00:00.000Z")
+    private OffsetDateTime rescheduleTime;
 }

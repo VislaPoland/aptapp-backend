@@ -157,9 +157,9 @@ INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes,
 
 -- reservations
 INSERT INTO public.notification (dtype, id, created_at, date, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id) VALUES ('MaintenanceNotification', 254, '2016-02-01 07:26:04', '2016-02-01 17:00', null, 'Somebody broke my window', '', 'Pending', 'Broken window', 'Maintenance', '2016-02-01 07:26:04', false, 451, 1, 21);
-INSERT INTO public.maintenance_reservation (id, begin_time, capacity, duration_minutes, end_time, note, version, employee_id, notification_id, slot_id) VALUES (1, '2016-02-01 19:00:00', 1, 30, '2016-02-01 19:30:00', 'Broken window', 1, 45, 254, 201);
+INSERT INTO public.maintenance_reservation (id, begin_time, capacity, duration_minutes, end_time, note, version, employee_id, notification_id, slot_id, status) VALUES (1, '2016-02-01 19:00:00', 1, 30, '2016-02-01 19:30:00', 'Broken window', 1, 45, 254, 201, 'Confirmed');
 INSERT INTO public.notification (dtype, id, created_at, date, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id) VALUES ('MaintenanceNotification', 203, '2016-02-01 07:26:04', '2016-02-01 17:00', null, 'There is a gas leaking in my kitchen', '', 'Pending', 'Leaking gas', 'Maintenance', '2016-02-01 04:16:44', true, 3, 1, 22);
-INSERT INTO public.maintenance_reservation (id, begin_time, capacity, duration_minutes, end_time, note, version, employee_id, notification_id, slot_id) VALUES (2, '2016-02-01 19:00:00', 1, 30, '2016-02-01 19:30:00', 'Urgent', 1, 45, 203, 201);
+INSERT INTO public.maintenance_reservation (id, begin_time, capacity, duration_minutes, end_time, note, version, employee_id, notification_id, slot_id, status) VALUES (2, '2016-02-01 19:00:00', 1, 30, '2016-02-01 19:30:00', 'Urgent', 1, 45, 203, 201, 'Confirmed');
 
 
 -- slot units

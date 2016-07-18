@@ -2,6 +2,7 @@ package com.creatix.domain.entity.store;
 
 import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
+import com.creatix.domain.enums.ReservationStatus;
 import com.querydsl.core.annotations.QueryInit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,6 +10,7 @@ import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +35,7 @@ public class MaintenanceReservation {
     private long id;
     @Version
     private int version;
+    @NotNull
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private ManagedEmployee employee;
     @ManyToMany
@@ -45,8 +48,10 @@ public class MaintenanceReservation {
     private Set<SlotUnit> units;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private MaintenanceSlot slot;
+    @NotNull
     @Column(nullable = false)
     private OffsetDateTime beginTime;
+    @NotNull
     @Column(nullable = false)
     private OffsetDateTime endTime;
     @Column(nullable = false)
@@ -55,6 +60,12 @@ public class MaintenanceReservation {
     private int durationMinutes;
     @Column(length = 2048)
     private String note;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus status;
+    @Column
+    private OffsetDateTime rescheduleTime;
 
     @QueryInit("targetApartment.tenant")
     @ManyToOne
