@@ -198,7 +198,7 @@ public class NotificationService {
 
         final Property property = targetApartment.getProperty();
         final Tenant tenant = targetApartment.getTenant();
-        if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) ) {
+        if ( (tenant != null) && (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) ) {
             smsMessageSender.send(new NeighborNotification(tenant));
         }
 
