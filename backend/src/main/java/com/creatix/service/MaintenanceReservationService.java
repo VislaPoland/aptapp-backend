@@ -1,12 +1,14 @@
 package com.creatix.service;
 
 import com.creatix.domain.dao.*;
+import com.creatix.domain.dto.property.RespondToRescheduleRequest;
 import com.creatix.domain.dto.property.slot.PersistMaintenanceReservationRequest;
 import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.MaintenanceSlot;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.SlotUnit;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.ReservationStatus;
 import com.creatix.security.AuthorizationManager;
@@ -16,11 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -145,6 +149,36 @@ public class MaintenanceReservationService {
         }
 
         reservationDao.delete(reservation);
+        return reservation;
+    }
+
+    @RoleSecured(AccountRole.Tenant)
+    public MaintenanceReservation respondToReschedule(@NotNull Long reservationId, @NotNull RespondToRescheduleRequest request) {
+        Objects.requireNonNull(reservationId, "Reservation id is null");
+        Objects.requireNonNull(request, "Request si null");
+
+        final MaintenanceReservation reservation = reservationDao.findById(reservationId);
+        if ( reservation == null ) {
+            throw new EntityNotFoundException(String.format("Maintenance reservation id=%d not found", reservationId));
+        }
+        if ( reservation.getNotification() == null ) {
+            throw new IllegalArgumentException(String.format("Maintenance reservation id=%d has no notification assigned", reservationId));
+        }
+        if ( reservation.getStatus() != ReservationStatus.Rescheduled ) {
+            throw new IllegalArgumentException(String.format("Maintenance reservation id=%d is not in Rescheduled state", reservationId));
+        }
+        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), reservation.getNotification().getTargetApartment().getTenant())) ) {
+            throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservationId));
+        }
+
+        if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Accept ) {
+            reservation.setStatus(ReservationStatus.Confirmed);
+        }
+        else if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Reject ) {
+            reservation.setStatus(ReservationStatus.Rejected);
+        }
+        reservationDao.persist(reservation);
+
         return reservation;
     }
 }

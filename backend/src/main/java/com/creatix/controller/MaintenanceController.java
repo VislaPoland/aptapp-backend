@@ -4,6 +4,7 @@ package com.creatix.controller;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
+import com.creatix.domain.dto.property.RespondToRescheduleRequest;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
@@ -19,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
@@ -108,5 +110,21 @@ public class MaintenanceController {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<MaintenanceSlotScheduleDto> deleteMaintenanceSlotSchedule(@PathVariable Long scheduleId) {
         return new DataResponse<>(mapper.toMaintenanceSlotScheduleDto(slotService.deleteScheduleById(scheduleId)));
+    }
+
+    @ApiOperation(value = "Send reschedule response")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @RequestMapping(path = "/reservations/{reservationId}/reschedule-respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @JsonView(Views.Public.class)
+    @RoleSecured(AccountRole.Tenant)
+    public DataResponse<MaintenanceReservationDto> respondToReschedule(
+            @PathVariable Long propertyId,
+            @PathVariable Long reservationId,
+            @RequestBody @Valid RespondToRescheduleRequest request) {
+        return new DataResponse<>(mapper.toMaintenanceReservationDto(maintenanceReservationService.respondToReschedule(reservationId, request)));
     }
 }
