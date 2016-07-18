@@ -76,9 +76,7 @@ public class ApartmentService {
 
     public List<Apartment> getApartmentsByPropertyId(long propertyId) {
         final Property property = propertyDao.findById(propertyId);
-        if ( !(authorizationManager.isAdministrator()) ) {
-            authorizationManager.checkManager(property);
-        }
+        authorizationManager.checkRead(property);
 
         return apartmentDao.findByProperty(property);
     }
