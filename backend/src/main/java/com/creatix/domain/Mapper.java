@@ -573,6 +573,6 @@ public class Mapper {
 
         return new PageableDataResponse<>(response.getData().stream()
                 .map(mappingFunction)
-                .collect(Collectors.toList()), response.getPageSize(), response.getTotalItems(), response.getTotalPages(), response.getPageNumber());
+                .collect(Collectors.toList()), response.getPageSize(), response.getNextId());
     }
 }
