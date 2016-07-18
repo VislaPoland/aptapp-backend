@@ -77,7 +77,7 @@ public class NotificationService {
             int pageSize) {
         final Account account = authorizationManager.getCurrentAccount();
 
-        final List<Notification> notifications = notificationDao.findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
+        List<Notification> notifications = notificationDao.findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
                 requestType,
                 notificationStatus,
                 notificationType,
@@ -85,7 +85,15 @@ public class NotificationService {
                 account,
                 pageSize + 1);
 
-        final Long nextId = notifications.size() > pageSize ? notifications.get(pageSize).getId() : null;
+
+        final Long nextId;
+        if ( notifications.size() > pageSize ) {
+            nextId = notifications.get(pageSize).getId();
+            notifications = notifications.subList(0, pageSize);
+        }
+        else {
+            nextId = null;
+        }
 
         return new PageableDataResponse<>(notifications, (long) pageSize, nextId);
     }
