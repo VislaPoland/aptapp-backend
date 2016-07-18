@@ -80,7 +80,7 @@ class IndexController implements ErrorController {
         return new RedirectView("/app/index.html");
     }
 
-    @ExceptionHandler({NullPointerException.class, Exception.class})
+    @ExceptionHandler({Throwable.class, Exception.class})
     public void serverError(Exception ex, HttpServletResponse response) throws IOException {
         handleException(ex, HttpStatus.INTERNAL_SERVER_ERROR, response);
     }
@@ -100,7 +100,7 @@ class IndexController implements ErrorController {
         handleException(ex, HttpStatus.NOT_FOUND, response);
     }
 
-    @ExceptionHandler({DataIntegrityViolationException.class, ConstraintViolationException.class, IllegalArgumentException.class, IllegalStateException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler({NullPointerException.class, DataIntegrityViolationException.class, ConstraintViolationException.class, IllegalArgumentException.class, IllegalStateException.class, MethodArgumentNotValidException.class})
     public void integrityViolation(Exception ex, HttpServletResponse response) throws IOException {
         handleException(ex, HttpStatus.UNPROCESSABLE_ENTITY, response);
     }
