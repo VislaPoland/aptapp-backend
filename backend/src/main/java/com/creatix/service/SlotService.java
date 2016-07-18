@@ -195,26 +195,30 @@ public class SlotService {
         return maintenanceSlotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public MaintenanceSlotSchedule createSchedule(long propertyId, PersistMaintenanceSlotScheduleRequest request) {
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    public MaintenanceSlotSchedule createSchedule(long propertyId, PersistMaintenanceSlotScheduleRequest request) throws SecurityException {
         final Property property = propertyDao.findById(propertyId);
-        authorizationManager.isManager(property);
+        if ( authorizationManager.isManager(property) || authorizationManager.isOwner(property) ) {
 
-        final MaintenanceSlotSchedule schedule = property.getSchedule() != null ? property.getSchedule() : new MaintenanceSlotSchedule();
-        schedule.setBeginTime(request.getBeginTime());
-        schedule.setEndTime(request.getEndTime());
-        schedule.setDaysOfWeek(request.getDaysOfWeek());
-        schedule.setProperty(property);
-        schedule.setTimeZone(property.getTimeZone());
-        schedule.setInitialCapacity(request.getInitialCapacity());
-        schedule.setUnitDurationMinutes(request.getUnitDurationMinutes());
-        maintenanceSlotScheduleDao.persist(schedule);
-        property.setSchedule(schedule);
-        propertyDao.persist(property);
+            final MaintenanceSlotSchedule schedule = property.getSchedule() != null ? property.getSchedule() : new MaintenanceSlotSchedule();
+            schedule.setBeginTime(request.getBeginTime());
+            schedule.setEndTime(request.getEndTime());
+            schedule.setDaysOfWeek(request.getDaysOfWeek());
+            schedule.setProperty(property);
+            schedule.setTimeZone(property.getTimeZone());
+            schedule.setInitialCapacity(request.getInitialCapacity());
+            schedule.setUnitDurationMinutes(request.getUnitDurationMinutes());
+            maintenanceSlotScheduleDao.persist(schedule);
+            property.setSchedule(schedule);
+            propertyDao.persist(property);
 
-        scheduleSlots(schedule);
+            scheduleSlots(schedule);
 
-        return schedule;
+            return schedule;
+        }
+        else {
+            throw new SecurityException("Not allowed to modify property schedule");
+        }
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})

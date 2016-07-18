@@ -38,7 +38,7 @@ public class MaintenanceScheduleController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public DataResponse<MaintenanceSlotScheduleDto> createPropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid PersistMaintenanceSlotScheduleRequest request) {
         return new DataResponse<>(propertyMapper.toMaintenanceSlotScheduleDto(slotService.createSchedule(propertyId, request)));
     }
@@ -53,7 +53,7 @@ public class MaintenanceScheduleController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public DataResponse<MaintenanceSlotScheduleDto> updatePropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid PersistMaintenanceSlotScheduleRequest request) {
         return new DataResponse<>(propertyMapper.toMaintenanceSlotScheduleDto(slotService.createSchedule(propertyId, request)));
     }

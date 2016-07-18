@@ -104,10 +104,17 @@ public class AuthorizationManager {
         }
     }
 
-    @RoleSecured(AccountRole.PropertyManager)
     public boolean isManager(@NotNull Property property) {
-        Objects.requireNonNull(property);
-        return ((getCurrentAccount() instanceof PropertyManager) && Objects.equals(property, ((PropertyManager) getCurrentAccount()).getManagedProperty()));
+        Objects.requireNonNull(property, "Property is null");
+
+        if ((getCurrentAccount() instanceof PropertyManager) && Objects.equals(property, ((PropertyManager) getCurrentAccount()).getManagedProperty())) {
+            return true;
+        }
+        else if ( (getCurrentAccount() instanceof AssistantPropertyManager) && Objects.equals(property, ((AssistantPropertyManager) getCurrentAccount()).getManager().getManagedProperty()) ) {
+            return true;
+        }
+
+        return false;
     }
 
     public void checkRead(@NotNull Property property) {
