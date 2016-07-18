@@ -33,6 +33,7 @@ import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -150,15 +151,27 @@ public class AccountService {
     }
 
     public List<Account> getAccounts(AccountRole[] roles, Long propertyId) {
-        Long propertyIdForced = propertyId;
+        List<Long> propertyIdForcedList = new ArrayList<>();
+        if ( propertyId != null ) {
+            propertyIdForcedList.add(propertyId);
+        }
+
         if ( !(authorizationManager.isAdministrator()) ) {
             final Account account = authorizationManager.getCurrentAccount();
             if ( account instanceof PropertyManager ) {
-                propertyIdForced = ((PropertyManager) account).getManagedProperty().getId();
+                final Long propertyIdForced = ((PropertyManager) account).getManagedProperty().getId();
+                propertyIdForcedList.add(propertyIdForced);
+            }
+            else if ( account instanceof AssistantPropertyManager ) {
+                final Long propertyIdForced = ((AssistantPropertyManager) account).getManager().getManagedProperty().getId();
+                propertyIdForcedList.add(propertyIdForced);
+            }
+            else if ( account instanceof PropertyOwner ) {
+                ((PropertyOwner) account).getOwnedProperties().forEach(p -> propertyIdForcedList.add(p.getId()));
             }
         }
 
-        return accountDao.findByRolesAndPropertyId(roles, propertyIdForced);
+        return accountDao.findByRolesAndPropertyIdList(roles, propertyIdForcedList);
     }
 
     private Account getAccount(String email) {

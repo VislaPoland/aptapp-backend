@@ -6,10 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.creatix.domain.entity.store.account.QAccount.account;
 import static com.creatix.domain.entity.store.account.QMaintenanceEmployee.maintenanceEmployee;
@@ -23,11 +20,11 @@ import static com.creatix.domain.entity.store.account.QTenant.tenant;
 @Transactional
 public class AccountDao extends DaoBase<Account, Long> {
 
-    public List<Account> findByRolesAndPropertyId(@NotNull AccountRole[] roles, Long propertyId) {
+    public List<Account> findByRolesAndPropertyIdList(@NotNull AccountRole[] roles, Collection<Long> propertyIdList) {
         Objects.requireNonNull(roles);
 
         final List<Account> accounts;
-        if ( propertyId == null ) {
+        if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
             accounts = queryFactory.selectFrom(account)
                     .where(account.role.in(roles).and(account.deletedAt.isNull()))
                     .fetch();
@@ -37,37 +34,37 @@ public class AccountDao extends DaoBase<Account, Long> {
             for ( AccountRole role : roles ) {
                 if ( role == AccountRole.Tenant ) {
                     accounts.addAll(queryFactory.selectFrom(tenant)
-                            .where(tenant.apartment.property.id.eq(propertyId)
+                            .where(tenant.apartment.property.id.in(propertyIdList)
                                     .and(tenant.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.Maintenance ) {
                     accounts.addAll(queryFactory.selectFrom(maintenanceEmployee)
-                            .where(maintenanceEmployee.manager.managedProperty.id.eq(propertyId)
+                            .where(maintenanceEmployee.manager.managedProperty.id.in(propertyIdList)
                                     .and(maintenanceEmployee.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.Security ) {
                     accounts.addAll(queryFactory.selectFrom(securityEmployee)
-                            .where(securityEmployee.manager.managedProperty.id.eq(propertyId)
+                            .where(securityEmployee.manager.managedProperty.id.in(propertyIdList)
                                     .and(securityEmployee.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyManager ) {
                     accounts.addAll(queryFactory.selectFrom(propertyManager)
-                            .where(propertyManager.managedProperty.id.eq(propertyId)
+                            .where(propertyManager.managedProperty.id.in(propertyIdList)
                                     .and(propertyManager.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyOwner ) {
                     accounts.addAll(queryFactory.selectFrom(propertyOwner)
-                            .where(propertyOwner.ownedProperties.any().id.eq(propertyId)
+                            .where(propertyOwner.ownedProperties.any().id.in(propertyIdList)
                                     .and(propertyOwner.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.SubTenant ) {
                     accounts.addAll(queryFactory.selectFrom(subTenant)
-                            .where(subTenant.parentTenant.apartment.property.id.eq(propertyId)
+                            .where(subTenant.parentTenant.apartment.property.id.in(propertyIdList)
                                     .and(subTenant.deletedAt.isNull()))
                             .fetch());
                 }
