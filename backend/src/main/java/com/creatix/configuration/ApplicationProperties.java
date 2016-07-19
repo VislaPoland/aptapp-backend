@@ -50,7 +50,7 @@ public class ApplicationProperties {
 
     @NotNull
     public URL buildAdminUrl(String relativePath) throws MalformedURLException {
-        return concat(frontendUrl, relativePath);
+        return concat(adminUrl, relativePath);
     }
 
     private URL concat(URL rootUrl, String relative) throws MalformedURLException {
