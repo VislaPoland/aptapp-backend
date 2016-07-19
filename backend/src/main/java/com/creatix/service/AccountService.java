@@ -299,6 +299,7 @@ public class AccountService {
         account.setRole(AccountRole.Administrator);
         mapper.fillAccount(request, account);
         account.setActive(true);
+        account.setCreatedAt(new Date());
         accountDao.persist(account);
 
         return account;
@@ -329,6 +330,7 @@ public class AccountService {
         account.setRole(AccountRole.PropertyOwner);
         mapper.fillAccount(request, account);
         account.setActive(false);
+        account.setCreatedAt(new Date());
         accountDao.persist(account);
         setActionToken(account);
 
@@ -373,6 +375,7 @@ public class AccountService {
         account.setRole(AccountRole.PropertyManager);
         mapper.fillAccount(request, account);
         account.setActive(false);
+        account.setCreatedAt(new Date());
         account.setManagedProperty(managedProperty);
         accountDao.persist(account);
         setActionToken(account);
@@ -423,6 +426,7 @@ public class AccountService {
         account.setRole(AccountRole.Security);
         mapper.fillAccount(request, account);
         account.setActive(false);
+        account.setCreatedAt(new Date());
         account.setManager(manager);
         securityEmployeeDao.persist(account);
         setActionToken(account);
@@ -459,6 +463,7 @@ public class AccountService {
         account.setRole(AccountRole.Maintenance);
         mapper.fillAccount(request, account);
         account.setActive(false);
+        account.setCreatedAt(new Date());
         account.setManager(manager);
         maintenanceEmployeeDao.persist(account);
         setActionToken(account);
@@ -510,6 +515,7 @@ public class AccountService {
         account.setRole(AccountRole.AssistantPropertyManager);
         mapper.fillAccount(request, account);
         account.setActive(false);
+        account.setCreatedAt(new Date());
         account.setManager(manager);
         assistantPropertyManagerDao.persist(account);
         setActionToken(account);
