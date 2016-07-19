@@ -15,6 +15,7 @@ import static com.creatix.domain.entity.store.account.QPropertyOwner.propertyOwn
 import static com.creatix.domain.entity.store.account.QSecurityEmployee.securityEmployee;
 import static com.creatix.domain.entity.store.account.QSubTenant.subTenant;
 import static com.creatix.domain.entity.store.account.QTenant.tenant;
+import static com.creatix.domain.entity.store.account.QAssistantPropertyManager.assistantPropertyManager;
 
 @Repository
 @Transactional
@@ -60,6 +61,12 @@ public class AccountDao extends DaoBase<Account, Long> {
                     accounts.addAll(queryFactory.selectFrom(propertyOwner)
                             .where(propertyOwner.ownedProperties.any().id.in(propertyIdList)
                                     .and(propertyOwner.deletedAt.isNull()))
+                            .fetch());
+                }
+                else if ( role == AccountRole.AssistantPropertyManager ) {
+                    accounts.addAll(queryFactory.selectFrom(assistantPropertyManager)
+                            .where(assistantPropertyManager.manager.managedProperty.id.in(propertyIdList)
+                                    .and(assistantPropertyManager.deletedAt.isNull()))
                             .fetch());
                 }
                 else if ( role == AccountRole.SubTenant ) {
