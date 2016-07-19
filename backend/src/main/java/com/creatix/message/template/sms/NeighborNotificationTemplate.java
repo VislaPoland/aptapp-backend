@@ -1,6 +1,7 @@
 package com.creatix.message.template.sms;
 
 import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.message.template.sms.SmsMessageTemplate;
 
 public class NeighborNotificationTemplate implements SmsMessageTemplate {
 

@@ -1,0 +1,1 @@
+${role} ${name} sent security a notification: ${message} ${timestamp}
