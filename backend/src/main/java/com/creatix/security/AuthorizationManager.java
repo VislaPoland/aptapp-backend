@@ -132,6 +132,8 @@ public class AuthorizationManager {
                 allowed = property.getManagers().contains(this.getCurrentAccount());
                 break;
             case AssistantPropertyManager:
+                allowed = property.getManagers().contains(((AssistantPropertyManager) this.getCurrentAccount()).getManager());
+                break;
             case Security:
             case Maintenance:
                 allowed = property.getManagers().contains(((ManagedEmployee) this.getCurrentAccount()).getManager());
