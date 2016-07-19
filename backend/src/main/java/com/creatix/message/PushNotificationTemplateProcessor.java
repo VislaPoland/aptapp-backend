@@ -7,6 +7,6 @@ public class PushNotificationTemplateProcessor extends TemplateProcessor {
 
     @Override
     protected String subPath() {
-        return "push-notification";
+        return "push";
     }
 }

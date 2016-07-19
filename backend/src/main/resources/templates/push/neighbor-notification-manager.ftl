@@ -1,0 +1,1 @@
+Neighbors: Apt. ${unitNumberSender} just asked Apt. ${unitNumberRecipient} to ${message} ${timestamp}

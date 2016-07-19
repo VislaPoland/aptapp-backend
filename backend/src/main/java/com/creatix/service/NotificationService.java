@@ -12,8 +12,8 @@ import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.PushNotificationSender;
 import com.creatix.message.SmsMessageSender;
-import com.creatix.message.template.NeighborNotification;
 import com.creatix.security.AuthorizationManager;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +59,8 @@ public class NotificationService {
     private NotificationPhotoDao notificationPhotoDao;
     @Autowired
     private SmsMessageSender smsMessageSender;
+    @Autowired
+    private PushNotificationSender pushNotificationSender;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -163,8 +165,9 @@ public class NotificationService {
         final Property property = targetApartment.getProperty();
         final Tenant tenant = targetApartment.getTenant();
         if ( (tenant != null) && (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
-            smsMessageSender.send(new NeighborNotification(tenant));
+            smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
         }
+        pushNotificationSender.sendNotification(new com.creatix.message.template.push.NeighborNotificationTemplate(notification), tenant);
 
         return notification;
     }

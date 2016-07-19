@@ -1,4 +1,6 @@
-package com.creatix.message.template;
+package com.creatix.message.template.sms;
+
+import com.creatix.message.template.MessageTemplate;
 
 public interface SmsMessageTemplate extends MessageTemplate {
 

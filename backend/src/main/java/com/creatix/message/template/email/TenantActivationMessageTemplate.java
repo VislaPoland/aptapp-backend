@@ -1,4 +1,4 @@
-package com.creatix.message.template;
+package com.creatix.message.template.email;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.Tenant;

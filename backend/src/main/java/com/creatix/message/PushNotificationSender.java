@@ -3,9 +3,11 @@ package com.creatix.message;
 import com.creatix.configuration.PushNotificationProperties;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.device.Device;
+import com.creatix.message.template.push.PushMessageTemplate;
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Sender;
 import com.notnoop.apns.*;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +55,12 @@ public class PushNotificationSender {
             throw new IllegalStateException("Google GCM key property is null");
         }
         this.gcmSender = new Sender(this.pushNotificationProperties.getGoogleCloudMessagingKey());
+    }
+
+    public void sendNotification(@NotNull PushMessageTemplate template, @NotNull Account recipient) throws IOException, TemplateException {
+        final PushNotification notification = new PushNotification();
+        notification.setMessage(templateProcessor.processTemplate(template));
+        sendNotification(notification, recipient);
     }
 
     public void sendNotification(@NotNull PushNotification notification, @NotNull Account recipient) throws IOException {

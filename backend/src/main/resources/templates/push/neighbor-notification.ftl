@@ -1,0 +1,1 @@
+Heads up! A neighbor has requested that you – ${message} ${timestamp}

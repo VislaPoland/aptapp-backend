@@ -1,7 +1,7 @@
 package com.creatix.message;
 
 import com.creatix.configuration.MailProperties;
-import com.creatix.message.template.EmailMessageTemplate;
+import com.creatix.message.template.email.EmailMessageTemplate;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;

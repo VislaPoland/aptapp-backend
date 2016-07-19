@@ -1,29 +1,23 @@
-package com.creatix.message.template;
+package com.creatix.message.template.email;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.Account;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
-public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
+public abstract class ActivationMessageTemplate implements EmailMessageTemplate {
 
     private final Account account;
     private final ApplicationProperties properties;
 
-    public ResetPasswordMessageTemplate(Account account, ApplicationProperties properties) {
+    public ActivationMessageTemplate(Account account, ApplicationProperties properties) {
         this.account = account;
         this.properties = properties;
     }
 
     @Override
-    public String getTemplateName() {
-        return "reset-password";
-    }
-
-    @Override
     public String getSubject() {
-        return "Apt. Password Reset Request";
+        return "Welcome to Apt. – A smarter way to communicate";
     }
 
     @Override
@@ -47,8 +41,8 @@ public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
         return properties.getFrontendUrl().toString();
     }
 
-    public String getResetPasswordPageUrl() throws MalformedURLException {
-        return properties.buildAdminUrl(String.format("set-password?token=%s", account.getActionToken())).toString();
+    public String getActivationPageUrl() throws MalformedURLException {
+        return properties.buildAdminUrl(String.format("new-user/%s", account.getActionToken())).toString();
     }
 
     public String getLogoUrl() throws MalformedURLException {
@@ -59,4 +53,3 @@ public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
         return properties.buildBackendUrl("static/aptapp_icon.png").toString();
     }
 }
-

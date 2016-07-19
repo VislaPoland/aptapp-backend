@@ -82,7 +82,7 @@ public class Property {
     }
 
     @Transient
-    private ZoneId getZoneId() {
+    public ZoneId getZoneId() {
         return ZoneId.of(getTimeZone());
     }
 }

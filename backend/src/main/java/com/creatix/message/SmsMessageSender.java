@@ -1,7 +1,7 @@
 package com.creatix.message;
 
 import com.creatix.configuration.TwilioProperties;
-import com.creatix.message.template.SmsMessageTemplate;
+import com.creatix.message.template.sms.SmsMessageTemplate;
 import com.twilio.sdk.Twilio;
 import com.twilio.sdk.type.PhoneNumber;
 import com.twilio.sdk.resource.api.v2010.account.Message;

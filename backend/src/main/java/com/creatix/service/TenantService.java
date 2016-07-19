@@ -12,15 +12,13 @@ import com.creatix.domain.entity.store.Vehicle;
 import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
-import com.creatix.domain.enums.TenantType;
 import com.creatix.message.EmailMessageSender;
 import com.creatix.message.MessageDeliveryException;
-import com.creatix.message.template.TenantActivationMessageTemplate;
+import com.creatix.message.template.email.TenantActivationMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
