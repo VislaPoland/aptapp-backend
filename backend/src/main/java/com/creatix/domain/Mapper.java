@@ -112,6 +112,12 @@ public class Mapper {
                                 accountDto.setProperty(toPropertyDto(managedProperty));
                             }
                         }
+                        else if ( account instanceof AssistantPropertyManager ) {
+                            final Property managedProperty = ((AssistantPropertyManager) account).getManager().getManagedProperty();
+                            if ( managedProperty != null ) {
+                                accountDto.setProperty(toPropertyDto(managedProperty));
+                            }
+                        }
                         else if ( account instanceof SubTenant ) {
                             final Apartment apartment = ((SubTenant) account).getApartment();
                             if ( apartment != null ) {
