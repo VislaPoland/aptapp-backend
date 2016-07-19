@@ -127,10 +127,15 @@ public class SlotService {
         return slot;
     }
 
-    public List<EventSlot> getEventSlotsByPropertyIdAndTimeRange(@NotNull Long propertyId, @NotNull OffsetDateTime beginDt, @NotNull OffsetDateTime endDt) {
+    public List<EventSlot> getEventSlotsByPropertyIdAndTimeRange(@NotNull Long propertyId, @NotNull LocalDate beginDate, @NotNull LocalDate endDate) {
         Objects.requireNonNull(propertyId);
-        Objects.requireNonNull(beginDt);
-        Objects.requireNonNull(endDt);
+        Objects.requireNonNull(beginDate);
+        Objects.requireNonNull(endDate);
+
+        final Property property = propertyService.getProperty(propertyId);
+
+        final OffsetDateTime beginDt = beginDate.atStartOfDay().atOffset(property.getZoneOffset(beginDate.atStartOfDay()));
+        final OffsetDateTime endDt = endDate.atTime(23, 59, 59).atOffset(property.getZoneOffset(endDate.atTime(23, 59, 59)));
 
         return eventSlotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
     }

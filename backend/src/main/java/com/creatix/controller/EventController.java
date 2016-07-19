@@ -4,7 +4,8 @@ package com.creatix.controller;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.property.slot.*;
+import com.creatix.domain.dto.property.slot.EventSlotDto;
+import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.SlotService;
@@ -20,8 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.OffsetDateTime;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,9 +47,9 @@ public class EventController {
     @RoleSecured
     public DataResponse<List<EventSlotDto>> getEvents(
             @PathVariable Long propertyId,
-            @ApiParam(example = "2016-07-07T10:37:47.960Z") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime beginDt,
-            @ApiParam(example = "2016-07-07T10:37:47.960Z") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDt) {
-        return new DataResponse<>(slotService.getEventSlotsByPropertyIdAndTimeRange(propertyId, beginDt, endDt).stream()
+            @ApiParam(example = "2016-07-01") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDate,
+            @ApiParam(example = "2016-07-31") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return new DataResponse<>(slotService.getEventSlotsByPropertyIdAndTimeRange(propertyId, beginDate, endDate).stream()
         .map(e -> mapper.toEventSlotDto(e))
                 .collect(Collectors.toList()));
     }
