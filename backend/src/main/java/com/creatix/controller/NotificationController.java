@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 @Transactional
 @RequestMapping("/api/notifications")
 public class NotificationController {
+
     @Autowired
     private NotificationService notificationService;
     @Autowired
@@ -92,7 +93,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
-    public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@RequestBody @Valid CreateMaintenanceNotificationRequest dto) {
+    public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@RequestBody @Valid CreateMaintenanceNotificationRequest dto) throws IOException, TemplateException {
         MaintenanceNotification n = mapper.fromMaintenanceNotificationRequest(dto);
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n)));
     }
@@ -137,7 +138,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/security", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance})
-    public DataResponse<SecurityNotificationDto> saveSecurityNotification(@RequestBody @Valid CreateSecurityNotificationRequest dto) {
+    public DataResponse<SecurityNotificationDto> saveSecurityNotification(@RequestBody @Valid CreateSecurityNotificationRequest dto) throws IOException, TemplateException {
         SecurityNotification n = mapper.fromSecurityNotificationRequest(dto);
         return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.saveSecurityNotification(n)));
     }

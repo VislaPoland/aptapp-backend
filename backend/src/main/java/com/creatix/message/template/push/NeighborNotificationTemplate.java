@@ -23,7 +23,7 @@ public class NeighborNotificationTemplate extends PushMessageTemplate {
         return formatTimestamp(notification.getCreatedAt(), notification.getTargetApartment().getProperty().getZoneId());
     }
 
-    protected String translateTileFromEnumString(String titleEnumString) {
+    private String translateTileFromEnumString(String titleEnumString) {
         switch ( titleEnumString ) {
             case "beMindful":
                 return "Please Be Mindful of Neighbors";
