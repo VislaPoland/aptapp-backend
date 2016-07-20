@@ -41,7 +41,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -62,8 +61,6 @@ public class Mapper {
     @Autowired
     private AssistantPropertyManagerDao assistantPropertyManagerDao;
     @Autowired
-    private HttpServletRequest httpRequest;
-    @Autowired
     private ApplicationProperties applicationProperties;
     @Autowired
     private AuthorizationManager authorizationManager;
@@ -74,8 +71,11 @@ public class Mapper {
         this.configure(mapperFactory);
     }
 
-    private String createDownloadUrl(NotificationPhoto photo) throws MalformedURLException, URISyntaxException {
+    private String createNotificationPhotoDownloadUrl(NotificationPhoto photo) throws MalformedURLException, URISyntaxException {
         return applicationProperties.buildBackendUrl(String.format("api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
+    }
+    private String createPropertyPhotoDownloadUrl(PropertyPhoto photo) throws MalformedURLException, URISyntaxException {
+        return applicationProperties.buildBackendUrl(String.format("api/properties/%d/photos/%s", photo.getProperty().getId(), photo.getFileName())).toString();
     }
 
     private void configure(MapperFactory mapperFactory) {
@@ -142,6 +142,17 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(PropertyPhoto.class, PropertyPhotoDto.class)
                 .byDefault()
+                .customize(new CustomMapper<PropertyPhoto, PropertyPhotoDto>() {
+                    @Override
+                    public void mapAtoB(PropertyPhoto a, PropertyPhotoDto b, MappingContext context) {
+                        try {
+                            b.setFileUrl(createPropertyPhotoDownloadUrl(a));
+                        }
+                        catch ( MalformedURLException | URISyntaxException e ) {
+                            throw new IllegalStateException("Failed to create download URL", e);
+                        }
+                    }
+                })
                 .register();
         mapperFactory.classMap(Property.class, PropertyDto.class)
                 .byDefault()
@@ -202,10 +213,10 @@ public class Mapper {
                     @Override
                     public void mapAtoB(NotificationPhoto a, NotificationPhotoDto b, MappingContext context) {
                         try {
-                            b.setFileUrl(createDownloadUrl(a));
+                            b.setFileUrl(createNotificationPhotoDownloadUrl(a));
                         }
                         catch ( MalformedURLException | URISyntaxException e ) {
-                            throw new IllegalStateException("Cannot crete download URL", e);
+                            throw new IllegalStateException("Failed to create download URL", e);
                         }
                     }
                 })

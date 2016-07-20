@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -152,14 +153,15 @@ public class PropertyController {
     @RoleSecured
     @ResponseBody
     public HttpEntity<byte[]> getFile(@PathVariable Long propertyId, @PathVariable Long photoId) throws IOException {
-        final PropertyPhoto file = propertyService.getPropertyPhoto(photoId);
-        final byte[] fileData = FileUtils.readFileToByteArray(new File(file.getFilePath()));
+        final PropertyPhoto photo = propertyService.getPropertyPhoto(photoId);
+        final File photoFile = new File(photo.getFilePath());
+        final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
 
         final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentLength(fileData.length);
+        headers.setContentType(MediaType.valueOf(Files.probeContentType(photoFile.toPath())));
+        headers.setContentLength(photoFileData.length);
 
-        return new HttpEntity<>(fileData, headers);
+        return new HttpEntity<>(photoFileData, headers);
     }
 
     @ApiOperation(value = "Get scheduled events", notes = "Get all scheduled events for single property")

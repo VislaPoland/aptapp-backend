@@ -39,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -193,13 +194,14 @@ public class NotificationController {
     @RequestMapping(value = "/{notificationId}/photos/{fileName:.+}", method = RequestMethod.GET)
     @ResponseBody
     public HttpEntity<byte[]> dowloadNotificationPhoto(@PathVariable Long notificationId, @PathVariable String fileName) throws IOException {
-        final NotificationPhoto file = notificationService.getNotificationPhoto(notificationId, fileName);
-        final byte[] fileData = FileUtils.readFileToByteArray(new File(file.getFilePath()));
+        final NotificationPhoto photo = notificationService.getNotificationPhoto(notificationId, fileName);
+        final File photoFile = new File(photo.getFilePath());
+        final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
 
         final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentLength(fileData.length);
+        headers.setContentType(MediaType.valueOf(Files.probeContentType(photoFile.toPath())));
+        headers.setContentLength(photoFileData.length);
 
-        return new HttpEntity<>(fileData, headers);
+        return new HttpEntity<>(photoFileData, headers);
     }
 }

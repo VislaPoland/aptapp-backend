@@ -15,6 +15,6 @@ public class NotificationPhotoDto {
     private Long id;
     @ApiModelProperty(value = "Photo file name", required = true)
     private String fileName;
-    @ApiModelProperty(value = "Photo relative URL", required = true)
+    @ApiModelProperty(value = "Photo URL", required = true)
     private String fileUrl;
 }
