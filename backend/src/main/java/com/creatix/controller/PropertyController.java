@@ -150,7 +150,6 @@ public class PropertyController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}/photos/{fileName:.+}", method = RequestMethod.GET)
-    @RoleSecured
     @ResponseBody
     public HttpEntity<byte[]> getFile(@PathVariable Long propertyId, @PathVariable String fileName) throws IOException {
         final PropertyPhoto photo = propertyService.getPropertyPhoto(propertyId, fileName);
