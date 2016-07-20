@@ -1,9 +1,10 @@
 package com.creatix.message.template.push;
 
-import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.template.MessageTemplate;
 
 import javax.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,4 +26,22 @@ public abstract class PushMessageTemplate implements MessageTemplate {
         return timestampFormatter.format(zonedTm);
     }
 
+    String formatTimestamp(OffsetDateTime tm) {
+        return timestampFormatter.format(tm);
+    }
+
+    String translateRoleNameFromEnum(AccountRole role) {
+        switch ( role ) {
+            case Tenant:
+                return "Neighbor";
+            case SubTenant:
+                return "Neighbor";
+            case AssistantPropertyManager:
+                return "Property manager assistant";
+            case PropertyManager:
+                return "Property manager";
+            default:
+                return "";
+        }
+    }
 }

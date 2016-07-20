@@ -1,0 +1,1 @@
+Your maintenance appointment for ${from} has been rescheduled to ${to}.

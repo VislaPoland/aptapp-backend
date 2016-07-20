@@ -1,18 +1,12 @@
 package com.creatix.message.template.push;
 
-import com.creatix.domain.entity.store.notification.SecurityNotification;
-import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 
-public class SecurityNotificationTemplate extends PushMessageTemplate {
-    protected final SecurityNotification notification;
+public class MaintenanceNotificationTemplate extends PushMessageTemplate {
+    protected final MaintenanceNotification notification;
 
-    public SecurityNotificationTemplate(SecurityNotification notification) {
+    public MaintenanceNotificationTemplate(MaintenanceNotification notification) {
         this.notification = notification;
-    }
-
-    @Override
-    public String getTemplateName() {
-        return "security-notification";
     }
 
     public String getRole() {
@@ -29,5 +23,10 @@ public class SecurityNotificationTemplate extends PushMessageTemplate {
 
     public String getTimestamp() {
         return formatTimestamp(notification.getCreatedAt(), notification.getProperty().getZoneId());
+    }
+
+    @Override
+    public String getTemplateName() {
+        return "maintenance-notification";
     }
 }
