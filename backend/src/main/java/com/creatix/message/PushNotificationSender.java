@@ -64,8 +64,8 @@ public class PushNotificationSender {
     }
 
     public void sendNotification(@NotNull PushNotification notification, @NotNull Account recipient) throws IOException {
-        Objects.requireNonNull(notification);
-        Objects.requireNonNull(recipient);
+        Objects.requireNonNull(notification, "Notification is null");
+        Objects.requireNonNull(recipient, "Recipient is null");
 
         if ( recipient.getDevices() != null ) {
             for ( Device toDevice : recipient.getDevices() ) {

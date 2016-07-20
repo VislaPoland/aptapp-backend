@@ -185,10 +185,12 @@ public class NotificationService {
 
         final Property property = targetApartment.getProperty();
         final Tenant tenant = targetApartment.getTenant();
-        if ( (tenant != null) && (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
-            smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
+        if ( tenant != null ) {
+            if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
+                smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
+            }
+            pushNotificationSender.sendNotification(new com.creatix.message.template.push.NeighborNotificationTemplate(notification), tenant);
         }
-        pushNotificationSender.sendNotification(new com.creatix.message.template.push.NeighborNotificationTemplate(notification), tenant);
 
         return notification;
     }
