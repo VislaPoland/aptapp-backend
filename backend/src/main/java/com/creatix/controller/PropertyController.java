@@ -149,11 +149,11 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/{propertyId}/photos/{photoId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{propertyId}/photos/{fileName:.+}", method = RequestMethod.GET)
     @RoleSecured
     @ResponseBody
-    public HttpEntity<byte[]> getFile(@PathVariable Long propertyId, @PathVariable Long photoId) throws IOException {
-        final PropertyPhoto photo = propertyService.getPropertyPhoto(photoId);
+    public HttpEntity<byte[]> getFile(@PathVariable Long propertyId, @PathVariable String fileName) throws IOException {
+        final PropertyPhoto photo = propertyService.getPropertyPhoto(propertyId, fileName);
         final File photoFile = new File(photo.getFilePath());
         final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
 

@@ -153,12 +153,13 @@ public class PropertyService {
         return property;
     }
 
-    public PropertyPhoto getPropertyPhoto(@NotNull Long propertyPhotoId) {
-        Objects.requireNonNull(propertyPhotoId, "Property photo id is null");
+    public PropertyPhoto getPropertyPhoto(@NotNull Long propertyId, @NotNull String fileName) {
+        Objects.requireNonNull(propertyId, "Property id is null");
+        Objects.requireNonNull(fileName, "File name is null");
 
-        final PropertyPhoto photo = propertyPhotoDao.findById(propertyPhotoId);
+        final PropertyPhoto photo = propertyPhotoDao.findByPropertyIdAndFileName(propertyId, fileName);
         if ( photo == null ) {
-            throw new EntityNotFoundException(String.format("Photo id=%d not found", propertyPhotoId));
+            throw new EntityNotFoundException(String.format("Photo id=%s not found", fileName));
         }
 
         return photo;
@@ -166,7 +167,10 @@ public class PropertyService {
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public PropertyPhoto deletePropertyPhoto(Long propertyPhotoId) throws IOException {
-        final PropertyPhoto photo = getPropertyPhoto(propertyPhotoId);
+        final PropertyPhoto photo = propertyPhotoDao.findById(propertyPhotoId);
+        if ( photo == null ) {
+            throw new EntityNotFoundException(String.format("Photo id=%d not found", propertyPhotoId));
+        }
 
         propertyPhotoDao.delete(photo);
 
