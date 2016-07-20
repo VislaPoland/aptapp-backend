@@ -28,7 +28,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
         final Environment env = createEnvironment(property, account);
         return env.query
                 .where(env.predicate.and(slot.property.eq(property)).and(slot.beginTime.between(from, to)))
-                .orderBy(slot.beginTime.asc())
+                .orderBy(slot.id.asc())
                 .fetch();
     }
 
@@ -56,7 +56,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
 
         return env.query
                 .where(env.predicate.and(slot.beginTime.eq(beginTime).or(slot.beginTime.after(beginTime))))
-                .orderBy(slot.beginTime.asc())
+                .orderBy(slot.id.asc())
                 .limit(pageSize)
                 .fetch();
     }
