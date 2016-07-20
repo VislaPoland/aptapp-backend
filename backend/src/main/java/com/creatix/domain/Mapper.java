@@ -389,6 +389,11 @@ public class Mapper {
                 .register();
     }
 
+    public PropertyPhotoDto toPropertyPhotoDto(@NotNull PropertyPhoto propertyPhoto) {
+        Objects.requireNonNull(propertyPhoto, "Property photo is null");
+        return mapperFactory.getMapperFacade().map(propertyPhoto, PropertyPhotoDto.class);
+    }
+
     public void fillApartment(@NotNull PersistApartmentRequest req, @NotNull Apartment ap) {
         Objects.requireNonNull(req);
         Objects.requireNonNull(ap);

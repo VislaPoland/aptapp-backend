@@ -23,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -149,12 +151,24 @@ public class PropertyService {
         return property;
     }
 
-    public PropertyPhoto getPropertyPhoto(long propertyPhotoId) {
+    public PropertyPhoto getPropertyPhoto(@NotNull Long propertyPhotoId) {
+        Objects.requireNonNull(propertyPhotoId, "Property photo id is null");
 
         final PropertyPhoto photo = propertyPhotoDao.findById(propertyPhotoId);
         if ( photo == null ) {
             throw new EntityNotFoundException(String.format("Photo id=%d not found", propertyPhotoId));
         }
+
+        return photo;
+    }
+
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public PropertyPhoto deletePropertyPhoto(Long propertyPhotoId) throws IOException {
+        final PropertyPhoto photo = getPropertyPhoto(propertyPhotoId);
+
+        propertyPhotoDao.delete(photo);
+
+        Files.deleteIfExists(new File(photo.getFilePath()).toPath());
 
         return photo;
     }

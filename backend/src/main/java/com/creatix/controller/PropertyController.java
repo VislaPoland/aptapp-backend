@@ -5,6 +5,7 @@ import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDto;
+import com.creatix.domain.dto.property.PropertyPhotoDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
 import com.creatix.domain.entity.store.PropertyPhoto;
@@ -123,8 +124,21 @@ public class PropertyController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<PropertyDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long propertyId) throws IOException {
+    public DataResponse<PropertyDto> storePropertyPhotos(@RequestParam MultipartFile[] files, @PathVariable long propertyId) throws IOException {
         return new DataResponse<>(mapper.toPropertyDto(propertyService.storePropertyPhotos(files, propertyId)));
+    }
+
+    @ApiOperation(value = "Delete property photo")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{propertyId}/photos/{photoId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public DataResponse<PropertyPhotoDto> deletePropertyPhoto(@PathVariable Long propertyId, @PathVariable Long photoId) throws IOException {
+        return new DataResponse<>(mapper.toPropertyPhotoDto(propertyService.deletePropertyPhoto(photoId)));
     }
 
     @ApiOperation(value = "Download property photo")
