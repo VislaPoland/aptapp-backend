@@ -136,12 +136,14 @@ public class PropertyService {
         for ( MultipartFile file : files ) {
 
             // move uploaded file to file repository
-            final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), String.format("%d-%d-%s", property.getId(), property.getPhotos().size(), file.getOriginalFilename()));
+            final String fileName = String.format("%d-%d-%s", property.getId(), property.getPhotos().size(), file.getOriginalFilename());
+            final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), fileName);
+            Files.createDirectories(photoFilePath.getParent());
             file.transferTo(photoFilePath.toFile());
 
             final PropertyPhoto photo = new PropertyPhoto();
             photo.setProperty(property);
-            photo.setFileName(file.getOriginalFilename());
+            photo.setFileName(fileName);
             photo.setFilePath(photoFilePath.toString());
             propertyPhotoDao.persist(photo);
 
