@@ -11,6 +11,7 @@ import com.creatix.security.RoleSecured;
 import com.creatix.service.MaintenanceReservationService;
 import com.creatix.service.SlotService;
 import com.fasterxml.jackson.annotation.JsonView;
+import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,7 +68,7 @@ public class MaintenanceController {
     @RoleSecured(AccountRole.Maintenance)
     public DataResponse<MaintenanceReservationDto> createMaintenanceReservation(
             @PathVariable Long propertyId,
-            @RequestBody @Valid PersistMaintenanceReservationRequest request) {
+            @RequestBody @Valid PersistMaintenanceReservationRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toMaintenanceReservationDto(maintenanceReservationService.createMaintenanceReservation(propertyId, request)));
     }
 

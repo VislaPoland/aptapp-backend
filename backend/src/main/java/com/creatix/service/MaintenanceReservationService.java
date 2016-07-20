@@ -9,16 +9,21 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.SlotUnit;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.ReservationStatus;
+import com.creatix.message.PushNotificationSender;
+import com.creatix.message.template.push.MaintenanceNotificationRescheduleTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -48,9 +53,11 @@ public class MaintenanceReservationService {
     private ManagedEmployeeDao managedEmployeeDao;
     @Autowired
     private MaintenanceNotificationDao maintenanceNotificationDao;
+    @Autowired
+    private PushNotificationSender pushNotificationSender;
 
     @RoleSecured(AccountRole.Maintenance)
-    public MaintenanceReservation createMaintenanceReservation(Long propertyId, PersistMaintenanceReservationRequest reservationRequest) {
+    public MaintenanceReservation createMaintenanceReservation(Long propertyId, PersistMaintenanceReservationRequest reservationRequest) throws IOException, TemplateException {
 
         final MaintenanceSlot slot = maintenanceSlotDao.findById(reservationRequest.getSlotId());
         if ( slot == null ) {
@@ -100,16 +107,22 @@ public class MaintenanceReservationService {
                 throw new IllegalArgumentException("Reservation does not fit into slot.");
             }
             // update slot unit capacity
-            reservation.getUnits().stream()
-                    .forEach(unit -> {
-                        unit.setCapacity(unit.getCapacity() - reservation.getCapacity());
-                        if (unit.getCapacity() < 0) {
-                            throw new IllegalArgumentException("Insufficient capacity");
-                        }
-                        slotUnitDao.persist(unit);
-                    });
+            reservation.getUnits().forEach(unit -> {
+                unit.setCapacity(unit.getCapacity() - reservation.getCapacity());
+                if ( unit.getCapacity() < 0 ) {
+                    throw new IllegalArgumentException("Insufficient capacity");
+                }
+                slotUnitDao.persist(unit);
+            });
         }
         reservationDao.persist(reservation);
+
+        if ( reservation.getStatus() == ReservationStatus.Rescheduled ) {
+            final MaintenanceNotification notification = reservation.getNotification();
+            if ( notification != null ) {
+                pushNotificationSender.sendNotification(new MaintenanceNotificationRescheduleTemplate(notification), notification.getTargetApartment().getTenant());
+            }
+        }
 
         return reservation;
     }
