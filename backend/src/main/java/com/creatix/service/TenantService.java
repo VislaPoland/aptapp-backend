@@ -9,6 +9,7 @@ import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ParkingStall;
 import com.creatix.domain.entity.store.Vehicle;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
@@ -77,9 +78,28 @@ public class TenantService {
             throw new IllegalArgumentException(String.format("Apartment id=%d has already tenant id=%d assigned.", apartment.getId(), apartment.getTenant().getId()));
         }
 
-        final Tenant tenant = mapper.toTenant(request);
+        Tenant tenant = null;
+        final Account account = accountDao.findByEmail(request.getPrimaryEmail());
+        if ( account instanceof Tenant ) {
+            tenant = (Tenant) account;
+        }
+        else if ( account != null ) {
+            throw new IllegalArgumentException(String.format("Account with email=%s already exists", request.getPrimaryEmail()));
+        }
+
+        if ( tenant == null ) {
+            tenant = mapper.toTenant(request);
+        }
+        else {
+            if ( tenant.getActive() == Boolean.TRUE ) {
+                throw new IllegalArgumentException(String.format("Tenant with email=%s already exists", request.getPrimaryEmail()));
+            }
+            mapper.fillTenant(request, tenant);
+        }
+
         tenant.setApartment(apartment);
         tenant.setActive(false);
+        tenant.setDeletedAt(null);
         tenant.setRole(AccountRole.Tenant);
         tenant.setEnableSms(true);
         tenantDao.persist(tenant);
@@ -255,6 +275,12 @@ public class TenantService {
     public Tenant deleteTenant(@NotNull Tenant tenant) {
         Objects.requireNonNull(tenant);
         authorizationManager.checkWrite(tenant);
+
+        if ( tenant.getApartment() != null ) {
+            final Apartment apartment = tenant.getApartment();
+            apartment.setTenant(null);
+            apartmentDao.persist(apartment);
+        }
 
         tenant.setDeletedAt(new Date());
         tenant.setActive(Boolean.FALSE);
