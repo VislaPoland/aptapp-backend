@@ -32,8 +32,7 @@ public class PersistAccountRequest {
     @ApiModelProperty(value = "Phone number", required = true)
     private String primaryPhone;
 
-    @NotEmpty
-    @ApiModelProperty(value = "Company name", required = true)
+    @ApiModelProperty(value = "Company name")
     private String companyName;
 
     @Email

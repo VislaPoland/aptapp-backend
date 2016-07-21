@@ -320,7 +320,6 @@ public class Mapper {
         mapperFactory.classMap(UpdateAccountProfileRequest.class, Account.class)
                 .exclude("firstName")
                 .exclude("lastName")
-                .exclude("companyName")
                 .exclude("primaryPhone")
                 .byDefault()
                 .customize(new CustomMapper<UpdateAccountProfileRequest, Account>() {

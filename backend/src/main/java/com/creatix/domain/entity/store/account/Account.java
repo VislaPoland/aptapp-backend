@@ -33,8 +33,7 @@ public class Account {
     @NotNull
     private String lastName;
 
-    @Column(nullable = false)
-    @NotNull
+    @Column
     private String companyName;
 
     @Column(nullable = false)
