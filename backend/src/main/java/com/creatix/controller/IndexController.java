@@ -55,7 +55,7 @@ class IndexController {
             @ApiResponse(code = 404, message = "Not found")})
     @RequestMapping(value = "/static/{fileName:.+}", method = RequestMethod.GET)
     @ResponseBody
-    public HttpEntity<byte[]> dowloadNotificationPhoto(@PathVariable @NotEmpty String fileName) throws IOException {
+    public HttpEntity<byte[]> downloadNotificationPhoto(@PathVariable @NotEmpty String fileName) throws IOException {
         final ClassLoader classLoader = getClass().getClassLoader();
         final Path absolutePath = Paths.get("static", fileName);
         final String strAbsolutePath = absolutePath.toString();
