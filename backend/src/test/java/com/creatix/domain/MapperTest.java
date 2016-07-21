@@ -11,6 +11,7 @@ import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.AssistantPropertyManager;
 import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.mock.WithMockCustomUser;
 import ma.glasnost.orika.MapperFactory;
@@ -41,6 +42,8 @@ public class MapperTest {
     private ApartmentDao apartmentDao;
     @Autowired
     private AccountDao accountDao;
+    @Autowired
+    private MapperFactory mapperFactory;
 
     @Test
     @WithMockCustomUser("apt@test.com")
@@ -66,5 +69,11 @@ public class MapperTest {
         assertNotNull(ownerDto.getOwnedProperties());
         assertEquals(asOwner.getOwnedProperties().size(), ownerDto.getOwnedProperties().size());
         assertEquals(owner.getPrimaryEmail(), ownerDto.getPrimaryEmail());
+
+        final AssistantPropertyManager apm = new AssistantPropertyManager();
+        apm.setPrimaryEmail("apm@test.com");
+        final PropertyDto.AccountDto apmDto = mapperFactory.getMapperFacade().map(apm, PropertyDto.AccountDto.class);
+        assertNotNull(apmDto);
+        assertEquals("apm@test.com", apmDto.getEmail());
     }
 }

@@ -128,17 +128,14 @@ public class Mapper {
                     }
                 })
                 .register();
-        mapperFactory.classMap(PropertyOwner.class, PropertyOwnerDto.class).byDefault().register();
 
-        mapperFactory.classMap(ManagedEmployee.class, PropertyDto.AccountDto.class)
+        mapperFactory.classMap(Account.class, PropertyDto.AccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
                 .register();
-        mapperFactory.classMap(PropertyManager.class, PropertyDto.AccountDto.class)
+        mapperFactory.classMap(PropertyOwner.class, PropertyOwnerDto.class)
                 .byDefault()
-                .field("primaryEmail", "email")
-                .field("primaryPhone", "phone")
                 .register();
         mapperFactory.classMap(PropertyPhoto.class, PropertyPhotoDto.class)
                 .byDefault()
