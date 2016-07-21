@@ -48,9 +48,6 @@ public class Notification {
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
-    @Column
-    private String response;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull

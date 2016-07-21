@@ -1,6 +1,7 @@
 package com.creatix.domain.entity.store.notification;
 
 import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.enums.NeighborhoodNotificationResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
@@ -20,4 +21,7 @@ public class NeighborhoodNotification extends Notification {
     @JoinColumn
     @NotNull
     private Apartment targetApartment;
+
+    @Column
+    private NeighborhoodNotificationResponse response;
 }

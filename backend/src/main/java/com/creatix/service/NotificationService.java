@@ -3,20 +3,22 @@ package com.creatix.service;
 import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
-import com.creatix.domain.entity.store.account.MaintenanceEmployee;
-import com.creatix.domain.entity.store.account.SecurityEmployee;
-import com.creatix.domain.enums.NotificationRequestType;
+import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
+import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.MaintenanceEmployee;
+import com.creatix.domain.entity.store.account.SecurityEmployee;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.*;
-import com.creatix.domain.enums.NotificationStatus;
-import com.creatix.domain.enums.NotificationType;
+import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.PushNotificationSender;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.MaintenanceNotificationTemplate;
+import com.creatix.message.template.push.NeighborNotificationNotMeTemplate;
+import com.creatix.message.template.push.NeighborNotificationResolvedTemplate;
 import com.creatix.message.template.push.SecurityNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
 import freemarker.template.TemplateException;
@@ -193,6 +195,53 @@ public class NotificationService {
         }
 
         return notification;
+    }
+
+    public NeighborhoodNotification respondToNeighborhoodNotification(long notificationId, @NotNull NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
+        Objects.requireNonNull(request, "Notification response request is null");
+
+        final NeighborhoodNotification notification = getOrElseThrow(notificationId, neighborhoodNotificationDao,
+                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
+
+        final Tenant tenant = notification.getTargetApartment().getTenant();
+        if ( authorizationManager.isSelf(tenant) ) {
+            notification.setResponse(request.getResponse());
+            neighborhoodNotificationDao.persist(notification);
+
+            if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
+                pushNotificationSender.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
+            }
+            else if ( request.getResponse() == NeighborhoodNotificationResponse.SorryNotMe ) {
+                pushNotificationSender.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
+            }
+
+            return notification;
+        }
+
+        throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
+    }
+
+    public SecurityNotification respondToSecurityNotification(long notificationId, @NotNull SecurityNotificationResponseRequest request) {
+        Objects.requireNonNull(request, "Notification response request is null");
+
+        final SecurityNotification notification = getOrElseThrow(notificationId, securityNotificationDao,
+                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
+
+        if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ) {
+            notification.setResponse(request.getResponse());
+            securityNotificationDao.persist(notification);
+
+            if ( request.getResponse() == SecurityNotificationResponse.NoIssueFound ) {
+                
+            }
+            else if ( request.getResponse() == SecurityNotificationResponse.Resolved ) {
+
+            }
+
+            return notification;
+        }
+
+        throw new SecurityException("You are not eligible to respond to security notifications from another property");
     }
 
     private Apartment getApartmentByUnitNumber(@NotNull String targetUnitNumber) {

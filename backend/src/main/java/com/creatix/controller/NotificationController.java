@@ -5,17 +5,19 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.notification.NotificationDto;
-import com.creatix.domain.enums.NotificationRequestType;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
 import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
+import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationDto;
 import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
+import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.entity.store.notification.NotificationPhoto;
 import com.creatix.domain.entity.store.notification.SecurityNotification;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.NotificationRequestType;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.message.MessageDeliveryException;
@@ -144,6 +146,19 @@ public class NotificationController {
         return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.saveSecurityNotification(n)));
     }
 
+    @ApiOperation(value = "Respond to security notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/security/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(value = {AccountRole.Security})
+    public DataResponse<SecurityNotificationDto> respondToSecurityNotification(@PathVariable long notificationId, @RequestBody @Valid SecurityNotificationResponseRequest request) {
+        return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.respondToSecurityNotification(notificationId, request)));
+    }
+
     @ApiOperation(value = "Get single neighborhood notification")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -170,6 +185,19 @@ public class NotificationController {
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(dto.getUnitNumber(), mapper.fromNeighborhoodNotificationRequest(dto))));
     }
 
+
+    @ApiOperation(value = "Respond to neighborhood notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/neighborhood/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(value = {AccountRole.Tenant})
+    public DataResponse<NeighborhoodNotificationDto> respondToNeighborhoodNotification(@PathVariable long notificationId, @RequestBody @Valid NeighborhoodNotificationResponseRequest request) {
+        return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.respondToNeighborhoodNotification(notificationId, request)));
+    }
 
     @ApiOperation(value = "Upload notification photo")
     @ApiResponses(value = {
