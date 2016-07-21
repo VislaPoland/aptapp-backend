@@ -7,19 +7,13 @@ import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotification
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.MaintenanceEmployee;
-import com.creatix.domain.entity.store.account.SecurityEmployee;
-import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.PushNotificationSender;
 import com.creatix.message.SmsMessageSender;
-import com.creatix.message.template.push.MaintenanceNotificationTemplate;
-import com.creatix.message.template.push.NeighborNotificationNotMeTemplate;
-import com.creatix.message.template.push.NeighborNotificationResolvedTemplate;
-import com.creatix.message.template.push.SecurityNotificationTemplate;
+import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
@@ -71,6 +65,10 @@ public class NotificationService {
     private SecurityEmployeeDao securityEmployeeDao;
     @Autowired
     private MaintenanceEmployeeDao maintenanceEmployeeDao;
+    @Autowired
+    private PropertyManagerDao propertyManagerDao;
+    @Autowired
+    private AssistantPropertyManagerDao assistantPropertyManagerDao;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -221,7 +219,7 @@ public class NotificationService {
         throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
     }
 
-    public SecurityNotification respondToSecurityNotification(long notificationId, @NotNull SecurityNotificationResponseRequest request) {
+    public SecurityNotification respondToSecurityNotification(long notificationId, @NotNull SecurityNotificationResponseRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(request, "Notification response request is null");
 
         final SecurityNotification notification = getOrElseThrow(notificationId, securityNotificationDao,
@@ -232,10 +230,26 @@ public class NotificationService {
             securityNotificationDao.persist(notification);
 
             if ( request.getResponse() == SecurityNotificationResponse.NoIssueFound ) {
-                
+                pushNotificationSender.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), notification.getAuthor());
+
+                for ( PropertyManager manager : propertyManagerDao.findByProperty(notification.getProperty()) ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), manager);
+                }
+
+                for ( AssistantPropertyManager manager : assistantPropertyManagerDao.findByProperty(notification.getProperty()) ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), manager);
+                }
             }
             else if ( request.getResponse() == SecurityNotificationResponse.Resolved ) {
+                pushNotificationSender.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), notification.getAuthor());
 
+                for ( PropertyManager manager : propertyManagerDao.findByProperty(notification.getProperty()) ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), manager);
+                }
+
+                for ( AssistantPropertyManager manager : assistantPropertyManagerDao.findByProperty(notification.getProperty()) ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), manager);
+                }
             }
 
             return notification;

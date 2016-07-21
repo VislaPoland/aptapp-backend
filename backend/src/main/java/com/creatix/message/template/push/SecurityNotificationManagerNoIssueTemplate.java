@@ -2,8 +2,8 @@ package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.notification.SecurityNotification;
 
-public class SecurityNotificationManagerNoIssueTemlate extends SecurityNotificationTemplate {
-    public SecurityNotificationManagerNoIssueTemlate(SecurityNotification notification) {
+public class SecurityNotificationManagerNoIssueTemplate extends SecurityNotificationTemplate {
+    public SecurityNotificationManagerNoIssueTemplate(SecurityNotification notification) {
         super(notification);
     }
 
