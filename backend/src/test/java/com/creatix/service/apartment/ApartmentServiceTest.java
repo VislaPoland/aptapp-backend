@@ -157,7 +157,8 @@ public class ApartmentServiceTest extends TestContext {
         assertNotNull(apartment);
         final Tenant tenant = apartment.getTenant();
         assertNotNull(tenant);
-        assertTrue(tenant.isDeleted());
+        assertFalse(tenant.isDeleted());
         assertFalse(tenant.getActive());
+        assertNull(tenant.getApartment());
     }
 }

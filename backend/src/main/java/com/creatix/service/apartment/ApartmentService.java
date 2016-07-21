@@ -4,6 +4,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.dao.ApartmentNeighborDao;
 import com.creatix.domain.dao.PropertyDao;
+import com.creatix.domain.dao.TenantDao;
 import com.creatix.domain.dto.apartment.PersistApartmentRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ApartmentNeighbor;
@@ -13,7 +14,6 @@ import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.TenantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +38,7 @@ public class ApartmentService {
     @Autowired
     private ApartmentNeighborDao apartmentNeighborDao;
     @Autowired
-    private TenantService tenantService;
+    private TenantDao tenantDao;
 
     public Apartment getApartment(Long apartmentId) {
         Apartment apartment = apartmentDao.findById(apartmentId);
@@ -61,7 +61,8 @@ public class ApartmentService {
                 throw new IllegalArgumentException("Cannot delete apartment with active tenant");
             }
             else {
-                tenantService.deleteTenant(tenant);
+                tenant.setApartment(null);
+                tenantDao.persist(tenant);
             }
         }
 
