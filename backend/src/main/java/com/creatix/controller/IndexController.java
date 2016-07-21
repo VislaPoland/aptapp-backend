@@ -40,7 +40,7 @@ import java.nio.file.Paths;
  */
 @RestController
 @ControllerAdvice
-class IndexController implements ErrorController {
+class IndexController {
 
     private final Logger logger = LoggerFactory.getLogger(IndexController.class);
 
@@ -119,17 +119,6 @@ class IndexController implements ErrorController {
         errorMessage.setTimestamp(System.currentTimeMillis());
         errorMessage.setPath(httpServletRequest.getServletPath());
         resp.getOutputStream().print(jsonMapper.writeValueAsString(errorMessage));
-    }
-
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @RequestMapping("/error")
-    public ModelAndView error() {
-        return new ModelAndView("/app/index");
-    }
-
-    @Override
-    public String getErrorPath() {
-        return "/error";
     }
 
     @Data
