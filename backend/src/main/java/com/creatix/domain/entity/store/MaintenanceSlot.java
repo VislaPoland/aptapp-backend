@@ -5,13 +5,13 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(indexes = {
+    @Index(columnList = "schedule_id")
+})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true)

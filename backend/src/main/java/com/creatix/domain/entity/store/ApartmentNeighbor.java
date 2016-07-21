@@ -8,6 +8,9 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "apartment_id")
+})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "id")

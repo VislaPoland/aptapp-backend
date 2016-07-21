@@ -5,12 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "target_apartment_id")
+})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true)

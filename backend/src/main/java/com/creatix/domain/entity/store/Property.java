@@ -19,10 +19,15 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "address_id"),
+        @Index(columnList = "owner_id"),
+        @Index(columnList = "schedule_id"),
+})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "id")
-@ToString(of = { "id", "name" })
+@ToString(of = {"id", "name"})
 public class Property {
 
     @Id

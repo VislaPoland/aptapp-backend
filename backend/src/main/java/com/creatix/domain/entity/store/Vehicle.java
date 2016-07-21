@@ -9,6 +9,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@Table(indexes = {
+    @Index(columnList = "owner_id")
+})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "licensePlate")

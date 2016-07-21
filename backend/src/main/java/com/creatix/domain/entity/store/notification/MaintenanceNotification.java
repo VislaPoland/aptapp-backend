@@ -12,6 +12,9 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
+@Table(indexes = {
+    @Index(columnList = "target_apartment_id")
+})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true)

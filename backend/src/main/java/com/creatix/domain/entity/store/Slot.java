@@ -24,6 +24,7 @@ import java.util.Set;
         indexes = {
                 @Index(columnList = "beginTime"),
                 @Index(columnList = "endTime"),
+                @Index(columnList = "property_id"),
         }
 )
 @BatchSize(size = 80)

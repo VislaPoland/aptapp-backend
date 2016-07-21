@@ -11,6 +11,9 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "account_id")
+})
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @BatchSize(size = 40)
 @Data

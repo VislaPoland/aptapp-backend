@@ -17,6 +17,9 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "property_id")
+})
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @BatchSize(size = 40)
 @Data

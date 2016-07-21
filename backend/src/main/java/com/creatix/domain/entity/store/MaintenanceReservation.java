@@ -22,7 +22,8 @@ import java.util.Set;
 @Table(
         indexes = {
                 @Index(columnList = "slot_id"),
-                @Index(columnList = "employee_id")
+                @Index(columnList = "employee_id"),
+                @Index(columnList = "status")
         }
 )
 @BatchSize(size = 80)

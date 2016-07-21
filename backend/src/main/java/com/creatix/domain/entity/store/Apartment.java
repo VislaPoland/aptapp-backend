@@ -11,12 +11,18 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "unitNumber", "property_id" })
+        @UniqueConstraint(columnNames = {"unitNumber", "property_id"})
+}, indexes = {
+        @Index(columnList = "property_id"),
+        @Index(columnList = "above_id"),
+        @Index(columnList = "below_id"),
+        @Index(columnList = "left_id"),
+        @Index(columnList = "right_id"),
 })
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "id")
-@ToString(of = { "id", "unitNumber" })
+@ToString(of = {"id", "unitNumber"})
 public class Apartment {
     @Id
     @GeneratedValue

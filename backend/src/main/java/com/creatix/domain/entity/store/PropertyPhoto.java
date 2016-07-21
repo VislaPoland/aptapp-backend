@@ -7,6 +7,9 @@ import org.hibernate.annotations.BatchSize;
 import javax.persistence.*;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "property_id")
+})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "id")

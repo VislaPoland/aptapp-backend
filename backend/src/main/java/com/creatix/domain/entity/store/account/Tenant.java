@@ -15,6 +15,9 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
+@Table(indexes = {
+        @Index(columnList = "apartment_id")
+})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})
