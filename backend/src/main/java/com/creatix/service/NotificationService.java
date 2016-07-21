@@ -7,7 +7,10 @@ import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotification
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.account.*;
+import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.MaintenanceEmployee;
+import com.creatix.domain.entity.store.account.SecurityEmployee;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
@@ -230,25 +233,23 @@ public class NotificationService {
             securityNotificationDao.persist(notification);
 
             if ( request.getResponse() == SecurityNotificationResponse.NoIssueFound ) {
-                pushNotificationSender.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), notification.getAuthor());
+                final Account account = notification.getAuthor();
 
-                for ( PropertyManager manager : propertyManagerDao.findByProperty(notification.getProperty()) ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), manager);
+                if ( account.getRole() == AccountRole.Tenant ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), account);
                 }
-
-                for ( AssistantPropertyManager manager : assistantPropertyManagerDao.findByProperty(notification.getProperty()) ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), manager);
+                else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), account);
                 }
             }
             else if ( request.getResponse() == SecurityNotificationResponse.Resolved ) {
-                pushNotificationSender.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), notification.getAuthor());
+                final Account account = notification.getAuthor();
 
-                for ( PropertyManager manager : propertyManagerDao.findByProperty(notification.getProperty()) ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), manager);
+                if ( account.getRole() == AccountRole.Tenant ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), account);
                 }
-
-                for ( AssistantPropertyManager manager : assistantPropertyManagerDao.findByProperty(notification.getProperty()) ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), manager);
+                else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), account);
                 }
             }
 
