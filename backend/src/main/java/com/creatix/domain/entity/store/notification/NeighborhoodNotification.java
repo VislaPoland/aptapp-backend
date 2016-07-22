@@ -23,5 +23,6 @@ public class NeighborhoodNotification extends Notification {
     private Apartment targetApartment;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private NeighborhoodNotificationResponse response;
 }
