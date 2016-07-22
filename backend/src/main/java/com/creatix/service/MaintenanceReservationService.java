@@ -13,6 +13,7 @@ import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.ReservationStatus;
 import com.creatix.message.PushNotificationSender;
+import com.creatix.message.template.push.MaintenanceNotificationApproveTemplate;
 import com.creatix.message.template.push.MaintenanceNotificationRescheduleTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
@@ -166,7 +167,7 @@ public class MaintenanceReservationService {
     }
 
     @RoleSecured(AccountRole.Tenant)
-    public MaintenanceReservation respondToReschedule(@NotNull Long reservationId, @NotNull RespondToRescheduleRequest request) {
+    public MaintenanceReservation respondToReschedule(@NotNull Long reservationId, @NotNull RespondToRescheduleRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(reservationId, "Reservation id is null");
         Objects.requireNonNull(request, "Request si null");
 
@@ -186,6 +187,7 @@ public class MaintenanceReservationService {
 
         if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Accept ) {
             reservation.setStatus(ReservationStatus.Confirmed);
+            pushNotificationSender.sendNotification(new MaintenanceNotificationApproveTemplate(reservation.getNotification()), reservation.getNotification().getAuthor());
         }
         else if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
