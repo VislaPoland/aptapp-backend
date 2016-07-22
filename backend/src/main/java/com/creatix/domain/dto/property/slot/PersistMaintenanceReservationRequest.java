@@ -14,6 +14,7 @@ import java.util.Date;
 @ApiModel
 @Data
 public class PersistMaintenanceReservationRequest {
+    @NotNull
     @ApiModelProperty(required = true)
     private Long slotId;
     @NotNull

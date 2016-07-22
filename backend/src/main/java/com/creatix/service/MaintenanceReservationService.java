@@ -17,6 +17,7 @@ import com.creatix.message.template.push.MaintenanceNotificationApproveTemplate;
 import com.creatix.message.template.push.MaintenanceNotificationRescheduleTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.twilio.sdk.resource.taskrouter.v1.workspace.task.Reservation;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,6 +79,7 @@ public class MaintenanceReservationService {
         }
 
         final MaintenanceReservation reservation = new MaintenanceReservation();
+        reservation.setSlot(slot);
         reservation.setStatus(reservationRequest.getStatus());
         if ( reservationRequest.getStatus() == ReservationStatus.Rescheduled ) {
             reservation.setRescheduleTime(reservationRequest.getRescheduleTime());
@@ -92,30 +94,7 @@ public class MaintenanceReservationService {
             reservation.setNotification(maintenanceNotificationDao.findById(reservationRequest.getNotificationId()));
         }
 
-
-        final int unitCount = slotService.calculateUnitCount(reservationRequest.getDurationMinutes(), slot.getUnitDurationMinutes());
-        if ( unitCount == 0 ) {
-            throw new IllegalArgumentException("Invalid duration of zero minutes");
-        }
-        synchronized ( syncLock ) {
-            // assign slots units to reservation
-            final int unitOffsetLft = slotService.calculateUnitOffset(slot, reservation.getBeginTime());
-            final int unitOffsetRgt = unitOffsetLft + unitCount - 1;
-            slot.getUnits().stream()
-                    .filter(u -> ((unitOffsetLft <= u.getOffset()) && (u.getOffset() <= unitOffsetRgt)))
-                    .forEach(reservation::addUnit);
-            if ( (reservation.getUnits() == null) || (reservation.getUnits().size() != unitCount) ) {
-                throw new IllegalArgumentException("Reservation does not fit into slot.");
-            }
-            // update slot unit capacity
-            reservation.getUnits().forEach(unit -> {
-                unit.setCapacity(unit.getCapacity() - reservation.getCapacity());
-                if ( unit.getCapacity() < 0 ) {
-                    throw new IllegalArgumentException("Insufficient capacity");
-                }
-                slotUnitDao.persist(unit);
-            });
-        }
+        reserveCapacity(reservation);
         reservationDao.persist(reservation);
 
         if ( reservation.getStatus() == ReservationStatus.Rescheduled ) {
@@ -185,15 +164,91 @@ public class MaintenanceReservationService {
             throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservationId));
         }
 
+        final MaintenanceReservation resultReservation;
         if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Accept ) {
             reservation.setStatus(ReservationStatus.Confirmed);
+            resultReservation = reschedule(reservation, request);
             pushNotificationSender.sendNotification(new MaintenanceNotificationApproveTemplate(reservation.getNotification()), reservation.getNotification().getAuthor());
         }
         else if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
+            releaseReservedCapacity(reservation);
+            resultReservation = reservation;
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported response type: " + request.getResponseType());
         }
         reservationDao.persist(reservation);
 
-        return reservation;
+        return resultReservation;
     }
+
+    private MaintenanceReservation reschedule(@NotNull MaintenanceReservation reservationOld, @NotNull RespondToRescheduleRequest request) {
+        Objects.requireNonNull(reservationOld, "Reservation old is null");
+        Objects.requireNonNull(request, "Reschedule request is null");
+        Objects.requireNonNull(request.getSlotId(), "Slot ID is null");
+
+        releaseReservedCapacity(reservationOld);
+
+        final MaintenanceSlot slot = maintenanceSlotDao.findById(request.getSlotId());
+        if ( slot == null ) {
+            throw new EntityNotFoundException(String.format("Slot id=%d not found", request.getSlotId()));
+        }
+
+        final MaintenanceReservation reservationNew = new MaintenanceReservation();
+        reservationNew.setSlot(slot);
+        reservationNew.setStatus(ReservationStatus.Confirmed);
+        reservationNew.setDurationMinutes(reservationOld.getDurationMinutes());
+        reservationNew.setBeginTime(slot.getBeginTime().with(reservationOld.getBeginTime()));
+        reservationNew.setEndTime(reservationNew.getBeginTime().plusMinutes(slot.getUnitDurationMinutes()));
+        reservationNew.setCapacity(reservationOld.getCapacity());
+        reservationNew.setEmployee(reservationOld.getEmployee());
+        reservationNew.setNote(reservationOld.getNote());
+        reservationNew.setNotification(reservationOld.getNotification());
+
+        reserveCapacity(reservationNew);
+        reservationDao.persist(reservationNew);
+
+        return reservationNew;
+    }
+
+    private void reserveCapacity(MaintenanceReservation reservation) {
+        final MaintenanceSlot slot = reservation.getSlot();
+
+        final int unitCount = slotService.calculateUnitCount(reservation.getDurationMinutes(), slot.getUnitDurationMinutes());
+        if ( unitCount == 0 ) {
+            throw new IllegalArgumentException("Invalid duration of zero minutes");
+        }
+        synchronized ( syncLock ) {
+            // assign slots units to reservation
+            final int unitOffsetLft = slotService.calculateUnitOffset(slot, reservation.getBeginTime());
+            final int unitOffsetRgt = unitOffsetLft + unitCount - 1;
+            slot.getUnits().stream()
+                    .filter(u -> ((unitOffsetLft <= u.getOffset()) && (u.getOffset() <= unitOffsetRgt)))
+                    .forEach(reservation::addUnit);
+            if ( (reservation.getUnits() == null) || (reservation.getUnits().size() != unitCount) ) {
+                throw new IllegalArgumentException("Reservation does not fit into slot.");
+            }
+            // update slot unit capacity
+            reservation.getUnits().forEach(unit -> {
+                unit.setCapacity(unit.getCapacity() - reservation.getCapacity());
+                if ( unit.getCapacity() < 0 ) {
+                    throw new IllegalArgumentException("Insufficient capacity");
+                }
+                slotUnitDao.persist(unit);
+            });
+        }
+    }
+
+    private void releaseReservedCapacity(MaintenanceReservation reservation) {
+        synchronized ( syncLock ) {
+            // free slot unit capacity
+            reservation.getUnits().forEach(unit -> {
+                unit.setCapacity(unit.getCapacity() + reservation.getCapacity());
+                slotUnitDao.persist(unit);
+            });
+        }
+    }
+
+
 }

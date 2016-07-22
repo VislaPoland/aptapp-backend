@@ -16,4 +16,7 @@ public class RespondToRescheduleRequest {
     @NotNull
     @ApiModelProperty(value = "Reschedule response type", required = true)
     private RescheduleResponseType responseType;
+    @ApiModelProperty
+    private Long slotId;
+
 }
