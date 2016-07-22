@@ -46,6 +46,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -136,6 +137,16 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(PropertyOwner.class, PropertyOwnerDto.class)
                 .byDefault()
+                .customize(new CustomMapper<PropertyOwner, PropertyOwnerDto>() {
+                    @Override
+                    public void mapAtoB(PropertyOwner a, PropertyOwnerDto b, MappingContext context) {
+                        b.setOwnedProperties(new ArrayList<>());
+                        a.getOwnedProperties().stream().filter(property -> property.getDeleteDate() == null).forEach(property -> {
+                            b.getOwnedProperties().add(toPropertyDto(property));
+                        });
+
+                    }
+                })
                 .register();
         mapperFactory.classMap(PropertyPhoto.class, PropertyPhotoDto.class)
                 .byDefault()
