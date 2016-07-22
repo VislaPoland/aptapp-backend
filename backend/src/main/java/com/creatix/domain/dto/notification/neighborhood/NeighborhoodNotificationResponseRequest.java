@@ -1,7 +1,5 @@
 package com.creatix.domain.dto.notification.neighborhood;
 
-import com.creatix.domain.dto.apartment.BasicApartmentDto;
-import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.enums.NeighborhoodNotificationResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,14 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
 @ApiModel
 @Getter
 @Setter
 @NoArgsConstructor
-public class NeighborhoodNotificationDto extends NotificationDto {
-    @ApiModelProperty(value = "Target apartment", required = true)
-    private BasicApartmentDto targetApartment;
-
-    @ApiModelProperty(value = "Neighborhood notification response message")
+public class NeighborhoodNotificationResponseRequest {
+    @ApiModelProperty(value = "Response", required = true)
+    @NotNull
     private NeighborhoodNotificationResponse response;
 }

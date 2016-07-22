@@ -4,9 +4,7 @@ import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.ReservationStatus;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 public class MaintenanceNotificationRescheduleTemplate extends MaintenanceNotificationTemplate {

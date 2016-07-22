@@ -3,21 +3,20 @@ package com.creatix.service;
 import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
-import com.creatix.domain.entity.store.account.MaintenanceEmployee;
-import com.creatix.domain.entity.store.account.SecurityEmployee;
-import com.creatix.domain.enums.NotificationRequestType;
+import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
+import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.MaintenanceEmployee;
+import com.creatix.domain.entity.store.account.SecurityEmployee;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.*;
-import com.creatix.domain.enums.NotificationStatus;
-import com.creatix.domain.enums.NotificationType;
+import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.PushNotificationSender;
 import com.creatix.message.SmsMessageSender;
-import com.creatix.message.template.push.MaintenanceNotificationTemplate;
-import com.creatix.message.template.push.SecurityNotificationTemplate;
+import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
@@ -69,6 +68,10 @@ public class NotificationService {
     private SecurityEmployeeDao securityEmployeeDao;
     @Autowired
     private MaintenanceEmployeeDao maintenanceEmployeeDao;
+    @Autowired
+    private PropertyManagerDao propertyManagerDao;
+    @Autowired
+    private AssistantPropertyManagerDao assistantPropertyManagerDao;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -193,6 +196,68 @@ public class NotificationService {
         }
 
         return notification;
+    }
+
+    public NeighborhoodNotification respondToNeighborhoodNotification(long notificationId, @NotNull NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
+        Objects.requireNonNull(request, "Notification response request is null");
+
+        final NeighborhoodNotification notification = getOrElseThrow(notificationId, neighborhoodNotificationDao,
+                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
+
+        final Tenant tenant = notification.getTargetApartment().getTenant();
+        if ( tenant != null ) {
+            if ( authorizationManager.isSelf(tenant) ) {
+                notification.setResponse(request.getResponse());
+                neighborhoodNotificationDao.persist(notification);
+
+                if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
+                    pushNotificationSender.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
+                }
+                else if ( request.getResponse() == NeighborhoodNotificationResponse.SorryNotMe ) {
+                    pushNotificationSender.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
+                }
+
+                return notification;
+            }
+        }
+        throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
+    }
+
+    public SecurityNotification respondToSecurityNotification(long notificationId, @NotNull SecurityNotificationResponseRequest request) throws IOException, TemplateException {
+        Objects.requireNonNull(request, "Notification response request is null");
+
+        final SecurityNotification notification = getOrElseThrow(notificationId, securityNotificationDao,
+                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
+
+        if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ) {
+            notification.setResponse(request.getResponse());
+            securityNotificationDao.persist(notification);
+
+            if ( request.getResponse() == SecurityNotificationResponse.NoIssueFound ) {
+                final Account account = notification.getAuthor();
+
+                if ( account.getRole() == AccountRole.Tenant ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), account);
+                }
+                else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), account);
+                }
+            }
+            else if ( request.getResponse() == SecurityNotificationResponse.Resolved ) {
+                final Account account = notification.getAuthor();
+
+                if ( account.getRole() == AccountRole.Tenant ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), account);
+                }
+                else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), account);
+                }
+            }
+
+            return notification;
+        }
+
+        throw new SecurityException("You are not eligible to respond to security notifications from another property");
     }
 
     private Apartment getApartmentByUnitNumber(@NotNull String targetUnitNumber) {

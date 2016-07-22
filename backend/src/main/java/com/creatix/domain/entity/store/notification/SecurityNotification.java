@@ -1,9 +1,11 @@
 package com.creatix.domain.entity.store.notification;
 
+import com.creatix.domain.enums.SecurityNotificationResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity
@@ -11,4 +13,6 @@ import javax.persistence.Entity;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SecurityNotification extends Notification {
+    @Column
+    private SecurityNotificationResponse response;
 }
