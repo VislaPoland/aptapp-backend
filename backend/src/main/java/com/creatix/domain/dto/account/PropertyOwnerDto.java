@@ -14,4 +14,6 @@ import java.util.List;
 public class PropertyOwnerDto extends AccountDto {
     @ApiModelProperty(value = "Owned properties")
     private List<PropertyDto> ownedProperties;
+    @ApiModelProperty(value = "Web url")
+    private String website;
 }
