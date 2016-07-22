@@ -204,9 +204,8 @@ public class NotificationService {
         final NeighborhoodNotification notification = getOrElseThrow(notificationId, neighborhoodNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
 
-        final Apartment apartment = notification.getTargetApartment();
-        if ( apartment != null ) {
-            final Tenant tenant = apartment.getTenant();
+        final Tenant tenant = notification.getTargetApartment().getTenant();
+        if ( tenant != null ) {
             if ( authorizationManager.isSelf(tenant) ) {
                 notification.setResponse(request.getResponse());
                 neighborhoodNotificationDao.persist(notification);
