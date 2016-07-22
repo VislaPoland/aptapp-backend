@@ -13,4 +13,9 @@ import java.util.Set;
 @ApiModel
 @Getter
 @Setter
-public class PersistPropertyOwnerRequest extends PersistAccountRequest { }
+public class PersistPropertyOwnerRequest extends PersistAccountRequest {
+
+    @ApiModelProperty(value = "Web url")
+    private String website;
+
+}
