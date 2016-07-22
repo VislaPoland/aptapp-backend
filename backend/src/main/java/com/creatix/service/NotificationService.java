@@ -220,9 +220,8 @@ public class NotificationService {
 
                 return notification;
             }
-
-            throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
         }
+        throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
     }
 
     public SecurityNotification respondToSecurityNotification(long notificationId, @NotNull SecurityNotificationResponseRequest request) throws IOException, TemplateException {
