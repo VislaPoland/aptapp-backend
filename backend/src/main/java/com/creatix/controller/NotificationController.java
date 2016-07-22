@@ -155,7 +155,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/security/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Security})
-    public DataResponse<SecurityNotificationDto> respondToSecurityNotification(@PathVariable long notificationId, @RequestBody @Valid SecurityNotificationResponseRequest request) {
+    public DataResponse<SecurityNotificationDto> respondToSecurityNotification(@PathVariable long notificationId, @RequestBody @Valid SecurityNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.respondToSecurityNotification(notificationId, request)));
     }
 
@@ -195,7 +195,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant})
-    public DataResponse<NeighborhoodNotificationDto> respondToNeighborhoodNotification(@PathVariable long notificationId, @RequestBody @Valid NeighborhoodNotificationResponseRequest request) {
+    public DataResponse<NeighborhoodNotificationDto> respondToNeighborhoodNotification(@PathVariable long notificationId, @RequestBody @Valid NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.respondToNeighborhoodNotification(notificationId, request)));
     }
 

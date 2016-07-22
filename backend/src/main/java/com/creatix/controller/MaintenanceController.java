@@ -126,7 +126,7 @@ public class MaintenanceController {
     public DataResponse<MaintenanceReservationDto> respondToReschedule(
             @PathVariable Long propertyId,
             @PathVariable Long reservationId,
-            @RequestBody @Valid RespondToRescheduleRequest request) {
+            @RequestBody @Valid RespondToRescheduleRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toMaintenanceReservationDto(maintenanceReservationService.respondToReschedule(reservationId, request)));
     }
 }
