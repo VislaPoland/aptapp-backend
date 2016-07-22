@@ -163,6 +163,7 @@ public class Mapper {
                 })
                 .register();
         mapperFactory.classMap(Property.class, PropertyDto.class)
+                .exclude("managers")
                 .byDefault()
                 .field("address.fullAddress", "fullAddress")
                 .customize(
@@ -173,14 +174,26 @@ public class Mapper {
 
                                 propertyDto.setAssistantManagers(
                                         assistantPropertyManagerDao.findByProperty(property).stream()
+                                                .filter(Account::getActive)
+                                                .filter(a -> a.getDeletedAt() == null)
                                                 .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDto.AccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
                                 propertyDto.setEmployees(
                                         managedEmployeeDao.findByProperty(property).stream()
+                                                .filter(Account::getActive)
+                                                .filter(a -> a.getDeletedAt() == null)
                                                 .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDto.AccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
+                                if ( property.getManagers() != null ) {
+                                    propertyDto.setManagers(property.getManagers().stream()
+                                            .filter(Account::getActive)
+                                            .filter(a -> a.getDeletedAt() == null)
+                                            .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDto.AccountDto.class))
+                                            .collect(Collectors.toList())
+                                    );
+                                }
                             }
                         }
                 )
