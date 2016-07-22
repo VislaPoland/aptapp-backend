@@ -19,6 +19,7 @@ import com.creatix.message.template.email.TenantActivationMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import freemarker.template.TemplateException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -107,6 +109,17 @@ public class TenantService {
         apartmentDao.persist(apartment);
 
         accountService.setActionToken(tenant);
+
+
+        if ( StringUtils.isNotBlank(request.getParkingStallNumber()) ) {
+            final ParkingStall parkingStall = new ParkingStall();
+            parkingStall.setUsingTenant(tenant);
+            parkingStall.setNumber(request.getParkingStallNumber());
+            parkingStallDao.persist(parkingStall);
+            tenant.setParkingStalls(new HashSet<>());
+            tenant.getParkingStalls().add(parkingStall);
+        }
+
 
         emailMessageSender.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
 

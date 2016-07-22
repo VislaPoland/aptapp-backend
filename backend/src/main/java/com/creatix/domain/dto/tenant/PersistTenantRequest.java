@@ -24,4 +24,7 @@ public class PersistTenantRequest extends PersistAccountRequest {
     @NotNull
     @ApiModelProperty(required = true, value = "Apartment ID")
     private Long apartmentId;
+
+    @ApiModelProperty(value = "Parking stall number")
+    private String parkingStallNumber;
 }
