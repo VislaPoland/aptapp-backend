@@ -204,22 +204,25 @@ public class NotificationService {
         final NeighborhoodNotification notification = getOrElseThrow(notificationId, neighborhoodNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
 
-        final Tenant tenant = notification.getTargetApartment().getTenant();
-        if ( authorizationManager.isSelf(tenant) ) {
-            notification.setResponse(request.getResponse());
-            neighborhoodNotificationDao.persist(notification);
+        final Apartment apartment = notification.getTargetApartment();
+        if ( apartment != null ) {
+            final Tenant tenant = apartment.getTenant();
+            if ( authorizationManager.isSelf(tenant) ) {
+                notification.setResponse(request.getResponse());
+                neighborhoodNotificationDao.persist(notification);
 
-            if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
-                pushNotificationSender.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
-            }
-            else if ( request.getResponse() == NeighborhoodNotificationResponse.SorryNotMe ) {
-                pushNotificationSender.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
+                if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
+                    pushNotificationSender.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
+                }
+                else if ( request.getResponse() == NeighborhoodNotificationResponse.SorryNotMe ) {
+                    pushNotificationSender.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
+                }
+
+                return notification;
             }
 
-            return notification;
+            throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
         }
-
-        throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
     }
 
     public SecurityNotification respondToSecurityNotification(long notificationId, @NotNull SecurityNotificationResponseRequest request) throws IOException, TemplateException {
