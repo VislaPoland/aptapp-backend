@@ -10,6 +10,7 @@ import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.EmailMessageSender;
 import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.template.email.AdministratorActivationMessageTemplate;
 import com.creatix.message.template.email.EmployeeActivationMessageTemplate;
 import com.creatix.message.template.email.PropertyOwnerActivationMessageTemplate;
 import com.creatix.message.template.email.ResetPasswordMessageTemplate;
@@ -291,7 +292,7 @@ public class AccountService {
     }
 
     @RoleSecured(AccountRole.Administrator)
-    public Account createAdministrator(@NotNull PersistAdministratorRequest request) {
+    public Account createAdministrator(@NotNull PersistAdministratorRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
@@ -301,6 +302,8 @@ public class AccountService {
         account.setActive(true);
         account.setCreatedAt(new Date());
         accountDao.persist(account);
+
+        emailMessageSender.send(new AdministratorActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }

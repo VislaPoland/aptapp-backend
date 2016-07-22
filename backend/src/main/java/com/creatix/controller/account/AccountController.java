@@ -152,7 +152,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured(AccountRole.Administrator)
     @RequestMapping(value = "/administrators", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createAdministrator(@RequestBody @Valid PersistAdministratorRequest request) {
+    public DataResponse<AccountDto> createAdministrator(@RequestBody @Valid PersistAdministratorRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createAdministrator(request)));
     }
 
