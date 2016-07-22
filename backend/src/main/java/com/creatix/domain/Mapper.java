@@ -352,6 +352,9 @@ public class Mapper {
                         if ( authorizationManager.canModifyAllProfileInfo() ) {
                             BeanUtils.copyProperties(request, account);
                         }
+                        if ( account instanceof PropertyOwner ) {
+                            ((PropertyOwner) account).setWebsite(request.getWebsite());
+                        }
                     }
                 })
                 .register();

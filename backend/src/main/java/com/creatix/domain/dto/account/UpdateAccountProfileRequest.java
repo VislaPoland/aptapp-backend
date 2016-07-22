@@ -14,8 +14,10 @@ public class UpdateAccountProfileRequest {
     private String lastName;
     @ApiModelProperty(value = "Company name")
     private String companyName;
-    @ApiModelProperty(value = "primaryPhone")
+    @ApiModelProperty(value = "Primary phone")
     private String primaryPhone;
+    @ApiModelProperty(value = "Web url")
+    private String website;
 
     @ApiModelProperty(value = "Secondary email address")
     private String secondaryEmail;
