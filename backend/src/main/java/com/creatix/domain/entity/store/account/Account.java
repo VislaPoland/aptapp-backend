@@ -36,8 +36,7 @@ public class Account {
     @Column
     private String companyName;
 
-    @Column(nullable = false)
-    @NotNull
+    @Column
     private String primaryPhone;
 
     @Column(nullable = false, unique = true)

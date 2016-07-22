@@ -39,7 +39,7 @@ public class AccountDto {
     @ApiModelProperty(value = "Secondary email address", required = true)
     private String secondaryEmail;
 
-    @ApiModelProperty(value = "Phone number", required = true)
+    @ApiModelProperty(value = "Phone number")
     private String primaryPhone;
 
     @ApiModelProperty(value = "Secondary phone number", required = true)
