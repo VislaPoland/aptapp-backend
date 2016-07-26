@@ -24,7 +24,7 @@ import java.util.Set;
 @ToString(callSuper = true, exclude = {"vehicles", "subTenants", "apartment", "parkingStalls"})
 public class Tenant extends TenantBase {
 
-    @OneToMany(mappedBy = "usingTenant")
+    @OneToMany(mappedBy = "usingTenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ParkingStall> parkingStalls;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)

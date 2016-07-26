@@ -4,13 +4,11 @@ import com.creatix.domain.dto.account.PersistAccountRequest;
 import com.creatix.domain.enums.TenantType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Setter
 @Getter
@@ -25,6 +23,10 @@ public class PersistTenantRequest extends PersistAccountRequest {
     @ApiModelProperty(required = true, value = "Apartment ID")
     private Long apartmentId;
 
-    @ApiModelProperty(value = "Parking stall number")
-    private String parkingStallNumber;
+    @ApiModelProperty(value = "Parking stalls")
+    private List<ParkingStallDto> parkingStalls;
+
+    @ApiModelProperty(value = "Vehicles")
+    private List<VehicleDto> vehicles;
+
 }

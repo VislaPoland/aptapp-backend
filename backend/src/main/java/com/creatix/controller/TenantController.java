@@ -5,11 +5,10 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
-import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
+import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
-import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
-import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
+import com.creatix.domain.dto.tenant.VehicleDto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
@@ -112,21 +111,6 @@ public class TenantController {
                 .collect(Collectors.toList()));
     }
 
-    @ApiOperation(value = "Delete tenant vehicle")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(value = "/{tenantId}/vehicles/{vehicleId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager})
-    public DataResponse<Void> deleteTenantVehicle(@PathVariable Long tenantId, @PathVariable Long vehicleId) {
-        tenantService.deleteVehicle(tenantId, vehicleId);
-        return new DataResponse<>();
-    }
-
     @ApiOperation(value = "Get tenant assigned parking stalls")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -141,23 +125,6 @@ public class TenantController {
         return new DataResponse<>(tenantService.getTenantParkingStalls(tenantId).stream()
                 .map(ps -> mapper.toParkingStallDto(ps))
                 .collect(Collectors.toList()));
-    }
-
-    @ApiOperation(value = "Update vehicle parked at tenant assigned parking stall")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 422, message = "Unprocessable")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(value = "/{tenantId}/parking-stalls/{parkingStallId}", method = RequestMethod.PUT,
-            consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant})
-    public DataResponse<ParkingStallDto> updateVehicleAtParkingStall(@PathVariable Long tenantId, @PathVariable Long parkingStallId,
-                                                                     @RequestBody @Valid AssignVehicleRequest request) {
-        return new DataResponse<>(mapper.toParkingStallDto(tenantService.updateVehicleAtParkingStall(tenantId, parkingStallId, request)));
     }
 
     @ApiOperation(value = "Get sub-tenants created by tenant")

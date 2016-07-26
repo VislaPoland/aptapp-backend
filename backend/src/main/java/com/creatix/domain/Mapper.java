@@ -24,11 +24,10 @@ import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
-import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
+import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
-import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
-import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
+import com.creatix.domain.dto.tenant.VehicleDto;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
@@ -46,9 +45,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -293,7 +290,74 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(PersistTenantRequest.class, Tenant.class)
+                .exclude("parkingStalls")
+                .exclude("vehicles")
                 .byDefault()
+                .customize(new CustomMapper<PersistTenantRequest, Tenant>() {
+                    @Override
+                    public void mapAtoB(PersistTenantRequest request, Tenant tenant, MappingContext context) {
+                        mapVehicles(request, tenant);
+                        mapParkingStalls(request, tenant);
+                    }
+
+                    private void mapVehicles(PersistTenantRequest request, Tenant tenant) {
+                        final List<VehicleDto> vehicleDtoList = request.getVehicles() != null ? request.getVehicles() : Collections.emptyList();
+                        if ( tenant.getVehicles() == null ) {
+                            tenant.setVehicles(new HashSet<>());
+                        }
+
+                        final Map<Long, Vehicle> idToVehicleMap = tenant.getVehicles().stream()
+                                .collect(Collectors.toMap(Vehicle::getId, Function.identity()));
+
+                        vehicleDtoList.forEach(vehicleDto -> {
+                            if ( vehicleDto.getId() == null ) {
+                                final Vehicle vehicle = mapperFactory.getMapperFacade().map(vehicleDto, Vehicle.class);
+                                vehicle.setOwner(tenant);
+                                tenant.getVehicles().add(vehicle);
+                            }
+                            else {
+                                final Vehicle vehicle = idToVehicleMap.get(vehicleDto.getId());
+                                if ( vehicle != null ) {
+                                    mapperFactory.getMapperFacade().map(vehicleDto, vehicle);
+                                    // remove updated vehicle from map
+                                    idToVehicleMap.remove(vehicle.getId());
+                                }
+                            }
+                        });
+
+                        // all vehicles that are now in map were not present in the input data --> remove them from tenant vehicle set
+                        tenant.getVehicles().removeAll(idToVehicleMap.values());
+                    }
+
+                    private void mapParkingStalls(PersistTenantRequest request, Tenant tenant) {
+                        final List<ParkingStallDto> parkingStallDtoList = request.getVehicles() != null ? request.getParkingStalls() : Collections.emptyList();
+                        if ( tenant.getParkingStalls() == null ) {
+                            tenant.setParkingStalls(new HashSet<>());
+                        }
+
+                        final Map<Long, ParkingStall> idToParkingStallMap = tenant.getParkingStalls().stream()
+                                .collect(Collectors.toMap(ParkingStall::getId, Function.identity()));
+
+                        parkingStallDtoList.forEach(parkingStallDto -> {
+                            if ( parkingStallDto.getId() == null ) {
+                                final ParkingStall parkingStall = mapperFactory.getMapperFacade().map(parkingStallDto, ParkingStall.class);
+                                parkingStall.setUsingTenant(tenant);
+                                tenant.getParkingStalls().add(parkingStall);
+                            }
+                            else {
+                                final ParkingStall parkingStall = idToParkingStallMap.get(parkingStallDto.getId());
+                                if ( parkingStall != null ) {
+                                    mapperFactory.getMapperFacade().map(parkingStallDto, parkingStall);
+                                    // remove updated parking stall from map
+                                    idToParkingStallMap.remove(parkingStall.getId());
+                                }
+                            }
+                        });
+
+                        // all parking stalls that are now in map were not present in the input data --> remove them from tenant parking stall set
+                        tenant.getParkingStalls().removeAll(idToParkingStallMap.values());
+                    }
+                })
                 .register();
 
         mapperFactory.classMap(Tenant.class, TenantDto.class)
@@ -306,19 +370,7 @@ public class Mapper {
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(ParkingStall.class, VehicleDto.ParkingStall.class)
-                .byDefault()
-                .register();
-
-        mapperFactory.classMap(AssignVehicleRequest.class, Vehicle.class)
-                .byDefault()
-                .register();
-
         mapperFactory.classMap(ParkingStall.class, ParkingStallDto.class)
-                .byDefault()
-                .register();
-
-        mapperFactory.classMap(Vehicle.class, ParkingStallDto.VehicleDto.class)
                 .byDefault()
                 .register();
 
@@ -547,13 +599,6 @@ public class Mapper {
     public VehicleDto toVehicleDto(@NotNull Vehicle vehicle) {
         Objects.requireNonNull(vehicle);
         return mapperFactory.getMapperFacade().map(vehicle, VehicleDto.class);
-    }
-
-    public void fillVehicle(@NotNull AssignVehicleRequest request, @NotNull Vehicle vehicle) {
-        Objects.requireNonNull(request);
-        Objects.requireNonNull(vehicle);
-
-        mapperFactory.getMapperFacade().map(request, vehicle);
     }
 
     public ParkingStallDto toParkingStallDto(@NotNull ParkingStall parkingStall) {

@@ -1,8 +1,6 @@
 package com.creatix.domain.dto.tenant;
 
 import com.creatix.domain.dto.account.AccountDto;
-import com.creatix.domain.dto.tenant.parkingStall.ParkingStallDto;
-import com.creatix.domain.dto.tenant.vehicle.VehicleDto;
 import com.creatix.domain.enums.TenantType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

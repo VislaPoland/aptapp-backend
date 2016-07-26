@@ -5,7 +5,6 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
-import com.creatix.domain.dto.tenant.vehicle.AssignVehicleRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ParkingStall;
 import com.creatix.domain.entity.store.Vehicle;
@@ -110,17 +109,6 @@ public class TenantService {
 
         accountService.setActionToken(tenant);
 
-
-        if ( StringUtils.isNotBlank(request.getParkingStallNumber()) ) {
-            final ParkingStall parkingStall = new ParkingStall();
-            parkingStall.setUsingTenant(tenant);
-            parkingStall.setNumber(request.getParkingStallNumber());
-            parkingStallDao.persist(parkingStall);
-            tenant.setParkingStalls(new HashSet<>());
-            tenant.getParkingStalls().add(parkingStall);
-        }
-
-
         emailMessageSender.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
 
         return tenant;
@@ -171,44 +159,6 @@ public class TenantService {
     public List<ParkingStall> getTenantParkingStalls(Long tenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         return tenant.getParkingStalls().stream().collect(Collectors.toList());
-    }
-
-    @RoleSecured({AccountRole.Tenant})
-    public ParkingStall updateVehicleAtParkingStall(Long tenantId, Long parkingStallId, @NotNull AssignVehicleRequest request) {
-        Objects.requireNonNull(request);
-
-        final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if ( authorizationManager.isSelf(tenant) ) {
-            final ParkingStall parkingStall = parkingStallDao.findById(parkingStallId);
-            if ( tenant.getParkingStalls().contains(parkingStall) ) {
-                //TODO refactor this code to make it more readable and clean
-                Vehicle vehicle = (parkingStall.getParkingVehicle() == null) ? new Vehicle() : parkingStall.getParkingVehicle();
-                mapper.fillVehicle(request, vehicle);
-                vehicle.setParkingStall(parkingStall);
-                vehicle.setOwner(tenant);
-
-                parkingStall.setParkingVehicle(vehicle);
-                parkingStallDao.persist(parkingStall);
-                return parkingStall;
-            }
-            throw new SecurityException(String.format("You are not eligible to use parking stall=%d", parkingStallId));
-        }
-        throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
-    }
-
-    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager})
-    public void deleteVehicle(Long tenantId, Long id) {
-        final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-
-        if ( authorizationManager.isSelf(tenant) ) {
-            final Vehicle vehicle = getOrElseThrow(id, vehicleDao, new EntityNotFoundException(String.format("Vehicle id=%s not found", id)));
-            final ParkingStall parkingStall = vehicle.getParkingStall();
-            parkingStall.setParkingVehicle(null);
-            parkingStallDao.persist(parkingStall);
-        }
-        else {
-            throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
-        }
     }
 
     @RoleSecured

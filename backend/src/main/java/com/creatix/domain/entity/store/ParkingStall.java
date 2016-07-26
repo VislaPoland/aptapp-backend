@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(indexes = {
     @Index(columnList = "using_tenant_id"),
-    @Index(columnList = "parking_vehicle_id")
 })
 @BatchSize(size = 40)
 @Data
@@ -29,7 +28,4 @@ public class ParkingStall {
     @ManyToOne
     @JoinColumn
     private Tenant usingTenant;
-
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Vehicle parkingVehicle;
 }

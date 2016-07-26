@@ -1,4 +1,4 @@
-package com.creatix.domain.dto.tenant.parkingStall;
+package com.creatix.domain.dto.tenant;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -6,8 +6,8 @@ import lombok.Data;
 
 @ApiModel
 @Data
-public abstract class AbstractParkingStallDto {
-    @ApiModelProperty(value = "Parking stall ID", required = true)
+public class ParkingStallDto {
+    @ApiModelProperty(value = "Parking stall ID")
     private Long id;
     @ApiModelProperty(value = "Parking stall number", required = true)
     private String number;
