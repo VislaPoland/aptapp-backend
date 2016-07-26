@@ -329,7 +329,7 @@ public class Mapper {
                     }
 
                     private void mapParkingStalls(PersistTenantRequest request, Tenant tenant) {
-                        final List<ParkingStallDto> parkingStallDtoList = request.getVehicles() != null ? request.getParkingStalls() : Collections.emptyList();
+                        final List<ParkingStallDto> parkingStallDtoList = request.getParkingStalls() != null ? request.getParkingStalls() : Collections.emptyList();
                         if ( tenant.getParkingStalls() == null ) {
                             tenant.setParkingStalls(new HashSet<>());
                         }
