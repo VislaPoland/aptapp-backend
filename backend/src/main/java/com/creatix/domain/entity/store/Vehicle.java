@@ -1,8 +1,7 @@
 package com.creatix.domain.entity.store;
 
 import com.creatix.domain.entity.store.account.Tenant;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
@@ -13,8 +12,10 @@ import javax.validation.constraints.NotNull;
     @Index(columnList = "owner_id")
 })
 @BatchSize(size = 40)
-@Data
-@EqualsAndHashCode(of = "id")
+@Setter
+@Getter
+@NoArgsConstructor
+// No hash code override, see https://hibernate.atlassian.net/browse/HHH-3799
 public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

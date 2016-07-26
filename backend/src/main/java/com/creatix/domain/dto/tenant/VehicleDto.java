@@ -3,12 +3,11 @@ package com.creatix.domain.dto.tenant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
 
 @ApiModel
 @Data
+@EqualsAndHashCode(of = {"id", "licensePlate"})
 public class VehicleDto {
 
     @ApiModelProperty(value = "Vehicle ID")

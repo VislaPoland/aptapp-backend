@@ -312,8 +312,7 @@ public class Mapper {
                         vehicleDtoList.forEach(vehicleDto -> {
                             if ( vehicleDto.getId() == null ) {
                                 final Vehicle vehicle = mapperFactory.getMapperFacade().map(vehicleDto, Vehicle.class);
-                                vehicle.setOwner(tenant);
-                                tenant.getVehicles().add(vehicle);
+                                tenant.addVehicle(vehicle);
                             }
                             else {
                                 final Vehicle vehicle = idToVehicleMap.get(vehicleDto.getId());
@@ -326,7 +325,7 @@ public class Mapper {
                         });
 
                         // all vehicles that are now in map were not present in the input data --> remove them from tenant vehicle set
-                        tenant.getVehicles().removeAll(idToVehicleMap.values());
+                        idToVehicleMap.values().forEach(tenant::removeVehicle);
                     }
 
                     private void mapParkingStalls(PersistTenantRequest request, Tenant tenant) {
@@ -341,8 +340,7 @@ public class Mapper {
                         parkingStallDtoList.forEach(parkingStallDto -> {
                             if ( parkingStallDto.getId() == null ) {
                                 final ParkingStall parkingStall = mapperFactory.getMapperFacade().map(parkingStallDto, ParkingStall.class);
-                                parkingStall.setUsingTenant(tenant);
-                                tenant.getParkingStalls().add(parkingStall);
+                                tenant.addParkingStall(parkingStall);
                             }
                             else {
                                 final ParkingStall parkingStall = idToParkingStallMap.get(parkingStallDto.getId());
@@ -355,7 +353,7 @@ public class Mapper {
                         });
 
                         // all parking stalls that are now in map were not present in the input data --> remove them from tenant parking stall set
-                        tenant.getParkingStalls().removeAll(idToParkingStallMap.values());
+                        idToParkingStallMap.values().forEach(tenant::removeParkingStall);
                     }
                 })
                 .register();
