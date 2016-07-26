@@ -287,4 +287,15 @@ public class SlotService {
         }
     }
 
+
+    @Scheduled(cron = "0 10 */6 * * *") // every 6 hours, 10 minutes past full hour
+    public void cleanupOldSlots() {
+        final List<MaintenanceSlot> oldSlots = maintenanceSlotDao.findByEndTimeBefore(OffsetDateTime.now().minusWeeks(1));
+        oldSlots.forEach(slot -> {
+            if ( slot.getReservations().isEmpty() ) {
+                slotDao.delete(slot);
+            }
+        });
+    }
+
 }

@@ -29,4 +29,9 @@ public class MaintenanceSlotDao extends DaoBase<MaintenanceSlot, Long> {
                 .fetch();
     }
 
+    public List<MaintenanceSlot> findByEndTimeBefore(OffsetDateTime endTime) {
+        return queryFactory.selectFrom(maintenanceSlot)
+                .where(maintenanceSlot.endTime.before(endTime))
+                .fetch();
+    }
 }

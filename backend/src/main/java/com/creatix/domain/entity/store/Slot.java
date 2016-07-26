@@ -47,7 +47,7 @@ public abstract class Slot {
     private OffsetDateTime endTime;
     @Column(nullable = false)
     private int unitDurationMinutes;
-    @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("offset ASC")
     private Set<SlotUnit> units;
 
