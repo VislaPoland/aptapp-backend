@@ -14,33 +14,28 @@ import javax.validation.constraints.NotNull;
 })
 @BatchSize(size = 40)
 @Data
-@EqualsAndHashCode(of = "licensePlate")
+@EqualsAndHashCode(of = "id")
 public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
-    @NotNull
+    @Column
     private String licensePlate;
 
-    @Column(nullable = false)
-    @NotNull
+    @Column
     private String make;
 
-    @Column(nullable = false)
-    @NotNull
+    @Column
     private String model;
 
-    @Column(nullable = false)
-    @NotNull
+    @Column
     private Integer year;
 
-    @Column(nullable = false)
-    @NotNull
+    @Column
     private String color;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false)
     @NotNull
     private Tenant owner;

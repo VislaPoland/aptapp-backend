@@ -560,7 +560,7 @@ public class AccountService {
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
-    public Account deleteAccount(@NotNull Account account) {
+    private Account deleteAccount(@NotNull Account account) {
         Objects.requireNonNull(account);
         if ( account instanceof Tenant ) {
             throw new IllegalArgumentException("Cannot delete tenant by using this API call");
