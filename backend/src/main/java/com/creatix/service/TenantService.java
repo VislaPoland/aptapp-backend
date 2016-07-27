@@ -168,6 +168,11 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.Tenant})
+    public SubTenant createSubTenant(@NotNull PersistSubTenantRequest request) {
+        return createSubTenant(authorizationManager.getCurrentAccount().getId(), request);
+    }
+
+    @RoleSecured({AccountRole.Tenant})
     public SubTenant createSubTenant(Long tenantId, @NotNull PersistSubTenantRequest request) {
         Objects.requireNonNull(request);
 
@@ -190,6 +195,11 @@ public class TenantService {
     @RoleSecured
     public SubTenant getSubTenant(Long subTenantId) {
         return getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
+    }
+
+    @RoleSecured({AccountRole.Tenant})
+    public SubTenant updateSubTenant(Long subTenantId, @NotNull PersistSubTenantRequest request) {
+        return updateSubTenant(authorizationManager.getCurrentAccount().getId(), subTenantId, request);
     }
 
     @RoleSecured({AccountRole.Tenant})
