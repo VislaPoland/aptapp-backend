@@ -231,4 +231,19 @@ public class TenantController {
         tenantService.deleteSubTenant(tenantId, subTenantId);
         return new DataResponse<>();
     }
+
+    @ApiOperation(value = "Delete sub-tenant account")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/me/subs/{subTenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Tenant})
+    public DataResponse<Void> deleteSubTenant(@PathVariable Long subTenantId) {
+        tenantService.deleteSubTenant(subTenantId);
+        return new DataResponse<>();
+    }
 }

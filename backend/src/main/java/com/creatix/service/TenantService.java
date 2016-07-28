@@ -222,6 +222,11 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.Tenant})
+    public void deleteSubTenant(Long subTenantId) {
+        deleteSubTenant(authorizationManager.getCurrentAccount().getId(), subTenantId);
+    }
+
+    @RoleSecured({AccountRole.Tenant})
     public void deleteSubTenant(Long tenantId, Long subTenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         if ( authorizationManager.isSelf(tenant) ) {
