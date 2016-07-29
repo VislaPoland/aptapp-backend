@@ -1,2 +1,1 @@
-Apt. - You have received a message from a neighbor. Please open your Apt. Mobile App to verify you have received their message.
-This is an automated message, please do not reply.
+Apt. - You have received a message from a neighbor. Please open your Apt.App to view details. Deactivate messaging in Apt.App settings. Please do not reply.
