@@ -138,10 +138,11 @@ public class Mapper {
                     @Override
                     public void mapAtoB(PropertyOwner a, PropertyOwnerDto b, MappingContext context) {
                         b.setOwnedProperties(new ArrayList<>());
-                        a.getOwnedProperties().stream().filter(property -> property.getDeleteDate() == null).forEach(property -> {
-                            b.getOwnedProperties().add(toPropertyDto(property));
-                        });
-
+                        if ( a.getOwnedProperties() != null ) {
+                            a.getOwnedProperties().stream().filter(property -> property.getDeleteDate() == null).forEach(property -> {
+                                b.getOwnedProperties().add(toPropertyDto(property));
+                            });
+                        }
                     }
                 })
                 .register();
