@@ -5,11 +5,13 @@ import com.creatix.domain.enums.AccountRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.validator.constraints.Email;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Set;
 
@@ -94,4 +96,9 @@ public class Account {
     public String getFullName() {
         return String.format("%s %s", getFirstName(), getLastName());
     }
+
+    public static Comparator<Account> COMPARE_BY_LAST_FIRST_NAME = (a, b) -> new CompareToBuilder()
+            .append(a.getLastName(), b.getLastName())
+            .append(a.getFirstName(), a.getLastName())
+            .toComparison();
 }

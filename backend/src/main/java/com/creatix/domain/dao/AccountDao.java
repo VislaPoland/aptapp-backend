@@ -94,6 +94,8 @@ public class AccountDao extends DaoBase<Account, Long> {
             }
         }
 
+        accounts.sort(Account.COMPARE_BY_LAST_FIRST_NAME);
+
         return accounts;
     }
 
