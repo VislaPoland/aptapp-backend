@@ -28,6 +28,8 @@ public class AccountDao extends DaoBase<Account, Long> {
         if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
             accounts = queryFactory.selectFrom(account)
                     .where(account.role.in(roles).and(account.deletedAt.isNull()))
+                    .orderBy(account.lastName.asc())
+                    .orderBy(account.firstName.asc())
                     .fetch();
         }
         else {
@@ -37,42 +39,56 @@ public class AccountDao extends DaoBase<Account, Long> {
                     accounts.addAll(queryFactory.selectFrom(tenant)
                             .where(tenant.apartment.property.id.in(propertyIdList)
                                     .and(tenant.deletedAt.isNull()))
+                            .orderBy(tenant.lastName.asc())
+                            .orderBy(tenant.firstName.asc())
                             .fetch());
                 }
                 else if ( role == AccountRole.Maintenance ) {
                     accounts.addAll(queryFactory.selectFrom(maintenanceEmployee)
                             .where(maintenanceEmployee.manager.managedProperty.id.in(propertyIdList)
                                     .and(maintenanceEmployee.deletedAt.isNull()))
+                            .orderBy(maintenanceEmployee.lastName.asc())
+                            .orderBy(maintenanceEmployee.firstName.asc())
                             .fetch());
                 }
                 else if ( role == AccountRole.Security ) {
                     accounts.addAll(queryFactory.selectFrom(securityEmployee)
                             .where(securityEmployee.manager.managedProperty.id.in(propertyIdList)
                                     .and(securityEmployee.deletedAt.isNull()))
+                            .orderBy(securityEmployee.lastName.asc())
+                            .orderBy(securityEmployee.firstName.asc())
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyManager ) {
                     accounts.addAll(queryFactory.selectFrom(propertyManager)
                             .where(propertyManager.managedProperty.id.in(propertyIdList)
                                     .and(propertyManager.deletedAt.isNull()))
+                            .orderBy(propertyManager.lastName.asc())
+                            .orderBy(propertyManager.firstName.asc())
                             .fetch());
                 }
                 else if ( role == AccountRole.PropertyOwner ) {
                     accounts.addAll(queryFactory.selectFrom(propertyOwner)
                             .where(propertyOwner.ownedProperties.any().id.in(propertyIdList)
                                     .and(propertyOwner.deletedAt.isNull()))
+                            .orderBy(propertyOwner.lastName.asc())
+                            .orderBy(propertyOwner.firstName.asc())
                             .fetch());
                 }
                 else if ( role == AccountRole.AssistantPropertyManager ) {
                     accounts.addAll(queryFactory.selectFrom(assistantPropertyManager)
                             .where(assistantPropertyManager.manager.managedProperty.id.in(propertyIdList)
                                     .and(assistantPropertyManager.deletedAt.isNull()))
+                            .orderBy(assistantPropertyManager.lastName.asc())
+                            .orderBy(assistantPropertyManager.firstName.asc())
                             .fetch());
                 }
                 else if ( role == AccountRole.SubTenant ) {
                     accounts.addAll(queryFactory.selectFrom(subTenant)
                             .where(subTenant.parentTenant.apartment.property.id.in(propertyIdList)
                                     .and(subTenant.deletedAt.isNull()))
+                            .orderBy(subTenant.lastName.asc())
+                            .orderBy(subTenant.firstName.asc())
                             .fetch());
                 }
             }

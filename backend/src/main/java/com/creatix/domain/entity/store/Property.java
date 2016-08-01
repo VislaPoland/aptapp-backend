@@ -67,6 +67,7 @@ public class Property {
     private Boolean enableSms;
 
     @OneToMany(mappedBy = "managedProperty")
+    @OrderBy("lastName asc, firstName asc")
     private Set<PropertyManager> managers;
 
     @OneToMany(mappedBy = "property")

@@ -14,6 +14,7 @@ public class PropertyDao extends DaoBase<Property, Long> {
     public List<Property> findAll() {
         return queryFactory.selectFrom(QProperty.property)
                 .where(QProperty.property.deleteDate.isNull())
+                .orderBy(QProperty.property.name.asc())
                 .fetch();
     }
 

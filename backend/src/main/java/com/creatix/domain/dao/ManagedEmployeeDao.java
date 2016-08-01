@@ -18,6 +18,8 @@ public class ManagedEmployeeDao extends AbstractAccountDao<ManagedEmployee> {
                 .selectFrom(managedEmployee)
                 .where(managedEmployee.deletedAt.isNull()
                         .and(managedEmployee.manager.managedProperty.eq(property)))
+                .orderBy(managedEmployee.lastName.asc())
+                .orderBy(managedEmployee.firstName.asc())
                 .fetch();
     }
 

@@ -9,6 +9,7 @@ import org.hibernate.annotations.BatchSize;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import java.util.Set;
 
 @Entity
@@ -19,6 +20,7 @@ import java.util.Set;
 public class PropertyOwner extends Account {
 
     @OneToMany(mappedBy = "owner")
+    @OrderBy("name asc")
     private Set<Property> ownedProperties;
 
     @Column
