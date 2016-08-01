@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -81,6 +82,11 @@ class IndexController {
     @ExceptionHandler({Throwable.class, Exception.class})
     public void serverError(Exception ex, HttpServletResponse response) throws IOException {
         handleException(ex, HttpStatus.INTERNAL_SERVER_ERROR, response);
+    }
+
+    @ExceptionHandler({BadCredentialsException.class})
+    public void badCredentials(Exception ex, HttpServletResponse response) throws IOException {
+        handleException(new BadCredentialsException("Incorrect Credentials", ex), HttpStatus.UNAUTHORIZED, response);
     }
 
     @ExceptionHandler({AuthenticationException.class, UsernameNotFoundException.class})
