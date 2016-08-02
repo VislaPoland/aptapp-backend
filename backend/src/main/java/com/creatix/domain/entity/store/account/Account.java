@@ -97,8 +97,4 @@ public class Account {
         return String.format("%s %s", getFirstName(), getLastName());
     }
 
-    public static Comparator<Account> COMPARE_BY_LAST_FIRST_NAME = (a, b) -> new CompareToBuilder()
-            .append(a.getLastName(), b.getLastName())
-            .append(a.getFirstName(), a.getLastName())
-            .toComparison();
 }

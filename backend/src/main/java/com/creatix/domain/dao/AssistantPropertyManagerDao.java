@@ -18,8 +18,8 @@ public class AssistantPropertyManagerDao extends DaoBase<AssistantPropertyManage
                 .selectFrom(assistantPropertyManager)
                 .where(assistantPropertyManager.deletedAt.isNull()
                         .and(assistantPropertyManager.manager.managedProperty.eq(property)))
-                .orderBy(assistantPropertyManager.lastName.asc())
                 .orderBy(assistantPropertyManager.firstName.asc())
+                .orderBy(assistantPropertyManager.lastName.asc())
                 .fetch();
     }
 
