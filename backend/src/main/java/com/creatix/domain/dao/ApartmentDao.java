@@ -16,7 +16,7 @@ public class ApartmentDao extends DaoBase<Apartment, Long> {
         final QApartment apartment = QApartment.apartment;
         return queryFactory.selectFrom(apartment)
                 .where(apartment.property.eq(property).and(apartment.unitNumber.eq(unitNumber)))
-                .orderBy(apartment.unitNumber.asc())
+                .orderBy(apartment.unitNumber.lower().asc())
                 .fetchOne();
 
     }
@@ -25,7 +25,7 @@ public class ApartmentDao extends DaoBase<Apartment, Long> {
         final QApartment apartment = QApartment.apartment;
         return queryFactory.selectFrom(apartment)
                 .where(apartment.property.eq(property))
-                .orderBy(apartment.unitNumber.asc())
+                .orderBy(apartment.unitNumber.lower().asc())
                 .fetch();
     }
 }
