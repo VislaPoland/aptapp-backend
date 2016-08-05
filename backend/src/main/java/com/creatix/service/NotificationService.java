@@ -231,6 +231,7 @@ public class NotificationService {
 
         if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ) {
             notification.setResponse(request.getResponse());
+            notification.setStatus(NotificationStatus.Resolved);
             securityNotificationDao.persist(notification);
 
             if ( request.getResponse() == SecurityNotificationResponse.NoIssueFound ) {
