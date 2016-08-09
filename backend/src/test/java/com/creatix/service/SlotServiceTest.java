@@ -2,10 +2,14 @@ package com.creatix.service;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
+import com.creatix.domain.dao.SlotDao;
 import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
+import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
 import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
 import com.creatix.domain.dto.property.slot.SlotDto;
 import com.creatix.domain.entity.store.EventSlot;
+import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
+import com.creatix.domain.entity.store.Slot;
 import com.creatix.domain.enums.AudienceType;
 import com.creatix.mock.WithMockCustomUser;
 import org.junit.Test;
@@ -18,9 +22,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
+import java.util.EnumSet;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -34,6 +38,8 @@ public class SlotServiceTest {
 
     @Autowired
     private SlotService slotService;
+    @Autowired
+    private SlotDao slotDao;
 
     @Test
     @WithMockCustomUser("apt@test.com")
@@ -86,6 +92,32 @@ public class SlotServiceTest {
         assertEquals(beginTime.plusMinutes(30), slot.getEndTime());
         assertEquals(1, slot.getUnits().size());
         assertEquals(AudienceType.Tenants, slot.getAudience());
+    }
+
+    @Test
+    @WithMockCustomUser("mark.building@apartments.com")
+    public void scheduleSlots() throws Exception {
+
+        final PersistMaintenanceSlotScheduleRequest request = new PersistMaintenanceSlotScheduleRequest();
+        request.setBeginTime(LocalTime.of(10, 0, 0));
+        request.setEndTime(LocalTime.of(18, 0, 0));
+        request.setDaysOfWeek(EnumSet.allOf(DayOfWeek.class));
+        request.setInitialCapacity(1);
+        request.setUnitDurationMinutes(60);
+        final MaintenanceSlotSchedule schedule = slotService.createSchedule(1L, request);
+        assertNotNull(schedule);
+        assertEquals((Long) 1L, schedule.getProperty().getId());
+        assertTrue(schedule.getDaysOfWeek().containsAll(request.getDaysOfWeek()));
+
+        slotService.scheduleSlots();
+        final List<Slot> slots1 = slotDao.findAll();
+
+        for ( int i = 0; i < 5; ++i ) {
+            slotService.scheduleSlots();
+            final List<Slot> slots2 = slotDao.findAll();
+
+            assertEquals(slots1.size(), slots2.size());
+        }
     }
 
 }

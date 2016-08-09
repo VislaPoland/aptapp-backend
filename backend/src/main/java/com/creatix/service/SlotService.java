@@ -260,7 +260,7 @@ public class SlotService {
             return;
         }
 
-        final List<MaintenanceSlot> scheduledSlots = maintenanceSlotDao.findByScheduleAndStartAfter(schedule, OffsetDateTime.now());
+        final List<MaintenanceSlot> scheduledSlots = maintenanceSlotDao.findByScheduleAndStartAfter(schedule, OffsetDateTime.now().minusDays(1));
         final Set<ZonedDateTime> scheduledTimes = scheduledSlots.stream()
                 .map(Slot::getBeginTime)
                 .map(dt -> dt.atZoneSameInstant(ZoneId.systemDefault()))

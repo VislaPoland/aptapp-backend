@@ -19,6 +19,10 @@ import static com.creatix.domain.entity.store.QSlot.slot;
 @Transactional
 public class SlotDao extends DaoBase<Slot, Long> {
 
+    public List<Slot> findAll() {
+        return queryFactory.selectFrom(QSlot.slot).fetch();
+    }
+
     public List<Slot> findByPropertyAndAccountAndDateRange(@NotNull Property property, @NotNull Account account, @NotNull OffsetDateTime from, @NotNull OffsetDateTime to) {
         Objects.requireNonNull(property, "Property is null");
         Objects.requireNonNull(from, "From date is null");
