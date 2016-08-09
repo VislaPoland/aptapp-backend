@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 /**
@@ -37,4 +38,9 @@ public class SlotUnit {
     private int offset;
     @ManyToMany(mappedBy = "units")
     private Set<MaintenanceReservation> reservations;
+
+    @Transient
+    public OffsetDateTime getBeginTime() {
+        return getSlot().getBeginTime().plusMinutes(slot.getUnitDurationMinutes());
+    }
 }

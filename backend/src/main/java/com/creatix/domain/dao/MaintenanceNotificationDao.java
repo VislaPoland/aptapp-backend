@@ -23,7 +23,7 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
     public List<MaintenanceNotification> findAllInDateRange(Date fromDate, Date tillDate) {
         final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;
         return queryFactory.selectFrom(maintenanceNotification)
-                .where(maintenanceNotification.date.between(fromDate, tillDate))
+                .where(maintenanceNotification.createdAt.between(fromDate, tillDate))
                 .fetch();
     }
 

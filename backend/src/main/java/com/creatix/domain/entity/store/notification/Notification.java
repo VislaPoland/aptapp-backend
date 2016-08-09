@@ -45,10 +45,6 @@ public class Notification {
     private NotificationStatus status;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
-
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private NotificationType type;

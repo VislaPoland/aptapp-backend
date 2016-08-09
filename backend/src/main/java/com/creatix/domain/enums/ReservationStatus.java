@@ -1,5 +1,5 @@
 package com.creatix.domain.enums;
 
 public enum ReservationStatus {
-    Confirmed, Rescheduled, Rejected, Cancelled
+    Pending, Confirmed, Rescheduled, Rejected, Cancelled
 }

@@ -7,11 +7,11 @@ import com.creatix.domain.enums.ReservationStatus;
 import java.util.Optional;
 
 
-public class MaintenanceNotificationRescheduleTemplate extends MaintenanceNotificationTemplate {
+public class MaintenanceRescheduleTemplate extends MaintenanceNotificationTemplate {
 
     private final MaintenanceReservation reservation;
 
-    public MaintenanceNotificationRescheduleTemplate(MaintenanceNotification notification) {
+    public MaintenanceRescheduleTemplate(MaintenanceNotification notification) {
         super(notification);
 
         Optional<MaintenanceReservation> reservation = notification.getReservations().stream()
@@ -38,6 +38,6 @@ public class MaintenanceNotificationRescheduleTemplate extends MaintenanceNotifi
 
     @Override
     public String getTemplateName() {
-        return "maintenance-notification-reschedule";
+        return "maintenance-reschedule";
     }
 }

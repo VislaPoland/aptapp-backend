@@ -11,12 +11,10 @@ import javax.validation.constraints.NotNull;
 public class RespondToRescheduleRequest {
 
     @ApiModel
-    public enum RescheduleResponseType { Accept, Reject }
+    public enum RescheduleResponseType { Confirm, Reject }
 
     @NotNull
     @ApiModelProperty(value = "Reschedule response type", required = true)
     private RescheduleResponseType responseType;
-    @ApiModelProperty
-    private Long slotId;
 
 }

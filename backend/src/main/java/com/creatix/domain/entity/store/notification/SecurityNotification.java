@@ -1,6 +1,6 @@
 package com.creatix.domain.entity.store.notification;
 
-import com.creatix.domain.enums.SecurityNotificationResponse;
+import com.creatix.domain.enums.SecurityNotificationResponseType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
@@ -18,6 +18,6 @@ public class SecurityNotification extends Notification {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private SecurityNotificationResponse response;
+    private SecurityNotificationResponseType response;
 
 }

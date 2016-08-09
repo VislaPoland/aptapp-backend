@@ -219,7 +219,6 @@ public class Mapper {
                 .byDefault()
                 .register();
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
-                .field("date", "scheduledAt")
                 .byDefault()
                 .register();
         mapperFactory.classMap(NeighborhoodNotification.class, NeighborhoodNotificationDto.class)
@@ -249,7 +248,6 @@ public class Mapper {
 
         mapperFactory.classMap(CreateMaintenanceNotificationRequest.class, MaintenanceNotification.class)
                 .byDefault()
-                .field("scheduledAt", "date")
                 .register();
 
         mapperFactory.classMap(CreateNeighborhoodNotificationRequest.class, NeighborhoodNotification.class)

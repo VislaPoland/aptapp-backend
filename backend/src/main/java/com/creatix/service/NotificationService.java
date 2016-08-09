@@ -3,9 +3,11 @@ package com.creatix.service;
 import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
+import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.MaintenanceEmployee;
@@ -20,8 +22,6 @@ import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,12 +37,12 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
 public class NotificationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     @Autowired
     private NotificationDao notificationDao;
@@ -69,9 +69,7 @@ public class NotificationService {
     @Autowired
     private MaintenanceEmployeeDao maintenanceEmployeeDao;
     @Autowired
-    private PropertyManagerDao propertyManagerDao;
-    @Autowired
-    private AssistantPropertyManagerDao assistantPropertyManagerDao;
+    private MaintenanceReservationService maintenanceReservationService;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -155,9 +153,10 @@ public class NotificationService {
         return notification;
     }
 
-    public MaintenanceNotification saveMaintenanceNotification(@NotNull String targetUnitNumber, @NotNull MaintenanceNotification notification) throws IOException, TemplateException {
+    public MaintenanceNotification saveMaintenanceNotification(@NotNull String targetUnitNumber, @NotNull MaintenanceNotification notification, @NotNull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
         Objects.requireNonNull(notification, "Notification is null");
+        Objects.requireNonNull(slotUnitId, "slot unit id is null");
 
         notification.setType(NotificationType.Maintenance);
         notification.setAuthor(authorizationManager.getCurrentAccount());
@@ -166,10 +165,11 @@ public class NotificationService {
         notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
         maintenanceNotificationDao.persist(notification);
 
+        maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
+
         for ( MaintenanceEmployee employee : maintenanceEmployeeDao.findByProperty(notification.getProperty()) ) {
             pushNotificationSender.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
         }
-
 
         return notification;
     }
@@ -234,7 +234,7 @@ public class NotificationService {
             notification.setStatus(NotificationStatus.Resolved);
             securityNotificationDao.persist(notification);
 
-            if ( request.getResponse() == SecurityNotificationResponse.NoIssueFound ) {
+            if ( request.getResponse() == SecurityNotificationResponseType.NoIssueFound ) {
                 final Account account = notification.getAuthor();
 
                 if ( account.getRole() == AccountRole.Tenant ) {
@@ -244,7 +244,7 @@ public class NotificationService {
                     pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), account);
                 }
             }
-            else if ( request.getResponse() == SecurityNotificationResponse.Resolved ) {
+            else if ( request.getResponse() == SecurityNotificationResponseType.Resolved ) {
                 final Account account = notification.getAuthor();
 
                 if ( account.getRole() == AccountRole.Tenant ) {
@@ -259,6 +259,42 @@ public class NotificationService {
         }
 
         throw new SecurityException("You are not eligible to respond to security notifications from another property");
+    }
+
+    public MaintenanceNotification respondToMaintenanceNotification(@NotNull Long notificationId, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
+        Objects.requireNonNull(notificationId, "Notification id is null");
+        Objects.requireNonNull(response, "Notification reseponse dto is null");
+
+        final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
+        final Stream<MaintenanceReservation> reservationStream = notification.getReservations().stream()
+                .filter(r -> r.getStatus() == ReservationStatus.Pending);
+        final long pendingCount = reservationStream.count();
+        if ( pendingCount == 0 ) {
+            throw new IllegalArgumentException("No pending reservations found for notification");
+        }
+        if ( pendingCount > 1 ) {
+            throw new IllegalStateException("Multiple pending reservations found for notification");
+        }
+
+        final Optional<MaintenanceReservation> optReservation = reservationStream.findAny();
+        if ( !(optReservation.isPresent()) ) {
+            throw new IllegalStateException("Application error");
+        }
+
+
+        final MaintenanceReservation reservation = optReservation.get();
+
+        if ( response.getResponse() == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
+            maintenanceReservationService.employeeConfirmReservation(reservation, response.getNote());
+        }
+        else if ( response.getResponse() == MaintenanceNotificationResponseRequest.ResponseType.Reschedule ) {
+            maintenanceReservationService.employeeRescheduleReservation(reservation, response.getSlotUnitId(), response.getNote());
+        }
+        else {
+            throw new IllegalArgumentException(String.format("Unsupported response type=%s", response.getResponse().name()));
+        }
+
+        return notification;
     }
 
     private Apartment getApartmentByUnitNumber(@NotNull String targetUnitNumber) {

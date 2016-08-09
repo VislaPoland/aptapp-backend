@@ -2,22 +2,20 @@ package com.creatix.service;
 
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.RespondToRescheduleRequest;
-import com.creatix.domain.dto.property.slot.PersistMaintenanceReservationRequest;
 import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.MaintenanceSlot;
-import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.SlotUnit;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
-import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.ReservationStatus;
 import com.creatix.message.PushNotificationSender;
-import com.creatix.message.template.push.MaintenanceNotificationApproveTemplate;
-import com.creatix.message.template.push.MaintenanceNotificationRescheduleTemplate;
+import com.creatix.message.template.push.MaintenanceConfirmTemplate;
+import com.creatix.message.template.push.MaintenanceRescheduleConfirmTemplate;
+import com.creatix.message.template.push.MaintenanceRescheduleRejectTemplate;
+import com.creatix.message.template.push.MaintenanceRescheduleTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
-import com.twilio.sdk.resource.taskrouter.v1.workspace.task.Reservation;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,16 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 
 @Service
 @Transactional
 public class MaintenanceReservationService {
+
+    private static final int DEFAULT_RESERVATION_CAPACITY = 1;
 
     private static final Object syncLock = new Object();
 
@@ -50,81 +46,44 @@ public class MaintenanceReservationService {
     @Autowired
     private SlotUnitDao slotUnitDao;
     @Autowired
-    private PropertyDao propertyDao;
-    @Autowired
-    private ManagedEmployeeDao managedEmployeeDao;
-    @Autowired
-    private MaintenanceNotificationDao maintenanceNotificationDao;
-    @Autowired
     private PushNotificationSender pushNotificationSender;
 
     @RoleSecured(AccountRole.Maintenance)
-    public MaintenanceReservation createMaintenanceReservation(Long propertyId, PersistMaintenanceReservationRequest reservationRequest) throws IOException, TemplateException {
+    public MaintenanceReservation createMaintenanceReservation(@NotNull MaintenanceNotification maintenanceNotification, @NotNull Long slotUnitId) throws IOException, TemplateException {
+        Objects.requireNonNull(maintenanceNotification, "Maintenance cnotification is null");
+        Objects.requireNonNull(slotUnitId, "Slot unit id is null");
 
-        final MaintenanceSlot slot = maintenanceSlotDao.findById(reservationRequest.getSlotId());
-        if ( slot == null ) {
-            throw new EntityNotFoundException(String.format("Slot id=%d not found", reservationRequest.getSlotId()));
+        final SlotUnit slotUnit = slotUnitDao.findById(slotUnitId);
+        if ( slotUnit == null ) {
+            throw new EntityNotFoundException(String.format("Slot unit id=%d not found", slotUnitId));
         }
+
+        final MaintenanceSlot slot = (MaintenanceSlot) slotUnit.getSlot();
 
         final ManagedEmployee employee = (ManagedEmployee) authorizationManager.getCurrentAccount();
         if ( employee == null ) {
             throw new IllegalStateException("Account is not employee assigned");
         }
-        if ( reservationRequest.getBeginTime().isBefore(OffsetDateTime.now()) ) {
+        if ( slotUnit.getBeginTime().isBefore(OffsetDateTime.now()) ) {
             throw new IllegalArgumentException("Cannot create reservation in the past");
-        }
-
-        if ( (reservationRequest.getStatus() == ReservationStatus.Rescheduled) && (reservationRequest.getRescheduleTime() == null) ) {
-            throw new IllegalArgumentException("Rescheduled status is set but no reschedule time is specified");
         }
 
         final MaintenanceReservation reservation = new MaintenanceReservation();
         reservation.setSlot(slot);
-        reservation.setStatus(reservationRequest.getStatus());
-        if ( reservationRequest.getStatus() == ReservationStatus.Rescheduled ) {
-            reservation.setRescheduleTime(reservationRequest.getRescheduleTime());
-        }
-        reservation.setDurationMinutes(reservationRequest.getDurationMinutes());
-        reservation.setBeginTime(slot.getBeginTime().with(reservationRequest.getBeginTime()));
+        reservation.setStatus(ReservationStatus.Pending);
+        reservation.setDurationMinutes(slot.getUnitDurationMinutes());
+        reservation.setBeginTime(slot.getBeginTime().with(slotUnit.getBeginTime()));
         reservation.setEndTime(reservation.getBeginTime().plusMinutes(slot.getUnitDurationMinutes()));
-        reservation.setCapacity(reservationRequest.getCapacity());
+        reservation.setCapacity(DEFAULT_RESERVATION_CAPACITY);
         reservation.setEmployee(employee);
-        reservation.setNote(reservationRequest.getNote());
-        if ( reservationRequest.getNotificationId() != null ) {
-            reservation.setNotification(maintenanceNotificationDao.findById(reservationRequest.getNotificationId()));
-        }
-
+        reservation.setNote(null);
+        reservation.setNotification(maintenanceNotification);
         reserveCapacity(reservation);
         reservationDao.persist(reservation);
-
-        if ( reservation.getStatus() == ReservationStatus.Rescheduled ) {
-            final MaintenanceNotification notification = reservation.getNotification();
-            if ( notification != null ) {
-                pushNotificationSender.sendNotification(new MaintenanceNotificationRescheduleTemplate(notification), notification.getTargetApartment().getTenant());
-            }
-        }
 
         return reservation;
     }
 
-
-    public List<MaintenanceReservation> findByPropertyId(Long propertyId, LocalDate date) {
-        final Property property = propertyDao.findById(propertyId);
-        if ( property == null ) {
-            throw new EntityNotFoundException(String.format("Property id=%d not found", propertyId));
-        }
-
-        return reservationDao.findByPropertyAndEndTimeAfter(property, OffsetDateTime.now());
-    }
-
-    public List<MaintenanceReservation> findByTrainerId(Long employeeId, LocalDate date) {
-        final ManagedEmployee employee = managedEmployeeDao.findById(employeeId);
-        if ( employee == null ) {
-            throw new EntityNotFoundException(String.format("Employee id=%d not found", employeeId));
-        }
-
-        return reservationDao.findByEmployeeAndEndTimeAfter(employee, OffsetDateTime.now());
-    }
 
     @RoleSecured(AccountRole.Maintenance)
     public MaintenanceReservation deleteById(long reservationId) {
@@ -146,7 +105,7 @@ public class MaintenanceReservationService {
     }
 
     @RoleSecured(AccountRole.Tenant)
-    public MaintenanceReservation respondToReschedule(@NotNull Long reservationId, @NotNull RespondToRescheduleRequest request) throws IOException, TemplateException {
+    public MaintenanceReservation tenantRespondToReschedule(@NotNull Long reservationId, @NotNull RespondToRescheduleRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(reservationId, "Reservation id is null");
         Objects.requireNonNull(request, "Request si null");
 
@@ -164,36 +123,65 @@ public class MaintenanceReservationService {
             throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservationId));
         }
 
-        final MaintenanceReservation resultReservation;
-        if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Accept ) {
+        if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Confirm ) {
             reservation.setStatus(ReservationStatus.Confirmed);
-            resultReservation = reschedule(reservation, request);
-            pushNotificationSender.sendNotification(new MaintenanceNotificationApproveTemplate(reservation.getNotification()), reservation.getNotification().getAuthor());
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation.getNotification()), reservation.getEmployee());
         }
         else if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
             releaseReservedCapacity(reservation);
-            resultReservation = reservation;
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation.getNotification()), reservation.getEmployee());
         }
         else {
             throw new IllegalArgumentException("Unsupported response type: " + request.getResponseType());
         }
         reservationDao.persist(reservation);
 
-        return resultReservation;
+        return reservation;
     }
 
-    private MaintenanceReservation reschedule(@NotNull MaintenanceReservation reservationOld, @NotNull RespondToRescheduleRequest request) {
-        Objects.requireNonNull(reservationOld, "Reservation old is null");
-        Objects.requireNonNull(request, "Reschedule request is null");
-        Objects.requireNonNull(request.getSlotId(), "Slot ID is null");
+    public MaintenanceReservation employeeConfirmReservation(@NotNull MaintenanceReservation reservation, String note) throws IOException, TemplateException {
+        Objects.requireNonNull(reservation, "Reservation is null");
 
+        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), reservation.getEmployee())) ) {
+            throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservation.getId()));
+        }
+
+        reservation.setStatus(ReservationStatus.Confirmed);
+        reservation.setNote(note);
+        reservationDao.persist(reservation);
+
+        final MaintenanceNotification notification = reservation.getNotification();
+        pushNotificationSender.sendNotification(new MaintenanceConfirmTemplate(notification), notification.getAuthor());
+
+        return reservation;
+    }
+
+    @NotNull
+    public MaintenanceReservation employeeRescheduleReservation(@NotNull MaintenanceReservation reservationOld, @NotNull Long slotUnitId, String note) throws IOException, TemplateException {
+        Objects.requireNonNull(reservationOld, "Reservation old is null");
+        Objects.requireNonNull(slotUnitId, "Slot unit ID is null");
+
+        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), reservationOld.getEmployee())) ) {
+            throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservationOld.getId()));
+        }
+
+        reservationOld.setStatus(ReservationStatus.Rescheduled);
+        reservationOld.setNote(note);
+        reservationDao.persist(reservationOld);
+
+
+        // release capacity held by old reservation
         releaseReservedCapacity(reservationOld);
 
-        final MaintenanceSlot slot = maintenanceSlotDao.findById(request.getSlotId());
-        if ( slot == null ) {
-            throw new EntityNotFoundException(String.format("Slot id=%d not found", request.getSlotId()));
+
+        final SlotUnit slotUnit = slotUnitDao.findById(slotUnitId);
+        if ( slotUnit == null ) {
+            throw new EntityNotFoundException(String.format("Slot unit id=%d not found", slotUnitId));
         }
+
+        final MaintenanceNotification notification = reservationOld.getNotification();
+        final MaintenanceSlot slot = (MaintenanceSlot) slotUnit.getSlot();
 
         final MaintenanceReservation reservationNew = new MaintenanceReservation();
         reservationNew.setSlot(slot);
@@ -204,10 +192,14 @@ public class MaintenanceReservationService {
         reservationNew.setCapacity(reservationOld.getCapacity());
         reservationNew.setEmployee(reservationOld.getEmployee());
         reservationNew.setNote(reservationOld.getNote());
-        reservationNew.setNotification(reservationOld.getNotification());
+        reservationNew.setNotification(notification);
 
         reserveCapacity(reservationNew);
         reservationDao.persist(reservationNew);
+
+        notification.getReservations().add(reservationNew);
+
+        pushNotificationSender.sendNotification(new MaintenanceRescheduleTemplate(notification), notification.getAuthor());
 
         return reservationNew;
     }

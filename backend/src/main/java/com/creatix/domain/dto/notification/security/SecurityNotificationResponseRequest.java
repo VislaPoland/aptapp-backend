@@ -1,6 +1,6 @@
 package com.creatix.domain.dto.notification.security;
 
-import com.creatix.domain.enums.SecurityNotificationResponse;
+import com.creatix.domain.enums.SecurityNotificationResponseType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -14,7 +14,9 @@ import javax.validation.constraints.NotNull;
 @Setter
 @NoArgsConstructor
 public class SecurityNotificationResponseRequest {
+
+
     @ApiModelProperty(value = "Response", required = true)
     @NotNull
-    private SecurityNotificationResponse response;
+    private SecurityNotificationResponseType response;
 }

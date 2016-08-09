@@ -18,9 +18,9 @@ public class CreateMaintenanceNotificationRequest {
     @ApiModelProperty(value = "Longer notification description", notes = "Maximum size of 100 letters")
     @Size(max = 100)
     private String description;
-    @ApiModelProperty(value = "Timestamp of notification")
     @NotNull
-    private Date scheduledAt;
+    @ApiModelProperty(value = "ID of the selected slot unit", required = true)
+    private Long slotUnitId;
     @ApiModelProperty(value = "Target apartment unit number", required = true)
     @NotNull
     private String unitNumber;

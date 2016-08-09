@@ -7,6 +7,7 @@ import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
+import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;
 import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationDto;
@@ -98,7 +99,7 @@ public class NotificationController {
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
     public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@RequestBody @Valid CreateMaintenanceNotificationRequest dto) throws IOException, TemplateException {
         MaintenanceNotification n = mapper.fromMaintenanceNotificationRequest(dto);
-        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n)));
+        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n, dto.getSlotUnitId())));
     }
 
     @ApiOperation(value = "Get all maintenance notifications in date range")
@@ -157,6 +158,19 @@ public class NotificationController {
     @RoleSecured(value = {AccountRole.Security})
     public DataResponse<SecurityNotificationDto> respondToSecurityNotification(@PathVariable long notificationId, @RequestBody @Valid SecurityNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.respondToSecurityNotification(notificationId, request)));
+    }
+
+    @ApiOperation(value = "Respond to maintenance notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/maintenance/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(value = {AccountRole.Security})
+    public DataResponse<MaintenanceNotificationDto> respondToSecurityNotification(@PathVariable Long notificationId, @RequestBody @Valid MaintenanceNotificationResponseRequest request) throws IOException, TemplateException {
+        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.respondToMaintenanceNotification(notificationId, request)));
     }
 
     @ApiOperation(value = "Get single neighborhood notification")

@@ -6,8 +6,8 @@ import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MaintenanceNotificationApproveTemplate extends MaintenanceNotificationTemplate {
-    public MaintenanceNotificationApproveTemplate(MaintenanceNotification notification) {
+public class MaintenanceRescheduleRejectTemplate extends MaintenanceNotificationTemplate {
+    public MaintenanceRescheduleRejectTemplate(MaintenanceNotification notification) {
         super(notification);
     }
 
@@ -21,6 +21,6 @@ public class MaintenanceNotificationApproveTemplate extends MaintenanceNotificat
 
     @Override
     public String getTemplateName() {
-        return "maintenance-notification-approve";
+        return "maintenance-reschedule-reject";
     }
 }

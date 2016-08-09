@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,4 @@ public class MaintenanceNotificationDto extends NotificationDto {
     @JsonView(Views.NotificationsWithReservation.class)
     @ApiModelProperty(value = "Maintenance reservations")
     private List<MaintenanceReservationDto> reservations;
-    @ApiModelProperty(value = "Timestamp of maintenance notification", required = true)
-    private Date scheduledAt;
 }

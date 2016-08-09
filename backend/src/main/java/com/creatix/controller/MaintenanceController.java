@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -55,21 +54,6 @@ public class MaintenanceController {
                 .stream()
                 .map(s -> mapper.toMaintenanceSlotDto(s))
                 .collect(Collectors.toList()));
-    }
-
-    @ApiOperation(value = "Create maintenance reservation")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
-    @RequestMapping(path = "/reservations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @JsonView(Views.Public.class)
-    @RoleSecured(AccountRole.Maintenance)
-    public DataResponse<MaintenanceReservationDto> createMaintenanceReservation(
-            @PathVariable Long propertyId,
-            @RequestBody @Valid PersistMaintenanceReservationRequest request) throws IOException, TemplateException {
-        return new DataResponse<>(mapper.toMaintenanceReservationDto(maintenanceReservationService.createMaintenanceReservation(propertyId, request)));
     }
 
     @ApiOperation(value = "Delete maintenance reservation")
@@ -127,6 +111,6 @@ public class MaintenanceController {
             @PathVariable Long propertyId,
             @PathVariable Long reservationId,
             @RequestBody @Valid RespondToRescheduleRequest request) throws IOException, TemplateException {
-        return new DataResponse<>(mapper.toMaintenanceReservationDto(maintenanceReservationService.respondToReschedule(reservationId, request)));
+        return new DataResponse<>(mapper.toMaintenanceReservationDto(maintenanceReservationService.tenantRespondToReschedule(reservationId, request)));
     }
 }
