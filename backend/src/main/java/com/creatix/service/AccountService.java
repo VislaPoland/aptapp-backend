@@ -170,6 +170,10 @@ public class AccountService {
             else if ( account instanceof PropertyOwner ) {
                 ((PropertyOwner) account).getOwnedProperties().forEach(p -> propertyIdForcedList.add(p.getId()));
             }
+            else if ( account instanceof ManagedEmployee ) {
+                final Long propertyIdForced = ((ManagedEmployee) account).getManager().getManagedProperty().getId();
+                propertyIdForcedList.add(propertyIdForced);
+            }
         }
 
         return accountDao.findByRolesAndPropertyIdList(roles, propertyIdForcedList);
