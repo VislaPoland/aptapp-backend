@@ -98,10 +98,7 @@ public class MaintenanceReservationService {
             throw new IllegalArgumentException("Cannot delete reservation in past");
         }
 
-        for ( SlotUnit unit : reservation.getUnits() ) {
-            unit.setCapacity(unit.getCapacity() + reservation.getCapacity());
-            slotUnitDao.persist(unit);
-        }
+        releaseReservedCapacity(reservation);
 
         reservationDao.delete(reservation);
         return reservation;
