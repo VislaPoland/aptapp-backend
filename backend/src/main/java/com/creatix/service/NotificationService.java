@@ -178,15 +178,17 @@ public class NotificationService {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
         Objects.requireNonNull(notification, "Notification is null");
 
+        final Apartment targetApartment = getApartmentByUnitNumber(targetUnitNumber);
+        final Property property = targetApartment.getProperty();
+        authorizationManager.checkRead(property);
+
         notification.setType(NotificationType.Neighborhood);
         notification.setAuthor(authorizationManager.getCurrentAccount());
-        notification.setProperty(authorizationManager.getCurrentProperty());
+        notification.setProperty(property);
         notification.setStatus(NotificationStatus.Pending);
-        final Apartment targetApartment = getApartmentByUnitNumber(targetUnitNumber);
         notification.setTargetApartment(targetApartment);
         neighborhoodNotificationDao.persist(notification);
 
-        final Property property = targetApartment.getProperty();
         final Tenant tenant = targetApartment.getTenant();
         if ( tenant != null ) {
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
