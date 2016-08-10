@@ -8,6 +8,7 @@ import com.creatix.domain.entity.store.SlotUnit;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.ReservationStatus;
 import com.creatix.message.PushNotificationSender;
 import com.creatix.message.template.push.MaintenanceConfirmTemplate;
@@ -47,6 +48,8 @@ public class MaintenanceReservationService {
     private SlotUnitDao slotUnitDao;
     @Autowired
     private PushNotificationSender pushNotificationSender;
+    @Autowired
+    private MaintenanceNotificationDao maintenanceNotificationDao;
 
     @RoleSecured(AccountRole.Maintenance)
     public MaintenanceReservation createMaintenanceReservation(@NotNull MaintenanceNotification maintenanceNotification, @NotNull Long slotUnitId) throws IOException, TemplateException {
@@ -137,6 +140,10 @@ public class MaintenanceReservationService {
         }
         reservationDao.persist(reservation);
 
+        final MaintenanceNotification notification = reservation.getNotification();
+        notification.setStatus(NotificationStatus.Resolved);
+        maintenanceNotificationDao.persist(notification);
+
         return reservation;
     }
 
@@ -152,6 +159,8 @@ public class MaintenanceReservationService {
         reservationDao.persist(reservation);
 
         final MaintenanceNotification notification = reservation.getNotification();
+        notification.setStatus(NotificationStatus.Resolved);
+        maintenanceNotificationDao.persist(notification);
         pushNotificationSender.sendNotification(new MaintenanceConfirmTemplate(notification), notification.getAuthor());
 
         return reservation;
@@ -181,6 +190,8 @@ public class MaintenanceReservationService {
         }
 
         final MaintenanceNotification notification = reservationOld.getNotification();
+        notification.setStatus(NotificationStatus.Pending);
+        maintenanceNotificationDao.persist(notification);
         final MaintenanceSlot slot = (MaintenanceSlot) slotUnit.getSlot();
 
         final MaintenanceReservation reservationNew = new MaintenanceReservation();

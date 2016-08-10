@@ -194,7 +194,7 @@ public class NotificationService {
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
             }
-            pushNotificationSender.sendNotification(new com.creatix.message.template.push.NeighborNotificationTemplate(notification), tenant);
+            pushNotificationSender.sendNotification(new NeighborNotificationTemplate(notification), tenant);
         }
 
         return notification;
