@@ -41,8 +41,6 @@ public class MaintenanceReservationService {
     @Autowired
     private ReservationDao reservationDao;
     @Autowired
-    private MaintenanceSlotDao maintenanceSlotDao;
-    @Autowired
     private SlotService slotService;
     @Autowired
     private SlotUnitDao slotUnitDao;
@@ -53,7 +51,7 @@ public class MaintenanceReservationService {
 
     @RoleSecured(AccountRole.Maintenance)
     public MaintenanceReservation createMaintenanceReservation(@NotNull MaintenanceNotification maintenanceNotification, @NotNull Long slotUnitId) throws IOException, TemplateException {
-        Objects.requireNonNull(maintenanceNotification, "Maintenance cnotification is null");
+        Objects.requireNonNull(maintenanceNotification, "Maintenance notification is null");
         Objects.requireNonNull(slotUnitId, "Slot unit id is null");
 
         final SlotUnit slotUnit = slotUnitDao.findById(slotUnitId);
