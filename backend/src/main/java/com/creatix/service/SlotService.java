@@ -1,6 +1,7 @@
 package com.creatix.service;
 
 import com.creatix.domain.Mapper;
+import com.creatix.domain.SlotUtils;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
 import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
@@ -159,7 +160,7 @@ public class SlotService {
 
         // create slot units
 
-        for ( int idx = 0, unitCount = calculateUnitCount(beginDt, endDt, schedule.getUnitDurationMinutes()); idx < unitCount; ++idx ) {
+        for ( int idx = 0, unitCount = SlotUtils.calculateUnitCount(beginDt, endDt, schedule.getUnitDurationMinutes()); idx < unitCount; ++idx ) {
             final SlotUnit unit = new SlotUnit();
             unit.setSlot(slot);
             unit.setCapacity(schedule.getInitialCapacity());
@@ -171,25 +172,6 @@ public class SlotService {
         }
 
         return slot;
-    }
-
-    private int calculateUnitCount(OffsetDateTime beginDt, OffsetDateTime endDt, int unitDurationMinutes) {
-        final Duration slotDuration = Duration.between(beginDt, endDt);
-        return (int) (slotDuration.toMinutes() / unitDurationMinutes);
-    }
-
-    int calculateUnitCount(int durationMinutes, int unitDurationMinutes) {
-        return (durationMinutes / unitDurationMinutes);
-    }
-
-    int calculateUnitOffset(Slot slot, OffsetDateTime unitTime) {
-        final Duration unitOffset = Duration.between(slot.getBeginTime(), unitTime);
-        final long offsetMinutes = unitOffset.toMinutes();
-        if ( offsetMinutes < 0 ) {
-            throw new IllegalArgumentException("Time is before slot begin time");
-        }
-
-        return (int) (offsetMinutes / slot.getUnitDurationMinutes());
     }
 
     @RoleSecured

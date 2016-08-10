@@ -1,5 +1,6 @@
 package com.creatix.service;
 
+import com.creatix.domain.SlotUtils;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.RespondToRescheduleRequest;
 import com.creatix.domain.entity.store.MaintenanceReservation;
@@ -41,8 +42,6 @@ public class MaintenanceReservationService {
     @Autowired
     private ReservationDao reservationDao;
     @Autowired
-    private SlotService slotService;
-    @Autowired
     private SlotUnitDao slotUnitDao;
     @Autowired
     private PushNotificationSender pushNotificationSender;
@@ -50,7 +49,7 @@ public class MaintenanceReservationService {
     private MaintenanceNotificationDao maintenanceNotificationDao;
 
     @RoleSecured(AccountRole.Maintenance)
-    public MaintenanceReservation createMaintenanceReservation(@NotNull MaintenanceNotification maintenanceNotification, @NotNull Long slotUnitId) throws IOException, TemplateException {
+    MaintenanceReservation createMaintenanceReservation(@NotNull MaintenanceNotification maintenanceNotification, @NotNull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(maintenanceNotification, "Maintenance notification is null");
         Objects.requireNonNull(slotUnitId, "Slot unit id is null");
 
@@ -142,7 +141,7 @@ public class MaintenanceReservationService {
         return reservation;
     }
 
-    public MaintenanceReservation employeeConfirmReservation(@NotNull MaintenanceReservation reservation, String note) throws IOException, TemplateException {
+    MaintenanceReservation employeeConfirmReservation(@NotNull MaintenanceReservation reservation, String note) throws IOException, TemplateException {
         Objects.requireNonNull(reservation, "Reservation is null");
 
         if ( !(Objects.equals(authorizationManager.getCurrentAccount(), reservation.getEmployee())) ) {
@@ -162,7 +161,7 @@ public class MaintenanceReservationService {
     }
 
     @NotNull
-    public MaintenanceReservation employeeRescheduleReservation(@NotNull MaintenanceReservation reservationOld, @NotNull Long slotUnitId, String note) throws IOException, TemplateException {
+    MaintenanceReservation employeeRescheduleReservation(@NotNull MaintenanceReservation reservationOld, @NotNull Long slotUnitId, String note) throws IOException, TemplateException {
         Objects.requireNonNull(reservationOld, "Reservation old is null");
         Objects.requireNonNull(slotUnitId, "Slot unit ID is null");
 
@@ -213,13 +212,13 @@ public class MaintenanceReservationService {
     private void reserveCapacity(MaintenanceReservation reservation) {
         final MaintenanceSlot slot = reservation.getSlot();
 
-        final int unitCount = slotService.calculateUnitCount(reservation.getDurationMinutes(), slot.getUnitDurationMinutes());
+        final int unitCount = SlotUtils.calculateUnitCount(reservation.getDurationMinutes(), slot.getUnitDurationMinutes());
         if ( unitCount == 0 ) {
             throw new IllegalArgumentException("Invalid duration of zero minutes");
         }
         synchronized ( syncLock ) {
             // assign slots units to reservation
-            final int unitOffsetLft = slotService.calculateUnitOffset(slot, reservation.getBeginTime());
+            final int unitOffsetLft = SlotUtils.calculateUnitOffset(slot, reservation.getBeginTime());
             final int unitOffsetRgt = unitOffsetLft + unitCount - 1;
             slot.getUnits().stream()
                     .filter(u -> ((unitOffsetLft <= u.getOffset()) && (u.getOffset() <= unitOffsetRgt)))
