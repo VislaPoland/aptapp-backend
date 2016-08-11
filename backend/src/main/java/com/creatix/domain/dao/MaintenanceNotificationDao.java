@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.Objects;
 @Repository
 @Transactional
 public class MaintenanceNotificationDao extends AbstractNotificationDao<MaintenanceNotification> {
-    public List<MaintenanceNotification> findAllInDateRange(Date fromDate, Date tillDate) {
+    public List<MaintenanceNotification> findAllInDateRange(OffsetDateTime fromDate, OffsetDateTime tillDate) {
         final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;
         return queryFactory.selectFrom(maintenanceNotification)
                 .where(maintenanceNotification.createdAt.between(fromDate, tillDate))

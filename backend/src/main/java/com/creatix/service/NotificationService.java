@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -110,7 +111,7 @@ public class NotificationService {
         return new PageableDataResponse<>(notifications, (long) pageSize, nextId);
     }
 
-    public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@NotNull Date beginDate, @NotNull Date endDate) {
+    public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@NotNull OffsetDateTime beginDate, @NotNull OffsetDateTime endDate) {
         Objects.requireNonNull(beginDate, "Begin date is null");
         Objects.requireNonNull(endDate, "End date is null");
         return maintenanceNotificationDao.findAllInDateRange(beginDate, endDate);

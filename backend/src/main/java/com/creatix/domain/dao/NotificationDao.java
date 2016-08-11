@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -34,14 +35,17 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
 
         final QNotification qNotification = QNotification.notification;
 
-        BooleanExpression predicate;
 
+        final OffsetDateTime startDt;
         if ( startId == null ) {
-            predicate = qNotification.createdAt.before(Date.from(Instant.now()));
+            startDt = OffsetDateTime.now();
         }
         else {
-            predicate = qNotification.id.loe(startId);
+            final Notification startNotification = findById(startId);
+            startDt = startNotification.getUpdatedAt();
         }
+
+        BooleanExpression predicate = qNotification.updatedAt.after(startDt).not();
 
 
         if ( requestType == NotificationRequestType.Sent ) {
@@ -83,7 +87,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
 
         return queryFactory.selectFrom(qNotification)
                 .where(predicate)
-                .orderBy(qNotification.id.desc())
+                .orderBy(qNotification.updatedAt.desc())
                 .limit(pageSize)
                 .fetch();
     }

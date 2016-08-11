@@ -54,16 +54,15 @@ public class Notification {
     private Account author;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    @NotNull
+    private OffsetDateTime createdAt;
+
+    @Column(nullable = false)
+    @NotNull
+    private OffsetDateTime updatedAt;
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
-
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date deletedAt;
+    private OffsetDateTime deletedAt;
 
     @OneToMany(mappedBy = "notification")
     private List<NotificationPhoto> photos = new ArrayList<>(1);

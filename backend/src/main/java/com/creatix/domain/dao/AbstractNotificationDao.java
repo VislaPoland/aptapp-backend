@@ -4,6 +4,7 @@ import com.creatix.domain.entity.store.notification.Notification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 @Component
@@ -13,11 +14,11 @@ public abstract class AbstractNotificationDao<T extends Notification> extends Da
     @Override
     public void persist(T notification) {
         if ( notification.getCreatedAt() == null ) {
-            notification.setCreatedAt(new Date());
-            notification.setUpdatedAt(new Date());
+            notification.setCreatedAt(OffsetDateTime.now());
+            notification.setUpdatedAt(OffsetDateTime.now());
         }
         else {
-            notification.setUpdatedAt(new Date());
+            notification.setUpdatedAt(OffsetDateTime.now());
         }
 
         super.persist(notification);

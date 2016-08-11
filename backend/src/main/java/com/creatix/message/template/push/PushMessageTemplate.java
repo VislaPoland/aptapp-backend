@@ -15,7 +15,7 @@ public abstract class PushMessageTemplate implements MessageTemplate {
 
     private DateTimeFormatter timestampFormatter = DateTimeFormatter.ofPattern("MM.dd.yyyy");
 
-    String formatTimestamp(Date tm, @NotNull ZoneId zoneId) {
+    String formatTimestamp(OffsetDateTime tm, @NotNull ZoneId zoneId) {
         Objects.requireNonNull(zoneId, "Zone Id is null");
 
         if ( tm == null ) {
