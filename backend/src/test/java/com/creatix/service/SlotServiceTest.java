@@ -92,6 +92,7 @@ public class SlotServiceTest {
         assertEquals(beginTime.plusMinutes(30), slot.getEndTime());
         assertEquals(1, slot.getUnits().size());
         assertEquals(AudienceType.Tenants, slot.getAudience());
+        assertEquals(request.getDurationMinutes(), slot.getUnitDurationMinutes());
     }
 
     @Test
