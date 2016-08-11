@@ -80,7 +80,7 @@ public class AuthorizationManager {
         return getCurrentProperty(account);
     }
 
-    public Property getCurrentProperty(Account account) throws SecurityException {
+    public static Property getCurrentProperty(Account account) throws SecurityException {
         assert account != null;
 
         switch ( account.getRole() ) {
@@ -88,12 +88,14 @@ public class AuthorizationManager {
                 return ((Tenant) account).getApartment().getProperty();
             case PropertyManager:
                 return ((PropertyManager) account).getManagedProperty();
+            case AssistantPropertyManager:
+                return ((AssistantPropertyManager) account).getManager().getManagedProperty();
             default:
                 if ( account instanceof ManagedEmployee ) {
                     return ((ManagedEmployee) account).getManager().getManagedProperty();
                 }
                 else {
-                    throw new SecurityException("Impossible to extract single linked apartment.");
+                    throw new SecurityException("Impossible to extract single linked property.");
                 }
         }
     }

@@ -107,7 +107,7 @@ public class AccountService {
     }
 
     private boolean isEligibleToResetCode(Account principal, Account target) {
-        final Property targetProperty = authorizationManager.getCurrentProperty(target);
+        final Property targetProperty = AuthorizationManager.getCurrentProperty(target);
 
         switch ( principal.getRole() ) {
             case Administrator:
@@ -115,7 +115,7 @@ public class AccountService {
             case PropertyOwner:
                 return ((PropertyOwner) principal).getOwnedProperties().contains(targetProperty);
             case PropertyManager:
-                return targetProperty.equals(authorizationManager.getCurrentProperty(principal));
+                return targetProperty.equals(AuthorizationManager.getCurrentProperty(principal));
             default:
                 return false;
         }
