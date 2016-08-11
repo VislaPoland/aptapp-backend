@@ -27,11 +27,17 @@ abstract class TemplateProcessor {
                 throw new IOException("Resource " + templatePath + " not found.");
             }
 
-            templateLoader.putTemplate(model.getTemplateName(), IOUtils.toString(templateResourceStream, Charset.defaultCharset()));
+            synchronized ( templateLoader ) {
+                templateLoader.putTemplate(model.getTemplateName(), IOUtils.toString(templateResourceStream, Charset.defaultCharset()));
+            }
         }
+
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-        cfg.setTemplateLoader(templateLoader);
-        Template template = cfg.getTemplate(model.getTemplateName());
+        Template template;
+        synchronized ( templateLoader ) {
+            cfg.setTemplateLoader(templateLoader);
+            template = cfg.getTemplate(model.getTemplateName());
+        }
 
         try ( StringWriter writer = new StringWriter() ) {
             template.process(model, writer);
