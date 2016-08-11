@@ -10,6 +10,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.SlotService;
 import com.fasterxml.jackson.annotation.JsonView;
+import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,7 +65,7 @@ public class EventController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<EventSlotDto> createEventSlot(@PathVariable Long propertyId, @RequestBody @Valid PersistEventSlotRequest request) {
+    public DataResponse<EventSlotDto> createEventSlot(@PathVariable Long propertyId, @RequestBody @Valid PersistEventSlotRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toEventSlotDto(slotService.createEventSlot(propertyId, request)));
     }
 

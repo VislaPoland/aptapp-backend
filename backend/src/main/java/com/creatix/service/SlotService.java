@@ -7,10 +7,15 @@ import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleReques
 import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
 import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
 import com.creatix.domain.entity.store.*;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.AudienceType;
+import com.creatix.message.PushNotificationSender;
+import com.creatix.message.template.push.EventNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.property.PropertyService;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -18,10 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.time.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +50,10 @@ public class SlotService {
     private SlotDao slotDao;
     @Autowired
     private Mapper mapper;
+    @Autowired
+    private AccountService accountService;
+    @Autowired
+    private PushNotificationSender pushNotificationSender;
 
     public ScheduledSlotsResponse getSlotsByFilter(@NotNull Long propertyId, LocalDate beginDate, LocalDate endDate, Long startId, Integer pageSize) {
         Objects.requireNonNull(propertyId, "Property id is required");
@@ -94,7 +102,7 @@ public class SlotService {
         return result;
     }
 
-    public EventSlot createEventSlot(@NotNull Long propertyId, @NotNull PersistEventSlotRequest request) {
+    public EventSlot createEventSlot(@NotNull Long propertyId, @NotNull PersistEventSlotRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(request);
 
@@ -111,6 +119,24 @@ public class SlotService {
         slot.addUnit(unit);
 
         eventSlotDao.persist(slot);
+
+        final List<Account> recipients;
+        if ( slot.getAudience() == AudienceType.Employees ) {
+            recipients = accountService.getAccounts(new AccountRole[]{AccountRole.Maintenance, AccountRole.Security, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, propertyId);
+        }
+        else if ( slot.getAudience() == AudienceType.Tenants ) {
+            recipients = accountService.getAccounts(new AccountRole[]{AccountRole.Tenant, AccountRole.SubTenant}, propertyId);
+        }
+        else if ( slot.getAudience() == AudienceType.Everyone )  {
+            recipients = accountService.getAccounts(AccountRole.values(), propertyId);
+        }
+        else {
+            recipients = Collections.emptyList();
+        }
+
+        for ( Account recipient : recipients ) {
+            pushNotificationSender.sendNotification(new EventNotificationTemplate(slot), recipient);
+        }
 
         return slot;
     }

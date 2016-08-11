@@ -22,7 +22,7 @@ import static com.creatix.domain.entity.store.account.QAssistantPropertyManager.
 public class AccountDao extends DaoBase<Account, Long> {
 
     public List<Account> findByRolesAndPropertyIdList(@NotNull AccountRole[] roles, Collection<Long> propertyIdList) {
-        Objects.requireNonNull(roles);
+        Objects.requireNonNull(roles, "Account roles array is null");
 
         final List<Account> accounts;
         if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
