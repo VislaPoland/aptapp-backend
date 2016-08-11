@@ -2,6 +2,7 @@ package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
+import com.creatix.domain.entity.store.notification.QMaintenanceNotification;
 import com.creatix.domain.enums.AudienceType;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
@@ -71,24 +72,34 @@ public class SlotDao extends DaoBase<Slot, Long> {
         env.reservations = QMaintenanceReservation.maintenanceReservation;
         env.tenant = QTenant.tenant;
         env.employee = QManagedEmployee.managedEmployee;
+        env.maintenanceNotification = QMaintenanceNotification.maintenanceNotification;;
         env.query = queryFactory.selectFrom(env.slot)
                 .distinct()
                 .leftJoin(env.slot.as(QMaintenanceSlot.class).reservations, env.reservations)
                 .leftJoin(env.reservations.employee, env.employee)
-                .leftJoin(env.reservations.notification.targetApartment.tenant, env.tenant);
+                .leftJoin(env.reservations.notification, env.maintenanceNotification)
+                .leftJoin(env.maintenanceNotification.targetApartment.tenant, env.tenant);
 
         env.predicate = env.slot.property.eq(property);
 
-        if ( account instanceof MaintenanceEmployee ) {
-            env.predicate = env.predicate.and(env.employee.id.eq(account.getId()).or(env.slot.instanceOf(EventSlot.class)));
+        if ( (account instanceof MaintenanceEmployee) || (account instanceof PropertyManager) || (account instanceof AssistantPropertyManager) ) {
+            // all maintenance notifications or events
+            env.predicate = env.predicate.and(env.reservations.isNotNull().or(env.slot.instanceOf(EventSlot.class)));
+        }
+        else if ( account instanceof SecurityEmployee ) {
+            // filter: self created maintenance notification or events
+            env.predicate = env.predicate.and(env.maintenanceNotification.author.id.eq(account.getId()).or(env.slot.instanceOf(EventSlot.class)));
         }
         else if ( account instanceof Tenant ) {
+            // filter: tenant's maintenance or events
             env.predicate = env.predicate.and(env.tenant.id.eq(account.getId()).or(env.slot.instanceOf(EventSlot.class)));
         }
         else {
             env.predicate = env.predicate.and(env.slot.instanceOf(EventSlot.class));
         }
 
+
+        // allow to see only appropriate events (filter by audience)
         if ( account instanceof EmployeeBase ) {
             env.predicate = env.predicate.and(env.slot.instanceOf(MaintenanceSlot.class)
                     .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
@@ -110,6 +121,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
         QManagedEmployee employee;
         BooleanExpression predicate;
         QSlot slot;
+        QMaintenanceNotification maintenanceNotification;
     }
 
 }
