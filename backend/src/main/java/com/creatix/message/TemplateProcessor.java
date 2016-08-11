@@ -32,9 +32,9 @@ abstract class TemplateProcessor {
             }
         }
 
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-        Template template;
+        final Template template;
         synchronized ( templateLoader ) {
+            final Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
             cfg.setTemplateLoader(templateLoader);
             template = cfg.getTemplate(model.getTemplateName());
         }
