@@ -26,10 +26,6 @@ public abstract class PushMessageTemplate implements MessageTemplate {
         return timestampFormatter.format(zonedTm);
     }
 
-    String formatTimestamp(OffsetDateTime tm) {
-        return timestampFormatter.format(tm);
-    }
-
     String translateRoleNameFromEnum(AccountRole role) {
         switch ( role ) {
             case Tenant:

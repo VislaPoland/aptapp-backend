@@ -64,8 +64,6 @@ public class MaintenanceReservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status;
-    @Column
-    private OffsetDateTime rescheduleTime;
 
     @QueryInit("targetApartment.tenant")
     @ManyToOne

@@ -14,7 +14,7 @@ public class EventNotificationTemplate extends PushMessageTemplate {
     }
 
     public String getTimestamp() {
-        return formatTimestamp(event.getBeginTime());
+        return formatTimestamp(event.getBeginTime(), event.getProperty().getZoneId());
     }
 
     @Override

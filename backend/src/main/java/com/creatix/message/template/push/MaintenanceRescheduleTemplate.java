@@ -1,39 +1,25 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.MaintenanceReservation;
-import com.creatix.domain.entity.store.notification.MaintenanceNotification;
-import com.creatix.domain.enums.ReservationStatus;
-
-import java.util.Optional;
 
 
-public class MaintenanceRescheduleTemplate extends MaintenanceNotificationTemplate {
+public class MaintenanceRescheduleTemplate extends PushMessageTemplate {
 
-    private final MaintenanceReservation reservation;
+    private final MaintenanceReservation reservationOld;
+    private final MaintenanceReservation reservationNew;
 
-    public MaintenanceRescheduleTemplate(MaintenanceNotification notification) {
-        super(notification);
 
-        Optional<MaintenanceReservation> reservation = notification.getReservations().stream()
-                .max((r1, r2) -> Long.compare(r1.getId(), r2.getId()));
-        if ( reservation.isPresent() ) {
-            this.reservation = reservation.get();
-
-            if ( this.reservation.getStatus() != ReservationStatus.Rescheduled ) {
-                throw new IllegalStateException("Invalid status of reservation: " + this.reservation.getStatus());
-            }
-        }
-        else {
-            throw new IllegalStateException("Not reservation is bound to notification");
-        }
+    public MaintenanceRescheduleTemplate(MaintenanceReservation reservationOld, MaintenanceReservation reservationNew) {
+        this.reservationOld = reservationOld;
+        this.reservationNew = reservationNew;
     }
 
     public String getFrom() {
-        return formatTimestamp(reservation.getBeginTime());
+        return formatTimestamp(reservationOld.getBeginTime(), reservationOld.getSlot().getProperty().getZoneId());
     }
 
     public String getTo() {
-        return formatTimestamp(reservation.getRescheduleTime());
+        return formatTimestamp(reservationNew.getBeginTime(), reservationNew.getSlot().getProperty().getZoneId());
     }
 
     @Override

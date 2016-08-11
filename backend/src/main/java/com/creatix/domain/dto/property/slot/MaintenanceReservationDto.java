@@ -40,6 +40,4 @@ public class MaintenanceReservationDto {
     private MaintenanceNotificationDto notification;
     @ApiModelProperty(required = true)
     private ReservationStatus status;
-    @ApiModelProperty(dataType = "java.lang.String", example = "2016-07-09T11:00:00.000Z")
-    private OffsetDateTime rescheduleTime;
 }

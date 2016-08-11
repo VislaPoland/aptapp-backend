@@ -127,12 +127,12 @@ public class MaintenanceReservationService {
 
         if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Confirm ) {
             reservation.setStatus(ReservationStatus.Confirmed);
-            pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation.getNotification()), reservation.getEmployee());
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation), reservation.getEmployee());
         }
         else if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
             releaseReservedCapacity(reservation);
-            pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation.getNotification()), reservation.getEmployee());
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation), reservation.getEmployee());
         }
         else {
             throw new IllegalArgumentException("Unsupported response type: " + request.getResponseType());
@@ -167,7 +167,7 @@ public class MaintenanceReservationService {
         final MaintenanceNotification notification = reservation.getNotification();
         notification.setStatus(NotificationStatus.Resolved);
         maintenanceNotificationDao.persist(notification);
-        pushNotificationSender.sendNotification(new MaintenanceConfirmTemplate(notification), notification.getAuthor());
+        pushNotificationSender.sendNotification(new MaintenanceConfirmTemplate(reservation), notification.getAuthor());
 
         return reservation;
     }
@@ -222,7 +222,7 @@ public class MaintenanceReservationService {
 
         notification.getReservations().add(reservationNew);
 
-        pushNotificationSender.sendNotification(new MaintenanceRescheduleTemplate(notification), notification.getAuthor());
+        pushNotificationSender.sendNotification(new MaintenanceRescheduleTemplate(reservationOld, reservationNew), notification.getAuthor());
 
         return reservationNew;
     }
