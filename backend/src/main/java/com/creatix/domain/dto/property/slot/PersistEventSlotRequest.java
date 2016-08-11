@@ -12,12 +12,15 @@ import java.time.OffsetDateTime;
 @ApiModel
 @Data
 public class PersistEventSlotRequest {
+    @NotNull
     @ApiModelProperty(value = "Time when slot starts", required = true, example = "2016-07-07T10:37:47.960Z")
     private OffsetDateTime beginTime;
+    @NotNull
     @ApiModelProperty(value = "Slot duration in minutes", required = true)
-    private int durationMinutes;
+    private Integer durationMinutes;
+    @NotNull
     @ApiModelProperty(value = "Initial slot unit capacity (1 = 1 person capacity)", required = true)
-    private int initialCapacity;
+    private Integer initialCapacity;
     @NotEmpty
     @ApiModelProperty(value = "Title", required = true)
     private String title;
