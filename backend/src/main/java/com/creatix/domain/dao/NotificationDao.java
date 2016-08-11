@@ -49,7 +49,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
 
             if ( account instanceof Tenant ) {
                 // tenant is recipient
-                predicate = predicate.and(qNotification.as(QNeighborhoodNotification.class).targetApartment.tenant.id.eq(account.getId()));
+                predicate = predicate.and(qNotification.as(QNeighborhoodNotification.class).targetApartment.tenant.id.eq(account.getId())).and(qNotification.instanceOf(NeighborhoodNotification.class));
             }
             if ( account instanceof MaintenanceEmployee ) {
                 // maintenance is recipient
