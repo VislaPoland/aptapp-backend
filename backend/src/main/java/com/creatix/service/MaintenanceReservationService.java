@@ -6,6 +6,7 @@ import com.creatix.domain.dto.property.RespondToRescheduleRequest;
 import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.MaintenanceSlot;
 import com.creatix.domain.entity.store.SlotUnit;
+import com.creatix.domain.entity.store.account.MaintenanceEmployee;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
@@ -48,7 +49,7 @@ public class MaintenanceReservationService {
     @Autowired
     private MaintenanceNotificationDao maintenanceNotificationDao;
 
-    @RoleSecured(AccountRole.Maintenance)
+    @RoleSecured(AccountRole.Tenant)
     MaintenanceReservation createMaintenanceReservation(@NotNull MaintenanceNotification maintenanceNotification, @NotNull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(maintenanceNotification, "Maintenance notification is null");
         Objects.requireNonNull(slotUnitId, "Slot unit id is null");
@@ -60,10 +61,14 @@ public class MaintenanceReservationService {
 
         final MaintenanceSlot slot = (MaintenanceSlot) slotUnit.getSlot();
 
-        final ManagedEmployee employee = (ManagedEmployee) authorizationManager.getCurrentAccount();
-        if ( employee == null ) {
-            throw new IllegalStateException("Account is not employee assigned");
+        final MaintenanceEmployee employee;
+        if ( authorizationManager.getCurrentAccount() instanceof MaintenanceEmployee ) {
+            employee = (MaintenanceEmployee) authorizationManager.getCurrentAccount();
         }
+        else {
+            employee = null;
+        }
+
         if ( slotUnit.getBeginTime().isBefore(OffsetDateTime.now()) ) {
             throw new IllegalArgumentException("Cannot create reservation in the past");
         }
@@ -141,11 +146,18 @@ public class MaintenanceReservationService {
         return reservation;
     }
 
+    @RoleSecured(AccountRole.Maintenance)
+    @NotNull
     MaintenanceReservation employeeConfirmReservation(@NotNull MaintenanceReservation reservation, String note) throws IOException, TemplateException {
         Objects.requireNonNull(reservation, "Reservation is null");
 
-        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), reservation.getEmployee())) ) {
-            throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservation.getId()));
+        if ( reservation.getEmployee() == null ) {
+            reservation.setEmployee((MaintenanceEmployee) authorizationManager.getCurrentAccount());
+        }
+        else {
+            if ( !(Objects.equals(authorizationManager.getCurrentAccount(), reservation.getEmployee())) ) {
+                throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservation.getId()));
+            }
         }
 
         reservation.setStatus(ReservationStatus.Confirmed);
@@ -160,13 +172,19 @@ public class MaintenanceReservationService {
         return reservation;
     }
 
+    @RoleSecured(AccountRole.Maintenance)
     @NotNull
     MaintenanceReservation employeeRescheduleReservation(@NotNull MaintenanceReservation reservationOld, @NotNull Long slotUnitId, String note) throws IOException, TemplateException {
         Objects.requireNonNull(reservationOld, "Reservation old is null");
         Objects.requireNonNull(slotUnitId, "Slot unit ID is null");
 
-        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), reservationOld.getEmployee())) ) {
-            throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservationOld.getId()));
+        if ( reservationOld.getEmployee() == null ) {
+            reservationOld.setEmployee((MaintenanceEmployee) authorizationManager.getCurrentAccount());
+        }
+        else {
+            if ( !(Objects.equals(authorizationManager.getCurrentAccount(), reservationOld.getEmployee())) ) {
+                throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservationOld.getId()));
+            }
         }
 
         reservationOld.setStatus(ReservationStatus.Rescheduled);

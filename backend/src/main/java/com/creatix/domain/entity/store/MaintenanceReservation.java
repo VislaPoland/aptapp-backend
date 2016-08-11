@@ -36,8 +36,7 @@ public class MaintenanceReservation {
     private long id;
     @Version
     private int version;
-    @NotNull
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     private ManagedEmployee employee;
     @ManyToMany
     @JoinTable(
