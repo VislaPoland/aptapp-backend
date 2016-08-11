@@ -37,8 +37,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -265,12 +264,12 @@ public class NotificationService {
 
     public MaintenanceNotification respondToMaintenanceNotification(@NotNull Long notificationId, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         Objects.requireNonNull(notificationId, "Notification id is null");
-        Objects.requireNonNull(response, "Notification reseponse dto is null");
+        Objects.requireNonNull(response, "Notification response dto is null");
 
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
-        final Stream<MaintenanceReservation> reservationStream = notification.getReservations().stream()
-                .filter(r -> r.getStatus() == ReservationStatus.Pending);
-        final long pendingCount = reservationStream.count();
+        final List<MaintenanceReservation> reservations = notification.getReservations().stream()
+                .filter(r -> r.getStatus() == ReservationStatus.Pending).collect(Collectors.toList());
+        final long pendingCount = reservations.size();
         if ( pendingCount == 0 ) {
             throw new IllegalArgumentException("No pending reservations found for notification");
         }
@@ -278,13 +277,7 @@ public class NotificationService {
             throw new IllegalStateException("Multiple pending reservations found for notification");
         }
 
-        final Optional<MaintenanceReservation> optReservation = reservationStream.findAny();
-        if ( !(optReservation.isPresent()) ) {
-            throw new IllegalStateException("Application error");
-        }
-
-
-        final MaintenanceReservation reservation = optReservation.get();
+        final MaintenanceReservation reservation = reservations.get(0);
 
         if ( response.getResponse() == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
             maintenanceReservationService.employeeConfirmReservation(reservation, response.getNote());
