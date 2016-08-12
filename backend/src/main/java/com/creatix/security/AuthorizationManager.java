@@ -238,9 +238,9 @@ public class AuthorizationManager {
                 return Objects.equals(tenant, reservation.getNotification().getTargetApartment().getTenant());
             }
         }
-        else if ( account instanceof MaintenanceEmployee ) {
-            final MaintenanceEmployee maintenance = (MaintenanceEmployee) account;
-            return Objects.equals(maintenance, reservation.getEmployee());
+        else if ( account instanceof EmployeeBase ) {
+            final Property property = AuthorizationManager.getCurrentProperty(account);
+            return Objects.equals(property, reservation.getSlot().getProperty());
         }
 
         return false;
