@@ -8,6 +8,7 @@ import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Sender;
 import com.notnoop.apns.*;
 import freemarker.template.TemplateException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,14 +70,16 @@ public class PushNotificationSender {
 
         if ( recipient.getDevices() != null ) {
             for ( Device toDevice : recipient.getDevices() ) {
-                switch ( toDevice.getPlatform() ) {
-                    case iOS: {
-                        this.sendAPNS(notification, toDevice);
-                        break;
-                    }
-                    case Android: {
-                        this.sendGCM(notification, toDevice);
-                        break;
+                if ( StringUtils.isNotBlank(toDevice.getPushToken()) ) {
+                    switch ( toDevice.getPlatform() ) {
+                        case iOS: {
+                            this.sendAPNS(notification, toDevice);
+                            break;
+                        }
+                        case Android: {
+                            this.sendGCM(notification, toDevice);
+                            break;
+                        }
                     }
                 }
             }
@@ -84,6 +87,13 @@ public class PushNotificationSender {
     }
 
     private ApnsNotification sendAPNS(@NotNull PushNotification notification, @NotNull Device device) {
+        Objects.requireNonNull(notification, "Notification is null");
+        Objects.requireNonNull(device, "Device is null");
+
+        if ( StringUtils.isBlank(device.getPushToken()) ) {
+            throw new IllegalArgumentException(String.format("Missing push token for device id=%d", device.getId()));
+        }
+
         PayloadBuilder payloadBuilder = APNS.newPayload();
         if ( notification.getBadgeCount() != null ) {
             payloadBuilder.badge(notification.getBadgeCount());
@@ -102,6 +112,13 @@ public class PushNotificationSender {
     }
 
     private void sendGCM(@NotNull PushNotification notification, @NotNull Device device) throws IOException {
+        Objects.requireNonNull(notification, "Notification is null");
+        Objects.requireNonNull(device, "Device is null");
+
+        if ( StringUtils.isBlank(device.getPushToken()) ) {
+            throw new IllegalArgumentException(String.format("Missing push token for device id=%d", device.getId()));
+        }
+
         Message.Builder messageBuilder = new Message.Builder();
         if ( notification.getBadgeCount() != null ) {
             messageBuilder.addData("badge", String.valueOf(notification.getBadgeCount()));
