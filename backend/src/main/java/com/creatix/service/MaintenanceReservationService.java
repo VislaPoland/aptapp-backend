@@ -210,8 +210,8 @@ public class MaintenanceReservationService {
         reservationNew.setSlot(slot);
         reservationNew.setStatus(ReservationStatus.Confirmed);
         reservationNew.setDurationMinutes(reservationOld.getDurationMinutes());
-        reservationNew.setBeginTime(slot.getBeginTime().with(reservationOld.getBeginTime()));
-        reservationNew.setEndTime(reservationNew.getBeginTime().plusMinutes(slot.getUnitDurationMinutes()));
+        reservationNew.setBeginTime(slotUnit.getBeginTime());
+        reservationNew.setEndTime(slotUnit.getEndTime());
         reservationNew.setCapacity(reservationOld.getCapacity());
         reservationNew.setEmployee(reservationOld.getEmployee());
         reservationNew.setNote(reservationOld.getNote());
