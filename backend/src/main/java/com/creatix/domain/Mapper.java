@@ -218,7 +218,7 @@ public class Mapper {
 
                         if ( !(authorizationManager.hasCurrentAccount()) || authorizationManager.hasAnyOfRoles(AccountRole.Tenant) ) {
                             // only authenticated non-tenant accounts are allowed to see author of the notification
-                            notification.setAuthor(null);
+                            notificationDto.setAuthor(null);
                         }
                     }
                 })
