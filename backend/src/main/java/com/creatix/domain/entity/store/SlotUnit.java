@@ -41,6 +41,11 @@ public class SlotUnit {
 
     @Transient
     public OffsetDateTime getBeginTime() {
-        return getSlot().getBeginTime().plusMinutes(slot.getUnitDurationMinutes());
+        return getSlot().getBeginTime().plusMinutes(offset * slot.getUnitDurationMinutes());
+    }
+
+    @Transient
+    public OffsetDateTime getEndTime() {
+        return getBeginTime().plusMinutes(slot.getUnitDurationMinutes());
     }
 }
