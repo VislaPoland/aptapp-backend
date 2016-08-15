@@ -208,7 +208,7 @@ public class MaintenanceReservationService {
 
         final MaintenanceReservation reservationNew = new MaintenanceReservation();
         reservationNew.setSlot(slot);
-        reservationNew.setStatus(ReservationStatus.Confirmed);
+        reservationNew.setStatus(ReservationStatus.Pending);
         reservationNew.setDurationMinutes(reservationOld.getDurationMinutes());
         reservationNew.setBeginTime(slotUnit.getBeginTime());
         reservationNew.setEndTime(slotUnit.getEndTime());
