@@ -1,5 +1,6 @@
 package com.creatix.domain.dto.notification;
 
+import com.creatix.domain.dto.property.BasicAccountDto;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import io.swagger.annotations.ApiModel;
@@ -33,4 +34,7 @@ public class NotificationDto {
     private NotificationType type;
     @ApiModelProperty(value = "Notification photo")
     private List<NotificationPhotoDto> photos;
+    @ApiModelProperty(value = "Author of the notification")
+    private BasicAccountDto author;
+
 }

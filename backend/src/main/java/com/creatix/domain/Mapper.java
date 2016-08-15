@@ -17,10 +17,7 @@ import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotifi
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationDto;
 import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
-import com.creatix.domain.dto.property.CreatePropertyRequest;
-import com.creatix.domain.dto.property.PropertyDto;
-import com.creatix.domain.dto.property.PropertyPhotoDto;
-import com.creatix.domain.dto.property.UpdatePropertyRequest;
+import com.creatix.domain.dto.property.*;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
@@ -31,6 +28,7 @@ import com.creatix.domain.dto.tenant.VehicleDto;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
+import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.AuthorizationManager;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
@@ -127,7 +125,7 @@ public class Mapper {
                 })
                 .register();
 
-        mapperFactory.classMap(Account.class, PropertyDto.AccountDto.class)
+        mapperFactory.classMap(Account.class, BasicAccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -174,21 +172,21 @@ public class Mapper {
                                         assistantPropertyManagerDao.findByProperty(property).stream()
                                                 .filter(Account::getActive)
                                                 .filter(a -> a.getDeletedAt() == null)
-                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDto.AccountDto.class))
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, BasicAccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
                                 propertyDto.setEmployees(
                                         managedEmployeeDao.findByProperty(property).stream()
                                                 .filter(Account::getActive)
                                                 .filter(a -> a.getDeletedAt() == null)
-                                                .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDto.AccountDto.class))
+                                                .map(e -> mapperFactory.getMapperFacade().map(e, BasicAccountDto.class))
                                                 .collect(Collectors.toList())
                                 );
                                 if ( property.getManagers() != null ) {
                                     propertyDto.setManagers(property.getManagers().stream()
                                             .filter(Account::getActive)
                                             .filter(a -> a.getDeletedAt() == null)
-                                            .map(e -> mapperFactory.getMapperFacade().map(e, PropertyDto.AccountDto.class))
+                                            .map(e -> mapperFactory.getMapperFacade().map(e, BasicAccountDto.class))
                                             .collect(Collectors.toList())
                                     );
                                 }
@@ -214,6 +212,16 @@ public class Mapper {
 
         mapperFactory.classMap(Notification.class, NotificationDto.class)
                 .byDefault()
+                .customize(new CustomMapper<Notification, NotificationDto>() {
+                    @Override
+                    public void mapAtoB(Notification notification, NotificationDto notificationDto, MappingContext context) {
+
+                        if ( !(authorizationManager.hasCurrentAccount()) || authorizationManager.hasAnyOfRoles(AccountRole.Tenant) ) {
+                            // only authenticated non-tenant accounts are allowed to see author of the notification
+                            notification.setAuthor(null);
+                        }
+                    }
+                })
                 .register();
         mapperFactory.classMap(SecurityNotification.class, SecurityNotificationDto.class)
                 .byDefault()

@@ -2,7 +2,7 @@ package com.creatix.controller;
 
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.property.PropertyDto;
+import com.creatix.domain.dto.property.BasicAccountDto;
 import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.property.PropertyEmployeeService;
@@ -37,8 +37,8 @@ public class PropertyEmployeeController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{employeeId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<PropertyDto.AccountDto> removePropertyEmployee(@PathVariable Long propertyId, @PathVariable Long employeeId) {
-        return new DataResponse<>(mapper.toPropertyAccount(propertyEmployeeService.delete(propertyId, employeeId)));
+    public DataResponse<BasicAccountDto> removePropertyEmployee(@PathVariable Long propertyId, @PathVariable Long employeeId) {
+        return new DataResponse<>(mapper.toBasicAccount(propertyEmployeeService.delete(propertyId, employeeId)));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.creatix.domain.mapper;
 
+import com.creatix.domain.dto.property.BasicAccountDto;
 import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.dto.property.contact.CreatePropertyContactRequest;
 import com.creatix.domain.dto.property.contact.UpdatePropertyContactRequest;
@@ -8,7 +9,6 @@ import com.creatix.domain.dto.property.facility.UpdatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.EmployeeBase;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import ma.glasnost.orika.impl.ConfigurableMapper;
@@ -34,7 +34,7 @@ public final class PropertyMapper extends ConfigurableMapper {
                 .register();
 
         //region Account
-        mapperFactory.classMap(Account.class, PropertyDto.AccountDto.class)
+        mapperFactory.classMap(Account.class, BasicAccountDto.class)
                 .byDefault()
                 .field("primaryEmail", "email")
                 .field("primaryPhone", "phone")
@@ -82,10 +82,10 @@ public final class PropertyMapper extends ConfigurableMapper {
     }
 
     //region Account
-    public PropertyDto.AccountDto toPropertyAccount(@NotNull Account account) {
+    public BasicAccountDto toBasicAccount(@NotNull Account account) {
         Objects.requireNonNull(account);
 
-        return this.map(account, PropertyDto.AccountDto.class);
+        return this.map(account, BasicAccountDto.class);
     }
     //endregion
 

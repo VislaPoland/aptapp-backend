@@ -7,15 +7,13 @@ import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.account.PropertyOwnerDto;
 import com.creatix.domain.dto.apartment.ApartmentDto;
-import com.creatix.domain.dto.property.PropertyDto;
+import com.creatix.domain.dto.property.BasicAccountDto;
 import com.creatix.domain.entity.store.Apartment;
-import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.AssistantPropertyManager;
 import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.mock.WithMockCustomUser;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +70,7 @@ public class MapperTest {
 
         final AssistantPropertyManager apm = new AssistantPropertyManager();
         apm.setPrimaryEmail("apm@test.com");
-        final PropertyDto.AccountDto apmDto = mapperFactory.getMapperFacade().map(apm, PropertyDto.AccountDto.class);
+        final BasicAccountDto apmDto = mapperFactory.getMapperFacade().map(apm, BasicAccountDto.class);
         assertNotNull(apmDto);
         assertEquals("apm@test.com", apmDto.getEmail());
     }

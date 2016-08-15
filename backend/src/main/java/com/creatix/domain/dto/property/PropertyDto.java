@@ -32,11 +32,11 @@ public class PropertyDto {
     @ApiModelProperty(value = "Property owner info", required = true)
     private OwnerDto owner;
     @ApiModelProperty(value = "Property managers")
-    private List<AccountDto> managers;
+    private List<BasicAccountDto> managers;
     @ApiModelProperty(value = "Property assistants of managers")
-    private List<AccountDto> assistantManagers;
+    private List<BasicAccountDto> assistantManagers;
     @ApiModelProperty(value = "Property employees")
-    private List<AccountDto> employees;
+    private List<BasicAccountDto> employees;
     @ApiModelProperty(value = "Property schedule", required = true)
     private MaintenanceSlotScheduleDto schedule;
     @ApiModelProperty(value = "Notification photo")
@@ -79,33 +79,9 @@ public class PropertyDto {
     @ApiModel
     @Getter
     @Setter
-    public static class OwnerDto extends AccountDto {
+    public static class OwnerDto extends BasicAccountDto {
         @ApiModelProperty(required = true)
         private String web;
-    }
-
-    @ApiModel
-    @Getter
-    @Setter
-    public static class AccountDto {
-        @ApiModelProperty(required = true)
-        private String id;
-        @ApiModelProperty(required = true)
-        private AccountRole role;
-        @ApiModelProperty(required = true)
-        private String firstName;
-        @ApiModelProperty(required = true)
-        private String lastName;
-        @ApiModelProperty(required = true)
-        private String fullName;
-        @ApiModelProperty(required = true)
-        private String phone;
-        @ApiModelProperty(required = true)
-        private String email;
-        @ApiModelProperty
-        private String companyName;
-        @ApiModelProperty
-        private Boolean deleted;
     }
 
 }
