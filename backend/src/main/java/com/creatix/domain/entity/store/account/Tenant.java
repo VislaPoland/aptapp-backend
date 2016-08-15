@@ -53,6 +53,11 @@ public class Tenant extends TenantBase {
         return apartment.getProperty().getAddress();
     }
 
+    @Transient
+    public String getFullName() {
+        return getFirstName() + " " + getLastName();
+    }
+
     public void addVehicle(@NotNull Vehicle vehicle) {
         Objects.requireNonNull(vehicle, "Vehicle is null");
         if ( vehicles == null ) {

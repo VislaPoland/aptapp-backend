@@ -266,6 +266,7 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(Apartment.class, BasicApartmentDto.class)
+                .field("tenant.fullName", "tenantName")
                 .byDefault()
                 .register();
 
