@@ -166,7 +166,7 @@ public class NotificationController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 403, message = "Forbidden")
     })
-    @JsonView(Views.Public.class)
+    @JsonView(Views.NotificationsWithReservation.class)
     @RequestMapping(path = "/maintenance/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Maintenance, AccountRole.Tenant})
     public DataResponse<MaintenanceNotificationDto> respondToMaintenanceNotification(@PathVariable Long notificationId, @RequestBody @Valid MaintenanceNotificationResponseRequest request) throws IOException, TemplateException {
