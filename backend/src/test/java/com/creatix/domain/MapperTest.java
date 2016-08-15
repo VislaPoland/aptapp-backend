@@ -72,6 +72,6 @@ public class MapperTest {
         apm.setPrimaryEmail("apm@test.com");
         final BasicAccountDto apmDto = mapperFactory.getMapperFacade().map(apm, BasicAccountDto.class);
         assertNotNull(apmDto);
-        assertEquals("apm@test.com", apmDto.getEmail());
+        assertEquals("apm@test.com", apmDto.getPrimaryEmail());
     }
 }

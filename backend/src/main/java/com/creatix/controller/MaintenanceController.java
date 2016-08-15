@@ -4,14 +4,12 @@ package com.creatix.controller;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.property.RespondToRescheduleRequest;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.MaintenanceReservationService;
 import com.creatix.service.SlotService;
 import com.fasterxml.jackson.annotation.JsonView;
-import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -22,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -98,19 +95,4 @@ public class MaintenanceController {
         return new DataResponse<>(mapper.toMaintenanceSlotScheduleDto(slotService.deleteScheduleById(scheduleId)));
     }
 
-    @ApiOperation(value = "Send reschedule response")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
-    @RequestMapping(path = "/reservations/{reservationId}/reschedule-respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @JsonView(Views.Public.class)
-    @RoleSecured(AccountRole.Tenant)
-    public DataResponse<MaintenanceReservationDto> respondToReschedule(
-            @PathVariable Long propertyId,
-            @PathVariable Long reservationId,
-            @RequestBody @Valid RespondToRescheduleRequest request) throws IOException, TemplateException {
-        return new DataResponse<>(mapper.toMaintenanceReservationDto(maintenanceReservationService.tenantRespondToReschedule(reservationId, request)));
-    }
 }

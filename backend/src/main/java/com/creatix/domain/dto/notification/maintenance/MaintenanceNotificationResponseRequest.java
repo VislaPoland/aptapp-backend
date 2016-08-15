@@ -16,7 +16,7 @@ public class MaintenanceNotificationResponseRequest {
 
     @ApiModel
     public enum ResponseType {
-        Confirm, Reschedule
+        Confirm, Reject, Reschedule
     }
 
 

@@ -2,12 +2,11 @@ package com.creatix.service;
 
 import com.creatix.domain.SlotUtils;
 import com.creatix.domain.dao.*;
-import com.creatix.domain.dto.property.RespondToRescheduleRequest;
+import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;
 import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.MaintenanceSlot;
 import com.creatix.domain.entity.store.SlotUnit;
 import com.creatix.domain.entity.store.account.MaintenanceEmployee;
-import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
@@ -28,7 +27,9 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -106,44 +107,77 @@ public class MaintenanceReservationService {
         return reservation;
     }
 
+    @RoleSecured(AccountRole.Maintenance)
+    public MaintenanceNotification employeeRespondToMaintenanceNotification(@NotNull MaintenanceNotification notification, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
+        Objects.requireNonNull(notification, "Notification is null");
+        Objects.requireNonNull(response, "Notification response dto is null");
+
+        final List<MaintenanceReservation> reservations = notification.getReservations().stream()
+                .filter(r -> r.getStatus() == ReservationStatus.Pending).collect(Collectors.toList());
+        final long pendingCount = reservations.size();
+        if ( pendingCount == 0 ) {
+            throw new IllegalArgumentException("No pending reservations found for notification");
+        }
+        if ( pendingCount > 1 ) {
+            throw new IllegalStateException("Multiple pending reservations found for notification");
+        }
+
+        final MaintenanceReservation reservation = reservations.get(0);
+
+        if ( response.getResponse() == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
+            employeeConfirmReservation(reservation, response.getNote());
+        }
+        else if ( response.getResponse() == MaintenanceNotificationResponseRequest.ResponseType.Reschedule ) {
+            employeeRescheduleReservation(reservation, response.getSlotUnitId(), response.getNote());
+        }
+        else {
+            throw new IllegalArgumentException(String.format("Unsupported response type=%s", response.getResponse().name()));
+        }
+
+        return notification;
+    }
+
     @RoleSecured(AccountRole.Tenant)
-    public MaintenanceReservation tenantRespondToReschedule(@NotNull Long reservationId, @NotNull RespondToRescheduleRequest request) throws IOException, TemplateException {
-        Objects.requireNonNull(reservationId, "Reservation id is null");
-        Objects.requireNonNull(request, "Request si null");
+    public MaintenanceNotification tenantRespondToMaintenanceReschedule(@NotNull MaintenanceNotification notification, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
+        Objects.requireNonNull(notification, "Notification is null");
+        Objects.requireNonNull(response, "Notification response dto is null");
 
-        final MaintenanceReservation reservation = reservationDao.findById(reservationId);
-        if ( reservation == null ) {
-            throw new EntityNotFoundException(String.format("Maintenance reservation id=%d not found", reservationId));
+        final List<MaintenanceReservation> reservations = notification.getReservations().stream()
+                .filter(r -> r.getStatus() == ReservationStatus.Rescheduled).collect(Collectors.toList());
+        final long pendingCount = reservations.size();
+        if ( pendingCount == 0 ) {
+            throw new IllegalArgumentException("No rescheduled reservations found for notification");
         }
-        if ( reservation.getNotification() == null ) {
-            throw new IllegalArgumentException(String.format("Maintenance reservation id=%d has no notification assigned", reservationId));
-        }
-        if ( reservation.getStatus() != ReservationStatus.Rescheduled ) {
-            throw new IllegalArgumentException(String.format("Maintenance reservation id=%d is not in Rescheduled state", reservationId));
-        }
-        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), reservation.getNotification().getTargetApartment().getTenant())) ) {
-            throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservationId));
+        if ( pendingCount > 1 ) {
+            throw new IllegalStateException("Multiple rescheduled reservations found for notification");
         }
 
-        if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Confirm ) {
+        final MaintenanceReservation reservation = reservations.get(0);
+
+        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), notification.getTargetApartment().getTenant())) ) {
+            throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservation.getId()));
+        }
+
+
+        final MaintenanceNotificationResponseRequest.ResponseType responseType = response.getResponse();
+        if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
             reservation.setStatus(ReservationStatus.Confirmed);
             pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation), reservation.getEmployee());
         }
-        else if ( request.getResponseType() == RespondToRescheduleRequest.RescheduleResponseType.Reject ) {
+        else if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
             releaseReservedCapacity(reservation);
             pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation), reservation.getEmployee());
         }
         else {
-            throw new IllegalArgumentException("Unsupported response type: " + request.getResponseType());
+            throw new IllegalArgumentException("Unsupported response type: " + responseType);
         }
         reservationDao.persist(reservation);
 
-        final MaintenanceNotification notification = reservation.getNotification();
         notification.setStatus(NotificationStatus.Resolved);
         maintenanceNotificationDao.persist(notification);
 
-        return reservation;
+        return notification;
     }
 
     @RoleSecured(AccountRole.Maintenance)

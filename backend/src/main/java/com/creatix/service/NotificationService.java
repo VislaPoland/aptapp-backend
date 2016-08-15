@@ -20,6 +20,7 @@ import com.creatix.message.PushNotificationSender;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
+import com.creatix.security.RoleSecured;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -263,34 +264,19 @@ public class NotificationService {
         throw new SecurityException("You are not eligible to respond to security notifications from another property");
     }
 
+    @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant})
     public MaintenanceNotification respondToMaintenanceNotification(@NotNull Long notificationId, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
-        Objects.requireNonNull(notificationId, "Notification id is null");
-        Objects.requireNonNull(response, "Notification response dto is null");
-
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
-        final List<MaintenanceReservation> reservations = notification.getReservations().stream()
-                .filter(r -> r.getStatus() == ReservationStatus.Pending).collect(Collectors.toList());
-        final long pendingCount = reservations.size();
-        if ( pendingCount == 0 ) {
-            throw new IllegalArgumentException("No pending reservations found for notification");
-        }
-        if ( pendingCount > 1 ) {
-            throw new IllegalStateException("Multiple pending reservations found for notification");
-        }
 
-        final MaintenanceReservation reservation = reservations.get(0);
-
-        if ( response.getResponse() == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
-            maintenanceReservationService.employeeConfirmReservation(reservation, response.getNote());
+        if ( authorizationManager.hasAnyOfRoles(AccountRole.Maintenance) ) {
+            return maintenanceReservationService.employeeRespondToMaintenanceNotification(notification, response);
         }
-        else if ( response.getResponse() == MaintenanceNotificationResponseRequest.ResponseType.Reschedule ) {
-            maintenanceReservationService.employeeRescheduleReservation(reservation, response.getSlotUnitId(), response.getNote());
+        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant) ) {
+            return maintenanceReservationService.tenantRespondToMaintenanceReschedule(notification, response);
         }
         else {
-            throw new IllegalArgumentException(String.format("Unsupported response type=%s", response.getResponse().name()));
+            throw new IllegalStateException("Unsupported account role");
         }
-
-        return notification;
     }
 
     private Apartment getApartmentByUnitNumber(@NotNull String targetUnitNumber) {
