@@ -124,14 +124,15 @@ public class MaintenanceReservationService {
 
         final MaintenanceReservation reservation = reservations.get(0);
 
-        if ( response.getResponse() == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
+        final MaintenanceNotificationResponseRequest.ResponseType responseType = response.getResponse();
+        if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
             employeeConfirmReservation(reservation, response.getNote());
         }
-        else if ( response.getResponse() == MaintenanceNotificationResponseRequest.ResponseType.Reschedule ) {
+        else if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Reschedule ) {
             employeeRescheduleReservation(reservation, response.getSlotUnitId(), response.getNote());
         }
         else {
-            throw new IllegalArgumentException(String.format("Unsupported response type=%s", response.getResponse().name()));
+            throw new IllegalArgumentException("Unsupported response type: " + responseType);
         }
 
         return notification;

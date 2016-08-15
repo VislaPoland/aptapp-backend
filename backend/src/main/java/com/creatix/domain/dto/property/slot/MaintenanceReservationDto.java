@@ -17,8 +17,6 @@ import java.util.List;
 public class MaintenanceReservationDto {
     @ApiModelProperty(value = "Reservation ID", required = true)
     private long id;
-    @ApiModelProperty(value = "Account ID", required = true)
-    private Long accountId;
     @ApiModelProperty(value = "Property ID", required = true)
     private Long propertyId;
     @ApiModelProperty(value = "Reserved slot units", required = true)

@@ -169,7 +169,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Maintenance, AccountRole.Tenant})
-    public DataResponse<MaintenanceNotificationDto> respondToSecurityNotification(@PathVariable Long notificationId, @RequestBody @Valid MaintenanceNotificationResponseRequest request) throws IOException, TemplateException {
+    public DataResponse<MaintenanceNotificationDto> respondToMaintenanceNotification(@PathVariable Long notificationId, @RequestBody @Valid MaintenanceNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.respondToMaintenanceNotification(notificationId, request)));
     }
 
