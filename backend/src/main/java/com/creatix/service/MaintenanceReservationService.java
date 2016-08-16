@@ -144,13 +144,13 @@ public class MaintenanceReservationService {
         Objects.requireNonNull(response, "Notification response dto is null");
 
         final List<MaintenanceReservation> reservations = notification.getReservations().stream()
-                .filter(r -> r.getStatus() == ReservationStatus.Rescheduled).collect(Collectors.toList());
+                .filter(r -> r.getStatus() == ReservationStatus.Pending).collect(Collectors.toList());
         final long pendingCount = reservations.size();
         if ( pendingCount == 0 ) {
-            throw new IllegalArgumentException("No rescheduled reservations found for notification");
+            throw new IllegalArgumentException("No pending reservations found for notification");
         }
         if ( pendingCount > 1 ) {
-            throw new IllegalStateException("Multiple rescheduled reservations found for notification");
+            throw new IllegalStateException("Multiple pending reservations found for notification");
         }
 
         final MaintenanceReservation reservation = reservations.get(0);
