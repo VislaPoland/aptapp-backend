@@ -210,6 +210,7 @@ public class NotificationService {
         final Tenant tenant = notification.getTargetApartment().getTenant();
         if ( tenant != null ) {
             if ( authorizationManager.isSelf(tenant) ) {
+                notification.setStatus(NotificationStatus.Resolved);
                 notification.setResponse(request.getResponse());
                 neighborhoodNotificationDao.persist(notification);
 
