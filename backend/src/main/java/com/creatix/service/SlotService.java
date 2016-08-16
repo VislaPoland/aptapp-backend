@@ -185,8 +185,8 @@ public class SlotService {
     }
 
     private Slot createMaintenanceSlotFromSchedule(@NotNull LocalDate date, @NotNull MaintenanceSlotSchedule schedule) {
-        Objects.requireNonNull(date);
-        Objects.requireNonNull(schedule);
+        Objects.requireNonNull(date, "Date is null");
+        Objects.requireNonNull(schedule, "Schedule is null");
 
 
         final OffsetDateTime beginDt = date.atTime(schedule.getBeginTime()).atOffset(schedule.getZoneOffset(date.atTime(schedule.getBeginTime())));
@@ -214,6 +214,8 @@ public class SlotService {
             slot.addUnit(unit);
         }
 
+        schedule.addSlot(slot);
+
         return slot;
     }
 
@@ -225,12 +227,18 @@ public class SlotService {
         return maintenanceSlotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public MaintenanceSlotSchedule createSchedule(long propertyId, PersistMaintenanceSlotScheduleRequest request) throws SecurityException {
         final Property property = propertyDao.findById(propertyId);
         if ( authorizationManager.isManager(property) || authorizationManager.isOwner(property) ) {
 
-            final MaintenanceSlotSchedule schedule = property.getSchedule() != null ? property.getSchedule() : new MaintenanceSlotSchedule();
+            final boolean releasePreviousSchedule = (property.getSchedule() != null);
+
+            if ( releasePreviousSchedule ) {
+                releaseScheduleSlots(property.getSchedule());
+            }
+
+            final MaintenanceSlotSchedule schedule = releasePreviousSchedule ? property.getSchedule() : new MaintenanceSlotSchedule();
             schedule.setBeginTime(request.getBeginTime());
             schedule.setEndTime(request.getEndTime());
             schedule.setDaysOfWeek(request.getDaysOfWeek());
@@ -249,6 +257,11 @@ public class SlotService {
         else {
             throw new SecurityException("Not allowed to modify property schedule");
         }
+    }
+
+    private void releaseScheduleSlots(MaintenanceSlotSchedule schedule) {
+        final ArrayList<MaintenanceSlot> slots = new ArrayList<>(schedule.getSlots());
+        slots.forEach(this::releaseSlot);
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
@@ -316,11 +329,28 @@ public class SlotService {
     @Scheduled(cron = "0 10 */6 * * *") // every 6 hours, 10 minutes past full hour
     public void cleanupOldSlots() {
         final List<MaintenanceSlot> oldSlots = maintenanceSlotDao.findByEndTimeBefore(OffsetDateTime.now().minusWeeks(1));
-        oldSlots.forEach(slot -> {
-            if ( slot.getReservations().isEmpty() ) {
+        oldSlots.forEach(this::releaseSlot);
+    }
+
+    private void releaseSlot(@NotNull MaintenanceSlot slot) {
+        Objects.requireNonNull(slot, "Slot is null");
+
+        if ( slot.getUnits() != null ) {
+            final ArrayList<SlotUnit> slotUnits = new ArrayList<>(slot.getUnits());
+            slotUnits.forEach(u -> {
+                if ( (u.getReservations() == null) || u.getReservations().isEmpty() ) {
+                    slot.removeUnit(u);
+                    slotUnitDao.delete(u);
+                }
+            });
+            if ( slot.getUnits().isEmpty() ) {
+                final MaintenanceSlotSchedule schedule = slot.getSchedule();
+                if ( schedule != null ) {
+                    schedule.removeSlot(slot);
+                }
                 slotDao.delete(slot);
             }
-        });
+        }
     }
 
 }

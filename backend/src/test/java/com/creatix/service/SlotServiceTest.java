@@ -8,6 +8,7 @@ import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleReques
 import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
 import com.creatix.domain.dto.property.slot.SlotDto;
 import com.creatix.domain.entity.store.EventSlot;
+import com.creatix.domain.entity.store.MaintenanceSlot;
 import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
 import com.creatix.domain.entity.store.Slot;
 import com.creatix.domain.enums.AudienceType;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -119,6 +121,45 @@ public class SlotServiceTest {
 
             assertEquals(slots1.size(), slots2.size());
         }
+    }
+
+    @Test
+    @WithMockCustomUser("mark.building@apartments.com")
+    public void rescheduleSlots() throws Exception {
+
+        final PersistMaintenanceSlotScheduleRequest request = new PersistMaintenanceSlotScheduleRequest();
+        request.setBeginTime(LocalTime.of(10, 0, 0));
+        request.setEndTime(LocalTime.of(18, 0, 0));
+        request.setDaysOfWeek(EnumSet.allOf(DayOfWeek.class));
+        request.setInitialCapacity(1);
+        request.setUnitDurationMinutes(60);
+
+        final MaintenanceSlotSchedule schedule1 = slotService.createSchedule(1L, request);
+        assertNotNull(schedule1);
+        assertEquals((Long) 1L, schedule1.getProperty().getId());
+        assertEquals(request.getBeginTime(), schedule1.getBeginTime());
+        assertEquals(request.getEndTime(), schedule1.getEndTime());
+        assertTrue(schedule1.getDaysOfWeek().containsAll(request.getDaysOfWeek()));
+        assertFalse(schedule1.getSlots().isEmpty());
+
+        final Set<MaintenanceSlot> slots1 = schedule1.getSlots();
+        slots1.forEach(slot -> assertEquals(request.getBeginTime(), slot.getBeginTime().toLocalTime()));
+
+
+
+
+        request.setBeginTime(LocalTime.of(9, 0, 0));
+        final MaintenanceSlotSchedule schedule2 = slotService.createSchedule(1L, request);
+        assertEquals(schedule1.getId(), schedule2.getId());
+        assertNotNull(schedule2);
+        assertEquals((Long) 1L, schedule2.getProperty().getId());
+        assertEquals(request.getBeginTime(), schedule2.getBeginTime());
+        assertEquals(request.getEndTime(), schedule2.getEndTime());
+        assertTrue(schedule2.getDaysOfWeek().containsAll(request.getDaysOfWeek()));
+        assertFalse(schedule2.getSlots().isEmpty());
+
+        final Set<MaintenanceSlot> slots2 = schedule1.getSlots();
+        slots2.forEach(slot -> assertEquals(request.getBeginTime(), slot.getBeginTime().toLocalTime()));
     }
 
 }

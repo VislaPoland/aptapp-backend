@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -39,7 +40,8 @@ public class MaintenanceSlotSchedule {
     @Column(nullable = false)
     private String timeZone;
 
-    public void addSlot(MaintenanceSlot slot) {
+    public void addSlot(@NotNull MaintenanceSlot slot) {
+        Objects.requireNonNull(slot, "Slot is null");
         if ( slots == null ) {
             slots = new HashSet<>();
         }
@@ -47,10 +49,23 @@ public class MaintenanceSlotSchedule {
         slots.add(slot);
     }
 
+    public boolean removeSlot(@NotNull MaintenanceSlot slot) {
+        Objects.requireNonNull(slot, "Slot is null");
+
+        boolean removed = false;
+        if ( Objects.equals(this, slot.getSchedule()) && (getSlots() != null) ) {
+            removed = getSlots().remove(slot);
+            if ( removed ) {
+                slot.setSchedule(null);
+            }
+        }
+        return removed;
+    }
+
     @PreRemove
     private void preRemove() {
         if ( slots != null ) {
-            slots.stream().forEach(s -> s.setSchedule(null));
+            slots.forEach(s -> s.setSchedule(null));
         }
     }
 

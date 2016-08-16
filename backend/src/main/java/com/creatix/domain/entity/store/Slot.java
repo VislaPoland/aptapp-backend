@@ -51,7 +51,9 @@ public abstract class Slot {
     @OrderBy("offset ASC")
     private Set<SlotUnit> units;
 
-    public void addUnit(SlotUnit unit) {
+    public void addUnit(@NotNull SlotUnit unit) {
+        Objects.requireNonNull(unit, "Unit is null");
+
         if ( unit.getSlot() == null ) {
             unit.setSlot(this);
         }
@@ -63,5 +65,18 @@ public abstract class Slot {
         }
 
         units.add(unit);
+    }
+
+    public boolean removeUnit(@NotNull SlotUnit unit) {
+        Objects.requireNonNull(unit, "Unit is null");
+
+        boolean removed = false;
+        if ( Objects.equals(this, unit.getSlot()) && (getUnits() != null) ) {
+            removed = getUnits().remove(unit);
+            if ( removed ) {
+                unit.setSlot(null);
+            }
+        }
+        return removed;
     }
 }

@@ -17,10 +17,4 @@ public class MaintenanceSlotScheduleDao extends DaoBase<MaintenanceSlotSchedule,
         return queryFactory.selectFrom(maintenanceSlotSchedule).fetch();
     }
 
-    public List<MaintenanceSlotSchedule> findByProperty(Property property) {
-        return queryFactory.selectFrom(maintenanceSlotSchedule)
-                .where(maintenanceSlotSchedule.property.eq(property))
-                .fetch();
-    }
-
 }
