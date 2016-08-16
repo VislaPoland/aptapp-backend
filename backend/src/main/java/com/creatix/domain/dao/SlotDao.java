@@ -4,6 +4,7 @@ import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.QMaintenanceNotification;
 import com.creatix.domain.enums.AudienceType;
+import com.creatix.domain.enums.ReservationStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.stereotype.Repository;
@@ -83,8 +84,8 @@ public class SlotDao extends DaoBase<Slot, Long> {
         env.predicate = env.slot.property.eq(property);
 
         if ( (account instanceof MaintenanceEmployee) || (account instanceof PropertyManager) || (account instanceof AssistantPropertyManager) ) {
-            // all maintenance notifications or events
-            env.predicate = env.predicate.and(env.reservations.isNotNull().or(env.slot.instanceOf(EventSlot.class)));
+            // all reservations in state pending or state confirmed or events
+            env.predicate = env.predicate.and(env.reservations.status.in(ReservationStatus.Pending, ReservationStatus.Confirmed).or(env.slot.instanceOf(EventSlot.class)));
         }
         else if ( account instanceof SecurityEmployee ) {
             // filter: self created maintenance notification or events
