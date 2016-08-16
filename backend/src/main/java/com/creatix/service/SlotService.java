@@ -3,13 +3,12 @@ package com.creatix.service;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.SlotUtils;
 import com.creatix.domain.dao.*;
-import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
-import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
-import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
+import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.AudienceType;
+import com.creatix.domain.enums.ReservationStatus;
 import com.creatix.message.PushNotificationSender;
 import com.creatix.message.template.push.EventNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
@@ -26,6 +25,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.*;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,6 +88,7 @@ public class SlotService {
             result.setSlots(slots.stream()
                     .limit(pageSize)
                     .map(s -> mapper.toSlotDto(s))
+                    .map(keepOnlyPendingAndConfirmedReservations())
                     .collect(Collectors.toList()));
             if ( slots.size() > pageSize ) {
                 result.setNextId(slots.get(pageSize).getId());
@@ -96,10 +97,26 @@ public class SlotService {
         else {
             result.setSlots(slots.stream()
                     .map(s -> mapper.toSlotDto(s))
+                    .map(keepOnlyPendingAndConfirmedReservations())
                     .collect(Collectors.toList()));
         }
 
         return result;
+    }
+
+    private Function<SlotDto, SlotDto> keepOnlyPendingAndConfirmedReservations() {
+        return s -> {
+            if ( s instanceof MaintenanceSlotDto ) {
+                MaintenanceSlotDto ms = (MaintenanceSlotDto) s;
+                if ( ms.getReservations() != null ) {
+                    ms.setReservations(ms.getReservations().stream()
+                            .filter(r -> EnumSet.of(ReservationStatus.Pending, ReservationStatus.Confirmed).contains(r.getStatus()))
+                            .collect(Collectors.toList()));
+                }
+            }
+
+            return s;
+        };
     }
 
     public EventSlot createEventSlot(@NotNull Long propertyId, @NotNull PersistEventSlotRequest request) throws IOException, TemplateException {
@@ -127,7 +144,7 @@ public class SlotService {
         else if ( slot.getAudience() == AudienceType.Tenants ) {
             recipients = accountService.getAccounts(new AccountRole[]{AccountRole.Tenant, AccountRole.SubTenant}, propertyId);
         }
-        else if ( slot.getAudience() == AudienceType.Everyone )  {
+        else if ( slot.getAudience() == AudienceType.Everyone ) {
             recipients = accountService.getAccounts(AccountRole.values(), propertyId);
         }
         else {
