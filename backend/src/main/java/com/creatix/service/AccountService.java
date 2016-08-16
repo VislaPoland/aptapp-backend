@@ -306,6 +306,7 @@ public class AccountService {
         account.setActive(true);
         account.setCreatedAt(new Date());
         accountDao.persist(account);
+        setActionToken(account);
 
         emailMessageSender.send(new AdministratorActivationMessageTemplate(account, applicationProperties));
 
