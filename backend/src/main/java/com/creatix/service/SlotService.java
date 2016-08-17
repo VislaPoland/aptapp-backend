@@ -344,11 +344,20 @@ public class SlotService {
                 }
             });
             if ( slot.getUnits().isEmpty() ) {
+                // remove empty slot
                 final MaintenanceSlotSchedule schedule = slot.getSchedule();
                 if ( schedule != null ) {
                     schedule.removeSlot(slot);
                 }
                 slotDao.delete(slot);
+            }
+            else {
+                // dissociate slot with schedule
+                final MaintenanceSlotSchedule schedule = slot.getSchedule();
+                if ( schedule != null ) {
+                    schedule.removeSlot(slot);
+                    slotDao.persist(slot);
+                }
             }
         }
     }
