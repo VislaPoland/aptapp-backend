@@ -9,7 +9,9 @@ import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(indexes = {
@@ -29,4 +31,14 @@ public class MaintenanceNotification extends Notification {
     private Boolean accessIfNotAtHome;
     @OneToMany(mappedBy = "notification")
     private List<MaintenanceReservation> reservations;
+
+    public void addReservation(@NotNull MaintenanceReservation reservation) {
+        Objects.requireNonNull(reservation, "Reservation is null");
+        if ( reservations == null ) {
+            reservations = new ArrayList<>();
+        }
+
+        reservation.setNotification(this);
+        reservations.add(reservation);
+    }
 }

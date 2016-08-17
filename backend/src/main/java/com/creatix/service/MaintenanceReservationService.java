@@ -87,6 +87,8 @@ public class MaintenanceReservationService {
         reserveCapacity(reservation);
         reservationDao.persist(reservation);
 
+        maintenanceNotification.addReservation(reservation);
+
         return reservation;
     }
 
