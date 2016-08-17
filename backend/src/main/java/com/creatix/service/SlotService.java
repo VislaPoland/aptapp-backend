@@ -307,7 +307,7 @@ public class SlotService {
         for ( DayOfWeek dayOfWeek : schedule.getDaysOfWeek() ) {
             LocalDate d = LocalDate.now().with(dayOfWeek);
 
-            for ( LocalDate dStop = d.plusMonths(2); d.isBefore(dStop); d = d.plusWeeks(1) ) {
+            for ( LocalDate dStop = d.plusMonths(4); d.isBefore(dStop); d = d.plusWeeks(1) ) {
                 if ( d.isBefore(LocalDate.now()) ) {
                     continue;
                 }
