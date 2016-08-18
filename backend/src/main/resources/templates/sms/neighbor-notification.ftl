@@ -1,1 +1,1 @@
-Apt. - You have received a message from a neighbor. Please open your Apt.App to view details. Deactivate messaging in Apt.App settings. Please do not reply.
+Notification from an Apt. App neighbor received - open app for details. If you would like to deactivate SMS, see Apt. App settings. Please do not reply.
