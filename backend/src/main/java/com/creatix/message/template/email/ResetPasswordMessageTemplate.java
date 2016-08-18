@@ -22,7 +22,7 @@ public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
 
     @Override
     public String getSubject() {
-        return "Apt. Password Reset Request";
+        return "Apt. App Password Reset Request";
     }
 
     @Override
