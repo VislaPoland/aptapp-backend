@@ -101,7 +101,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
 
 
         // allow to see only appropriate events (filter by audience)
-        if ( account instanceof EmployeeBase ) {
+        if ( account instanceof ManagedEmployee ) {
             env.predicate = env.predicate.and(env.slot.instanceOf(MaintenanceSlot.class)
                     .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
                     .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Employees)));
