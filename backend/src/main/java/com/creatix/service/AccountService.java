@@ -1,12 +1,14 @@
 package com.creatix.service;
 
 import com.creatix.configuration.ApplicationProperties;
+import com.creatix.configuration.DeviceProperties;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.*;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
+import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.EmailMessageSender;
 import com.creatix.message.MessageDeliveryException;
@@ -32,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +46,8 @@ import java.util.Objects;
 @Transactional
 public class AccountService {
 
+    @Autowired
+    private DeviceDao deviceDao;
     @Autowired
     private AccountDao accountDao;
     @Autowired
@@ -75,6 +80,10 @@ public class AccountService {
     private SecurityEmployeeDao securityEmployeeDao;
     @Autowired
     private MaintenanceEmployeeDao maintenanceEmployeeDao;
+    @Autowired
+    private HttpSession httpSession;
+    @Autowired
+    private DeviceProperties deviceProperties;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -556,6 +565,16 @@ public class AccountService {
         setActionToken(account);
         accountDao.persist(account);
         emailMessageSender.send(new ResetPasswordMessageTemplate(account, applicationProperties));
+    }
+
+    @RoleSecured
+    public void logout() {
+        Object deviceObject = httpSession.getAttribute(this.deviceProperties.getSessionKeyDevice());
+        if ( deviceObject instanceof Device ) {
+            final Device device = deviceDao.findById(((Device) deviceObject).getId());
+            device.setDeletedAt(new Date());
+            deviceDao.persist(device);
+        }
     }
 
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})

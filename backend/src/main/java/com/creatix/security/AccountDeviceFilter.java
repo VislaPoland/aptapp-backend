@@ -47,7 +47,7 @@ public class AccountDeviceFilter extends GenericFilterBean {
                 throw new SecurityException("Device identifier is required for all requests.");
             }
 
-            final Device device = accountDeviceService.getOrCreateDevice(deviceUDID, platformType);
+            final Device device = accountDeviceService.retrieveDevice(deviceUDID, platformType);
             this.httpSession.setAttribute(this.deviceProperties.getSessionKeyDevice(), device);
         }
 

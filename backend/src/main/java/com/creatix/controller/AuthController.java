@@ -1,9 +1,8 @@
 package com.creatix.controller;
 
-import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.*;
 import com.creatix.domain.entity.store.account.Account;
-import com.creatix.security.AuthorizationManager;
+import com.creatix.security.RoleSecured;
 import com.creatix.service.AccountService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
@@ -51,5 +50,18 @@ public class AuthController {
     public DataResponse<LoginResponse> signIn(@RequestBody @Valid LoginRequest loginRequest) {
         accountService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         return new DataResponse<>(accountService.createLoginResponse(loginRequest.getEmail()));
+    }
+
+    @ApiOperation(value = "Logout")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized")
+    })
+    @JsonView(Views.Public.class)
+    @RoleSecured
+    @RequestMapping(value = "/attempt", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<Void> logout() {
+        accountService.logout();
+        return new DataResponse<>();
     }
 }

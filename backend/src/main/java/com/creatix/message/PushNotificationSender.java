@@ -70,7 +70,7 @@ public class PushNotificationSender {
 
         if ( recipient.getDevices() != null ) {
             for ( Device toDevice : recipient.getDevices() ) {
-                if ( StringUtils.isNotBlank(toDevice.getPushToken()) ) {
+                if ( !(toDevice.isDeleted()) && StringUtils.isNotBlank(toDevice.getPushToken()) ) {
                     switch ( toDevice.getPlatform() ) {
                         case iOS: {
                             this.sendAPNS(notification, toDevice);

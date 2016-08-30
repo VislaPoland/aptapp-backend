@@ -33,17 +33,21 @@ public class AccountDeviceService {
     @Autowired
     private HttpSession httpSession;
 
-    public Device getOrCreateDevice(@NotNull String deviceUDID, @NotNull PlatformType platformType) {
-        Objects.requireNonNull(deviceUDID);
-        Objects.requireNonNull(platformType);
+    @NotNull
+    public Device retrieveDevice(@NotNull String deviceUDID, @NotNull PlatformType platformType) {
+        Objects.requireNonNull(deviceUDID, "Device UDID is null");
+        Objects.requireNonNull(platformType, "Platform type is null");
 
         Device device = deviceDao.findByUDID(deviceUDID);
         if (device == null) {
             device = new Device();
             device.setUdid(deviceUDID);
             device.setPlatform(platformType);
-            deviceDao.persist(device);
         }
+        // clear delete date
+        device.setDeletedAt(null);
+        deviceDao.persist(device);
+
         if ( this.authorizationManager.hasCurrentAccount() ) {
             final Account account = this.getAccount(this.authorizationManager.getCurrentAccount().getId());
             if (device.getAccount() == null || (device.getAccount() != null && device.getAccount().getId().equals(account.getId()))) {
