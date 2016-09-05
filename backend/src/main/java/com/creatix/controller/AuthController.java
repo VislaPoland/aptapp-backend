@@ -59,7 +59,7 @@ public class AuthController {
     })
     @JsonView(Views.Public.class)
     @RoleSecured
-    @RequestMapping(value = "/attempt", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<Void> logout() {
         accountService.logout();
         return new DataResponse<>();
