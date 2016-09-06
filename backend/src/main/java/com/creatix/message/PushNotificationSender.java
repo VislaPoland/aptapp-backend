@@ -127,7 +127,7 @@ public class PushNotificationSender {
             messageBuilder.addData("title", notification.getTitle());
         }
         if ( notification.getMessage() != null ) {
-            messageBuilder.addData("body", notification.getMessage());
+            messageBuilder.addData("message", notification.getMessage());
         }
         if ( notification.getAttributes() != null ) {
             notification.getAttributes().forEach(a -> messageBuilder.addData(a.getName(), a.getValue()));
