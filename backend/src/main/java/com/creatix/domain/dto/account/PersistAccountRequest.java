@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -41,5 +42,7 @@ public class PersistAccountRequest {
     @ApiModelProperty(value = "Secondary phone number")
     private String secondaryPhone;
 
-
+    public void setPrimaryEmail(String primaryEmail) {
+        this.primaryEmail = StringUtils.lowerCase(primaryEmail);
+    }
 }
