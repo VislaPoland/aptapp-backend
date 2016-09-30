@@ -80,7 +80,7 @@ public class AuthorizationManager {
         return getCurrentProperty(account);
     }
 
-    public static Property getCurrentProperty(Account account) throws SecurityException {
+    public Property getCurrentProperty(Account account) throws SecurityException {
         assert account != null;
 
         switch ( account.getRole() ) {
@@ -239,7 +239,7 @@ public class AuthorizationManager {
             }
         }
         else if ( account instanceof EmployeeBase ) {
-            final Property property = AuthorizationManager.getCurrentProperty(account);
+            final Property property = getCurrentProperty(account);
             return Objects.equals(property, reservation.getSlot().getProperty());
         }
 
@@ -302,5 +302,31 @@ public class AuthorizationManager {
                 AccountRole.PropertyManager,
                 AccountRole.Security,
                 AccountRole.Maintenance);
+    }
+
+    public boolean canResetActivationCode(@NotNull Account account) {
+        Objects.requireNonNull(account, "Account is null");
+
+        final Property property = getCurrentProperty(account);
+
+        switch ( getCurrentAccount().getRole() ) {
+            case Administrator:
+                return true;
+            case PropertyOwner:
+                return isOwner(property);
+            case PropertyManager:
+            case AssistantPropertyManager:
+                return isManager(property);
+            default:
+                return false;
+        }
+    }
+
+    public void checkResetActivationCode(@NotNull Account account) {
+        Objects.requireNonNull(account, "Account is null");
+
+        if ( !(canResetActivationCode(account)) ) {
+            throw new SecurityException(String.format("You are not allowed to reset user=%s activation code", account.getPrimaryEmail()));
+        }
     }
 }

@@ -10,6 +10,7 @@ import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,8 @@ import java.util.List;
 @Transactional
 public class NotificationDao extends AbstractNotificationDao<Notification> {
 
+    @Autowired
+    private AuthorizationManager authorizationManager;
 
     public List<Notification> findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
             @NotNull NotificationRequestType requestType,
@@ -81,7 +84,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             predicate = predicate.and(qNotification.instanceOf(NeighborhoodNotification.class));
         }
 
-        predicate = predicate.and(qNotification.property.eq(AuthorizationManager.getCurrentProperty(account)));
+        predicate = predicate.and(qNotification.property.eq(authorizationManager.getCurrentProperty(account)));
 
         return queryFactory.selectFrom(qNotification)
                 .where(predicate)

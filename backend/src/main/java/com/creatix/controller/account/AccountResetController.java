@@ -43,8 +43,8 @@ public class AccountResetController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     @RequestMapping(value = "/reset/code", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<String> resetCode(@RequestBody @Valid ResetCodeRequest request) {
-        return new DataResponse<>(accountService.resetCodeFromRequest(request));
+    public DataResponse<String> resetCode(@RequestBody @Valid ResetCodeRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        return new DataResponse<>(accountService.resetActivationCode(request));
     }
 
     @ApiOperation(value = "Request for password reset")

@@ -12,10 +12,7 @@ import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.EmailMessageSender;
 import com.creatix.message.MessageDeliveryException;
-import com.creatix.message.template.email.AdministratorActivationMessageTemplate;
-import com.creatix.message.template.email.EmployeeActivationMessageTemplate;
-import com.creatix.message.template.email.PropertyOwnerActivationMessageTemplate;
-import com.creatix.message.template.email.ResetPasswordMessageTemplate;
+import com.creatix.message.template.email.*;
 import com.creatix.security.*;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -102,32 +99,28 @@ public class AccountService {
         accountDao.persist(account);
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
-    public String resetCodeFromRequest(@NotNull ResetCodeRequest request) {
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public String resetActivationCode(@NotNull ResetCodeRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Objects.requireNonNull(request);
 
         final Long accountId = request.getAccountId();
         final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
-        if ( isEligibleToResetCode(authorizationManager.getCurrentAccount(), account) ) {
-            setActionToken(account);
-            return account.getActionToken();
-        }
-        throw new SecurityException(String.format("You are not eligible to reset user=%d activation code", accountId));
+
+        return resetActivationCode(request.getAccountId());
     }
 
-    private boolean isEligibleToResetCode(Account principal, Account target) {
-        final Property targetProperty = AuthorizationManager.getCurrentProperty(target);
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public String resetActivationCode(@NotNull Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        Objects.requireNonNull(accountId, "Account ID is null");
 
-        switch ( principal.getRole() ) {
-            case Administrator:
-                return true;
-            case PropertyOwner:
-                return ((PropertyOwner) principal).getOwnedProperties().contains(targetProperty);
-            case PropertyManager:
-                return targetProperty.equals(AuthorizationManager.getCurrentProperty(principal));
-            default:
-                return false;
-        }
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        authorizationManager.checkResetActivationCode(account);
+
+        setActionToken(account);
+
+        emailMessageSender.send(new ResetActivationMessageTemplate(account, applicationProperties));
+
+        return account.getActionToken();
     }
 
     public LoginResponse createLoginResponse(String email) {

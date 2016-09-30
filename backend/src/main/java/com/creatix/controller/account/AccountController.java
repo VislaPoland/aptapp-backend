@@ -299,4 +299,16 @@ public class AccountController {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateAssistantPropertyManager(accountId, request)));
     }
 
+    @ApiOperation(value = "Reset authentication code")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.Public.class)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    @RequestMapping(value = "/{accountId}/reset/code", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<String> resetCode(@PathVariable Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        return new DataResponse<>(accountService.resetActivationCode(accountId));
+    }
 }
