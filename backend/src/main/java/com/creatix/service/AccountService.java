@@ -116,6 +116,10 @@ public class AccountService {
         final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
         authorizationManager.checkResetActivationCode(account);
 
+        if ( account.getActive() == Boolean.TRUE ) {
+            throw new IllegalArgumentException(String.format("Account id=%d is already activated", accountId));
+        }
+
         setActionToken(account);
 
         emailMessageSender.send(new ResetActivationMessageTemplate(account, applicationProperties));
