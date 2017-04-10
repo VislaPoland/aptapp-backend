@@ -373,6 +373,7 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(Vehicle.class, VehicleDto.class)
+                .exclude("licensePlate")
                 .byDefault()
                 .register();
 
