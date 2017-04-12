@@ -11,6 +11,7 @@ import javax.persistence.*;
 /**
  * Created by kvimbi on 11/04/2017.
  */
+@Entity
 @EqualsAndHashCode(of = "id")
 @ToString(of = {"id", "applicationFeatureType", "apartment", "enabled"})
 @Data
@@ -29,6 +30,6 @@ public class ApplicationFeature {
     private boolean enabled;
 
     @ManyToOne
-    private Apartment apartment;
+    private Property property;
 
 }

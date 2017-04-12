@@ -107,7 +107,7 @@ public class FeatureAccessDecisionVoter implements AccessDecisionVoter<Object> {
 
         ApplicationFeature feature = applicationFeatureDao.findByFeatureTypeAndApartment(
                 annotation.feature(),
-                properties.iterator().next().getId()
+                properties.iterator().next()
         );
 
         if (!feature.isEnabled()) {
