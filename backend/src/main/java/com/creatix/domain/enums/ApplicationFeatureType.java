@@ -5,6 +5,6 @@ package com.creatix.domain.enums;
  */
 public enum ApplicationFeatureType {
 
-    NONE, NEIGHBORS, SECURITY, MAINTENANCE
+    NONE, NEIGHBORHOOD, SECURITY, MAINTENANCE
 
 }

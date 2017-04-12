@@ -5,6 +5,7 @@ import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
 import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.ApplicationFeatureType;
 import com.creatix.domain.mapper.PropertyMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.SlotService;
@@ -38,7 +39,7 @@ public class MaintenanceScheduleController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured(value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.PropertyOwner}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceSlotScheduleDto> createPropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid PersistMaintenanceSlotScheduleRequest request) {
         return new DataResponse<>(propertyMapper.toMaintenanceSlotScheduleDto(slotService.createSchedule(propertyId, request)));
     }
@@ -53,7 +54,7 @@ public class MaintenanceScheduleController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured(value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.PropertyOwner}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceSlotScheduleDto> updatePropertySchedule(@PathVariable Long propertyId, @RequestBody @Valid PersistMaintenanceSlotScheduleRequest request) {
         return new DataResponse<>(propertyMapper.toMaintenanceSlotScheduleDto(slotService.createSchedule(propertyId, request)));
     }
