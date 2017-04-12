@@ -11,19 +11,22 @@ import javax.persistence.*;
 /**
  * Created by kvimbi on 11/04/2017.
  */
+@Table(uniqueConstraints =
+    @UniqueConstraint(columnNames = {"property_id", "applicationFeatureType"})
+)
 @Entity
 @EqualsAndHashCode(of = "id")
-@ToString(of = {"id", "applicationFeatureType", "apartment", "enabled"})
+@ToString(of = {"id", "applicationFeatureType", "property", "enabled"})
 @Data
 @Accessors(chain = true)
 public class ApplicationFeature {
 
     @Id
-    @Enumerated(EnumType.STRING)
     @GeneratedValue
     private Long id;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private ApplicationFeatureType applicationFeatureType;
 
     @Column
