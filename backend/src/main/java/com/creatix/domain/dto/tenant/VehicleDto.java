@@ -7,14 +7,11 @@ import lombok.EqualsAndHashCode;
 
 @ApiModel
 @Data
-@EqualsAndHashCode(of = {"id", "licensePlate"})
+@EqualsAndHashCode(of = {"id"})
 public class VehicleDto {
 
     @ApiModelProperty(value = "Vehicle ID")
     private Long id;
-
-    @ApiModelProperty(value = "License plate number")
-    private String licensePlate;
 
     @ApiModelProperty(value = "Vehicle manufacturer")
     private String make;
