@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by kvimbi on 13/04/2017.
+ * Created by Tomas Michalek on 13/04/2017.
  */
 @RestController
 @RequestMapping(path = "/api/businessCategories")

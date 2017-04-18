@@ -53,6 +53,12 @@ public class DiscountCouponController {
         return new HttpEntity<>(businessMapper.toDiscountCoupon(discountCouponService.getById(couponId)));
     }
 
+    @RequestMapping(path = "/{couponId}/sendNotification", method = RequestMethod.GET)
+    @RoleSecured
+    public void sendNotification(@PathVariable("couponId") @NotNull Long couponId) {
+        discountCouponService.sendNotification(couponId);
+    }
+
     @RequestMapping(path = "/{couponId}/qr", method = RequestMethod.GET)
     @RoleSecured
     public HttpEntity<byte[]> getCouponQRCode(@PathVariable("couponId") @NotNull Long couponId) {

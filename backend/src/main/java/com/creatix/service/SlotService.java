@@ -9,7 +9,7 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.AudienceType;
 import com.creatix.domain.enums.ReservationStatus;
-import com.creatix.message.PushNotificationSender;
+import com.creatix.service.message.PushNotificationService;
 import com.creatix.message.template.push.EventNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
@@ -53,7 +53,7 @@ public class SlotService {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private PushNotificationSender pushNotificationSender;
+    private PushNotificationService pushNotificationService;
 
     public ScheduledSlotsResponse getSlotsByFilter(@NotNull Long propertyId, LocalDate beginDate, LocalDate endDate, Long startId, Integer pageSize) {
         Objects.requireNonNull(propertyId, "Property id is required");
@@ -152,7 +152,7 @@ public class SlotService {
         }
 
         for ( Account recipient : recipients ) {
-            pushNotificationSender.sendNotification(new EventNotificationTemplate(slot), recipient);
+            pushNotificationService.sendNotification(new EventNotificationTemplate(slot), recipient);
         }
 
         return slot;

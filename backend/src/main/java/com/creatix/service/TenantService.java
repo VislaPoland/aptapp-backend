@@ -12,13 +12,12 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
-import com.creatix.message.EmailMessageSender;
+import com.creatix.service.message.EmailMessageService;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.template.email.TenantActivationMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import freemarker.template.TemplateException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +27,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -55,7 +53,7 @@ public class TenantService {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private EmailMessageSender emailMessageSender;
+    private EmailMessageService emailMessageService;
     @Autowired
     private ApplicationProperties applicationProperties;
 
@@ -109,7 +107,7 @@ public class TenantService {
 
         accountService.setActionToken(tenant);
 
-        emailMessageSender.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
+        emailMessageService.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
 
         return tenant;
     }

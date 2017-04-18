@@ -4,7 +4,6 @@ import com.creatix.domain.dao.business.BusinessProfileDao;
 import com.creatix.domain.dao.business.DiscountCouponDao;
 import com.creatix.domain.dao.business.DiscountCouponUsageDao;
 import com.creatix.domain.dto.business.DiscountCouponDto;
-import com.creatix.domain.entity.store.business.BusinessCategory;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
 import com.creatix.domain.entity.store.business.DiscountCouponUsage;
@@ -18,9 +17,8 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import lombok.experimental.Accessors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import javax.persistence.EntityNotFoundException;
@@ -36,7 +34,7 @@ import java.util.Objects;
 /**
  * Created by Tomas Michalek on 12/04/2017.
  */
-@Component
+@Service
 public class DiscountCouponService {
 
 
@@ -52,10 +50,18 @@ public class DiscountCouponService {
     private BusinessProfileDao businessProfileDao;
     @Autowired
     private BusinessMapper businessMapper;
+    @Autowired
+    private BusinessNotificationExecutor businessNotificationExecutor;
 
-
+    /**
+     * Finds discount coupon by id, or throws {@link EntityNotFoundException} if not found
+     *
+     * @param discountCouponId
+     * @return
+     */
+    @NotNull
     public DiscountCoupon getById(long discountCouponId) {
-        return discountCouponDao.findById(discountCouponId);
+        return findCouponById(discountCouponId);
     }
 
     @NotNull
@@ -88,11 +94,7 @@ public class DiscountCouponService {
         Objects.requireNonNull(discountCouponDto);
         Objects.requireNonNull(discountCouponDto.getId());
 
-        DiscountCoupon storedCoupon = discountCouponDao.findById(discountCouponDto.getId());
-
-        if (null == storedCoupon) {
-            throw new EntityNotFoundException(String.format("Discount coupon %d not found", discountCouponDto.getId()));
-        }
+        DiscountCoupon storedCoupon = findCouponById(discountCouponDto.getId());
 
         if (authorizationManager.canWrite(storedCoupon.getBusinessProfile().getProperty())) {
             businessMapper.map(discountCouponDto, storedCoupon);
@@ -114,12 +116,10 @@ public class DiscountCouponService {
      * @param discountCouponId to lookup
      * @return discount coupon with decremented uses left
      */
+    @NotNull
+    @RoleSecured({AccountRole.Tenant, AccountRole.SubTenant})
     public DiscountCouponDto useDiscountCoupon(long discountCouponId) {
-        DiscountCoupon discountCoupon = getById(discountCouponId);
-
-        if (null == discountCoupon) {
-            throw new EntityNotFoundException(String.format("Coupon with id %d not found", discountCouponId));
-        }
+        DiscountCoupon discountCoupon = findCouponById(discountCouponId);
 
         authorizationManager.checkRead(discountCoupon.getBusinessProfile().getProperty());
 
@@ -149,6 +149,37 @@ public class DiscountCouponService {
 
         return businessMapper.toDiscountCoupon(couponUsage);
     }
+
+
+    /**
+     * Sends push notification about discount coupon to all tenants accommodated in property of the business
+     * discount coupon belongs to
+     *
+     * @param discountCouponId
+     */
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public void sendNotification(long discountCouponId) {
+        final DiscountCoupon discountCoupon = findCouponById(discountCouponId);
+        businessNotificationExecutor.sendNotification(discountCoupon);
+    }
+
+    /**
+     * Returns {@link DiscountCoupon} or throws {@link EntityNotFoundException} if not found
+     *
+     * @param discountCouponId
+     * @return discount coupon
+     * @throws EntityNotFoundException if not found
+     */
+    private DiscountCoupon findCouponById(long discountCouponId) throws EntityNotFoundException {
+        DiscountCoupon discountCoupon = discountCouponDao.findById(discountCouponId);
+
+        if (null == discountCoupon) {
+            throw new EntityNotFoundException(String.format("Coupon with id %d not found", discountCouponId));
+        }
+
+        return discountCoupon;
+    }
+
 
     public byte[] getCouponQR(long discountCouponId) {
         DiscountCoupon coupon = getById(discountCouponId);

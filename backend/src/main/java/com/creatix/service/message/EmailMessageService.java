@@ -1,6 +1,8 @@
-package com.creatix.message;
+package com.creatix.service.message;
 
 import com.creatix.configuration.MailProperties;
+import com.creatix.message.EmailTemplateProcessor;
+import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.template.email.EmailMessageTemplate;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,7 @@ import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 
 @Component
-public class EmailMessageSender {
+public class EmailMessageService {
 
     @Autowired
     private MailProperties mailProperties;

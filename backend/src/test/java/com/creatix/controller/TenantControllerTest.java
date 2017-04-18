@@ -57,7 +57,6 @@ public class TenantControllerTest {
 
         VehicleDto vehicleDto = new VehicleDto();
         vehicleDto.setColor("red");
-        vehicleDto.setLicensePlate("XY345GE");
         vehicleDto.setMake("Toyota");
         vehicleDto.setModel("Camry");
         vehicleDto.setYear(2016);

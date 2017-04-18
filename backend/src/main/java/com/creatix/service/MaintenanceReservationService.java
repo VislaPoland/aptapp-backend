@@ -11,7 +11,7 @@ import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.ReservationStatus;
-import com.creatix.message.PushNotificationSender;
+import com.creatix.service.message.PushNotificationService;
 import com.creatix.message.template.push.MaintenanceConfirmTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleConfirmTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleRejectTemplate;
@@ -46,7 +46,7 @@ public class MaintenanceReservationService {
     @Autowired
     private SlotUnitDao slotUnitDao;
     @Autowired
-    private PushNotificationSender pushNotificationSender;
+    private PushNotificationService pushNotificationService;
     @Autowired
     private MaintenanceNotificationDao maintenanceNotificationDao;
 
@@ -165,12 +165,12 @@ public class MaintenanceReservationService {
         final MaintenanceNotificationResponseRequest.ResponseType responseType = response.getResponse();
         if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
             reservation.setStatus(ReservationStatus.Confirmed);
-            pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation), reservation.getEmployee());
+            pushNotificationService.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation), reservation.getEmployee());
         }
         else if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
             releaseReservedCapacity(reservation);
-            pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation), reservation.getEmployee());
+            pushNotificationService.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation), reservation.getEmployee());
         }
         else {
             throw new IllegalArgumentException("Unsupported response type: " + responseType);
@@ -204,7 +204,7 @@ public class MaintenanceReservationService {
         final MaintenanceNotification notification = reservation.getNotification();
         notification.setStatus(NotificationStatus.Resolved);
         maintenanceNotificationDao.persist(notification);
-        pushNotificationSender.sendNotification(new MaintenanceConfirmTemplate(reservation), notification.getAuthor());
+        pushNotificationService.sendNotification(new MaintenanceConfirmTemplate(reservation), notification.getAuthor());
 
         return reservation;
     }
@@ -259,7 +259,7 @@ public class MaintenanceReservationService {
 
         notification.getReservations().add(reservationNew);
 
-        pushNotificationSender.sendNotification(new MaintenanceRescheduleTemplate(reservationOld, reservationNew), notification.getAuthor());
+        pushNotificationService.sendNotification(new MaintenanceRescheduleTemplate(reservationOld, reservationNew), notification.getAuthor());
 
         return reservationNew;
     }

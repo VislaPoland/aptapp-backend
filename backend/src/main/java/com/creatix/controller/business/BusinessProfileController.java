@@ -99,7 +99,7 @@ public class BusinessProfileController {
     public DataResponse<BusinessProfileDto> getBusinessProfile(@PathVariable("businessProfileId") Long businessProfileId) {
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(
-                        businessProfileService.getBusinessProfile(businessProfileId)
+                        businessProfileService.getById(businessProfileId)
                 )
         );
     }
@@ -154,6 +154,19 @@ public class BusinessProfileController {
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(businessProfileService.updateBusinessProfileFromRequest(request))
         );
+    }
+
+    @ApiOperation(value = "Sends push notification about new business profile")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/{businessProfileId}/sendNotification", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public void notify(@PathVariable("businessProfileId") Long businessProfileId) {
+        businessProfileService.sendNotification(businessProfileId);
     }
 
 

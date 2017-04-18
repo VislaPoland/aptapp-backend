@@ -13,7 +13,7 @@ import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * Created by Tomas Michalek on 12/04/2017.
  */
-@Component
+@Service
 public class BusinessProfileService {
 
     @Autowired
@@ -36,13 +36,11 @@ public class BusinessProfileService {
     private AuthorizationManager authorizationManager;
     @Autowired
     private BusinessMapper businessMapper;
+    @Autowired
+    private BusinessNotificationExecutor businessNotificationExecutor;
 
     public List<BusinessProfile> listBusinessProfilesForProperty(long propertyId) {
-        Property property = propertyDao.findById(propertyId);
-
-        if (null == property) {
-            throw new EntityNotFoundException(String.format("Property %d not found", propertyId));
-        }
+        Property property = findPropertyById(propertyId);
 
         authorizationManager.checkRead(property);
 
@@ -50,11 +48,7 @@ public class BusinessProfileService {
     }
 
     public List<BusinessProfile> listBusinessesForPropertyAndCategory(long propertyId, long businessCategoryId) {
-        Property property = propertyDao.findById(propertyId);
-
-        if (null == property) {
-            throw new EntityNotFoundException(String.format("Property %d not found", propertyId));
-        }
+        Property property = findPropertyById(propertyId);
 
         authorizationManager.checkRead(property);
 
@@ -69,11 +63,7 @@ public class BusinessProfileService {
     public List<BusinessProfile> searchBusinesses(long propertyId, @NotNull String name, long businessCategoryId) {
         Objects.requireNonNull(name);
 
-        Property property = propertyDao.findById(propertyId);
-
-        if (null == property) {
-            throw new EntityNotFoundException(String.format("Property %d not found", propertyId));
-        }
+        Property property = findPropertyById(propertyId);
 
         authorizationManager.checkRead(property);
 
@@ -82,8 +72,15 @@ public class BusinessProfileService {
         return businessProfileDao.searchBusinesses(property, name, category);
     }
 
-    public BusinessProfile getBusinessProfile(long businessProfileId) {
-        BusinessProfile profile = businessProfileDao.findById(businessProfileId);
+    /**
+     * Finds business profile by id, or throws {@link EntityNotFoundException} if not found
+     *
+     * @param businessProfileId
+     * @return
+     */
+    @NotNull
+    public BusinessProfile getById(long businessProfileId) {
+        BusinessProfile profile = findBusinessProfileById(businessProfileId);
         authorizationManager.checkRead(profile.getProperty());
         return profile;
     }
@@ -94,11 +91,7 @@ public class BusinessProfileService {
     public BusinessProfile createBusinessProfileFromRequest(@NotNull BusinessProfileDto businessProfileDto, long propertyId) {
         Objects.requireNonNull(businessProfileDto, "Business profile must not be null");
 
-        Property property = propertyDao.findById(propertyId);
-
-        if (null == property) {
-            throw new EntityNotFoundException(String.format("Property %d not found", propertyId));
-        }
+        Property property = findPropertyById(propertyId);
 
         if (authorizationManager.canWrite(property)) {
             BusinessProfile businessProfile = businessMapper.toBusinessProfile(businessProfileDto);
@@ -116,10 +109,7 @@ public class BusinessProfileService {
     public BusinessProfile updateBusinessProfileFromRequest(@NotNull BusinessProfileDto businessProfileDto) {
         Objects.requireNonNull(businessProfileDto, "Business profile must not be null");
 
-        BusinessProfile storedProfile = businessProfileDao.findById(businessProfileDto.getId());
-        if (null == storedProfile) {
-            throw new EntityNotFoundException(String.format("Business profile %d not found", businessProfileDto.getId()));
-        }
+        BusinessProfile storedProfile = findBusinessProfileById(businessProfileDto.getId());
 
         if (authorizationManager.canWrite(storedProfile.getProperty())) {
             businessMapper.map(businessProfileDto, storedProfile);
@@ -153,6 +143,7 @@ public class BusinessProfileService {
         }
     }
 
+    @NotNull
     @RoleSecured(AccountRole.Administrator)
     public BusinessCategory deleteBusinessCategory(long businessCategoryId) {
         BusinessCategory category = businessCategoryDao.findById(businessCategoryId);
@@ -164,16 +155,41 @@ public class BusinessProfileService {
         return category;
     }
 
+    @NotNull
     public List<DiscountCoupon> listBusinessDiscountCoupons(long businessProfileId) {
+        BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
+
+        authorizationManager.checkRead(businessProfile.getProperty());
+
+        return businessProfile.getDiscountCouponList();
+    }
+
+
+
+
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public void sendNotification(long businessProfileId) {
+        final BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
+        businessNotificationExecutor.sendNotification(businessProfile);
+    }
+
+
+    private BusinessProfile findBusinessProfileById(long businessProfileId) {
         BusinessProfile businessProfile = businessProfileDao.findById(businessProfileId);
 
         if (null == businessProfile) {
             throw new EntityNotFoundException(String.format("Business profile %d not found", businessProfileId));
         }
+        return businessProfile;
+    }
 
-        authorizationManager.checkRead(businessProfile.getProperty());
+    private Property findPropertyById(long propertyId) {
+        Property property = propertyDao.findById(propertyId);
 
-        return businessProfile.getDiscountCouponList();
+        if (null == property) {
+            throw new EntityNotFoundException(String.format("Property %d not found", propertyId));
+        }
+        return property;
     }
 
 }

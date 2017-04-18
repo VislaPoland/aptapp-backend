@@ -7,7 +7,6 @@ import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationRe
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
-import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.MaintenanceEmployee;
@@ -16,7 +15,7 @@ import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
-import com.creatix.message.PushNotificationSender;
+import com.creatix.service.message.PushNotificationService;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
@@ -36,10 +35,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -64,7 +61,7 @@ public class NotificationService {
     @Autowired
     private SmsMessageSender smsMessageSender;
     @Autowired
-    private PushNotificationSender pushNotificationSender;
+    private PushNotificationService pushNotificationService;
     @Autowired
     private SecurityEmployeeDao securityEmployeeDao;
     @Autowired
@@ -148,7 +145,7 @@ public class NotificationService {
         securityNotificationDao.persist(notification);
 
         for ( SecurityEmployee secEmp : securityEmployeeDao.findByProperty(notification.getProperty()) ) {
-            pushNotificationSender.sendNotification(new SecurityNotificationTemplate(notification), secEmp);
+            pushNotificationService.sendNotification(new SecurityNotificationTemplate(notification), secEmp);
         }
 
         return notification;
@@ -169,7 +166,7 @@ public class NotificationService {
         maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
 
         for ( MaintenanceEmployee employee : maintenanceEmployeeDao.findByProperty(notification.getProperty()) ) {
-            pushNotificationSender.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
+            pushNotificationService.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
         }
 
         return notification;
@@ -195,7 +192,7 @@ public class NotificationService {
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
             }
-            pushNotificationSender.sendNotification(new NeighborNotificationTemplate(notification), tenant);
+            pushNotificationService.sendNotification(new NeighborNotificationTemplate(notification), tenant);
         }
 
         return notification;
@@ -215,10 +212,10 @@ public class NotificationService {
                 neighborhoodNotificationDao.persist(notification);
 
                 if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
-                    pushNotificationSender.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
+                    pushNotificationService.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
                 }
                 else if ( request.getResponse() == NeighborhoodNotificationResponse.SorryNotMe ) {
-                    pushNotificationSender.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
+                    pushNotificationService.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
                 }
 
                 return notification;
@@ -242,20 +239,20 @@ public class NotificationService {
                 final Account account = notification.getAuthor();
 
                 if ( account.getRole() == AccountRole.Tenant ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), account);
+                    pushNotificationService.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), account);
                 }
                 else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), account);
+                    pushNotificationService.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), account);
                 }
             }
             else if ( request.getResponse() == SecurityNotificationResponseType.Resolved ) {
                 final Account account = notification.getAuthor();
 
                 if ( account.getRole() == AccountRole.Tenant ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), account);
+                    pushNotificationService.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), account);
                 }
                 else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), account);
+                    pushNotificationService.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), account);
                 }
             }
 

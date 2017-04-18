@@ -3,7 +3,7 @@ package com.creatix.domain.dto.business;
 import lombok.Data;
 
 /**
- * Created by kvimbi on 13/04/2017.
+ * Created by Tomas Michalek on 13/04/2017.
  */
 @Data
 public class BusinessContactDto {

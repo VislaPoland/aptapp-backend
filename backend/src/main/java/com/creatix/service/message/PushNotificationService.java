@@ -1,8 +1,10 @@
-package com.creatix.message;
+package com.creatix.service.message;
 
 import com.creatix.configuration.PushNotificationProperties;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.device.Device;
+import com.creatix.message.push.GenericPushNotification;
+import com.creatix.message.PushNotificationTemplateProcessor;
 import com.creatix.message.template.push.PushMessageTemplate;
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Sender;
@@ -18,15 +20,12 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 @Transactional
-public class PushNotificationSender {
+public class PushNotificationService {
 
     @Autowired
     private PushNotificationProperties pushNotificationProperties;
@@ -59,12 +58,12 @@ public class PushNotificationSender {
     }
 
     public void sendNotification(@NotNull PushMessageTemplate template, @NotNull Account recipient) throws IOException, TemplateException {
-        final PushNotification notification = new PushNotification();
+        final GenericPushNotification notification = new GenericPushNotification();
         notification.setMessage(templateProcessor.processTemplate(template));
         sendNotification(notification, recipient);
     }
 
-    public void sendNotification(@NotNull PushNotification notification, @NotNull Account recipient) throws IOException {
+    public void sendNotification(@NotNull GenericPushNotification notification, @NotNull Account recipient) throws IOException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(recipient, "Recipient is null");
 
@@ -86,7 +85,7 @@ public class PushNotificationSender {
         }
     }
 
-    private ApnsNotification sendAPNS(@NotNull PushNotification notification, @NotNull Device device) {
+    private ApnsNotification sendAPNS(@NotNull GenericPushNotification notification, @NotNull Device device) {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(device, "Device is null");
 
@@ -111,7 +110,7 @@ public class PushNotificationSender {
         return this.apnsService.push(device.getPushToken(), payloadBuilder.build());
     }
 
-    private void sendGCM(@NotNull PushNotification notification, @NotNull Device device) throws IOException {
+    private void sendGCM(@NotNull GenericPushNotification notification, @NotNull Device device) throws IOException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(device, "Device is null");
 
@@ -130,19 +129,19 @@ public class PushNotificationSender {
             messageBuilder.addData("message", notification.getMessage());
         }
         if ( notification.getAttributes() != null ) {
-            notification.getAttributes().forEach(a -> messageBuilder.addData(a.getName(), a.getValue()));
+            notification.getAttributes().entrySet().forEach(a -> messageBuilder.addData(a.getKey(), a.getValue()));
         }
 
         final Message message = messageBuilder.build();
         this.gcmSender.send(message, device.getPushToken(), 1);
     }
 
-    private Map<String, String> attributesAsMap(List<PushNotification.Attribute> attributes) {
+    private Map<String, String> attributesAsMap(Map<String, String> attributes) {
         if ( attributes == null ) {
             return Collections.emptyMap();
         }
         else {
-            return attributes.stream().collect(Collectors.toMap(PushNotification.Attribute::getName, PushNotification.Attribute::getValue));
+            return attributes.entrySet().stream().collect(Collectors.toMap(HashMap.Entry::getKey, HashMap.Entry::getValue));
         }
     }
 }

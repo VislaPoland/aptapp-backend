@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
- * Created by kvimbi on 13/04/2017.
+ * Created by Tomas Michalek on 13/04/2017.
  */
 @Component
 public class BusinessMapper extends ConfigurableMapper {

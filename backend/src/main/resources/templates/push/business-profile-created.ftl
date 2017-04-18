@@ -1,0 +1,1 @@
+${businessName} has just opened near you. Check it out!
