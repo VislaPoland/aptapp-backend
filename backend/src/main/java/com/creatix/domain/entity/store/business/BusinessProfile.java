@@ -3,6 +3,7 @@ package com.creatix.domain.entity.store.business;
 import com.creatix.domain.entity.store.Property;
 import lombok.Data;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.util.List;
 
@@ -17,8 +18,17 @@ public class BusinessProfile {
     @GeneratedValue
     private Long id;
 
-    @Column(length = 120)
+    @Column(length = 120, nullable = false)
     private String name;
+
+    @Column
+    private Long lat;
+
+    @Column
+    private Long lng;
+
+    @Column(nullable = false)
+    private boolean isImageUploaded = false;
 
     @OneToMany
     List<BusinessCategory> businessCategoryList;
@@ -26,10 +36,10 @@ public class BusinessProfile {
     @OneToOne
     private BusinessContact contact;
 
-    @Column(length = 120)
+    @Column(length = 120, nullable = false)
     private String description;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Property property;
 
     @OneToMany

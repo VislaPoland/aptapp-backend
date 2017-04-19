@@ -19,11 +19,11 @@ public class DiscountCoupon {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private BusinessProfile businessProfile;
 
     @Column(nullable = false)
-    private boolean active = false;
+    private boolean enabled = false;
 
     @Column(nullable = false)
     private int availableUses = 0;

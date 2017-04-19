@@ -26,7 +26,14 @@ public class BusinessMapper extends ConfigurableMapper {
         super.configure(factory);
 
         factory.classMap(BusinessProfile.class, BusinessProfileDto.class)
+                .exclude("hasImage")
                 .byDefault()
+                .customize(new CustomMapper<BusinessProfile, BusinessProfileDto>() {
+                    @Override
+                    public void mapAtoB(BusinessProfile businessProfile, BusinessProfileDto businessProfileDto, MappingContext context) {
+                        businessProfileDto.setImageUploaded(businessProfile.isImageUploaded());
+                    }
+                })
                 .register();
         factory.classMap(BusinessCategory.class, BusinessCategoryDto.class)
                 .byDefault()

@@ -18,7 +18,7 @@ public class BusinessCategory {
     @GeneratedValue
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
 }

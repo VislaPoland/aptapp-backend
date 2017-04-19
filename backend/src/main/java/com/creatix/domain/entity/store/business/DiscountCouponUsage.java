@@ -28,17 +28,17 @@ public class DiscountCouponUsage {
             this.discountCoupon = discountCoupon;
         }
 
-        @OneToOne
+        @OneToOne(optional = false)
         private Account account;
 
-        @OneToOne
+        @OneToOne(optional = false)
         private DiscountCoupon discountCoupon;
     }
 
     @EmbeddedId
     IdKey id;
 
-    @Column
+    @Column(nullable = false)
     private int usesLeft;
 
 }
