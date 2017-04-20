@@ -7,16 +7,21 @@ import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.business.BusinessCategory;
 import com.creatix.domain.entity.store.business.BusinessProfile;
+import com.creatix.domain.entity.store.business.BusinessProfileCarteItem;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
+import com.creatix.domain.entity.store.photo.BusinessProfilePhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.StoredFilesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -164,13 +169,14 @@ public class BusinessProfileService {
         return businessProfile.getDiscountCouponList();
     }
 
-
-
-
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public void sendNotification(long businessProfileId) {
         final BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
         businessNotificationExecutor.sendNotification(businessProfile);
+    }
+
+    public List<BusinessProfileCarteItem> listCarte(Long businessProfileId) {
+        return findBusinessProfileById(businessProfileId).getBusinessProfileCarte();
     }
 
 
@@ -192,4 +198,23 @@ public class BusinessProfileService {
         return property;
     }
 
+    @Autowired
+    private StoredFilesService storedFilesService;
+
+    public BusinessProfile storeBusinessProfilePhotos(MultipartFile[] files, long businessProfileId) {
+        final BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
+        List<BusinessProfilePhoto> photoStoreList;
+        try {
+            photoStoreList = storedFilesService.storePhotos(files, foreignKeyObject -> {
+                BusinessProfilePhoto businessProfilePhoto = new BusinessProfilePhoto();
+                businessProfilePhoto.setBusinessProfile(businessProfile);
+                return businessProfilePhoto;
+            }, businessProfile, BusinessProfilePhoto.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Unable to store photo for business profile", e);
+        }
+        businessProfile.getBusinessProfilePhotoList().addAll(photoStoreList);
+
+        return businessProfile;
+    }
 }

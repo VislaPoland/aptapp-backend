@@ -1,6 +1,5 @@
 package com.creatix.service;
 
-import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;
@@ -12,28 +11,27 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.MaintenanceEmployee;
 import com.creatix.domain.entity.store.account.SecurityEmployee;
 import com.creatix.domain.entity.store.account.Tenant;
-import com.creatix.domain.entity.store.notification.*;
+import com.creatix.domain.entity.store.notification.MaintenanceNotification;
+import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
+import com.creatix.domain.entity.store.notification.Notification;
+import com.creatix.domain.entity.store.notification.SecurityNotification;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
-import com.creatix.service.message.PushNotificationService;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.message.PushNotificationService;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -54,10 +52,6 @@ public class NotificationService {
     private ApartmentDao apartmentDao;
     @Autowired
     private AuthorizationManager authorizationManager;
-    @Autowired
-    private FileUploadProperties uploadProperties;
-    @Autowired
-    private NotificationPhotoDao notificationPhotoDao;
     @Autowired
     private SmsMessageSender smsMessageSender;
     @Autowired
@@ -287,41 +281,4 @@ public class NotificationService {
         return apartment;
     }
 
-    public Notification storeNotificationPhotos(@NotNull MultipartFile[] files, long notificationId) throws IOException {
-        Objects.requireNonNull(files, "Files array is null");
-
-        final Notification notification = notificationDao.findById(notificationId);
-        if ( notification == null ) {
-            throw new EntityNotFoundException(String.format("Notification id=%d not found", notificationId));
-        }
-
-        for ( MultipartFile file : files ) {
-
-            // move uploaded file to file repository
-            final String fileName = String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename());
-            final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), fileName);
-            Files.createDirectories(photoFilePath.getParent());
-            file.transferTo(photoFilePath.toFile());
-
-            final NotificationPhoto photo = new NotificationPhoto();
-            photo.setNotification(notification);
-            photo.setFileName(fileName);
-            photo.setFilePath(photoFilePath.toString());
-            notificationPhotoDao.persist(photo);
-
-            notification.getPhotos().add(photo);
-        }
-
-        return notification;
-    }
-
-    public NotificationPhoto getNotificationPhoto(Long notificationId, String fileName) {
-
-        final NotificationPhoto photo = notificationPhotoDao.findByNotificationIdAndFileName(notificationId, fileName);
-        if ( photo == null ) {
-            throw new EntityNotFoundException(String.format("Photo id=%s not found", fileName));
-        }
-
-        return photo;
-    }
 }

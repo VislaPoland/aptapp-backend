@@ -1,9 +1,9 @@
 package com.creatix.domain.entity.store.business;
 
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.photo.BusinessProfilePhoto;
 import lombok.Data;
 
-import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.util.List;
 
@@ -27,11 +27,14 @@ public class BusinessProfile {
     @Column
     private Long lng;
 
-    @Column(nullable = false)
-    private boolean isImageUploaded = false;
+    @OneToMany
+    private List<BusinessCategory> businessCategoryList;
 
     @OneToMany
-    List<BusinessCategory> businessCategoryList;
+    private List<BusinessProfilePhoto> businessProfilePhotoList;
+
+    @Column
+    private Long defaultPhotoId;
 
     @OneToOne
     private BusinessContact contact;
@@ -44,5 +47,8 @@ public class BusinessProfile {
 
     @OneToMany
     List<DiscountCoupon> discountCouponList;
+
+    @OneToMany
+    List<BusinessProfileCarteItem> businessProfileCarte;
 
 }

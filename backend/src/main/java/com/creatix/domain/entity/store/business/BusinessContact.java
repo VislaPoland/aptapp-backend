@@ -2,14 +2,15 @@ package com.creatix.domain.entity.store.business;
 
 import com.creatix.domain.entity.store.Contact;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 /**
  * Created by Tomas Michalek on 12/04/2017.
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 public class BusinessContact extends Contact {

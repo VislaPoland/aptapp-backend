@@ -24,7 +24,11 @@ public class BusinessProfileDto {
     @ApiModelProperty(value = "Whether has business profile image uploaded or not", readOnly = true)
     private boolean isImageUploaded;
     @ApiModelProperty("List of categories business is included in")
-    List<BusinessCategoryDto> businessCategoryList;
+    private List<BusinessCategoryDto> businessCategoryList;
+    @ApiModelProperty("List of photos for business profile")
+    private List<BusinessProfilePhotoDto> businessProfilePhotoList;
+    @ApiModelProperty("Id of photo set as default image")
+    private Long defaultPhotoId;
     @ApiModelProperty("Contact information")
     private BusinessContactDto contact;
     @ApiModelProperty(value = "Description", required = true)
