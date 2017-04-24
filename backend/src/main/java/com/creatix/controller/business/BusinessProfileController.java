@@ -5,7 +5,6 @@ import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.business.BusinessProfileCarteItemDto;
 import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.dto.business.BusinessSearchRequest;
-import com.creatix.domain.dto.business.DiscountCouponDto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.RoleSecured;
@@ -110,25 +109,6 @@ public class BusinessProfileController {
         );
     }
 
-    @ApiOperation(value = "List business discount coupons")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(path = "/{businessProfileId}/discountCoupons", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
-    public DataResponse<List<DiscountCouponDto>> listDiscountCoupons(@PathVariable("businessProfileId") Long businessProfileId) {
-        return new DataResponse<>(
-                businessProfileService.listBusinessDiscountCoupons(businessProfileId)
-                        .stream()
-                        .map(dc -> businessMapper.toDiscountCoupon(dc))
-                        .collect(Collectors.toList())
-        );
-    }
-
-
     @ApiOperation(value = "Creates business profile")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -201,7 +181,7 @@ public class BusinessProfileController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<BusinessProfileDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long businessProfileId) throws IOException {
+    public DataResponse<BusinessProfileDto> storeBusinessProfilePhotos(@RequestParam MultipartFile[] files, @PathVariable long businessProfileId) throws IOException {
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(businessProfileService.storeBusinessProfilePhotos(files, businessProfileId))
         );

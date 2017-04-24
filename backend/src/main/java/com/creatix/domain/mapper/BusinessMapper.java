@@ -94,6 +94,10 @@ public class BusinessMapper extends ConfigurableMapper {
 
     @NotNull
     private String getCartPhotoUrl(@NotNull BusinessProfileCarteItem businessProfileCarteItem) throws MalformedURLException {
+        if (businessProfileCarteItem.getBusinessProfileCartePhoto() == null) {
+            return null;
+        }
+
         return applicationProperties.buildBackendUrl(
                 String.format(
                         "api/photos/%d/%s",
@@ -152,6 +156,11 @@ public class BusinessMapper extends ConfigurableMapper {
     public BusinessProfileCarteItemDto toBusinessProfileCarteItem(@NotNull BusinessProfileCarteItem businessProfileCarteItem) {
         Objects.requireNonNull(businessProfileCarteItem);
         return this.map(businessProfileCarteItem, BusinessProfileCarteItemDto.class);
+    }
+
+    public BusinessProfileCarteItem toBusinessProfileCarteItem(@NotNull BusinessProfileCarteItemDto businessProfileCarteItemDto) {
+        Objects.requireNonNull(businessProfileCarteItemDto);
+        return this.map(businessProfileCarteItemDto, BusinessProfileCarteItem.class);
     }
 
 }

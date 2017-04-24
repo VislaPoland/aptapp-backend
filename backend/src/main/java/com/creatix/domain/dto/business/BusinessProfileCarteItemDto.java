@@ -22,16 +22,7 @@ public class BusinessProfileCarteItemDto {
     @ApiModelProperty(required = true)
     private double price;
 
-    @ApiModelProperty
-    BusinessProfileCartePhoto businessProfileCartePhoto;
-
-    @ApiModelProperty(required = true)
-    BusinessProfile businessProfile;
-
-    @ApiModelProperty(value = "Photo file name", required = true)
-    private String fileName;
-
-    @ApiModelProperty(value = "Photo URL", required = true)
+    @ApiModelProperty(value = "Photo URL", required = false)
     private String fileUrl;
 
 }

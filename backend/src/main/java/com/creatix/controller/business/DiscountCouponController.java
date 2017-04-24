@@ -1,16 +1,25 @@
 package com.creatix.controller.business;
 
+import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.business.DiscountCouponDto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.business.BusinessProfileService;
 import com.creatix.service.business.DiscountCouponService;
+import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 12/04/2017.
@@ -23,7 +32,27 @@ public class DiscountCouponController {
     private DiscountCouponService discountCouponService;
     @Autowired
     private BusinessMapper businessMapper;
+    @Autowired
+    private BusinessProfileService businessProfileService;
 
+
+    @ApiOperation(value = "List business discount coupons")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<List<DiscountCouponDto>> listDiscountCoupons(@PathVariable("businessProfileId") Long businessProfileId) {
+        return new DataResponse<>(
+                businessProfileService.listBusinessDiscountCoupons(businessProfileId)
+                        .stream()
+                        .map(dc -> businessMapper.toDiscountCoupon(dc))
+                        .collect(Collectors.toList())
+        );
+    }
 
     @RequestMapping(path = "/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})

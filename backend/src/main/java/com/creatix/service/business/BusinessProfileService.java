@@ -43,6 +43,8 @@ public class BusinessProfileService {
     private BusinessMapper businessMapper;
     @Autowired
     private BusinessNotificationExecutor businessNotificationExecutor;
+    @Autowired
+    private StoredFilesService storedFilesService;
 
     public List<BusinessProfile> listBusinessProfilesForProperty(long propertyId) {
         Property property = findPropertyById(propertyId);
@@ -198,9 +200,6 @@ public class BusinessProfileService {
         return property;
     }
 
-    @Autowired
-    private StoredFilesService storedFilesService;
-
     public BusinessProfile storeBusinessProfilePhotos(MultipartFile[] files, long businessProfileId) {
         final BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
         List<BusinessProfilePhoto> photoStoreList;
@@ -214,6 +213,7 @@ public class BusinessProfileService {
             throw new IllegalArgumentException("Unable to store photo for business profile", e);
         }
         businessProfile.getBusinessProfilePhotoList().addAll(photoStoreList);
+        businessProfileDao.persist(businessProfile);
 
         return businessProfile;
     }
