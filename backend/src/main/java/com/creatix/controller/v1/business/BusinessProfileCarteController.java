@@ -1,5 +1,6 @@
-package com.creatix.controller.business;
+package com.creatix.controller.v1.business;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.business.BusinessProfileCarteItemDto;
@@ -23,7 +24,8 @@ import java.io.IOException;
  * Created by kvimbi on 20/04/2017.
  */
 @RestController
-@RequestMapping("/api/properties/{propertyId}/businesses/{businessProfileId}/carte")
+@RequestMapping(path = {"/api/properties/{propertyId}/businesses/{businessProfileId}/carte", "/api/v1/properties/{propertyId}/businesses/{businessProfileId}/carte"})
+@ApiVersion(1.0)
 public class BusinessProfileCarteController {
 
     @Autowired

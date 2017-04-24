@@ -1,5 +1,6 @@
-package com.creatix.controller;
+package com.creatix.controller.v1;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.security.RoleSecured;
@@ -20,7 +21,8 @@ import javax.validation.Valid;
 
 @RestController
 @Transactional
-@RequestMapping("/api/auth")
+@RequestMapping(path = {"/api/auth", "/api/v1/auth"})
+@ApiVersion(1.0)
 public class AuthController {
 
     @Autowired

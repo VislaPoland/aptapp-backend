@@ -1,5 +1,6 @@
-package com.creatix.controller;
+package com.creatix.controller.v1;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
@@ -21,7 +22,8 @@ import javax.validation.Valid;
 
 @RestController
 @Transactional
-@RequestMapping("/api/properties/{propertyId}/schedule")
+@RequestMapping(path = {"/api/properties/{propertyId}/schedule", "/api/v1/properties/{propertyId}/schedule"})
+@ApiVersion(1.0)
 public class MaintenanceScheduleController {
     @Autowired
     private SlotService slotService;

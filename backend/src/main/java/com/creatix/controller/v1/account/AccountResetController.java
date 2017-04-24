@@ -1,5 +1,6 @@
-package com.creatix.controller.account;
+package com.creatix.controller.v1.account;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.account.AskResetPasswordRequest;
@@ -28,7 +29,8 @@ import java.io.IOException;
 
 @RestController
 @Transactional
-@RequestMapping("/api/account")
+@RequestMapping(path = {"/api/account", "/api/v1/account"})
+@ApiVersion(1.0)
 public class AccountResetController {
 
     @Autowired

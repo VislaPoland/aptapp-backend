@@ -1,5 +1,6 @@
-package com.creatix.controller.business;
+package com.creatix.controller.v1.business;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.business.BusinessCategoryDto;
@@ -22,7 +23,8 @@ import java.util.stream.Collectors;
  * Created by Tomas Michalek on 13/04/2017.
  */
 @RestController
-@RequestMapping(path = "/api/businessCategories")
+@RequestMapping(path = {"/api/businessCategories", "/api/v1/businessCategories"})
+@ApiVersion(1.0)
 public class BusinessCategoryController {
 
 

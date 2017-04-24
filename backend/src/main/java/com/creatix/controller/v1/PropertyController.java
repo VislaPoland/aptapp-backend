@@ -1,5 +1,6 @@
-package com.creatix.controller;
+package com.creatix.controller.v1;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.DataResponse;
@@ -39,7 +40,8 @@ import java.util.stream.Collectors;
 
 @RestController
 @Transactional
-@RequestMapping("/api/properties")
+@RequestMapping(path = {"/api/properties", "/api/v1/properties"})
+@ApiVersion(minVersion = 1.0)
 public class PropertyController {
     @Autowired
     private Mapper mapper;

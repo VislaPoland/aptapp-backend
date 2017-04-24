@@ -1,6 +1,7 @@
-package com.creatix.controller.account.device;
+package com.creatix.controller.v1.account.device;
 
 import com.creatix.configuration.DeviceProperties;
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.account.device.AccountDeviceDto;
@@ -21,7 +22,8 @@ import javax.validation.Valid;
 
 @RestController
 @Transactional
-@RequestMapping("/api/users/{accountId}/devices")
+@RequestMapping(path = {"/api/users/{accountId}/devices", "/api/v1/users/{accountId}/devices"})
+@ApiVersion(1.0)
 public class AccountDeviceController {
 
     @Autowired

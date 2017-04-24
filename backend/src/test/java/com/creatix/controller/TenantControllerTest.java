@@ -2,6 +2,7 @@ package com.creatix.controller;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
+import com.creatix.controller.v1.TenantController;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;

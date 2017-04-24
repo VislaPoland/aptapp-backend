@@ -1,5 +1,6 @@
-package com.creatix.controller.business;
+package com.creatix.controller.v1.business;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.business.DiscountCouponDto;
@@ -25,7 +26,8 @@ import java.util.stream.Collectors;
  * Created by Tomas Michalek on 12/04/2017.
  */
 @RestController
-@RequestMapping("/api/properties/{propertyId}/businesses/{businessProfileId}/coupons")
+@RequestMapping(path = {"/api/properties/{propertyId}/businesses/{businessProfileId}/coupons", "/api/v1/properties/{propertyId}/businesses/{businessProfileId}/coupons"})
+@ApiVersion(1.0)
 public class DiscountCouponController {
 
     @Autowired

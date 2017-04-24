@@ -2,6 +2,7 @@ package com.creatix.controller;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
+import com.creatix.controller.v1.NotificationController;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;

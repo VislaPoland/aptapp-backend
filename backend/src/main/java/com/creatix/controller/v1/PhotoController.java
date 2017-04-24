@@ -1,5 +1,6 @@
-package com.creatix.controller;
+package com.creatix.controller.v1;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.Views;
 import com.creatix.service.StoredFilesService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -17,7 +18,8 @@ import java.io.IOException;
  * Created by kvimbi on 20/04/2017.
  */
 @RestController
-@RequestMapping("/api/photos")
+@RequestMapping(path = {"/api/photos", "/api/v1/photos"})
+@ApiVersion(1.0)
 public class PhotoController {
 
     @Autowired

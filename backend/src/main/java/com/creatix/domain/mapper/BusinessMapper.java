@@ -64,7 +64,6 @@ public class BusinessMapper extends ConfigurableMapper {
 
         factory.classMap(BusinessProfileCarteItem.class, BusinessProfileCarteItemDto.class)
                 .byDefault()
-                .fieldAToB("businessProfileCartePhoto.fileName", "fileName")
                 .customize(new CustomMapper<BusinessProfileCarteItem, BusinessProfileCarteItemDto>() {
                     @Override
                     public void mapAtoB(BusinessProfileCarteItem businessProfileCarteItem, BusinessProfileCarteItemDto businessProfileCarteItemDto, MappingContext context) {

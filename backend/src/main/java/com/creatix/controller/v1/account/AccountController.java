@@ -1,5 +1,6 @@
-package com.creatix.controller.account;
+package com.creatix.controller.v1.account;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
@@ -28,7 +29,8 @@ import java.util.stream.Collectors;
 
 @RestController
 @Transactional
-@RequestMapping("/api/users")
+@RequestMapping(path = {"/api/users", "/api/v1/users"})
+@ApiVersion(1.0)
 public class AccountController {
 
     @Autowired

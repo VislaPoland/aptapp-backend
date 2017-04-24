@@ -1,5 +1,6 @@
-package com.creatix.controller;
+package com.creatix.controller.v1;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Transactional
-@RequestMapping(value = "/api/apartments/{apartmentId}/tenants")
+@RequestMapping(path = {"/api/apartments/{apartmentId}/tenants", "/api/v1/apartments/{apartmentId}/tenants"})
+@ApiVersion(1.0)
 public class ApartmentTenantController {
 
     @Autowired
