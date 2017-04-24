@@ -12,7 +12,7 @@ import lombok.Setter;
 public class BasicAccountDto {
 
     @ApiModelProperty(required = true)
-    private String id;
+    private Long id;
     @ApiModelProperty(required = true)
     private AccountRole role;
     @ApiModelProperty(required = true)
@@ -25,17 +25,8 @@ public class BasicAccountDto {
     private String primaryPhone;
     @ApiModelProperty
     private String companyName;
-    @ApiModelProperty
-    private Boolean deleted;
-
 
     @Deprecated
-    @ApiModelProperty(notes = "deprecated, use primaryPhone instead")
-    private String phone;
-    @Deprecated
-    @ApiModelProperty(notes = "deprecated, use primaryEmail instead")
-    private String email;
-    @Deprecated
-    @ApiModelProperty(required = true)
+    @ApiModelProperty(required = true, notes = "*Deprecated*, use first and last name fields instead!")
     private String fullName;
 }

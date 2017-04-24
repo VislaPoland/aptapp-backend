@@ -127,8 +127,6 @@ public class Mapper {
 
         mapperFactory.classMap(Account.class, BasicAccountDto.class)
                 .byDefault()
-                .field("primaryEmail", "email")
-                .field("primaryPhone", "phone")
                 .register();
         mapperFactory.classMap(PropertyOwner.class, PropertyOwnerDto.class)
                 .byDefault()
