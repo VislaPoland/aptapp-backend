@@ -25,7 +25,7 @@ import com.creatix.domain.enums.NotificationType;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.NotificationService;
-import com.creatix.service.StoredFilesService;
+import com.creatix.service.AttachmentService;
 import com.fasterxml.jackson.annotation.JsonView;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
@@ -60,7 +60,7 @@ public class NotificationController {
     @Autowired
     private Mapper mapper;
     @Autowired
-    private StoredFilesService storedFilesService;
+    private AttachmentService attachmentService;
 
     //general
     @ApiOperation(value = "Filter notifications")
@@ -228,7 +228,7 @@ public class NotificationController {
     @RequestMapping(path = "/{notificationId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<NotificationDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long notificationId) throws IOException {
-        return new DataResponse<>(mapper.toNotificationDto(storedFilesService.storeNotificationPhotos(files, notificationId)));
+        return new DataResponse<>(mapper.toNotificationDto(attachmentService.storeNotificationPhotos(files, notificationId)));
     }
 
     @ApiOperation(value = "Download notification photo")
@@ -241,7 +241,7 @@ public class NotificationController {
     @RequestMapping(value = "/{notificationId}/photos/{fileName:.+}", method = RequestMethod.GET)
     @ResponseBody
     public HttpEntity<byte[]> downloadNotificationPhoto(@PathVariable Long notificationId, @PathVariable String fileName) throws IOException {
-        final NotificationPhoto photo = storedFilesService.getNotificationPhoto(notificationId, fileName);
+        final NotificationPhoto photo = attachmentService.getNotificationPhoto(notificationId, fileName);
         final File photoFile = new File(photo.getFilePath());
         final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
 

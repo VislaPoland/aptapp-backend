@@ -13,16 +13,16 @@ import javax.persistence.OneToOne;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-public class BusinessProfileCartePhoto extends GenericPhotoStore {
+public class BusinessProfileCartePhoto extends Attachment {
 
 
     @OneToOne(optional = false)
     private BusinessProfileCarteItem businessProfileCarteItem;
 
     public BusinessProfileCartePhoto() {
-        this.setStoredPhotoType(StoredPhotoType.BUSINESS_PROFILE_CARTE);
+        this.setAttachedEntityType(AttachedEntityType.BUSINESS_PROFILE_CARTE);
     }
 
     @Override
-    public void setStoredPhotoType(StoredPhotoType storedPhotoType) {}
+    public void setAttachedEntityType(AttachedEntityType attachedEntityType) {}
 }

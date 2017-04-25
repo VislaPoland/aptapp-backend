@@ -35,7 +35,7 @@ public class NotificationServiceTest {
     @Autowired
     private NotificationService notificationService;
     @Autowired
-    private StoredFilesService storedFilesService;
+    private AttachmentService attachmentService;
     @Autowired
     private Mapper mapper;
 
@@ -43,7 +43,7 @@ public class NotificationServiceTest {
     public void storeNotificationPhotos() throws Exception {
         final MockMultipartFile file = new MockMultipartFile("test.jpg", "test.jpg", "image/jpeg", new byte[] {1,2,3,4,5,6});
 
-        final Notification notification = storedFilesService.storeNotificationPhotos(new MultipartFile[]{file}, 1);
+        final Notification notification = attachmentService.storeNotificationPhotos(new MultipartFile[]{file}, 1);
         assertNotNull(notification);
         assertEquals((Long) 1L, notification.getId());
         assertNotNull(notification.getPhotos());

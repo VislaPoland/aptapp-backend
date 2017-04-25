@@ -9,7 +9,7 @@ import com.creatix.domain.dto.business.BusinessSearchRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.StoredFilesService;
+import com.creatix.service.AttachmentService;
 import com.creatix.service.business.BusinessProfileService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +38,7 @@ public class BusinessProfileController {
     @Autowired
     private BusinessMapper businessMapper;
     @Autowired
-    private StoredFilesService storedFilesService;
+    private AttachmentService attachmentService;
 
     @ApiOperation(value = "List business profiles for property")
     @ApiResponses(value = {

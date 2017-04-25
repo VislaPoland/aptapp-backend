@@ -3,11 +3,12 @@ package com.creatix.service;
 import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.NotificationDao;
 import com.creatix.domain.dao.NotificationPhotoDao;
-import com.creatix.domain.dao.PhotoStoreDao;
+import com.creatix.domain.dao.AttachmentDao;
 import com.creatix.domain.entity.store.notification.Notification;
 import com.creatix.domain.entity.store.notification.NotificationPhoto;
-import com.creatix.domain.entity.store.photo.GenericPhotoStore;
-import com.creatix.domain.entity.store.photo.PhotoObjectFactory;
+import com.creatix.domain.entity.store.photo.Attachment;
+import com.creatix.domain.entity.store.photo.AttachmentMediaType;
+import com.creatix.domain.entity.store.photo.AttachmentObjectFactory;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,11 @@ import java.util.UUID;
  * Created by kvimbi on 19/04/2017.
  */
 @Service
-public class StoredFilesService {
+public class AttachmentService {
 
 
     @Autowired
-    private PhotoStoreDao photoStoreDao;
+    private AttachmentDao attachmentDao;
     @Autowired
     private FileUploadProperties uploadProperties;
     @Autowired
@@ -73,12 +74,22 @@ public class StoredFilesService {
         return notification;
     }
 
-    public <T extends GenericPhotoStore> List<T> storePhotos(@NotNull MultipartFile[] files,
-                                                         @NotNull PhotoObjectFactory<T> photoObjectFactory,
-                                                         @NotNull Object fkObject,
-                                                         Class<T> clazz) throws IOException {
+    public NotificationPhoto getNotificationPhoto(Long notificationId, String fileName) {
+
+        final NotificationPhoto photo = notificationPhotoDao.findByNotificationIdAndFileName(notificationId, fileName);
+        if ( photo == null ) {
+            throw new EntityNotFoundException(String.format("Photo id=%s not found", fileName));
+        }
+
+        return photo;
+    }
+
+    public <T extends Attachment> List<T> storeAttachments(@NotNull MultipartFile[] files,
+                                                           @NotNull AttachmentObjectFactory<T> attachmentObjectFactory,
+                                                           @NotNull Object fkObject,
+                                                           Class<T> clazz) throws IOException {
         Objects.requireNonNull(files, "Files array is null");
-        Objects.requireNonNull(photoObjectFactory);
+        Objects.requireNonNull(attachmentObjectFactory);
         Objects.requireNonNull(fkObject);
 
         Entity entityAnnotation = fkObject.getClass().getAnnotation(Entity.class);
@@ -90,60 +101,51 @@ public class StoredFilesService {
             throw new IllegalArgumentException("Foreign key object does not have getId() method, or failed to invoke", e);
         }
 
-        ArrayList<T> storedPhotoList = new ArrayList<>(files.length);
+        ArrayList<T> storedAttachmentsList = new ArrayList<>(files.length);
 
         for ( MultipartFile file : files ) {
             // move uploaded file to file repository
             final String fileName = String.format("%d-%s", fkId, UUID.randomUUID().toString());
-            final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), fileName);
-            Files.createDirectories(photoFilePath.getParent());
-            file.transferTo(photoFilePath.toFile());
+            final Path attachmentFilePath = Paths.get(uploadProperties.getRepositoryPath(), fileName);
+            Files.createDirectories(attachmentFilePath.getParent());
+            file.transferTo(attachmentFilePath.toFile());
 
-            T photo = photoObjectFactory.createPhotoObject(fkObject);
-            photo.setFileName(fileName);
-            photo.setFilePath(photoFilePath.toString());
-            photoStoreDao.persist(photo);
+            T attachment = attachmentObjectFactory.createAttachment(fkObject);
+            attachment.setFileName(fileName);
+            attachment.setFilePath(attachmentFilePath.toString());
+            attachment.setAttachmentMediaType(AttachmentMediaType.IMAGE);
+            attachmentDao.persist(attachment);
 
-            storedPhotoList.add(photo);
+            storedAttachmentsList.add(attachment);
 
         }
 
-        return storedPhotoList;
-    }
-
-    public NotificationPhoto getNotificationPhoto(Long notificationId, String fileName) {
-
-        final NotificationPhoto photo = notificationPhotoDao.findByNotificationIdAndFileName(notificationId, fileName);
-        if ( photo == null ) {
-            throw new EntityNotFoundException(String.format("Photo id=%s not found", fileName));
-        }
-
-        return photo;
+        return storedAttachmentsList;
     }
 
     @Getter
-    public static class DownloadPhotoResult {
-        private final byte[] photoData;
+    public static class DownloadAttachment {
+        private final byte[] fileContent;
         private final MediaType mediaType;
 
-        DownloadPhotoResult(byte[] photoData, MediaType mediaType) {
-            this.photoData = photoData;
+        DownloadAttachment(byte[] fileContent, MediaType mediaType) {
+            this.fileContent = fileContent;
             this.mediaType = mediaType;
         }
     }
 
-    public DownloadPhotoResult downloadPhoto(long photoId, @NotNull String fileName) throws IOException {
-        GenericPhotoStore photo = photoStoreDao.findById(photoId);
+    public DownloadAttachment downloadAttachment(long attachmentId, @NotNull String fileName) throws IOException {
+        Attachment attachment = attachmentDao.findById(attachmentId);
 
-        if (photo != null && fileName.equals(photo.getFileName())) {
-            final File photoFile = new File(photo.getFilePath());
-            return new DownloadPhotoResult(
-                    FileUtils.readFileToByteArray(photoFile),
-                    MediaType.valueOf(Files.probeContentType(photoFile.toPath()))
+        if (attachment != null && fileName.equals(attachment.getFileName())) {
+            final File attachmentFile = new File(attachment.getFilePath());
+            return new DownloadAttachment(
+                    FileUtils.readFileToByteArray(attachmentFile),
+                    MediaType.valueOf(Files.probeContentType(attachmentFile.toPath()))
             );
         }
 
-        throw new EntityNotFoundException(String.format("Photo id=%s not found", fileName));
+        throw new EntityNotFoundException(String.format("Attachment id=%s not found", fileName));
     }
 
 }

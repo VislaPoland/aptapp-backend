@@ -1,6 +1,8 @@
 package com.creatix.domain.dto;
 
-import com.creatix.domain.entity.store.photo.StoredPhotoType;
+import com.creatix.domain.entity.store.photo.AttachedEntityType;
+import com.creatix.domain.entity.store.photo.AttachedEntityType;
+import com.creatix.domain.entity.store.photo.AttachmentMediaType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +12,7 @@ import lombok.Data;
  */
 @ApiModel
 @Data
-public class GenericPhotoDto {
+public class AttachmentDto {
 
     @ApiModelProperty(required = true)
     private Long id;
@@ -22,6 +24,8 @@ public class GenericPhotoDto {
     private String fileUrl;
 
     @ApiModelProperty(required = true)
-    private StoredPhotoType storedPhotoType;
+    private AttachedEntityType attachedEntityType;
+
+    private AttachmentMediaType attachmentMediaType;
 
 }

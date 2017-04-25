@@ -2,6 +2,7 @@ package com.creatix.domain.entity.store.photo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.http.MediaType;
 
 import javax.persistence.*;
 
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @EqualsAndHashCode(of = "id")
 @Data
-public class GenericPhotoStore {
+public class Attachment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,5 +28,9 @@ public class GenericPhotoStore {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private StoredPhotoType storedPhotoType;
+    private AttachedEntityType attachedEntityType;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AttachmentMediaType attachmentMediaType;
 }

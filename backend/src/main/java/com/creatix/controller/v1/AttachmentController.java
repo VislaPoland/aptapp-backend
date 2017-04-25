@@ -2,7 +2,7 @@ package com.creatix.controller.v1;
 
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.Views;
-import com.creatix.service.StoredFilesService;
+import com.creatix.service.AttachmentService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -18,12 +18,12 @@ import java.io.IOException;
  * Created by kvimbi on 20/04/2017.
  */
 @RestController
-@RequestMapping(path = {"/api/photos", "/api/v1/photos"})
+@RequestMapping(path = {"/api/attachments", "/api/v1/attachments"})
 @ApiVersion(1.0)
-public class PhotoController {
+public class AttachmentController {
 
     @Autowired
-    private StoredFilesService storedFilesService;
+    private AttachmentService attachmentService;
 
     @ApiOperation(value = "Download notification photo")
     @ApiResponses(value = {
@@ -32,16 +32,16 @@ public class PhotoController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/{photoId}/{fileName:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{attachmentId}/{fileName:.+}", method = RequestMethod.GET)
     @ResponseBody
-    public HttpEntity<byte[]> downloadPhoto(@PathVariable Long photoId, @PathVariable String fileName) throws IOException {
-        StoredFilesService.DownloadPhotoResult photoFileData = storedFilesService.downloadPhoto(photoId, fileName);
+    public HttpEntity<byte[]> downloadPhoto(@PathVariable Long attachmentId, @PathVariable String fileName) throws IOException {
+        AttachmentService.DownloadAttachment attachmentFileData = attachmentService.downloadAttachment(attachmentId, fileName);
 
         final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(photoFileData.getMediaType());
-        headers.setContentLength(photoFileData.getPhotoData().length);
+        headers.setContentType(attachmentFileData.getMediaType());
+        headers.setContentLength(attachmentFileData.getFileContent().length);
 
-        return new HttpEntity<>(photoFileData.getPhotoData(), headers);
+        return new HttpEntity<>(attachmentFileData.getFileContent(), headers);
     }
 
 }

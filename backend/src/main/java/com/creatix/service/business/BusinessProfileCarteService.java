@@ -7,7 +7,7 @@ import com.creatix.domain.entity.store.business.BusinessProfileCarteItem;
 import com.creatix.domain.entity.store.photo.BusinessProfileCartePhoto;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.AuthorizationManager;
-import com.creatix.service.StoredFilesService;
+import com.creatix.service.AttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +33,7 @@ public class BusinessProfileCarteService {
     @Autowired
     private BusinessMapper businessMapper;
     @Autowired
-    private StoredFilesService storedFilesService;
+    private AttachmentService attachmentService;
 
     public BusinessProfileCarteItem createFromRequest(@NotNull  BusinessProfileCarteItemDto request, long businessProfileId) {
         Objects.requireNonNull(request);
@@ -96,7 +96,7 @@ public class BusinessProfileCarteService {
 
         List<BusinessProfileCartePhoto> photoStoreList;
         try {
-            photoStoreList = storedFilesService.storePhotos(files, foreignKeyObject -> {
+            photoStoreList = attachmentService.storeAttachments(files, foreignKeyObject -> {
                 BusinessProfileCartePhoto businessProfilePhoto = new BusinessProfileCartePhoto();
                 businessProfilePhoto.setBusinessProfileCarteItem(businessProfileCarteItem);
                 return businessProfilePhoto;

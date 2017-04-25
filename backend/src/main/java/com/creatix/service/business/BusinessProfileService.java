@@ -14,7 +14,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.StoredFilesService;
+import com.creatix.service.AttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +44,7 @@ public class BusinessProfileService {
     @Autowired
     private BusinessNotificationExecutor businessNotificationExecutor;
     @Autowired
-    private StoredFilesService storedFilesService;
+    private AttachmentService attachmentService;
 
     public List<BusinessProfile> listBusinessProfilesForProperty(long propertyId) {
         Property property = findPropertyById(propertyId);
@@ -204,7 +204,7 @@ public class BusinessProfileService {
         final BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
         List<BusinessProfilePhoto> photoStoreList;
         try {
-            photoStoreList = storedFilesService.storePhotos(files, foreignKeyObject -> {
+            photoStoreList = attachmentService.storeAttachments(files, foreignKeyObject -> {
                 BusinessProfilePhoto businessProfilePhoto = new BusinessProfilePhoto();
                 businessProfilePhoto.setBusinessProfile(businessProfile);
                 return businessProfilePhoto;

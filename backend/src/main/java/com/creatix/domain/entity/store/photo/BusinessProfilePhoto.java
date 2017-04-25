@@ -13,16 +13,15 @@ import javax.persistence.ManyToOne;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-public class BusinessProfilePhoto extends GenericPhotoStore {
+public class BusinessProfilePhoto extends Attachment {
 
     @ManyToOne(optional = false)
     private BusinessProfile businessProfile;
 
     public BusinessProfilePhoto() {
-        this.setStoredPhotoType(StoredPhotoType.BUSINESS_PROFILE);
+        this.setAttachedEntityType(AttachedEntityType.BUSINESS_PROFILE);
     }
 
     @Override
-    public void setStoredPhotoType(StoredPhotoType storedPhotoType) {}
-
+    public void setAttachedEntityType(AttachedEntityType attachedEntityType) {}
 }
