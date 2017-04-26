@@ -20,7 +20,7 @@ public class BusinessContact extends Contact {
     @Column
     private String houseNumber;
     @Column
-    private Integer zipCode;
+    private String zipCode;
     @Column
     private String country;
     @Column

@@ -36,7 +36,7 @@ public class BusinessProfile {
     @Column
     private Long defaultPhotoId;
 
-    @OneToOne
+    @OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private BusinessContact contact;
 
     @Column(length = 120, nullable = false)

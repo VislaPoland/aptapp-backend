@@ -19,6 +19,13 @@ INSERT INTO public.maintenance_slot_schedule(id, begin_time, end_time, initial_c
 -- property
 INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id, time_zone, enable_sms) VALUES (1, 'South Water Apartments', 'Active', 1, 1, 1, 'America/Chicago', true);
 
+-- business profile categories
+INSERT INTO public.business_category (id, name) VALUES(1, 'GENERAL');
+
+INSERT INTO public.business_contact (id, communication_type, type, value, country, house_number, state, street, zip_code) VALUES (1, 'Phone', 'Business', '+421902265340', 'Slovakia', '50/1', 'Ilava', 'Sesame street', '018 51');
+
+INSERT INTO public.business_profile(id, name, description, lat, lng, contact_id, property_id) VALUES (1, 'First business profile', 'Description of business profile', 1.4554, 15.677, 1, 1);
+
 -- property contacts
 INSERT INTO public.contact (id, communication_type, type, value) VALUES (1, 'Email', 'OtherUseful', 'southwater@apartments.com');
 INSERT INTO public.contact (id, communication_type, type, value) VALUES (2, 'Phone', 'OtherUseful', '(785) 123-9653');

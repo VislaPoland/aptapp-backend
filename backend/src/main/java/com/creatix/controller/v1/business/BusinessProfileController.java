@@ -37,8 +37,6 @@ public class BusinessProfileController {
     private BusinessProfileService businessProfileService;
     @Autowired
     private BusinessMapper businessMapper;
-    @Autowired
-    private AttachmentService attachmentService;
 
     @ApiOperation(value = "List business profiles for property")
     @ApiResponses(value = {

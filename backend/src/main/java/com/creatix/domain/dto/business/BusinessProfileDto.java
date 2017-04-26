@@ -3,6 +3,7 @@ package com.creatix.domain.dto.business;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  */
 @ApiModel("Business profile")
 @Data
+@Accessors(chain = true)
 public class BusinessProfileDto {
 
     @ApiModelProperty(value = "Id", required = true, readOnly = true)
