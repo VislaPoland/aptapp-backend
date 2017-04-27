@@ -203,8 +203,6 @@ public class Mapper {
 
         mapperFactory.classMap(PropertyOwner.class, PropertyDto.OwnerDto.class)
                 .byDefault()
-                .field("primaryEmail", "email")
-                .field("primaryPhone", "phone")
                 .field("website", "web")
                 .register();
 
