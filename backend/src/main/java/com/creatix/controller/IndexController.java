@@ -21,6 +21,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
@@ -30,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,6 +75,20 @@ class IndexController {
         headers.setContentLength(fileData.length);
 
         return new HttpEntity<>(fileData, headers);
+    }
+
+    @RequestMapping(path = "appVersion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public HttpEntity<String> getAppVersion() throws IOException {
+        final ClassLoader classLoader = getClass().getClassLoader();
+        final String fileData;
+        try ( final InputStream fileInputStream = classLoader.getResourceAsStream("version_number") ) {
+            if ( fileInputStream == null ) {
+                throw new IOException("Version file not found!");
+            }
+            fileData = StreamUtils.copyToString(fileInputStream, Charset.forName("utf-8"));
+        }
+
+        return new HttpEntity<>(fileData);
     }
 
     @RequestMapping(value = { "/app", "/app/" }, method = RequestMethod.GET)

@@ -44,6 +44,21 @@ repositories {
     maven { url 'https://repo.spring.io/libs-milestone' }
 }
 
+task createBuildVersionFile(type:Exec) {
+	commandLine "$projectDir/createBuildVersion.sh"
+}
+
+war {
+	webInf {
+		from("$buildDir/tmp/") {
+			include "version_number"
+			into('classes/')
+		}
+	}
+}
+
+war.dependsOn createBuildVersionFile
+
 
 dependencies {
 
