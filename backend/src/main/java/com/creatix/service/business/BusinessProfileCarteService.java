@@ -35,8 +35,8 @@ public class BusinessProfileCarteService {
     @Autowired
     private AttachmentService attachmentService;
 
-    public BusinessProfileCarteItem createFromRequest(@NotNull  BusinessProfileCarteItemDto request, long businessProfileId) {
-        Objects.requireNonNull(request);
+    public BusinessProfileCarteItem createFromRequest(@NotNull BusinessProfileCarteItemDto request, long businessProfileId) {
+        Objects.requireNonNull(request, "Request object can not be null");
         BusinessProfile businessProfile = businessProfileService.getById(businessProfileId);
 
         if (authorizationManager.canWrite(businessProfile.getProperty())) {
@@ -51,7 +51,7 @@ public class BusinessProfileCarteService {
     }
 
     public BusinessProfileCarteItem updateFromRequest(@NotNull BusinessProfileCarteItemDto request) {
-        Objects.requireNonNull(request);
+        Objects.requireNonNull(request, "Request object can not be null");
         Objects.requireNonNull(request.getId(), "Id must not be null!");
 
         BusinessProfileCarteItem businessProfileCarteItem = businessProfileCarteItemDao.findById(request.getId());

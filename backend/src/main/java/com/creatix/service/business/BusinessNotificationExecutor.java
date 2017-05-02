@@ -3,22 +3,22 @@ package com.creatix.service.business;
 import com.creatix.domain.dao.TenantDao;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
+import com.creatix.message.PushNotificationTemplateProcessor;
 import com.creatix.message.push.BusinessProfileCreatedPush;
 import com.creatix.message.push.DiscountCouponCreatedPush;
-import com.creatix.message.push.GenericPushNotification;
-import com.creatix.service.message.PushNotificationService;
-import com.creatix.message.PushNotificationTemplateProcessor;
 import com.creatix.message.template.push.businessProfile.BusinessProfileCreatedTemplate;
 import com.creatix.message.template.push.businessProfile.DiscountCouponCreatedTemplate;
 import com.creatix.service.apartment.ApartmentService;
+import com.creatix.service.message.PushNotificationService;
 import freemarker.template.TemplateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.Objects;
 
 /**
@@ -26,6 +26,8 @@ import java.util.Objects;
  */
 @Service
 public class BusinessNotificationExecutor {
+
+    private final Logger logger = LoggerFactory.getLogger(BusinessNotificationExecutor.class);
 
     @Autowired
     private ApartmentService apartmentService;
@@ -45,8 +47,13 @@ public class BusinessNotificationExecutor {
             notification.setMessage(
                     templateProcessor.processTemplate(new BusinessProfileCreatedTemplate(businessProfile))
             );
-        } catch (IOException | TemplateException e) {
-            e.printStackTrace();
+        } catch (IOException | TemplateException exception) {
+            logger.error(
+                    String.format(
+                            "Unable to create template for push message about business profile %d",
+                            businessProfile.getId()),
+                    exception
+            );
         }
 
         apartmentService.getApartmentsByPropertyId(businessProfile.getProperty().getId())
@@ -56,9 +63,14 @@ public class BusinessNotificationExecutor {
                 .forEach(tenant -> {
                     try {
                         pushNotificationService.sendNotification(notification, tenant);
-                    } catch (IOException e) {
-                        //TODO: handle this
-                        e.printStackTrace();
+                    } catch (IOException exception) {
+                        logger.error(
+                                String.format(
+                                        "Unable to create template for push message about business profile %d",
+                                        businessProfile.getId()
+                                ),
+                                exception
+                        );
                     }
                 });
     }
@@ -84,9 +96,15 @@ public class BusinessNotificationExecutor {
                 .forEach(tenant -> {
                     try {
                         pushNotificationService.sendNotification(notification, tenant);
-                    } catch (IOException e) {
-                        //TODO: handle this
-                        e.printStackTrace();
+                    } catch (IOException exception) {
+                        logger.error(
+                                String.format(
+                                        "Unable to send push notification about discount coupon %d to tenant %d",
+                                        discountCoupon.getId(),
+                                        tenant.getId()
+                                ),
+                                exception
+                        );
                     }
                 });
     }

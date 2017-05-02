@@ -17,11 +17,14 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -30,6 +33,8 @@ import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by Tomas Michalek on 12/04/2017.
@@ -37,6 +42,9 @@ import java.util.Objects;
 @Service
 public class DiscountCouponService {
 
+    private final Logger logger = LoggerFactory.getLogger(BusinessNotificationExecutor.class);
+
+    private ConcurrentMap<Long, Long> locks = new ConcurrentHashMap<>();
 
     private final static int QR_CODE_SIZE = 128;
 
@@ -66,8 +74,8 @@ public class DiscountCouponService {
 
     @NotNull
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DiscountCoupon createDiscountCoupon(@NotNull DiscountCouponDto discountCouponDto, long businessProfileId) {
-        Objects.requireNonNull(discountCouponDto);
+    public DiscountCoupon createDiscountCouponFromRequest(@NotNull DiscountCouponDto request, long businessProfileId) {
+        Objects.requireNonNull(request, "Request object can not be null");
 
         BusinessProfile businessProfile = businessProfileDao.findById(businessProfileId);
 
@@ -76,7 +84,7 @@ public class DiscountCouponService {
         }
 
         if (authorizationManager.canWrite(businessProfile.getProperty())) {
-            DiscountCoupon discountCoupon = businessMapper.toDiscountCoupon(discountCouponDto);
+            DiscountCoupon discountCoupon = businessMapper.toDiscountCoupon(request);
             discountCoupon.setBusinessProfile(businessProfile);
             discountCouponDao.persist(discountCoupon);
             return discountCoupon;
@@ -90,14 +98,14 @@ public class DiscountCouponService {
 
     @NotNull
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DiscountCoupon updateDiscountCoupon(@NotNull DiscountCouponDto discountCouponDto) {
-        Objects.requireNonNull(discountCouponDto);
-        Objects.requireNonNull(discountCouponDto.getId());
+    public DiscountCoupon updateDiscountCouponFromRequest(@NotNull DiscountCouponDto request) {
+        Objects.requireNonNull(request, "Request object can not be null");
+        Objects.requireNonNull(request.getId(), "Coupon id can not be null for update");
 
-        DiscountCoupon storedCoupon = findCouponById(discountCouponDto.getId());
+        DiscountCoupon storedCoupon = findCouponById(request.getId());
 
         if (authorizationManager.canWrite(storedCoupon.getBusinessProfile().getProperty())) {
-            businessMapper.map(discountCouponDto, storedCoupon);
+            businessMapper.map(request, storedCoupon);
             discountCouponDao.persist(storedCoupon);
             return storedCoupon;
         }
@@ -116,38 +124,54 @@ public class DiscountCouponService {
      * @param discountCouponId to lookup
      * @return discount coupon with decremented uses left
      */
+    @Transactional
     @NotNull
     @RoleSecured({AccountRole.Tenant, AccountRole.SubTenant})
     public DiscountCouponDto useDiscountCoupon(long discountCouponId) {
-        DiscountCoupon discountCoupon = findCouponById(discountCouponId);
+        synchronized (getLockObject(discountCouponId)) {
+            try {
+                DiscountCoupon discountCoupon = findCouponById(discountCouponId);
 
-        authorizationManager.checkRead(discountCoupon.getBusinessProfile().getProperty());
+                authorizationManager.checkRead(discountCoupon.getBusinessProfile().getProperty());
 
-        DiscountCouponUsage.IdKey usageKey = new DiscountCouponUsage.IdKey(
-                authorizationManager.getCurrentAccount(),
-                discountCoupon
-        );
-        DiscountCouponUsage couponUsage = discountCouponUsageDao.findById(usageKey);
+                DiscountCouponUsage.IdKey usageKey = new DiscountCouponUsage.IdKey(
+                        authorizationManager.getCurrentAccount(),
+                        discountCoupon
+                );
+                DiscountCouponUsage couponUsage = discountCouponUsageDao.findById(usageKey);
 
-        if (null == couponUsage) {
-            couponUsage = new DiscountCouponUsage()
-                    .setUsesLeft(
-                            discountCoupon.getAvailableUses() == DiscountCoupon.UNLIMITED_USE ?
-                                    DiscountCoupon.UNLIMITED_USE :
-                                    discountCoupon.getAvailableUses() - 1
-                    )
-                    .setId(usageKey);
-            discountCouponUsageDao.persist(couponUsage);
-        } else {
-            if (couponUsage.getUsesLeft() == 0) {
-                throw new IllegalStateException(String.format("Coupon %d has no more uses left for user", discountCouponId));
-            } else if (couponUsage.getUsesLeft() != DiscountCoupon.UNLIMITED_USE) {
-                couponUsage.setUsesLeft(couponUsage.getUsesLeft() - 1);
-                discountCouponUsageDao.persist(couponUsage);
+                if (null == couponUsage) {
+                    couponUsage = new DiscountCouponUsage()
+                            .setUsesLeft(
+                                    discountCoupon.getAvailableUses() == DiscountCoupon.UNLIMITED_USE ?
+                                            DiscountCoupon.UNLIMITED_USE :
+                                            discountCoupon.getAvailableUses() - 1
+                            )
+                            .setId(usageKey);
+                    discountCouponUsageDao.persist(couponUsage);
+                } else {
+                    if (couponUsage.getUsesLeft() == 0) {
+                        throw new IllegalStateException(String.format("Coupon %d has no more uses left for user", discountCouponId));
+                    } else if (couponUsage.getUsesLeft() != DiscountCoupon.UNLIMITED_USE) {
+                        couponUsage.setUsesLeft(couponUsage.getUsesLeft() - 1);
+                        discountCouponUsageDao.persist(couponUsage);
+                    }
+                }
+
+                return businessMapper.toDiscountCoupon(couponUsage);
+            } finally {
+                locks.remove(discountCouponId);
             }
         }
+    }
 
-        return businessMapper.toDiscountCoupon(couponUsage);
+    private synchronized Object getLockObject(Long key) {
+        locks.putIfAbsent(key, key);
+        return locks.get(key);
+    }
+
+    private void removeLockObject(Long key) {
+        locks.remove(key);
     }
 
 
@@ -199,8 +223,7 @@ public class DiscountCouponService {
         try {
             byteMatrix = qrCodeWriter.encode(coupon.getCode(), BarcodeFormat.QR_CODE, QR_CODE_SIZE, QR_CODE_SIZE, hintMap);
         } catch (WriterException e) {
-            //todo: process this!
-            e.printStackTrace();
+            logger.error("Unable to create QR code matrix data", e);
         }
         int CrunchifyWidth = byteMatrix.getWidth();
         BufferedImage image = new BufferedImage(CrunchifyWidth, CrunchifyWidth,
@@ -224,8 +247,7 @@ public class DiscountCouponService {
         try {
             ImageIO.write(image, "png", baos);
         } catch (IOException e) {
-            //TODO: handle this
-            e.printStackTrace();
+            logger.error("Unable to write image data to output stream", e);
         }
         return baos.toByteArray();
 

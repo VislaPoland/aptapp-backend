@@ -63,7 +63,7 @@ public class DiscountCouponController {
             @PathVariable("businessProfileId") Long businessProfileId) {
         return new HttpEntity<>(
                 businessMapper.toDiscountCoupon(
-                        discountCouponService.createDiscountCoupon(request, businessProfileId)
+                        discountCouponService.createDiscountCouponFromRequest(request, businessProfileId)
                 )
         );
     }
@@ -73,7 +73,7 @@ public class DiscountCouponController {
     public HttpEntity<DiscountCouponDto> updateDiscountCoupon(@RequestBody @NotNull DiscountCouponDto request) {
         return new HttpEntity<>(
                 businessMapper.toDiscountCoupon(
-                        discountCouponService.updateDiscountCoupon(request)
+                        discountCouponService.updateDiscountCouponFromRequest(request)
                 )
         );
     }
