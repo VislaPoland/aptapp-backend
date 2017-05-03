@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Created by kvimbi on 19/04/2017.
+ * Created by Tomas Michalek on 19/04/2017.
  */
 @Service
 public class AttachmentService {

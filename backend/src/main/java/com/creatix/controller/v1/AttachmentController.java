@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 /**
- * Created by kvimbi on 20/04/2017.
+ * Created by Tomas Michalek on 20/04/2017.
  */
 @RestController
 @RequestMapping(path = {"/api/attachments", "/api/v1/attachments"})

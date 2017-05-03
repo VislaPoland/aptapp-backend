@@ -5,7 +5,7 @@ import com.creatix.domain.entity.store.business.BusinessProfileCarteItem;
 import org.springframework.stereotype.Repository;
 
 /**
- * Created by kvimbi on 20/04/2017.
+ * Created by Tomas Michalek on 20/04/2017.
  */
 @Repository
 public class BusinessProfileCarteItemDao extends DaoBase<BusinessProfileCarteItem, Long> {

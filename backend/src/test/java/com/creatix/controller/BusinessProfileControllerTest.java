@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 
 /**
- * Created by kvimbi on 25/04/2017.
+ * Created by Tomas Michalek on 25/04/2017.
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration

@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
 /**
- * Created by kvimbi on 19/04/2017.
+ * Created by Tomas Michalek on 19/04/2017.
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity

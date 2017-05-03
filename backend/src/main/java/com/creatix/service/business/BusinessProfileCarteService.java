@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Created by kvimbi on 20/04/2017.
+ * Created by Tomas Michalek on 20/04/2017.
  */
 @Service
 public class BusinessProfileCarteService {

@@ -21,7 +21,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 
 /**
- * Created by kvimbi on 20/04/2017.
+ * Created by Tomas Michalek on 20/04/2017.
  */
 @RestController
 @RequestMapping(path = {"/api/properties/{propertyId}/businesses/{businessProfileId}/carte", "/api/v1/properties/{propertyId}/businesses/{businessProfileId}/carte"})

@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Created by kvimbi on 24/04/2017.
+ * Created by Tomas Michalek on 24/04/2017.
  */
 public class VersionRequestMapper extends RequestMappingHandlerMapping {
 

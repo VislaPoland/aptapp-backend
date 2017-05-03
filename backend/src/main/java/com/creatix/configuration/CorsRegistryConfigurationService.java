@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 /**
- * Created by kvimbi on 26/04/2017.
+ * Created by Tomas Michalek on 26/04/2017.
  */
 @Component
 public class CorsRegistryConfigurationService {

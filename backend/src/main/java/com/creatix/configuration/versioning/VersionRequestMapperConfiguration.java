@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
- * Created by kvimbi on 24/04/2017.
+ * Created by Tomas Michalek on 24/04/2017.
  */
 @Configuration
 public class VersionRequestMapperConfiguration extends WebMvcConfigurationSupport {
