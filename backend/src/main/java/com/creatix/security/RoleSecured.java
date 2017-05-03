@@ -1,6 +1,7 @@
 package com.creatix.security;
 
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.ApplicationFeatureType;
 
 import java.lang.annotation.*;
 
@@ -11,4 +12,5 @@ import java.lang.annotation.*;
 public @interface RoleSecured
 {
     AccountRole[] value() default {};
+    ApplicationFeatureType feature() default ApplicationFeatureType.NONE;
 }

@@ -7,6 +7,7 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.ApplicationFeatureType;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.MaintenanceReservationService;
 import com.creatix.service.SlotService;
@@ -45,7 +46,7 @@ public class MaintenanceController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/slots", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<List<MaintenanceSlotDto>> getMaintenanceSlots(
             @PathVariable Long propertyId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate day) {
@@ -63,7 +64,7 @@ public class MaintenanceController {
     })
     @RequestMapping(path = "/reservations/{reservationId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(Views.Public.class)
-    @RoleSecured(AccountRole.Maintenance)
+    @RoleSecured(value = AccountRole.Maintenance, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceReservationDto> deleteMaintenanceReservation(@PathVariable Long reservationId) {
         return new DataResponse<>(mapper.toMaintenanceReservationDto(maintenanceReservationService.deleteById(reservationId)));
     }
@@ -77,7 +78,7 @@ public class MaintenanceController {
     })
     @RequestMapping(path = "/schedule", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(Views.Public.class)
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceSlotScheduleDto> createMaintenanceSlotSchedule(
             @PathVariable Long propertyId,
             @RequestBody @Valid PersistMaintenanceSlotScheduleRequest request) {
@@ -92,7 +93,7 @@ public class MaintenanceController {
     })
     @RequestMapping(path = "/schedule/{scheduleId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(Views.Public.class)
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceSlotScheduleDto> deleteMaintenanceSlotSchedule(@PathVariable Long scheduleId) {
         return new DataResponse<>(mapper.toMaintenanceSlotScheduleDto(slotService.deleteScheduleById(scheduleId)));
     }

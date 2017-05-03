@@ -2,6 +2,7 @@ package com.creatix.controller.v1;
 
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
+import com.creatix.domain.dto.ApplicationFeatureDto;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
@@ -12,6 +13,7 @@ import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
 import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.ApplicationFeatureService;
 import com.creatix.service.SlotService;
 import com.creatix.service.apartment.ApartmentService;
 import com.creatix.service.property.PropertyService;
@@ -50,7 +52,7 @@ public class PropertyController {
     @Autowired
     private SlotService slotService;
     @Autowired
-    private ApartmentService apartmentService;
+    private ApplicationFeatureService applicationFeatureService;
 
     @ApiOperation(value = "Get all properties")
     @ApiResponses(value = {
@@ -182,5 +184,21 @@ public class PropertyController {
             @ApiParam @RequestParam(required = false) Integer pageSize) {
 
         return new DataResponse<>(slotService.getSlotsByFilter(propertyId, beginDt, endDt, startId, pageSize));
+    }
+
+
+    @ApiOperation(value = "Get application features configuration for property")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/{propertyId}/features", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<List<ApplicationFeatureDto>> listFeaturesForProperty(@PathVariable Long propertyId) {
+        return new DataResponse<>(applicationFeatureService.listFeaturesByProperty(propertyId).stream().map(
+                applicationFeature -> mapper.toApplicationFeatureDto(applicationFeature)
+        ).collect(Collectors.toList()));
     }
 }

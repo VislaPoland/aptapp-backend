@@ -4,6 +4,7 @@ import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.dao.AssistantPropertyManagerDao;
 import com.creatix.domain.dao.ManagedEmployeeDao;
 import com.creatix.domain.dto.AddressDto;
+import com.creatix.domain.dto.ApplicationFeatureDto;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.account.*;
 import com.creatix.domain.dto.apartment.ApartmentDto;
@@ -466,6 +467,10 @@ public class Mapper {
                 .byDefault()
                 .register();
 
+        mapperFactory.classMap(ApplicationFeature.class, ApplicationFeatureDto.class)
+                .byDefault()
+                .register();
+
         mapperFactory.classMap(SlotUnit.class, SlotUnitDto.class)
                 .byDefault()
                 .field("slot.id", "slotId")
@@ -659,6 +664,16 @@ public class Mapper {
     public SlotDto toSlotDto(@NotNull Slot slot) {
         Objects.requireNonNull(slot);
         return mapperFactory.getMapperFacade().map(slot, SlotDto.class);
+    }
+
+    public ApplicationFeatureDto toApplicationFeatureDto(@NotNull ApplicationFeature applicationFeature) {
+        Objects.requireNonNull(applicationFeature);
+        return mapperFactory.getMapperFacade().map(applicationFeature, ApplicationFeatureDto.class);
+    }
+
+    public ApplicationFeature toApplicationFeature(@NotNull ApplicationFeatureDto applicationFeatureDto) {
+        Objects.requireNonNull(applicationFeatureDto);
+        return mapperFactory.getMapperFacade().map(applicationFeatureDto, ApplicationFeature.class);
     }
 
     public <T, R> PageableDataResponse<List<R>> toPageableDataResponse(@NotNull PageableDataResponse<List<T>> response, @NotNull Function<T, R> mappingFunction) {
