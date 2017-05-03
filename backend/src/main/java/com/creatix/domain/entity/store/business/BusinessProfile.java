@@ -1,6 +1,7 @@
 package com.creatix.domain.entity.store.business;
 
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.photo.AttachmentId;
 import com.creatix.domain.entity.store.photo.BusinessProfilePhoto;
 import lombok.Data;
 
@@ -12,7 +13,7 @@ import java.util.List;
  */
 @Entity
 @Data
-public class BusinessProfile {
+public class BusinessProfile implements AttachmentId {
 
     @Id
     @GeneratedValue

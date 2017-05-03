@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store.business;
 
+import com.creatix.domain.entity.store.photo.AttachmentId;
 import com.creatix.domain.entity.store.photo.BusinessProfileCartePhoto;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Data
-public class BusinessProfileCarteItem {
+public class BusinessProfileCarteItem implements AttachmentId {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

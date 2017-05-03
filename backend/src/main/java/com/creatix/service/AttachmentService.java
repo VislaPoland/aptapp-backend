@@ -7,6 +7,7 @@ import com.creatix.domain.dao.AttachmentDao;
 import com.creatix.domain.entity.store.notification.Notification;
 import com.creatix.domain.entity.store.notification.NotificationPhoto;
 import com.creatix.domain.entity.store.photo.Attachment;
+import com.creatix.domain.entity.store.photo.AttachmentId;
 import com.creatix.domain.entity.store.photo.AttachmentMediaType;
 import com.creatix.domain.entity.store.photo.AttachmentObjectFactory;
 import lombok.Getter;
@@ -86,7 +87,7 @@ public class AttachmentService {
 
     public <T extends Attachment> List<T> storeAttachments(@NotNull MultipartFile[] files,
                                                            @NotNull AttachmentObjectFactory<T> attachmentObjectFactory,
-                                                           @NotNull Object fkObject,
+                                                           @NotNull AttachmentId fkObject,
                                                            Class<T> clazz) throws IOException {
         Objects.requireNonNull(files, "Files array is null");
         Objects.requireNonNull(attachmentObjectFactory);
@@ -94,12 +95,7 @@ public class AttachmentService {
 
         Entity entityAnnotation = fkObject.getClass().getAnnotation(Entity.class);
         Objects.requireNonNull(entityAnnotation, "Foreign key must be annotated with @Entity");
-        Long fkId;
-        try {
-            fkId = (Long) fkObject.getClass().getMethod("getId").invoke(null);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException("Foreign key object does not have getId() method, or failed to invoke", e);
-        }
+        Long fkId = fkObject.getId();
 
         ArrayList<T> storedAttachmentsList = new ArrayList<>(files.length);
 
