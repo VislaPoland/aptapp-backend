@@ -3,6 +3,7 @@ package com.creatix.controller.v1;
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.ApplicationFeatureDto;
+import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
@@ -10,6 +11,7 @@ import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.dto.property.PropertyPhotoDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
+import com.creatix.domain.dto.property.slot.SlotDto;
 import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
@@ -176,14 +178,15 @@ public class PropertyController {
     @JsonView(Views.SlotsWithReservations.class)
     @RequestMapping(path = "/{propertyId}/schedule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<ScheduledSlotsResponse> getEvents(
+    public PageableDataResponse<List<SlotDto>> getEvents(
             @PathVariable Long propertyId,
             @ApiParam(example = "2016-07-07") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDt,
             @ApiParam(example = "2016-07-07") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDt,
             @ApiParam @RequestParam(required = false) Long startId,
             @ApiParam @RequestParam(required = false) Integer pageSize) {
 
-        return new DataResponse<>(slotService.getSlotsByFilter(propertyId, beginDt, endDt, startId, pageSize));
+        ScheduledSlotsResponse slotsByFilter = slotService.getSlotsByFilter(propertyId, beginDt, endDt, startId, pageSize);
+        return new PageableDataResponse<>(slotsByFilter.getSlots(), pageSize.longValue(), slotsByFilter.getNextId());
     }
 
 
