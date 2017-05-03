@@ -119,7 +119,7 @@ public class AuthorizationManager {
         return false;
     }
 
-    public void checkRead(@NotNull Property property) {
+    public void checkRead(@NotNull Property property) throws SecurityException {
         Objects.requireNonNull(property);
         boolean allowed = false;
         switch ( getCurrentAccount().getRole() ) {

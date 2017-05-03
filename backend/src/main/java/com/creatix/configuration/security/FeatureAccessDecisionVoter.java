@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * Created by kvimbi on 11/04/2017.
+ * Created by Tomas Michalek on 11/04/2017.
  */
 @Component
 public class FeatureAccessDecisionVoter implements AccessDecisionVoter<Object> {

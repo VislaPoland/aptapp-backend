@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * Created by kvimbi on 11/04/2017.
+ * Created by Tomas Michalek on 11/04/2017.
  */
 @Repository
 public class ApplicationFeatureDao extends DaoBase<ApplicationFeature, Long> {

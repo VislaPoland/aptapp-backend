@@ -36,8 +36,6 @@ public final class PropertyMapper extends ConfigurableMapper {
         //region Account
         mapperFactory.classMap(Account.class, BasicAccountDto.class)
                 .byDefault()
-                .field("primaryEmail", "email")
-                .field("primaryPhone", "phone")
                 .register();
         //endregion
 

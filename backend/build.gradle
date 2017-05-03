@@ -44,6 +44,21 @@ repositories {
     maven { url 'https://repo.spring.io/libs-milestone' }
 }
 
+task createBuildVersionFile(type:Exec) {
+	commandLine "$projectDir/createBuildVersion.sh"
+}
+
+war {
+	webInf {
+		from("$buildDir/tmp/") {
+			include "version_number"
+			into('classes/')
+		}
+	}
+}
+
+war.dependsOn createBuildVersionFile
+
 
 dependencies {
 
@@ -76,6 +91,7 @@ dependencies {
 	compile('com.twilio.sdk:twilio-java-sdk:7.0.0-rc-6')
 	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.5')
     compile('com.googlecode.json-simple:json-simple:1.1')
+	compile group: 'com.google.zxing', name: 'core', version: '3.3.0'
 
 	//	APNS
 	compile('com.notnoop.apns:apns:1.0.0.Beta3')

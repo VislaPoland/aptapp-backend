@@ -1,45 +1,40 @@
 package com.creatix.service;
 
-import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
-import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.MaintenanceEmployee;
 import com.creatix.domain.entity.store.account.SecurityEmployee;
 import com.creatix.domain.entity.store.account.Tenant;
-import com.creatix.domain.entity.store.notification.*;
+import com.creatix.domain.entity.store.notification.MaintenanceNotification;
+import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
+import com.creatix.domain.entity.store.notification.Notification;
+import com.creatix.domain.entity.store.notification.SecurityNotification;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
-import com.creatix.message.PushNotificationSender;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.message.PushNotificationService;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -58,13 +53,9 @@ public class NotificationService {
     @Autowired
     private AuthorizationManager authorizationManager;
     @Autowired
-    private FileUploadProperties uploadProperties;
-    @Autowired
-    private NotificationPhotoDao notificationPhotoDao;
-    @Autowired
     private SmsMessageSender smsMessageSender;
     @Autowired
-    private PushNotificationSender pushNotificationSender;
+    private PushNotificationService pushNotificationService;
     @Autowired
     private SecurityEmployeeDao securityEmployeeDao;
     @Autowired
@@ -148,7 +139,7 @@ public class NotificationService {
         securityNotificationDao.persist(notification);
 
         for ( SecurityEmployee secEmp : securityEmployeeDao.findByProperty(notification.getProperty()) ) {
-            pushNotificationSender.sendNotification(new SecurityNotificationTemplate(notification), secEmp);
+            pushNotificationService.sendNotification(new SecurityNotificationTemplate(notification), secEmp);
         }
 
         return notification;
@@ -169,7 +160,7 @@ public class NotificationService {
         maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
 
         for ( MaintenanceEmployee employee : maintenanceEmployeeDao.findByProperty(notification.getProperty()) ) {
-            pushNotificationSender.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
+            pushNotificationService.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
         }
 
         return notification;
@@ -195,7 +186,7 @@ public class NotificationService {
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
             }
-            pushNotificationSender.sendNotification(new NeighborNotificationTemplate(notification), tenant);
+            pushNotificationService.sendNotification(new NeighborNotificationTemplate(notification), tenant);
         }
 
         return notification;
@@ -215,10 +206,10 @@ public class NotificationService {
                 neighborhoodNotificationDao.persist(notification);
 
                 if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
-                    pushNotificationSender.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
+                    pushNotificationService.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
                 }
                 else if ( request.getResponse() == NeighborhoodNotificationResponse.SorryNotMe ) {
-                    pushNotificationSender.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
+                    pushNotificationService.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
                 }
 
                 return notification;
@@ -242,20 +233,20 @@ public class NotificationService {
                 final Account account = notification.getAuthor();
 
                 if ( account.getRole() == AccountRole.Tenant ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), account);
+                    pushNotificationService.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), account);
                 }
                 else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), account);
+                    pushNotificationService.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), account);
                 }
             }
             else if ( request.getResponse() == SecurityNotificationResponseType.Resolved ) {
                 final Account account = notification.getAuthor();
 
                 if ( account.getRole() == AccountRole.Tenant ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), account);
+                    pushNotificationService.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), account);
                 }
                 else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
-                    pushNotificationSender.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), account);
+                    pushNotificationService.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), account);
                 }
             }
 
@@ -290,41 +281,4 @@ public class NotificationService {
         return apartment;
     }
 
-    public Notification storeNotificationPhotos(@NotNull MultipartFile[] files, long notificationId) throws IOException {
-        Objects.requireNonNull(files, "Files array is null");
-
-        final Notification notification = notificationDao.findById(notificationId);
-        if ( notification == null ) {
-            throw new EntityNotFoundException(String.format("Notification id=%d not found", notificationId));
-        }
-
-        for ( MultipartFile file : files ) {
-
-            // move uploaded file to file repository
-            final String fileName = String.format("%d-%d-%s", notification.getId(), notification.getPhotos().size(), file.getOriginalFilename());
-            final Path photoFilePath = Paths.get(uploadProperties.getRepositoryPath(), fileName);
-            Files.createDirectories(photoFilePath.getParent());
-            file.transferTo(photoFilePath.toFile());
-
-            final NotificationPhoto photo = new NotificationPhoto();
-            photo.setNotification(notification);
-            photo.setFileName(fileName);
-            photo.setFilePath(photoFilePath.toString());
-            notificationPhotoDao.persist(photo);
-
-            notification.getPhotos().add(photo);
-        }
-
-        return notification;
-    }
-
-    public NotificationPhoto getNotificationPhoto(Long notificationId, String fileName) {
-
-        final NotificationPhoto photo = notificationPhotoDao.findByNotificationIdAndFileName(notificationId, fileName);
-        if ( photo == null ) {
-            throw new EntityNotFoundException(String.format("Photo id=%s not found", fileName));
-        }
-
-        return photo;
-    }
 }

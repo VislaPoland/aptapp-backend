@@ -1,0 +1,1 @@
+New discount coupon is available for ${businessName}

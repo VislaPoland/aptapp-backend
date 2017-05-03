@@ -20,12 +20,12 @@ import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRe
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.*;
 import com.creatix.domain.dto.property.slot.*;
+import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
-import com.creatix.domain.dto.tenant.ParkingStallDto;
+import com.creatix.domain.dto.tenant.VehicleDto;
 import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
-import com.creatix.domain.dto.tenant.VehicleDto;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
@@ -204,8 +204,6 @@ public class Mapper {
 
         mapperFactory.classMap(PropertyOwner.class, PropertyDto.OwnerDto.class)
                 .byDefault()
-                .field("primaryEmail", "email")
-                .field("primaryPhone", "phone")
                 .field("website", "web")
                 .register();
 

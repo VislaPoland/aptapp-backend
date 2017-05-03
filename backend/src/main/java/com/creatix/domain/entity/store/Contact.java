@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "id")
+@Inheritance(strategy= InheritanceType.TABLE_PER_CLASS)
 public class Contact {
 
     @Id

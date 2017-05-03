@@ -2,6 +2,7 @@ package com.creatix.controller;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
+import com.creatix.controller.v1.TenantController;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
@@ -57,7 +58,6 @@ public class TenantControllerTest {
 
         VehicleDto vehicleDto = new VehicleDto();
         vehicleDto.setColor("red");
-        vehicleDto.setLicensePlate("XY345GE");
         vehicleDto.setMake("Toyota");
         vehicleDto.setModel("Camry");
         vehicleDto.setYear(2016);

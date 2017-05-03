@@ -1,7 +1,6 @@
 package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.PropertyPhoto;
-import com.creatix.domain.entity.store.QProperty;
 import com.creatix.domain.entity.store.QPropertyPhoto;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

@@ -20,12 +20,12 @@ public abstract class DaoBase<T, ID> {
     protected EntityManager em;
 
     @Autowired
-    JPQLQueryFactory queryFactory;
+    protected JPQLQueryFactory queryFactory;
 
     private Class<T> type;
 
     @SuppressWarnings("unchecked")
-    DaoBase() {
+    protected DaoBase() {
         final Class<?>[] classes = GenericTypeResolver.resolveTypeArguments(getClass(), DaoBase.class);
         this.type = (Class<T>) classes[0];
     }

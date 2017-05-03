@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Created by kvimbi on 12/04/2017.
+ * Created by Tomas Michalek on 12/04/2017.
  */
 @RestController
 @RequestMapping(path = "/api/appFeatures")

@@ -2,21 +2,22 @@ package com.creatix.service;
 
 import com.creatix.domain.dao.ApplicationFeatureDao;
 import com.creatix.domain.dao.PropertyDao;
-import com.creatix.domain.dto.ApplicationFeatureDto;
 import com.creatix.domain.entity.store.ApplicationFeature;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.enums.ApplicationFeatureType;
 import com.creatix.security.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * Created by kvimbi on 12/04/2017.
+ * Created by Tomas Michalek on 12/04/2017.
  */
 @Component
 public class ApplicationFeatureService {

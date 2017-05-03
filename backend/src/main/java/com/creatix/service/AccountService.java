@@ -10,7 +10,7 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
-import com.creatix.message.EmailMessageSender;
+import com.creatix.service.message.EmailMessageService;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.template.email.*;
 import com.creatix.security.*;
@@ -66,7 +66,7 @@ public class AccountService {
     @Autowired
     private PropertyDao propertyDao;
     @Autowired
-    private EmailMessageSender emailMessageSender;
+    private EmailMessageService emailMessageService;
     @Autowired
     private AccountDeviceService accountDeviceService;
     @Autowired
@@ -122,7 +122,7 @@ public class AccountService {
 
         setActionToken(account);
 
-        emailMessageSender.send(new ResetActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new ResetActivationMessageTemplate(account, applicationProperties));
 
         return account.getActionToken();
     }
@@ -314,7 +314,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new AdministratorActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new AdministratorActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
@@ -348,7 +348,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new PropertyOwnerActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new PropertyOwnerActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
@@ -394,7 +394,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
@@ -445,7 +445,7 @@ public class AccountService {
         securityEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
@@ -482,7 +482,7 @@ public class AccountService {
         maintenanceEmployeeDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
@@ -534,7 +534,7 @@ public class AccountService {
         assistantPropertyManagerDao.persist(account);
         setActionToken(account);
 
-        emailMessageSender.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
@@ -561,7 +561,7 @@ public class AccountService {
         final Account account = getAccount(request.getEmail());
         setActionToken(account);
         accountDao.persist(account);
-        emailMessageSender.send(new ResetPasswordMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new ResetPasswordMessageTemplate(account, applicationProperties));
     }
 
     @RoleSecured
