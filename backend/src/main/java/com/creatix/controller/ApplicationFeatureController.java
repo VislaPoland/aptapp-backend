@@ -1,5 +1,6 @@
 package com.creatix.controller;
 
+import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.ApplicationFeatureDto;
 import com.creatix.domain.dto.DataResponse;
@@ -21,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by Tomas Michalek on 12/04/2017.
  */
 @RestController
-@RequestMapping(path = "/api/appFeatures")
+@RequestMapping(path = "/api/properties/{propertyId}/features")
+@ApiVersion(1.0)
 public class ApplicationFeatureController {
 
 
