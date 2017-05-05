@@ -7,6 +7,7 @@ import static com.creatix.domain.entity.store.QApplicationFeature.applicationFea
 import com.creatix.domain.entity.store.QApplicationFeature;
 import com.creatix.domain.enums.ApplicationFeatureType;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  * Created by Tomas Michalek on 11/04/2017.
  */
 @Repository
+@Transactional
 public class ApplicationFeatureDao extends DaoBase<ApplicationFeature, Long> {
 
 

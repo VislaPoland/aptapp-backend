@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by Tomas Michalek on 12/04/2017.
  */
 @RestController
-@RequestMapping(path = "/api/properties/{propertyId}/features")
+@RequestMapping(path = {"/api/properties/{propertyId}/features", "/api/v1/properties/{propertyId}/feature"})
 @ApiVersion(1.0)
 public class ApplicationFeatureController {
 
