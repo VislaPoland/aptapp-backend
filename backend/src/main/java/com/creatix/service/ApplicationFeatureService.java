@@ -8,6 +8,7 @@ import com.creatix.domain.enums.ApplicationFeatureType;
 import com.creatix.security.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
@@ -20,6 +21,7 @@ import java.util.Optional;
  * Created by Tomas Michalek on 12/04/2017.
  */
 @Component
+@Transactional
 public class ApplicationFeatureService {
 
 
