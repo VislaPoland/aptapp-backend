@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
@@ -160,13 +161,21 @@ public class PropertyController {
     public HttpEntity<byte[]> getFile(@PathVariable Long propertyId, @PathVariable String fileName) throws IOException {
         final PropertyPhoto photo = propertyService.getPropertyPhoto(propertyId, fileName);
         final File photoFile = new File(photo.getFilePath());
-        final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
+        if (photoFile.exists()) {
+            try {
+                final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
 
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.valueOf(Files.probeContentType(photoFile.toPath())));
-        headers.setContentLength(photoFileData.length);
+                final HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.valueOf(Files.probeContentType(photoFile.toPath())));
+                headers.setContentLength(photoFileData.length);
 
-        return new HttpEntity<>(photoFileData, headers);
+                return new HttpEntity<>(photoFileData, headers);
+            } catch (IOException exception) {
+                throw new EntityNotFoundException("Unable to locate photo file");
+            }
+        }
+
+        throw new EntityNotFoundException("Unable to locate photo file");
     }
 
     @ApiOperation(value = "Get scheduled events", notes = "Get all scheduled events for single property")

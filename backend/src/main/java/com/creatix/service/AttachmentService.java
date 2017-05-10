@@ -135,10 +135,18 @@ public class AttachmentService {
 
         if (attachment != null && fileName.equals(attachment.getFileName())) {
             final File attachmentFile = new File(attachment.getFilePath());
-            return new DownloadAttachment(
-                    FileUtils.readFileToByteArray(attachmentFile),
-                    MediaType.valueOf(Files.probeContentType(attachmentFile.toPath()))
-            );
+            if (attachmentFile.exists()) {
+                try {
+                    return new DownloadAttachment(
+                            FileUtils.readFileToByteArray(attachmentFile),
+                            MediaType.valueOf(Files.probeContentType(attachmentFile.toPath()))
+                    );
+                } catch (IOException e) {
+                    throw new EntityNotFoundException(String.format("Unable to read attachments file %s", fileName));
+                }
+            } else {
+                throw new EntityNotFoundException(String.format("Unable to locate attachments file %s", fileName));
+            }
         }
 
         throw new EntityNotFoundException(String.format("Attachment id=%s not found", fileName));
