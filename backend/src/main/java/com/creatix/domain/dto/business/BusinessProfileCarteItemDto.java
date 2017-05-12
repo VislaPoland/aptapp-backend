@@ -1,7 +1,5 @@
 package com.creatix.domain.dto.business;
 
-import com.creatix.domain.entity.store.business.BusinessProfile;
-import com.creatix.domain.entity.store.photo.BusinessProfileCartePhoto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

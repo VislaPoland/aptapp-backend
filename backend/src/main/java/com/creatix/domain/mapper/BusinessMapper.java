@@ -3,7 +3,7 @@ package com.creatix.domain.mapper;
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.dto.business.*;
 import com.creatix.domain.entity.store.business.*;
-import com.creatix.domain.entity.store.photo.BusinessProfilePhoto;
+import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;

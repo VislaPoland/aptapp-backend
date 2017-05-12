@@ -1,8 +1,7 @@
-package com.creatix.domain.entity.store.photo;
+package com.creatix.domain.entity.store.attachment;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.http.MediaType;
 
 import javax.persistence.*;
 

@@ -1,4 +1,4 @@
-package com.creatix.domain.entity.store.photo;
+package com.creatix.domain.entity.store.attachment;
 
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import lombok.Data;

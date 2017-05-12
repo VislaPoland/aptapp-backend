@@ -172,7 +172,7 @@ public class BusinessProfileController {
         );
     }
 
-    @ApiOperation(value = "Upload notification photo")
+    @ApiOperation(value = "Upload business profile photo")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),

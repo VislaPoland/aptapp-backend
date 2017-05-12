@@ -1,7 +1,7 @@
 package com.creatix.domain.entity.store.business;
 
-import com.creatix.domain.entity.store.photo.AttachmentId;
-import com.creatix.domain.entity.store.photo.BusinessProfileCartePhoto;
+import com.creatix.domain.entity.store.attachment.AttachmentId;
+import com.creatix.domain.entity.store.attachment.BusinessProfileCartePhoto;
 import lombok.Data;
 
 import javax.persistence.*;
