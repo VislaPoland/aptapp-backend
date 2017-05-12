@@ -1,12 +1,10 @@
 package com.creatix.domain.mapper;
 
 import com.creatix.configuration.ApplicationProperties;
-import com.creatix.domain.dto.community.board.CommunityBoardCategoryDto;
-import com.creatix.domain.dto.community.board.CommunityBoardItemAuthorDto;
-import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
-import com.creatix.domain.dto.community.board.CommunityBoardItemPhotoDto;
+import com.creatix.domain.dto.community.board.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.community.board.CommunityBoardCategory;
+import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItemPhoto;
 import ma.glasnost.orika.CustomMapper;
@@ -84,6 +82,16 @@ public class CommunityBoardMapper extends ConfigurableMapper {
     public CommunityBoardCategoryDto toCommunityBoardCategoryDto(@NotNull CommunityBoardCategory communityBoardCategory) {
         Objects.requireNonNull(communityBoardCategory, "Board item category must not be null");
         return this.map(communityBoardCategory, CommunityBoardCategoryDto.class);
+    }
+
+    public CommunityBoardCommentDto toCommunityBoardComment(@NotNull CommunityBoardComment communityBoardComment) {
+        Objects.requireNonNull(communityBoardComment, "Comment object can not be null");
+        return this.map(communityBoardComment, CommunityBoardCommentDto.class);
+    }
+
+    public CommunityBoardComment toCommunityBoardComment(@NotNull CommunityBoardCommentDto communityBoardCommentDto) {
+        Objects.requireNonNull(communityBoardCommentDto, "Comment object can not be null");
+        return this.map(communityBoardCommentDto, CommunityBoardComment.class);
     }
 
 }

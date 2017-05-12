@@ -20,6 +20,10 @@ public enum CommunityBoardStatusType {
     /**
      * Item is sold, or not valid anymore
      */
-    CLOSED
+    CLOSED,
+    /**
+     * Deleted item
+     */
+    DELETED
 
 }

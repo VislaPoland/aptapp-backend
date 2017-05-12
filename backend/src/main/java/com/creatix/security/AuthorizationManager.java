@@ -329,4 +329,44 @@ public class AuthorizationManager {
             throw new SecurityException(String.format("You are not allowed to reset user=%s activation code", account.getPrimaryEmail()));
         }
     }
+
+    /**
+     * Check access permissions
+     *
+     * <ol>
+     *     <li>Tenant, Sub-Tenant - can modify only own items</li>
+     *     <li>PropertyOwner, PropertyManager, AssistantPropertyManager - can modify all items linked to managed property</li>
+     *     <li>Administrator - can modify everything</li>
+     *     <li>Maintenance, Security - has no power here</li>
+     * </ol>
+     *
+     * @param authorAccountId author of the item (either comment or community board post item)
+     * @param property to which the item is linked
+     * @param sessionAccount of user making request
+     * @throws SecurityException if user is not authorized to make changes
+     */
+    public void checkCommunityBoardModifyAccess(Long authorAccountId, Property property, Account sessionAccount) throws SecurityException {
+
+        switch (sessionAccount.getRole()) {
+            case Tenant:
+            case SubTenant:
+                if (!authorAccountId.equals(sessionAccount.getId())) {
+                    throw new SecurityException("You can not modify this item");
+                }
+                break;
+            case PropertyOwner:
+            case PropertyManager:
+            case AssistantPropertyManager:
+                if (!this.canWrite(property)) {
+                    throw new SecurityException("You can not modify this item");
+                }
+                break;
+            case Maintenance:
+            case Security:
+                throw new SecurityException("You can not modify this item");
+            case Administrator:
+                // he can do anything
+                break;
+        }
+    }
 }

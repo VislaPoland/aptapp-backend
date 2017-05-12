@@ -5,6 +5,7 @@ import com.creatix.domain.dto.community.board.SearchRequest;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.community.board.CommunityBoardCategory;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
+import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.stereotype.Repository;
@@ -37,7 +38,10 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
         JPQLQuery<CommunityBoardItem> query = queryFactory.selectFrom(communityBoardItem);
 
         //where
-        BooleanExpression wherePredicate = communityBoardItem.property.eq(property);
+        BooleanExpression wherePredicate = communityBoardItem.property.eq(property)
+                .and(
+                        communityBoardItem.communityBoardStatus.eq(CommunityBoardStatusType.OPEN)
+                );
         if (null != category) {
             wherePredicate = wherePredicate.and(communityBoardItem.category.eq(category));
         }

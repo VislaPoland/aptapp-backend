@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * Created by kvimbi on 11/05/2017.
  */
 @RestController
-@RequestMapping(path = "/api/properties/{propertyId}/communityBoards")
+@RequestMapping(path = "/api/v1/properties/{propertyId}/communityBoards")
 @ApiVersion(1.0)
 public class CommunityBoardItemController {
 
@@ -48,7 +48,7 @@ public class CommunityBoardItemController {
     public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody CommunityBoardItemDto request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
-                        communityBoardService.createNewFromRequest(propertyId, request)
+                        communityBoardService.createNewBoardItemFromRequest(propertyId, request)
                 )
         );
     }
@@ -64,12 +64,12 @@ public class CommunityBoardItemController {
     public DataResponse<CommunityBoardItemDto> updateItem(@RequestBody CommunityBoardItemDto request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
-                        communityBoardService.updateItemFromRequest(request)
+                        communityBoardService.updateBoardItemFromRequest(request)
                 )
         );
     }
 
-    @ApiOperation(value = "Update existing item")
+    @ApiOperation(value = "Get existing item")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
@@ -77,10 +77,10 @@ public class CommunityBoardItemController {
     })
     @RequestMapping(path = "/{itemId}", method = RequestMethod.GET)
     @RoleSecured()
-    public DataResponse<CommunityBoardItemDto> updateItem(@PathVariable("itemId") Long itemId) {
+    public DataResponse<CommunityBoardItemDto> getItem(@PathVariable("itemId") Long itemId) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
-                        communityBoardService.getById(itemId)
+                        communityBoardService.getBoardItemById(itemId)
                 )
         );
     }
@@ -96,7 +96,7 @@ public class CommunityBoardItemController {
     public DataResponse<CommunityBoardItemDto> deleteItem(@PathVariable("itemId") Long itemId) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
-                        communityBoardService.deleteById(itemId)
+                        communityBoardService.deleteBoardItemById(itemId)
                 )
         );
     }
@@ -113,7 +113,7 @@ public class CommunityBoardItemController {
     public DataResponse<List<CommunityBoardItemDto>> listVisibleItems(@PathVariable("propertyId") Long propertyId,
                                                                       @PathVariable("page") Long offset,
                                                                       @PathVariable("limit") Long limit) {
-        return new DataResponse<>(communityBoardService.listItemsForProperty(propertyId, offset, limit)
+        return new DataResponse<>(communityBoardService.listBoardItemsForProperty(propertyId, offset, limit)
                 .stream()
                 .filter(e -> e.getCommunityBoardStatus() == CommunityBoardStatusType.OPEN)
                 .map(e-> communityBoardMapper.toCommunityBoardItem(e))
@@ -132,7 +132,7 @@ public class CommunityBoardItemController {
     @RoleSecured
     public DataResponse<List<CommunityBoardItemDto>> searchBoard(@PathVariable("propertyId") Long propertyId,
                                                         @RequestBody SearchRequest searchRequest) {
-        return new DataResponse<>(communityBoardService.searchItemsForProperty(propertyId, searchRequest)
+        return new DataResponse<>(communityBoardService.searchBoardItemsForProperty(propertyId, searchRequest)
                 .stream()
                 .filter(e -> e.getCommunityBoardStatus() == CommunityBoardStatusType.OPEN)
                 .map(e-> communityBoardMapper.toCommunityBoardItem(e))
@@ -153,7 +153,7 @@ public class CommunityBoardItemController {
     @RoleSecured
     public DataResponse<CommunityBoardItemDto> storeCommunityItemPhotos(@RequestParam MultipartFile[] files, @PathVariable("itemId") long itemId) throws IOException {
         return new DataResponse<>(
-                communityBoardMapper.toCommunityBoardItem(communityBoardService.storeBusinessProfilePhotos(files, itemId))
+                communityBoardMapper.toCommunityBoardItem(communityBoardService.storeBoardItemPhotos(files, itemId))
         );
     }
 
