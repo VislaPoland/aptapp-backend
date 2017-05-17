@@ -43,7 +43,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "/", method = RequestMethod.POST)
+    @RequestMapping(path = "", method = RequestMethod.POST)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody CommunityBoardItemDto request) {
         return new DataResponse<>(
@@ -59,7 +59,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "/", method = RequestMethod.PUT)
+    @RequestMapping(path = "", method = RequestMethod.PUT)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemDto> updateItem(@RequestBody CommunityBoardItemDto request) {
         return new DataResponse<>(

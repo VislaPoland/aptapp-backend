@@ -34,7 +34,7 @@ public class CommunityBoardCommentController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "/", method = RequestMethod.GET)
+    @RequestMapping(path = "", method = RequestMethod.GET)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<List<CommunityBoardCommentDto>> listAllComments(@PathVariable("boardItemId") Long boardItemId) {
         return new DataResponse<>(
@@ -51,7 +51,7 @@ public class CommunityBoardCommentController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "/", method = RequestMethod.POST)
+    @RequestMapping(path = "", method = RequestMethod.POST)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardCommentDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody CommunityBoardCommentDto request) {
         return new DataResponse<>(
@@ -67,7 +67,7 @@ public class CommunityBoardCommentController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "/", method = RequestMethod.PUT)
+    @RequestMapping(path = "", method = RequestMethod.PUT)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardCommentDto> updateItem(@RequestBody CommunityBoardCommentDto request) {
         return new DataResponse<>(
