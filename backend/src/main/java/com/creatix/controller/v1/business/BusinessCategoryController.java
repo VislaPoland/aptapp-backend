@@ -40,7 +40,7 @@ public class BusinessCategoryController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<BusinessCategoryDto>> listBusinessCategories() {
         return new DataResponse<>(businessProfileService.listBusinessCategories()
@@ -73,7 +73,7 @@ public class BusinessCategoryController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/", method = {RequestMethod.PUT, RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "", method = {RequestMethod.PUT, RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(AccountRole.Administrator)
     public DataResponse<BusinessCategoryDto> createBusinessCategory(@RequestBody BusinessCategoryDto businessCategoryDto) {
         return new DataResponse<>(
