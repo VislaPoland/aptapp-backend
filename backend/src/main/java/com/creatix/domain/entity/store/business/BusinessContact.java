@@ -22,7 +22,7 @@ public class BusinessContact extends Contact {
     @Column
     private String zipCode;
     @Column
-    private String country;
+    private String city;
     @Column
     private String state;
 

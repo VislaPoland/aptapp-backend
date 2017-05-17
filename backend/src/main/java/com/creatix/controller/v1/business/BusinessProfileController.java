@@ -45,7 +45,7 @@ public class BusinessProfileController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<BusinessProfileDto>> listBusinessProfilesForProperty(@PathVariable Long propertyId) {
         return new DataResponse<>(businessProfileService.listBusinessProfilesForProperty(propertyId)
@@ -54,7 +54,7 @@ public class BusinessProfileController {
                 .collect(Collectors.toList()));
     }
 
-    @ApiOperation(value = "List businesss profiles for property and category")
+    @ApiOperation(value = "List business profiles for property and category")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
@@ -79,7 +79,7 @@ public class BusinessProfileController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/categories/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/categories/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<BusinessProfileDto>> listBusinessProfilesForPropertyAndCategory(
             @PathVariable Long propertyId,
@@ -116,7 +116,7 @@ public class BusinessProfileController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileDto> createBusinessProfile(@RequestBody BusinessProfileDto request,
                                                                   @PathVariable("propertyId") Long propertyId) {
@@ -134,7 +134,7 @@ public class BusinessProfileController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/", method = {RequestMethod.PUT}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "", method = {RequestMethod.PUT}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileDto> update(@RequestBody BusinessProfileDto request) {
         return new DataResponse<>(
