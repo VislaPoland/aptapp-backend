@@ -3,9 +3,9 @@ package com.creatix.controller.v1;
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.ApplicationFeatureDto;
+import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyDto;
 import com.creatix.domain.dto.property.PropertyPhotoDto;
@@ -17,7 +17,6 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.ApplicationFeatureService;
 import com.creatix.service.SlotService;
-import com.creatix.service.apartment.ApartmentService;
 import com.creatix.service.property.PropertyService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
@@ -192,7 +191,7 @@ public class PropertyController {
             @ApiParam(example = "2016-07-07") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDt,
             @ApiParam(example = "2016-07-07") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDt,
             @ApiParam @RequestParam(required = false) Long startId,
-            @ApiParam @RequestParam(required = false) Integer pageSize) {
+            @ApiParam @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
 
         ScheduledSlotsResponse slotsByFilter = slotService.getSlotsByFilter(propertyId, beginDt, endDt, startId, pageSize);
         return new PageableDataResponse<>(slotsByFilter.getSlots(), pageSize.longValue(), slotsByFilter.getNextId());
