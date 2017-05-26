@@ -1,5 +1,7 @@
 package com.creatix.domain.entity.store.business;
 
+import com.creatix.domain.entity.store.attachment.AttachmentId;
+import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -11,7 +13,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @Accessors(chain = true)
-public class DiscountCoupon {
+public class DiscountCoupon implements AttachmentId {
 
     public static final int UNLIMITED_USE = -1;
 
@@ -30,5 +32,8 @@ public class DiscountCoupon {
 
     @Column
     private String code;
+
+    @OneToOne
+    private DiscountCouponPhoto discountCouponPhoto;
 
 }

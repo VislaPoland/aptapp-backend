@@ -4,6 +4,8 @@ import com.creatix.domain.dao.business.BusinessProfileDao;
 import com.creatix.domain.dao.business.DiscountCouponDao;
 import com.creatix.domain.dao.business.DiscountCouponUsageDao;
 import com.creatix.domain.dto.business.DiscountCouponDto;
+import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
+import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
 import com.creatix.domain.entity.store.business.DiscountCouponUsage;
@@ -11,6 +13,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.AttachmentService;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -21,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.persistence.EntityNotFoundException;
@@ -31,6 +35,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,6 +65,8 @@ public class DiscountCouponService {
     private BusinessMapper businessMapper;
     @Autowired
     private BusinessNotificationExecutor businessNotificationExecutor;
+    @Autowired
+    private AttachmentService attachmentService;
 
     /**
      * Finds discount coupon by id, or throws {@link EntityNotFoundException} if not found
@@ -253,4 +260,24 @@ public class DiscountCouponService {
 
     }
 
+    public DiscountCoupon storeBusinessProfilePhotos(MultipartFile[] files, long couponId) {
+        final DiscountCoupon discountCoupon = findCouponById(couponId);
+        List<DiscountCouponPhoto> photoStoreList;
+        try {
+            photoStoreList = attachmentService.storeAttachments(files, foreignKeyObject -> {
+                DiscountCouponPhoto discountCouponPhoto = new DiscountCouponPhoto();
+                discountCouponPhoto.setDiscountCoupon(discountCoupon);
+                return discountCouponPhoto;
+            }, discountCoupon, DiscountCouponPhoto.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Unable to store photo for business profile", e);
+        }
+        if (null != photoStoreList && photoStoreList.size() == 1) {
+            discountCoupon.setDiscountCouponPhoto(photoStoreList.get(0));
+            discountCouponDao.persist(discountCoupon);
+            return discountCoupon;
+        } else {
+            throw new IllegalArgumentException("Unable to store photo for business profile");
+        }
+    }
 }

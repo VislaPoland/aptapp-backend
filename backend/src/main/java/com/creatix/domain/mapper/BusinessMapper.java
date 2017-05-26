@@ -2,6 +2,7 @@ package com.creatix.domain.mapper;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.dto.business.*;
+import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
 import com.creatix.domain.entity.store.business.*;
 import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import ma.glasnost.orika.CustomMapper;
@@ -46,6 +47,19 @@ public class BusinessMapper extends ConfigurableMapper {
                 .register();
         factory.classMap(DiscountCoupon.class, DiscountCouponDto.class)
                 .byDefault()
+                .register();
+        factory.classMap(DiscountCouponPhoto.class, DiscountCouponPhotoDto.class)
+                .byDefault()
+                .customize(new CustomMapper<DiscountCouponPhoto, DiscountCouponPhotoDto>() {
+                    @Override
+                    public void mapAtoB(DiscountCouponPhoto discountCouponPhoto, DiscountCouponPhotoDto discountCouponPhotoDto, MappingContext context) {
+                        try {
+                            discountCouponPhotoDto.setFileUrl(getDiscountCouponPhotoUrl(discountCouponPhoto));
+                        } catch (MalformedURLException e) {
+                            throw new IllegalStateException("Failed to create download URL", e);
+                        }
+                    }
+                })
                 .register();
         factory.classMap(DiscountCouponUsage.class, DiscountCouponDto.class)
                 .customize(new CustomMapper<DiscountCouponUsage, DiscountCouponDto>() {
@@ -99,7 +113,7 @@ public class BusinessMapper extends ConfigurableMapper {
 
         return applicationProperties.buildBackendUrl(
                 String.format(
-                        "api/photos/%d/%s",
+                        "api/attachments/%d/%s",
                         businessProfileCarteItem.getBusinessProfileCartePhoto().getId(),
                         businessProfileCarteItem.getBusinessProfileCartePhoto().getFileName()
                 )
@@ -109,9 +123,19 @@ public class BusinessMapper extends ConfigurableMapper {
     private String getCartPhotoUrl(@NotNull BusinessProfilePhoto businessProfilePhoto) throws MalformedURLException {
         return applicationProperties.buildBackendUrl(
                 String.format(
-                        "api/photos/%d/%s",
+                        "api/attachments/%d/%s",
                         businessProfilePhoto.getId(),
                         businessProfilePhoto.getFileName()
+                )
+        ).toString();
+    }
+    @NotNull
+    private String getDiscountCouponPhotoUrl(@NotNull DiscountCouponPhoto discountCouponPhoto) throws MalformedURLException {
+        return applicationProperties.buildBackendUrl(
+                String.format(
+                        "api/attachments/%d/%s",
+                        discountCouponPhoto.getId(),
+                        discountCouponPhoto.getFileName()
                 )
         ).toString();
     }

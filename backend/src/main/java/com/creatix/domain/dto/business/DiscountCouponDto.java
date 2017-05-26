@@ -1,5 +1,6 @@
 package com.creatix.domain.dto.business;
 
+import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,5 +23,8 @@ public class DiscountCouponDto {
 
     @ApiModelProperty(value = "Coupon code used in QR")
     private String code;
+
+    @ApiModelProperty(value = "Photo image for coupon")
+    private DiscountCouponPhotoDto discountCouponPhoto;
 
 }

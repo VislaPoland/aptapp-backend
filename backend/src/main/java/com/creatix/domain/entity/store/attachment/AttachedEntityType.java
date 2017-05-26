@@ -5,6 +5,6 @@ package com.creatix.domain.entity.store.attachment;
  */
 public enum AttachedEntityType {
 
-    BUSINESS_PROFILE, BUSINESS_PROFILE_CARTE, COMMUNITY_BOARD_ITEM
+    BUSINESS_PROFILE, BUSINESS_PROFILE_CARTE, COMMUNITY_BOARD_ITEM, DISCOUNT_COUPON
 
 }
