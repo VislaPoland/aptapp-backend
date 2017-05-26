@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Created by kvimbi on 10/05/2017.
+ * Created by Tomas Michalek on 10/05/2017.
  */
 @Service
 public class CommunityBoardService {

@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
- * Created by kvimbi on 10/05/2017.
+ * Created by Tomas Michalek on 10/05/2017.
  */
 @Data
 public class CommunityBoardItemDto {

@@ -3,7 +3,7 @@ package com.creatix.domain.dto.community.board;
 import lombok.Data;
 
 /**
- * Created by kvimbi on 10/05/2017.
+ * Created by Tomas Michalek on 10/05/2017.
  */
 @Data
 public class CommunityBoardCategoryDto {

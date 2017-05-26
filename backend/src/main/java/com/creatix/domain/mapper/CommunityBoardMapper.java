@@ -19,7 +19,7 @@ import java.net.MalformedURLException;
 import java.util.Objects;
 
 /**
- * Created by kvimbi on 10/05/2017.
+ * Created by Tomas Michalek on 10/05/2017.
  */
 @Component
 public class CommunityBoardMapper extends ConfigurableMapper {

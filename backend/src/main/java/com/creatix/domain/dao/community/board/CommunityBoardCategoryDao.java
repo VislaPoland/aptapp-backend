@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 
 /**
- * Created by kvimbi on 11/05/2017.
+ * Created by Tomas Michalek on 11/05/2017.
  */
 @Repository
 @Transactional

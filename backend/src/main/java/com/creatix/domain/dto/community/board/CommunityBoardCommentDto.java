@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.OffsetDateTime;
 
 /**
- * Created by kvimbi on 12/05/2017.
+ * Created by Tomas Michalek on 12/05/2017.
  */
 @Data
 public class CommunityBoardCommentDto {

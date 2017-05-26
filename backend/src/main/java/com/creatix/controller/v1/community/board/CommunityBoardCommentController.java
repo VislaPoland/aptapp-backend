@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by kvimbi on 12/05/2017.
+ * Created by Tomas Michalek on 12/05/2017.
  */
 @RestController
 @RequestMapping(path = "/api/v1/properties/{propertyId}/communityBoards/{boardItemId}/comments")

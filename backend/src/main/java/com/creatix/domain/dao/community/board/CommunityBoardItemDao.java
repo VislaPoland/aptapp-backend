@@ -16,7 +16,7 @@ import java.util.List;
 import static com.creatix.domain.entity.store.community.board.QCommunityBoardItem.communityBoardItem;
 
 /**
- * Created by kvimbi on 10/05/2017.
+ * Created by Tomas Michalek on 10/05/2017.
  */
 @Repository
 @Transactional

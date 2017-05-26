@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
 /**
- * Created by kvimbi on 10/05/2017.
+ * Created by Tomas Michalek on 10/05/2017.
  */
 @Entity
 @Data

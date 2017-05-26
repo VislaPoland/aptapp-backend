@@ -1,7 +1,7 @@
 package com.creatix.domain.enums.community.board;
 
 /**
- * Created by kvimbi on 11/05/2017.
+ * Created by Tomas Michalek on 11/05/2017.
  */
 public enum CommunityBoardStatusType {
 
