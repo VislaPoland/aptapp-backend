@@ -168,6 +168,13 @@ public class PersonalMessageService {
                     (currentAccount.equals(personalMessage.getToAccount()) && personalMessage.getDeleteStatus() != PersonalMessageDeleteStatus.RECIPIENT)
                 )
            ) {
+
+            // mark the message as read?
+            if (currentAccount.equals(personalMessage.getFromAccount()) && personalMessage.getMessageStatus() != PersonalMessageStatusType.READ) {
+                personalMessage.setMessageStatus(PersonalMessageStatusType.READ);
+                personalMessageDao.persist(personalMessage);
+            }
+
             return personalMessage;
         }
 
