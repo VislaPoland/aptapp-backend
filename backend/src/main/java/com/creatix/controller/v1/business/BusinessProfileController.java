@@ -134,11 +134,27 @@ public class BusinessProfileController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "", method = {RequestMethod.PUT}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/{businessProfileId}", method = {RequestMethod.PUT}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<BusinessProfileDto> update(@RequestBody BusinessProfileDto request) {
+    public DataResponse<BusinessProfileDto> update(@RequestBody BusinessProfileDto request, @PathVariable("businessProfileId") Long businessProfileId) {
+        request.setId(businessProfileId);
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(businessProfileService.updateBusinessProfileFromRequest(request))
+        );
+    }
+
+    @ApiOperation(value = "Delete business profile")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/{businessProfileId}", method = {RequestMethod.DELETE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public DataResponse<BusinessProfileDto> delete(@PathVariable("businessProfileId") Long businessProfileId) {
+        return new DataResponse<>(
+                businessMapper.toBusinessProfile(businessProfileService.deleteBusinessProfile(businessProfileId))
         );
     }
 
