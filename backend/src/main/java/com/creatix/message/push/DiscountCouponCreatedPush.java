@@ -10,7 +10,7 @@ public class DiscountCouponCreatedPush extends GenericPushNotification {
     public DiscountCouponCreatedPush(long discountCouponId) {
         super();
 
-        if (this.getAttributes().containsKey(DISCOUNT_COUPON_ID_ATTRIBUTE_KEY)) {
+        if ( ! this.getAttributes().containsKey(DISCOUNT_COUPON_ID_ATTRIBUTE_KEY)) {
             getAttributes().put(
                     DISCOUNT_COUPON_ID_ATTRIBUTE_KEY,
                     String.valueOf(discountCouponId)
