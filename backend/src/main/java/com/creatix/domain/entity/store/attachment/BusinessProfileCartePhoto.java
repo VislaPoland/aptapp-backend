@@ -16,11 +16,11 @@ import javax.persistence.OneToOne;
 public class BusinessProfileCartePhoto extends Attachment {
 
 
-    @OneToOne(optional = false)
+    @OneToOne
     private BusinessProfileCarteItem businessProfileCarteItem;
 
     public BusinessProfileCartePhoto() {
-        this.setAttachedEntityType(AttachedEntityType.BUSINESS_PROFILE_CARTE);
+        this.attachedEntityType = AttachedEntityType.BUSINESS_PROFILE_CARTE;
     }
 
     @Override

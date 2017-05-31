@@ -15,11 +15,11 @@ import javax.persistence.OneToOne;
 @Data
 public class DiscountCouponPhoto extends Attachment {
 
-    @OneToOne(optional = false)
+    @OneToOne
     private DiscountCoupon discountCoupon;
 
     public DiscountCouponPhoto() {
-        this.setAttachedEntityType(AttachedEntityType.DISCOUNT_COUPON);
+        this.attachedEntityType = AttachedEntityType.DISCOUNT_COUPON;
     }
 
     @Override

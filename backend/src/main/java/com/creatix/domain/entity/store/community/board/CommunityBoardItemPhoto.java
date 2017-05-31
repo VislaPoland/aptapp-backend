@@ -16,11 +16,11 @@ import javax.persistence.OneToOne;
 @EqualsAndHashCode(callSuper = true)
 public class CommunityBoardItemPhoto extends Attachment {
 
-    @OneToOne(optional = false)
+    @OneToOne
     private CommunityBoardItem communityBoardItem;
 
     public CommunityBoardItemPhoto() {
-        this.setAttachedEntityType(AttachedEntityType.COMMUNITY_BOARD_ITEM);
+        this.attachedEntityType = AttachedEntityType.COMMUNITY_BOARD_ITEM;
     }
 
     @Override

@@ -27,7 +27,7 @@ public class Attachment {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private AttachedEntityType attachedEntityType;
+    protected AttachedEntityType attachedEntityType;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
