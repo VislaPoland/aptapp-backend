@@ -36,4 +36,7 @@ public class BusinessProfileDto {
     @ApiModelProperty(value = "Description", required = true)
     private String description;
 
+    @ApiModelProperty("Id of property business profile belongs to")
+    private Long propertyId;
+
 }
