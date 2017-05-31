@@ -16,10 +16,12 @@ import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.AttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Role;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
@@ -29,6 +31,7 @@ import java.util.Objects;
  * Created by Tomas Michalek on 12/04/2017.
  */
 @Service
+@Transactional
 public class BusinessProfileService {
 
     @Autowired
@@ -215,6 +218,13 @@ public class BusinessProfileService {
         businessProfile.getBusinessProfilePhotoList().addAll(photoStoreList);
         businessProfileDao.persist(businessProfile);
 
+        return businessProfile;
+    }
+
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public BusinessProfile deleteBusinessProfile(long businessProfileId) {
+        BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
+        businessProfileDao.delete(businessProfile);
         return businessProfile;
     }
 }
