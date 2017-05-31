@@ -1,5 +1,6 @@
 package com.creatix.domain.dto.business;
 
+import com.creatix.domain.enums.CommunicationType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,6 +17,12 @@ public class BusinessContactDto {
     @ApiModelProperty("Contact entry id")
     private Long id;
 
+    @ApiModelProperty(value = "Communication type")
+    private CommunicationType communicationType;
+
+    @ApiModelProperty(value = "Value for contact phone/Number")
+    private String communicationValue;
+
     @ApiModelProperty("Contact street")
     private String street;
 
@@ -25,8 +32,8 @@ public class BusinessContactDto {
     @ApiModelProperty("Zip code")
     private String zipCode;
 
-    @ApiModelProperty("Country")
-    private String country;
+    @ApiModelProperty("city")
+    private String city;
 
     @ApiModelProperty("State")
     private String state;

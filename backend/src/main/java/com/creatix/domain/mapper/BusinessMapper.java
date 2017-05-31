@@ -1,10 +1,12 @@
 package com.creatix.domain.mapper;
 
 import com.creatix.configuration.ApplicationProperties;
+import com.creatix.domain.dao.business.BusinessCategoryDao;
 import com.creatix.domain.dto.business.*;
 import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
 import com.creatix.domain.entity.store.business.*;
 import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
+import com.creatix.domain.enums.ContactType;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 13/04/2017.
@@ -25,17 +28,29 @@ public class BusinessMapper extends ConfigurableMapper {
     @Autowired
     private ApplicationProperties applicationProperties;
 
+    @Autowired
+    private BusinessCategoryDao businessCategoryDao;
+
     @Override
     protected void configure(MapperFactory factory) {
         super.configure(factory);
 
         factory.classMap(BusinessProfile.class, BusinessProfileDto.class)
                 .exclude("hasImage")
+                .fieldAToB("property.id", "propertyId")
                 .byDefault()
                 .customize(new CustomMapper<BusinessProfile, BusinessProfileDto>() {
                     @Override
                     public void mapAtoB(BusinessProfile businessProfile, BusinessProfileDto businessProfileDto, MappingContext context) {
                         businessProfileDto.setImageUploaded(businessProfile.getDefaultPhotoId() != null);
+                    }
+                    @Override
+                    public void mapBtoA(BusinessProfileDto businessProfileDto, BusinessProfile businessProfile, MappingContext context) {
+                        businessProfile.setBusinessCategoryList(
+                            businessProfileDto.getBusinessCategoryList().stream().map(
+                                    c -> businessCategoryDao.findById(c.getId())
+                            ).collect(Collectors.toList())
+                        );
                     }
                 })
                 .register();
