@@ -69,10 +69,10 @@ public class Mapper {
     }
 
     private String createNotificationPhotoDownloadUrl(NotificationPhoto photo) throws MalformedURLException, URISyntaxException {
-        return applicationProperties.buildBackendUrl(String.format("api/attachments/%d/%s", photo.getNotification().getId(), photo.getFileName())).toString();
+        return applicationProperties.buildBackendUrl(String.format("api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
     }
     private String createPropertyPhotoDownloadUrl(PropertyPhoto photo) throws MalformedURLException, URISyntaxException {
-        return applicationProperties.buildBackendUrl(String.format("api/attachments/%d/%s", photo.getProperty().getId(), photo.getFileName())).toString();
+        return applicationProperties.buildBackendUrl(String.format("api/properties/%d/photos/%s", photo.getProperty().getId(), photo.getFileName())).toString();
     }
 
     private void configure(MapperFactory mapperFactory) {
