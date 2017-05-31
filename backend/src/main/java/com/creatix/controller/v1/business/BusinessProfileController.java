@@ -5,7 +5,10 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.business.BusinessProfileCarteItemDto;
 import com.creatix.domain.dto.business.BusinessProfileDto;
+import com.creatix.domain.dto.business.BusinessProfilePhotoDto;
 import com.creatix.domain.dto.business.BusinessSearchRequest;
+import com.creatix.domain.entity.store.attachment.Attachment;
+import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.RoleSecured;
@@ -196,12 +199,27 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileDto> storeBusinessProfilePhotos(@RequestParam MultipartFile[] files, @PathVariable long businessProfileId) throws IOException {
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(businessProfileService.storeBusinessProfilePhotos(files, businessProfileId))
         );
     }
 
+    @ApiOperation(value = "Upload business profile photo")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/{businessProfileId}/photos/{photoId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public DataResponse<BusinessProfilePhotoDto> deleteBusinessProfilePhoto(@PathVariable("photoId") Long photoId,
+                                                                            @PathVariable("businessProfileId") Long businessProfileId) throws IOException {
+        return new DataResponse<>(
+                businessMapper.toBusinessProfilePhoto(businessProfileService.deleteBusinessProfilePhoto(photoId))
+        );
+    }
 
 }

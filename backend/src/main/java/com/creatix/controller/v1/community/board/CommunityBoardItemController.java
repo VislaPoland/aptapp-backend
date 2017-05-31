@@ -4,6 +4,7 @@ import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
+import com.creatix.domain.dto.community.board.CommunityBoardItemPhotoDto;
 import com.creatix.domain.dto.community.board.SearchRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
@@ -140,8 +141,6 @@ public class CommunityBoardItemController {
         );
     }
 
-
-
     @ApiOperation(value = "Upload community item photos")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -154,6 +153,22 @@ public class CommunityBoardItemController {
     public DataResponse<CommunityBoardItemDto> storeCommunityItemPhotos(@RequestParam MultipartFile[] files, @PathVariable("itemId") long itemId) throws IOException {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(communityBoardService.storeBoardItemPhotos(files, itemId))
+        );
+    }
+
+    @ApiOperation(value = "Upload community item photos")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/{itemId}/photos/{photoId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<CommunityBoardItemPhotoDto> deleteCommunityItemPhoto(@PathVariable("itemId") long itemId,
+                                                                             @PathVariable("photoId") long photoId) throws IOException {
+        return new DataResponse<>(
+                communityBoardMapper.toCommunityBoardItemPhoto(communityBoardService.deleteCommunityItemPhoto(photoId))
         );
     }
 
