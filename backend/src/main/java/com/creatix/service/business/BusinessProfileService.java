@@ -5,6 +5,7 @@ import com.creatix.domain.dao.business.BusinessCategoryDao;
 import com.creatix.domain.dao.business.BusinessProfileDao;
 import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.attachment.Attachment;
 import com.creatix.domain.entity.store.business.BusinessCategory;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.BusinessProfileCarteItem;
@@ -16,7 +17,6 @@ import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.AttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Role;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -191,6 +191,9 @@ public class BusinessProfileService {
         if (null == businessProfile) {
             throw new EntityNotFoundException(String.format("Business profile %d not found", businessProfileId));
         }
+
+        authorizationManager.checkRead(businessProfile.getProperty());
+
         return businessProfile;
     }
 
@@ -224,7 +227,24 @@ public class BusinessProfileService {
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public BusinessProfile deleteBusinessProfile(long businessProfileId) {
         BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
-        businessProfileDao.delete(businessProfile);
-        return businessProfile;
+        if (authorizationManager.canWrite(businessProfile.getProperty())) {
+            businessProfileDao.delete(businessProfile);
+            return businessProfile;
+        }
+
+        throw new SecurityException(String.format("You are not eligible to delete business profile with id=%d",
+                businessProfile.getId()));
+    }
+
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public BusinessProfilePhoto deleteBusinessProfilePhoto(long photoId) {
+        BusinessProfilePhoto attachment = (BusinessProfilePhoto) attachmentService.findById(photoId);
+
+        if (authorizationManager.canWrite(attachment.getBusinessProfile().getProperty())) {
+            return (BusinessProfilePhoto) attachmentService.deleteAttachment(attachment);
+        }
+
+        throw new SecurityException(String.format("You are not eligible to update business profile with id=%d",
+                attachment.getBusinessProfile().getId()));
     }
 }

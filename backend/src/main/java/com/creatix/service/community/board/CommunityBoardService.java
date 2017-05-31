@@ -8,6 +8,7 @@ import com.creatix.domain.dto.community.board.CommunityBoardCommentDto;
 import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
 import com.creatix.domain.dto.community.board.SearchRequest;
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import com.creatix.domain.entity.store.community.board.CommunityBoardCategory;
 import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
@@ -252,4 +253,14 @@ public class CommunityBoardService {
     }
 
 
+    public CommunityBoardItemPhoto deleteCommunityItemPhoto(long photoId) {
+        CommunityBoardItemPhoto attachment = (CommunityBoardItemPhoto) attachmentService.findById(photoId);
+
+        if (authorizationManager.canWrite(attachment.getCommunityBoardItem().getProperty())) {
+            return (CommunityBoardItemPhoto) attachmentService.deleteAttachment(attachment);
+        }
+
+        throw new SecurityException(String.format("You are not eligible to update item with id=%d",
+                attachment.getCommunityBoardItem().getId()));
+    }
 }

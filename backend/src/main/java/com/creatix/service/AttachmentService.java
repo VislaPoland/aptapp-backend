@@ -191,7 +191,17 @@ public class AttachmentService {
         throw new EntityNotFoundException(String.format("Attachment id=%s not found", fileName));
     }
 
-    public void deleteAttachment(@NotNull Attachment attachment) {
+    public Attachment deleteAttachmentById(long attachmentId) {
+        Attachment attachment = attachmentDao.findById(attachmentId);
+        if (null == attachment) {
+            throw new EntityNotFoundException(String.format("Attachment id=%d not found", attachmentId));
+        }
+
+        return deleteAttachment(attachment);
+    }
+
+
+    public Attachment deleteAttachment(@NotNull Attachment attachment) {
         Objects.requireNonNull(attachment, "Attachment object can not be null");
         if (null != attachment.getFilePath()) {
             File file = new File(attachment.getFilePath());
@@ -200,6 +210,12 @@ public class AttachmentService {
             }
         }
         attachmentDao.delete(attachment);
+
+        return attachment;
+    }
+
+    public Attachment findById(long attachmentId) {
+        return attachmentDao.findById(attachmentId);
     }
 
 }

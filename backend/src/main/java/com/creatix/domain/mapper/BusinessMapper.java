@@ -201,4 +201,8 @@ public class BusinessMapper extends ConfigurableMapper {
         return this.map(businessProfileCarteItemDto, BusinessProfileCarteItem.class);
     }
 
+    public BusinessProfilePhotoDto toBusinessProfilePhoto(@NotNull BusinessProfilePhoto businessProfilePhoto) {
+        Objects.requireNonNull(businessProfilePhoto, "Profile photo object can not be null");
+        return this.map(businessProfilePhoto, BusinessProfilePhotoDto.class);
+    }
 }
