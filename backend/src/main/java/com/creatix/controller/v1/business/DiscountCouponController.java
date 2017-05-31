@@ -117,7 +117,7 @@ public class DiscountCouponController {
     @RoleSecured
     public DataResponse<DiscountCouponDto> storeBusinessProfilePhotos(@RequestParam MultipartFile[] files, @PathVariable long couponId) throws IOException {
         return new DataResponse<>(
-                businessMapper.toDiscountCoupon(discountCouponService.storeBusinessProfilePhotos(files, couponId))
+                businessMapper.toDiscountCoupon(discountCouponService.storeDiscountCouponPhotos(files, couponId))
         );
     }
 
