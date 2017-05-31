@@ -1,5 +1,6 @@
 package com.creatix.service.business;
 
+import com.creatix.domain.dao.AttachmentDao;
 import com.creatix.domain.dao.business.BusinessProfileDao;
 import com.creatix.domain.dao.business.DiscountCouponDao;
 import com.creatix.domain.dao.business.DiscountCouponUsageDao;
@@ -45,6 +46,7 @@ import java.util.concurrent.ConcurrentMap;
  * Created by Tomas Michalek on 12/04/2017.
  */
 @Service
+@Transactional
 public class DiscountCouponService {
 
     private final Logger logger = LoggerFactory.getLogger(BusinessNotificationExecutor.class);
@@ -260,8 +262,16 @@ public class DiscountCouponService {
 
     }
 
-    public DiscountCoupon storeBusinessProfilePhotos(MultipartFile[] files, long couponId) {
+    public DiscountCoupon storeDiscountCouponPhotos(MultipartFile[] files, long couponId) {
         final DiscountCoupon discountCoupon = findCouponById(couponId);
+
+        if (discountCoupon.getDiscountCouponPhoto() != null) {
+            DiscountCouponPhoto discountCouponPhoto = discountCoupon.getDiscountCouponPhoto();
+            discountCoupon.setDiscountCouponPhoto(null);
+            discountCouponDao.persist(discountCoupon);
+            attachmentService.deleteAttachment(discountCouponPhoto);
+        }
+
         List<DiscountCouponPhoto> photoStoreList;
         try {
             photoStoreList = attachmentService.storeAttachments(files, foreignKeyObject -> {
