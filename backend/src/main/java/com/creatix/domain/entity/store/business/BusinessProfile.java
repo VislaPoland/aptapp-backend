@@ -28,10 +28,10 @@ public class BusinessProfile implements AttachmentId {
     @Column
     private Long lng;
 
-    @OneToMany
+    @ManyToMany
     private List<BusinessCategory> businessCategoryList;
 
-    @OneToMany
+    @OneToMany(mappedBy = "businessProfile", cascade = {CascadeType.REMOVE})
     private List<BusinessProfilePhoto> businessProfilePhotoList;
 
     @Column
@@ -46,10 +46,10 @@ public class BusinessProfile implements AttachmentId {
     @ManyToOne(optional = false)
     private Property property;
 
-    @OneToMany
+    @OneToMany(mappedBy = "businessProfile", cascade = {CascadeType.REMOVE})
     List<DiscountCoupon> discountCouponList;
 
-    @OneToMany
+    @OneToMany(mappedBy = "businessProfile", cascade = {CascadeType.REMOVE})
     List<BusinessProfileCarteItem> businessProfileCarte;
 
 }
