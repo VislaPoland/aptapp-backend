@@ -90,7 +90,7 @@ public class ApplicationFeatureService {
             throw new EntityNotFoundException(String.format("Feature id=%d not found", applicationFeatureId));
         }
 
-        if (authorizationManager.canUpdateProperty(applicationFeature.getProperty())) {
+        if (authorizationManager.canWrite(applicationFeature.getProperty())) {
             applicationFeature.setEnabled(status);
             applicationFeatureDao.persist(applicationFeature);
             return applicationFeature;
