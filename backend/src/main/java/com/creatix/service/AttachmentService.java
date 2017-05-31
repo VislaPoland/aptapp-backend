@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 19/04/2017.
@@ -216,6 +217,22 @@ public class AttachmentService {
 
     public Attachment findById(long attachmentId) {
         return attachmentDao.findById(attachmentId);
+    }
+
+
+    public List<Attachment> deleteAttachmentFiles(List<? extends Attachment> attachmentList) {
+        Objects.requireNonNull(attachmentList, "Attachment list can not be null");
+        return attachmentList
+                .parallelStream()
+                .filter(
+                        e -> null != e && null != e.getFilePath()
+                ).map(attachment -> {
+                    File file = new File(attachment.getFilePath());
+                    if (file.exists()) {
+                        boolean delete = file.delete();
+                    }
+                    return attachment;
+                }).collect(Collectors.toList());
     }
 
 }
