@@ -35,10 +35,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.EnumMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -266,10 +264,7 @@ public class DiscountCouponService {
         final DiscountCoupon discountCoupon = findCouponById(couponId);
 
         if (discountCoupon.getDiscountCouponPhoto() != null) {
-            DiscountCouponPhoto discountCouponPhoto = discountCoupon.getDiscountCouponPhoto();
-            discountCoupon.setDiscountCouponPhoto(null);
-            discountCouponDao.persist(discountCoupon);
-            attachmentService.deleteAttachment(discountCouponPhoto);
+            attachmentService.deleteAttachmentFiles(Collections.singletonList(discountCoupon.getDiscountCouponPhoto()));
         }
 
         List<DiscountCouponPhoto> photoStoreList;

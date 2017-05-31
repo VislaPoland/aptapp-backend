@@ -228,6 +228,7 @@ public class BusinessProfileService {
     public BusinessProfile deleteBusinessProfile(long businessProfileId) {
         BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
         if (authorizationManager.canWrite(businessProfile.getProperty())) {
+            attachmentService.deleteAttachmentFiles(businessProfile.getBusinessProfilePhotoList());
             businessProfileDao.delete(businessProfile);
             return businessProfile;
         }
