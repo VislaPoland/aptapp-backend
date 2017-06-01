@@ -12,12 +12,17 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.message.PersonalMessageDeleteStatus;
 import com.creatix.domain.enums.message.PersonalMessageStatusType;
+import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.PushNotificationTemplateProcessor;
+import com.creatix.message.SmsMessageSender;
 import com.creatix.message.push.GenericPushNotification;
 import com.creatix.message.template.push.NewPersonalMessageTemplate;
+import com.creatix.message.template.sms.SmsMessageTemplate;
+import com.creatix.message.template.sms.TenantPersonalMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import freemarker.template.TemplateException;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +57,8 @@ public class PersonalMessageService {
     private PushNotificationTemplateProcessor templateProcessor;
     @Autowired
     private NotificationDao notificationDao;
+    @ApiModelProperty
+    private SmsMessageSender smsMessageSender;
 
     public List<PersonalMessage> sendMessageToPropertyManagers(long propertyId, @NotNull final String title, @NotNull final String content) {
         Objects.requireNonNull(title, "Title can not be null");
@@ -109,6 +116,12 @@ public class PersonalMessageService {
             try {
                 dispatchPersonalMessage(personalMessage);
             } catch (IOException | TemplateException e) {
+                //TODO: log error
+            }
+
+            try {
+                smsMessageSender.send(new TenantPersonalMessageTemplate(recipientAccount.getPrimaryPhone(), personalMessage));
+            } catch (IOException | TemplateException | MessageDeliveryException e) {
                 //TODO: log error
             }
 
