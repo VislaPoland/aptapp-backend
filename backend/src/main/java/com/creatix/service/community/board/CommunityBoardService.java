@@ -263,4 +263,8 @@ public class CommunityBoardService {
         throw new SecurityException(String.format("You are not eligible to update item with id=%d",
                 attachment.getCommunityBoardItem().getId()));
     }
+
+    public List<CommunityBoardCategory> listCategories() {
+        return communityBoardCategoryDao.listAll();
+    }
 }

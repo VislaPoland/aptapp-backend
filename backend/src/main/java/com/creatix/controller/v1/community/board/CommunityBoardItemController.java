@@ -3,6 +3,7 @@ package com.creatix.controller.v1.community.board;
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
+import com.creatix.domain.dto.community.board.CommunityBoardCategoryDto;
 import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
 import com.creatix.domain.dto.community.board.CommunityBoardItemPhotoDto;
 import com.creatix.domain.dto.community.board.SearchRequest;
@@ -169,6 +170,25 @@ public class CommunityBoardItemController {
                                                                              @PathVariable("photoId") long photoId) throws IOException {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItemPhoto(communityBoardService.deleteCommunityItemPhoto(photoId))
+        );
+    }
+
+
+    @ApiOperation(value = "List of categories for community board")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/categories", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<List<CommunityBoardCategoryDto>> listCommunityBoardCategories() {
+        return new DataResponse<>(
+                communityBoardService.listCategories()
+                        .stream()
+                        .map(category -> communityBoardMapper.toCommunityBoardCategoryDto(category))
+                        .collect(Collectors.toList())
         );
     }
 
