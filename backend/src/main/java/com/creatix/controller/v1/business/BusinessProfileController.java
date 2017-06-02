@@ -7,12 +7,9 @@ import com.creatix.domain.dto.business.BusinessProfileCarteItemDto;
 import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.dto.business.BusinessProfilePhotoDto;
 import com.creatix.domain.dto.business.BusinessSearchRequest;
-import com.creatix.domain.entity.store.attachment.Attachment;
-import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.AttachmentService;
 import com.creatix.service.business.BusinessProfileService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -57,6 +56,12 @@ public class BusinessProfileController {
                 .collect(Collectors.toList()));
     }
 
+    /**
+     *
+     * @param propertyId
+     * @param businessCategoryIdList Comma separated list of category ids
+     * @return
+     */
     @ApiOperation(value = "List business profiles for property and category")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -64,12 +69,22 @@ public class BusinessProfileController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/categories/{businessCategoryId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/categories/{businessCategoryIdList}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<BusinessProfileDto>> listBusinessProfilesForPropertyAndCategory(
             @PathVariable Long propertyId,
-            @PathVariable Long businessCategoryId) {
-        return new DataResponse<>(businessProfileService.listBusinessesForPropertyAndCategory(propertyId, businessCategoryId)
+            @PathVariable String businessCategoryIdList) {
+        List<Long> categoryIdList = Arrays.stream(businessCategoryIdList.split(","))
+                .map(e -> {
+                    try {
+                        return Long.valueOf(e);
+                    } catch (NumberFormatException ex) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return new DataResponse<>(businessProfileService.listBusinessesForPropertyAndCategories(propertyId, categoryIdList)
                 .stream()
                 .map(bp -> businessMapper.toBusinessProfile(bp))
                 .collect(Collectors.toList()));

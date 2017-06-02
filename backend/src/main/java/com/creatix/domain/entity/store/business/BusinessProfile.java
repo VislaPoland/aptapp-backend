@@ -4,6 +4,7 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.attachment.AttachmentId;
 import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  * Created by Tomas Michalek on 12/04/2017.
  */
 @Entity
+@EqualsAndHashCode(of = {"id"})
 @Data
 public class BusinessProfile implements AttachmentId {
 
@@ -28,7 +30,7 @@ public class BusinessProfile implements AttachmentId {
     @Column
     private Long lng;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<BusinessCategory> businessCategoryList;
 
     @OneToMany(mappedBy = "businessProfile", cascade = {CascadeType.REMOVE})
