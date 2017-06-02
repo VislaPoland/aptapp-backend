@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 12/04/2017.
@@ -28,15 +29,19 @@ public class BusinessProfileDao extends DaoBase<BusinessProfile, Long> {
                 .fetch();
     }
 
-    public List<BusinessProfile> listBusinessesForPropertyAndCategory(Property property, BusinessCategory cateogory) {
-        return queryFactory
-                .selectFrom(businessProfile)
-                .where(
-                        businessProfile.property.eq(property).and(
-                                businessProfile.businessCategoryList.contains(cateogory)
-                        )
-                )
-                .fetch();
+    public List<BusinessProfile> listBusinessesForPropertyAndCategories(Property property, List<BusinessCategory> categoryList) {
+        return categoryList
+                .parallelStream()
+                .flatMap(category -> queryFactory
+                    .selectFrom(businessProfile)
+                    .where(
+                            businessProfile.property.eq(property).and(
+                                    businessProfile.businessCategoryList.contains(category)
+                            )
+                    )
+                    .fetch().stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public List<BusinessProfile> searchBusinesses(Property property, String name, BusinessCategory businessCategory) {

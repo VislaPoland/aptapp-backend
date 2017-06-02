@@ -5,7 +5,6 @@ import com.creatix.domain.dao.business.BusinessCategoryDao;
 import com.creatix.domain.dao.business.BusinessProfileDao;
 import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.attachment.Attachment;
 import com.creatix.domain.entity.store.business.BusinessCategory;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.BusinessProfileCarteItem;
@@ -24,8 +23,10 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 12/04/2017.
@@ -57,17 +58,20 @@ public class BusinessProfileService {
         return businessProfileDao.listBusinessesForProperty(property);
     }
 
-    public List<BusinessProfile> listBusinessesForPropertyAndCategory(long propertyId, long businessCategoryId) {
+    public List<BusinessProfile> listBusinessesForPropertyAndCategories(long propertyId, List<Long> businessCategoryIdList) {
         Property property = findPropertyById(propertyId);
 
         authorizationManager.checkRead(property);
 
-        BusinessCategory category = businessCategoryDao.findById(businessCategoryId);
-        if (null == category) {
-            throw new EntityNotFoundException(String.format("Category %d not found", businessCategoryId));
+        List<BusinessCategory> businessCategoryList = businessCategoryIdList
+                .parallelStream()
+                .map(id -> businessCategoryDao.findById(id))
+                .collect(Collectors.toList());
+        if (businessCategoryList.size() == 0) {
+            return Collections.emptyList();
         }
 
-        return businessProfileDao.listBusinessesForPropertyAndCategory(property, category);
+        return businessProfileDao.listBusinessesForPropertyAndCategories(property, businessCategoryList);
     }
 
     public List<BusinessProfile> searchBusinesses(long propertyId, @NotNull String name, long businessCategoryId) {
