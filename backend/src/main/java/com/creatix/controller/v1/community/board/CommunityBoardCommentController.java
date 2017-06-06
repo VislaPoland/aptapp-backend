@@ -2,6 +2,7 @@ package com.creatix.controller.v1.community.board;
 
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.community.board.CommunityBoardCommentDto;
+import com.creatix.domain.dto.community.board.CommunityBoardCommentEditRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.CommunityBoardMapper;
 import com.creatix.security.RoleSecured;
@@ -53,10 +54,10 @@ public class CommunityBoardCommentController {
     })
     @RequestMapping(path = "", method = RequestMethod.POST)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardCommentDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody CommunityBoardCommentDto request) {
+    public DataResponse<CommunityBoardCommentDto> createNew(@PathVariable("boardItemId") Long boardItemId, @RequestBody CommunityBoardCommentEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardComment(
-                        communityBoardService.createNewCommentFromRequest(propertyId, request)
+                        communityBoardService.createNewCommentFromRequest(boardItemId, request)
                 )
         );
     }
@@ -69,7 +70,7 @@ public class CommunityBoardCommentController {
     })
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardCommentDto> updateItem(@RequestBody CommunityBoardCommentDto request) {
+    public DataResponse<CommunityBoardCommentDto> updateItem(@RequestBody CommunityBoardCommentEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardComment(
                         communityBoardService.updateCommentFromRequest(request)

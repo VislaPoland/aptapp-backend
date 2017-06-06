@@ -10,12 +10,14 @@ import com.creatix.domain.entity.store.community.board.CommunityBoardItemPhoto;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 /**
@@ -31,8 +33,22 @@ public class CommunityBoardMapper extends ConfigurableMapper {
     protected void configure(MapperFactory factory) {
         super.configure(factory);
 
+        factory.getConverterFactory().registerConverter(new PassThroughConverter(OffsetDateTime.class, OffsetDateTime.class));
+
         factory.classMap(CommunityBoardItem.class, CommunityBoardItemDto.class)
                 .byDefault()
+                .fieldAToB("showEmailAddress", "privacySettings.showEmailAddress")
+                .fieldAToB("showApartmentNumber", "privacySettings.showApartmentNumber")
+                .fieldBToA("privacySettings.showEmailAddress", "showEmailAddress")
+                .fieldBToA("privacySettings.showApartmentNumber", "showApartmentNumber")
+                .register();
+
+        factory.classMap(CommunityBoardItemEditRequest.class, CommunityBoardItem.class)
+                .byDefault()
+                .fieldAToB("privacySettings.showEmailAddress", "showEmailAddress")
+                .fieldAToB("privacySettings.showApartmentNumber", "showApartmentNumber")
+                .fieldBToA("showEmailAddress", "privacySettings.showEmailAddress")
+                .fieldBToA("showApartmentNumber", "privacySettings.showApartmentNumber")
                 .register();
 
         factory.classMap(CommunityBoardItemPhoto.class, CommunityBoardItemPhotoDto.class)
@@ -62,11 +78,24 @@ public class CommunityBoardMapper extends ConfigurableMapper {
         factory.classMap(Account.class, CommunityBoardItemAuthorDto.class)
                 .byDefault()
                 .register();
+
+        factory.classMap(CommunityBoardComment.class, CommunityBoardCommentDto.class)
+                .byDefault()
+                .register();
+
+        factory.classMap(CommunityBoardCommentEditRequest.class, CommunityBoardComment.class)
+                .byDefault()
+                .register();
     }
 
     public CommunityBoardItemDto toCommunityBoardItem(@NotNull CommunityBoardItem communityBoardItem) {
         Objects.requireNonNull(communityBoardItem, "Community board item must not be null");
         return this.map(communityBoardItem, CommunityBoardItemDto.class);
+    }
+
+    public CommunityBoardItem toCommunityBoardItem(@NotNull CommunityBoardItemEditRequest communityBoardItem) {
+        Objects.requireNonNull(communityBoardItem, "Community board item must not be null");
+        return this.map(communityBoardItem, CommunityBoardItem.class);
     }
 
     public CommunityBoardItem toCommunityBoardItem(@NotNull CommunityBoardItemDto communityBoardItemDto) {
@@ -90,6 +119,11 @@ public class CommunityBoardMapper extends ConfigurableMapper {
     }
 
     public CommunityBoardComment toCommunityBoardComment(@NotNull CommunityBoardCommentDto communityBoardCommentDto) {
+        Objects.requireNonNull(communityBoardCommentDto, "Comment object can not be null");
+        return this.map(communityBoardCommentDto, CommunityBoardComment.class);
+    }
+
+    public CommunityBoardComment toCommunityBoardComment(@NotNull CommunityBoardCommentEditRequest communityBoardCommentDto) {
         Objects.requireNonNull(communityBoardCommentDto, "Comment object can not be null");
         return this.map(communityBoardCommentDto, CommunityBoardComment.class);
     }

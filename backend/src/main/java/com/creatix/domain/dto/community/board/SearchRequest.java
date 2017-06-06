@@ -15,8 +15,8 @@ public class SearchRequest {
     private Long communityBoardCategoryId;
 
     private Boolean orderDesc = true;
-    private Long offset = 0L;
-    private Long limit = 50L;
+    private Long startId = null;
+    private Long pageSize = 50L;
     private SearchRequestOrderColumn orderBy = SearchRequestOrderColumn.CREATED;
 
 }

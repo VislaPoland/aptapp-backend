@@ -11,6 +11,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.business.BusinessProfileService;
+import com.creatix.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -74,16 +75,7 @@ public class BusinessProfileController {
     public DataResponse<List<BusinessProfileDto>> listBusinessProfilesForPropertyAndCategory(
             @PathVariable Long propertyId,
             @PathVariable String businessCategoryIdList) {
-        List<Long> categoryIdList = Arrays.stream(businessCategoryIdList.split(","))
-                .map(e -> {
-                    try {
-                        return Long.valueOf(e);
-                    } catch (NumberFormatException ex) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<Long> categoryIdList = StringUtils.splitToLong(businessCategoryIdList, ",");
         return new DataResponse<>(businessProfileService.listBusinessesForPropertyAndCategories(propertyId, categoryIdList)
                 .stream()
                 .map(bp -> businessMapper.toBusinessProfile(bp))

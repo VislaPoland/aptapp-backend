@@ -2,16 +2,16 @@ package com.creatix.controller.v1.community.board;
 
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.community.board.CommunityBoardCategoryDto;
-import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
-import com.creatix.domain.dto.community.board.CommunityBoardItemPhotoDto;
-import com.creatix.domain.dto.community.board.SearchRequest;
+import com.creatix.domain.dto.community.board.*;
+import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
 import com.creatix.domain.mapper.CommunityBoardMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.community.board.CommunityBoardService;
+import com.creatix.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ public class CommunityBoardItemController {
     })
     @RequestMapping(path = "", method = RequestMethod.POST)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody CommunityBoardItemDto request) {
+    public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
                         communityBoardService.createNewBoardItemFromRequest(propertyId, request)
@@ -63,7 +64,7 @@ public class CommunityBoardItemController {
     })
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardItemDto> updateItem(@RequestBody CommunityBoardItemDto request) {
+    public DataResponse<CommunityBoardItemDto> updateItem(@RequestBody CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
                         communityBoardService.updateBoardItemFromRequest(request)
@@ -110,17 +111,32 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "/{page}/{limit}", method = RequestMethod.GET)
+    @RequestMapping(path = "", method = RequestMethod.GET)
     @RoleSecured
-    public DataResponse<List<CommunityBoardItemDto>> listVisibleItems(@PathVariable("propertyId") Long propertyId,
-                                                                      @PathVariable("page") Long offset,
-                                                                      @PathVariable("limit") Long limit) {
-        return new DataResponse<>(communityBoardService.listBoardItemsForProperty(propertyId, offset, limit)
-                .stream()
-                .filter(e -> e.getCommunityBoardStatus() == CommunityBoardStatusType.OPEN)
-                .map(e-> communityBoardMapper.toCommunityBoardItem(e))
-                .collect(Collectors.toList())
-        );
+    public PageableDataResponse<List<CommunityBoardItemDto>> listVisibleItems(@PathVariable("propertyId") Long propertyId,
+                                                                                           @RequestParam(value = "startId", required = false) Long startId,
+                                                                                           @RequestParam(value = "pageSize", required = true) Long pageSize,
+                                                                                           @RequestParam(value = "categoryList", required = false) String categoryList) {
+        if (null == categoryList || "".equals(categoryList)) {
+            List<CommunityBoardItem> boardItems = communityBoardService.listBoardItemsForProperty(propertyId, Collections.singletonList(CommunityBoardStatusType.OPEN), startId, pageSize + 1);
+            return new PageableDataResponse<>(boardItems
+                    .stream()
+                    .limit(pageSize)
+                    .map(e-> communityBoardMapper.toCommunityBoardItem(e))
+                    .collect(Collectors.toList()),
+                    pageSize, boardItems.size() > pageSize ? boardItems.get(pageSize.intValue()).getId() : null
+            );
+        } else {
+            List<Long> categoryIdList = StringUtils.splitToLong(categoryList, ",");
+            List<CommunityBoardItem> boardItems = communityBoardService.listBoardItemsForPropertyAndCategory(propertyId, Collections.singletonList(CommunityBoardStatusType.OPEN), categoryIdList, startId, pageSize + 1);
+            return new PageableDataResponse<>(boardItems
+                    .stream()
+                    .limit(pageSize)
+                    .map(e-> communityBoardMapper.toCommunityBoardItem(e))
+                    .collect(Collectors.toList()),
+                    pageSize, boardItems.size() > pageSize ? boardItems.get(pageSize.intValue()).getId() : null
+            );
+        }
     }
 
 
@@ -132,13 +148,16 @@ public class CommunityBoardItemController {
     })
     @RequestMapping(path = "/search", method = RequestMethod.GET)
     @RoleSecured
-    public DataResponse<List<CommunityBoardItemDto>> searchBoard(@PathVariable("propertyId") Long propertyId,
+    public PageableDataResponse<List<CommunityBoardItemDto>> searchBoard(@PathVariable("propertyId") Long propertyId,
                                                         @RequestBody SearchRequest searchRequest) {
-        return new DataResponse<>(communityBoardService.searchBoardItemsForProperty(propertyId, searchRequest)
+
+        List<CommunityBoardItem> boardItems = communityBoardService.searchBoardItemsForProperty(propertyId, Collections.singletonList(CommunityBoardStatusType.OPEN), searchRequest.getPageSize() + 1, searchRequest);
+        return new PageableDataResponse<>(boardItems
                 .stream()
-                .filter(e -> e.getCommunityBoardStatus() == CommunityBoardStatusType.OPEN)
+                .limit(searchRequest.getPageSize())
                 .map(e-> communityBoardMapper.toCommunityBoardItem(e))
-                .collect(Collectors.toList())
+                .collect(Collectors.toList()),
+                searchRequest.getPageSize(), boardItems.size() > searchRequest.getPageSize() ? boardItems.get(searchRequest.getPageSize().intValue()).getId() : null
         );
     }
 

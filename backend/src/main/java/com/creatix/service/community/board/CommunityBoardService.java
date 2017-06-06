@@ -4,11 +4,8 @@ import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.community.board.CommunityBoardCategoryDao;
 import com.creatix.domain.dao.community.board.CommunityBoardCommentDao;
 import com.creatix.domain.dao.community.board.CommunityBoardItemDao;
-import com.creatix.domain.dto.community.board.CommunityBoardCommentDto;
-import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
-import com.creatix.domain.dto.community.board.SearchRequest;
+import com.creatix.domain.dto.community.board.*;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import com.creatix.domain.entity.store.community.board.CommunityBoardCategory;
 import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
@@ -23,15 +20,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 10/05/2017.
  */
 @Service
+@Transactional
 public class CommunityBoardService {
 
     @Autowired
@@ -49,24 +49,36 @@ public class CommunityBoardService {
     @Autowired
     private AttachmentService attachmentService;
 
-    public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, long offset, long limit) {
+    public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, List<CommunityBoardStatusType> statusTypes, Long startId, long pageSize) {
         Property property = getProperty(propertyId);
 
-        return communityBoardItemDao.listByProperty(property, offset, limit);
+        return communityBoardItemDao.listByPropertyAndStatus(property, statusTypes, startId, pageSize);
     }
 
-    public List<CommunityBoardItem> searchBoardItemsForProperty(long propertyId, SearchRequest searchRequest) {
-        Objects.requireNonNull(searchRequest, "Serach request can not be null");
+    public List<CommunityBoardItem> listBoardItemsForPropertyAndCategory(long propertyId, List<CommunityBoardStatusType> statusTypes, List<Long> categoryIdList, Long startId, long pageSize) {
+        Property property = getProperty(propertyId);
+
+        List<CommunityBoardCategory> categoryList = categoryIdList
+                .stream()
+                .map(categoryId -> communityBoardCategoryDao.findById(categoryId))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return communityBoardItemDao.listByPropertyAnCategories(property, statusTypes, categoryList, startId, pageSize);
+    }
+
+    public List<CommunityBoardItem> searchBoardItemsForProperty(long propertyId, List<CommunityBoardStatusType> statusTypes, long pageSize, SearchRequest searchRequest) {
+        Objects.requireNonNull(searchRequest, "Search request can not be null");
 
         Property property = getProperty(propertyId);
         CommunityBoardCategory communityBoardCategory = null;
         if (null != searchRequest.getCommunityBoardCategoryId()) {
             communityBoardCategory = communityBoardCategoryDao.findById(searchRequest.getCommunityBoardCategoryId());
         }
-        return communityBoardItemDao.searchFromRequest(property, searchRequest, communityBoardCategory);
+        return communityBoardItemDao.searchFromRequest(property, statusTypes, pageSize, searchRequest, communityBoardCategory);
     }
 
-    public CommunityBoardItem createNewBoardItemFromRequest(long propertyId, CommunityBoardItemDto request) {
+    public CommunityBoardItem createNewBoardItemFromRequest(long propertyId, CommunityBoardItemEditRequest request) {
         if (null != request.getId()) {
             throw new IllegalArgumentException(String.format("Request ID must be null, got %d instead", request.getId()));
         }
@@ -82,7 +94,7 @@ public class CommunityBoardService {
         return boardItem;
     }
 
-    public CommunityBoardItem updateBoardItemFromRequest(CommunityBoardItemDto request) {
+    public CommunityBoardItem updateBoardItemFromRequest(CommunityBoardItemEditRequest request) {
         Objects.requireNonNull(request.getId(), "ID must not be null");
 
         CommunityBoardItem existingItem = getBoardItemById(request.getId());
@@ -164,7 +176,7 @@ public class CommunityBoardService {
     }
 
     @NotNull
-    public CommunityBoardComment createNewCommentFromRequest(long boardId, @NotNull CommunityBoardCommentDto request) {
+    public CommunityBoardComment createNewCommentFromRequest(long boardId, @NotNull CommunityBoardCommentEditRequest request) {
         Objects.requireNonNull(request, "Request must not be null");
 
         if (null != request.getId()) {
@@ -194,6 +206,7 @@ public class CommunityBoardService {
         comment.setCommunityBoardItem(boardItem);
         comment.setAuthor(authorizationManager.getCurrentAccount());
         comment.setParentComment(parentComment);
+        comment.setStatus(CommunityBoardCommentStatusType.APPROVED);
 
         communityBoardCommentDao.persist(comment);
 
@@ -201,7 +214,7 @@ public class CommunityBoardService {
 
     }
 
-    public CommunityBoardComment updateCommentFromRequest(CommunityBoardCommentDto request) {
+    public CommunityBoardComment updateCommentFromRequest(CommunityBoardCommentEditRequest request) {
         Objects.requireNonNull(request, "Request object must not be null");
         Objects.requireNonNull(request.getId(), "ID of object for edditing must not be null");
 

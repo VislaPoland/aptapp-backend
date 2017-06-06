@@ -6,16 +6,19 @@ import com.creatix.domain.entity.store.attachment.AttachmentId;
 import com.creatix.domain.enums.community.board.CommunityBoardItemType;
 import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by Tomas Michalek on 10/05/2017.
  */
 @Data
+@EqualsAndHashCode(of = {"id"})
 @Entity
 public class CommunityBoardItem implements AttachmentId {
 
@@ -49,27 +52,19 @@ public class CommunityBoardItem implements AttachmentId {
     @ManyToOne
     private Account account;
 
+    @Column
+    private Boolean showEmailAddress;
+
+    @Column
+    private Boolean showApartmentNumber;
+
     @OneToMany
     private List<CommunityBoardItemPhoto> photoList;
 
     @Column(nullable = false)
-    @NotNull
     private OffsetDateTime createdAt;
 
     @Column(nullable = false)
-    @NotNull
     private OffsetDateTime updatedAt;
-
-    @PrePersist
-    public void prePersist() {
-        if (null == id && this.createdAt == null) {
-            this.createdAt = OffsetDateTime.now();
-        }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = OffsetDateTime.now();
-    }
 
 }

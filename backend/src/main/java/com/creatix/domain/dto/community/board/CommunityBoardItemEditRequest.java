@@ -5,14 +5,11 @@ import com.creatix.domain.enums.community.board.CommunityBoardItemType;
 import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
 import lombok.Data;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 /**
- * Created by Tomas Michalek on 10/05/2017.
+ * Created by kvimbi on 02/06/2017.
  */
 @Data
-public class CommunityBoardItemDto {
+public class CommunityBoardItemEditRequest {
 
     private Long id;
     private String title;
@@ -22,9 +19,5 @@ public class CommunityBoardItemDto {
     private CommunityBoardItemType communityBoardItemType;
     private CommunityBoardStatusType communityBoardStatus;
     private PrivacySettingsDto privacySettings;
-    private CommunityBoardItemAuthorDto account;
-    private List<CommunityBoardItemPhotoDto> photoList;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
 
 }
