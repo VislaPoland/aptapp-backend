@@ -33,7 +33,7 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
         if (null != startId) {
             CommunityBoardItem firstItem = findById(startId);
             if (null != firstItem) {
-                wherePredicate = wherePredicate.and(communityBoardItem.createdAt.loe(firstItem.getUpdatedAt()));
+                wherePredicate = wherePredicate.and(communityBoardItem.createdAt.loe(firstItem.getCreatedAt()));
             }
         }
         return queryFactory.selectFrom(communityBoardItem)
@@ -65,7 +65,7 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
         if (null != searchRequest.getStartId()) {
             CommunityBoardItem firstItem = findById(searchRequest.getStartId());
             if (null != firstItem) {
-                wherePredicate = wherePredicate.and(communityBoardItem.createdAt.loe(firstItem.getUpdatedAt()));
+                wherePredicate = wherePredicate.and(communityBoardItem.createdAt.loe(firstItem.getCreatedAt()));
             }
         }
         wherePredicate = wherePredicate.and(communityBoardItem.communityBoardStatus.in(statusTypes));
@@ -108,7 +108,7 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
         if (null != startId) {
             CommunityBoardItem firstItem = findById(startId);
             if (null != firstItem) {
-                wherePredicate = wherePredicate.and(communityBoardItem.createdAt.loe(firstItem.getUpdatedAt()));
+                wherePredicate = wherePredicate.and(communityBoardItem.createdAt.loe(firstItem.getCreatedAt()));
             }
         }
         return queryFactory.selectFrom(communityBoardItem)
