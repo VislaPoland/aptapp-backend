@@ -4,6 +4,8 @@ import com.creatix.domain.dao.DaoBase;
 import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
 import static com.creatix.domain.entity.store.community.board.QCommunityBoardComment.communityBoardComment;
+
+import com.creatix.domain.enums.community.board.CommunityBoardCommentStatusType;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
@@ -19,7 +21,9 @@ public class CommunityBoardCommentDao extends DaoBase<CommunityBoardComment, Lon
     public List<CommunityBoardComment> listParentComments(CommunityBoardItem communityBoardItem) {
         return queryFactory.selectFrom(communityBoardComment).where(
                 communityBoardComment.communityBoardItem.eq(communityBoardItem).and(
-                        communityBoardComment.parentComment.isNull()
+                        communityBoardComment.parentComment.isNull().and(
+                                communityBoardComment.status.ne(CommunityBoardCommentStatusType.DELETED)
+                        )
                 )
         ).fetch();
     }
