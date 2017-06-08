@@ -374,7 +374,7 @@ public class AuthorizationManager {
     }
 
 
-    private Set<Property> getAccountProperties(Account account) {
+    public Set<Property> getAccountProperties(Account account) {
         switch (account.getRole()) {
             case Administrator:
                 return Collections.emptySet();
