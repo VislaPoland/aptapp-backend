@@ -1,6 +1,7 @@
 package com.creatix.domain.mapper;
 
 import com.creatix.configuration.ApplicationProperties;
+import com.creatix.domain.dao.community.board.CommunityBoardCategoryDao;
 import com.creatix.domain.dto.community.board.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.community.board.CommunityBoardCategory;
@@ -28,6 +29,8 @@ public class CommunityBoardMapper extends ConfigurableMapper {
 
     @Autowired
     private ApplicationProperties applicationProperties;
+    @Autowired
+    private CommunityBoardCategoryDao communityBoardCategoryDao;
 
     @Override
     protected void configure(MapperFactory factory) {
@@ -36,19 +39,43 @@ public class CommunityBoardMapper extends ConfigurableMapper {
         factory.getConverterFactory().registerConverter(new PassThroughConverter(OffsetDateTime.class, OffsetDateTime.class));
 
         factory.classMap(CommunityBoardItem.class, CommunityBoardItemDto.class)
+                .exclude("category")
                 .byDefault()
                 .fieldAToB("showEmailAddress", "privacySettings.showEmailAddress")
                 .fieldAToB("showApartmentNumber", "privacySettings.showApartmentNumber")
                 .fieldBToA("privacySettings.showEmailAddress", "showEmailAddress")
                 .fieldBToA("privacySettings.showApartmentNumber", "showApartmentNumber")
+                .fieldAToB("category", "category")
+                .customize(new CustomMapper<CommunityBoardItem, CommunityBoardItemDto>() {
+                    @Override
+                    public void mapBtoA(CommunityBoardItemDto communityBoardItemDto, CommunityBoardItem communityBoardItem, MappingContext context) {
+                        if (null != communityBoardItemDto.getCategory()) {
+                            communityBoardItem.setCategory(
+                                    communityBoardCategoryDao.findById(communityBoardItemDto.getCategory().getId())
+                            );
+                        }
+                    }
+                })
                 .register();
 
         factory.classMap(CommunityBoardItemEditRequest.class, CommunityBoardItem.class)
+                .exclude("category")
                 .byDefault()
                 .fieldAToB("privacySettings.showEmailAddress", "showEmailAddress")
                 .fieldAToB("privacySettings.showApartmentNumber", "showApartmentNumber")
                 .fieldBToA("showEmailAddress", "privacySettings.showEmailAddress")
                 .fieldBToA("showApartmentNumber", "privacySettings.showApartmentNumber")
+                .fieldBToA("category", "category")
+                .customize(new CustomMapper<CommunityBoardItemEditRequest, CommunityBoardItem>() {
+                    @Override
+                    public void mapAtoB(CommunityBoardItemEditRequest communityBoardItemEditRequest, CommunityBoardItem communityBoardItem, MappingContext context) {
+                        if (null != communityBoardItemEditRequest.getCategory()) {
+                            communityBoardItem.setCategory(
+                                    communityBoardCategoryDao.findById(communityBoardItemEditRequest.getCategory().getId())
+                            );
+                        }
+                    }
+                })
                 .register();
 
         factory.classMap(CommunityBoardItemPhoto.class, CommunityBoardItemPhotoDto.class)
