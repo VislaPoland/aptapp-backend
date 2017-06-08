@@ -285,4 +285,17 @@ public class DiscountCouponService {
             throw new IllegalArgumentException("Unable to store photo for business profile");
         }
     }
+
+    public DiscountCoupon deleteCouponById(long couponId) {
+        final DiscountCoupon discountCoupon = findCouponById(couponId);
+        if (authorizationManager.canWrite(discountCoupon.getBusinessProfile().getProperty())) {
+            discountCouponDao.delete(discountCoupon);
+            return discountCoupon;
+        }
+
+        throw new SecurityException(
+                String.format("You are not eligible to create or modify discount coupons for property %d",
+                        discountCoupon.getBusinessProfile().getProperty().getId())
+        );
+    }
 }
