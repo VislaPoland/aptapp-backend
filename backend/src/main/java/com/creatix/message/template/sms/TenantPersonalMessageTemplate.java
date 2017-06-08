@@ -17,7 +17,7 @@ public class TenantPersonalMessageTemplate implements SmsMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return null;
+        return "personal-message-to-tenant";
     }
 
     public String getMessageContent() {

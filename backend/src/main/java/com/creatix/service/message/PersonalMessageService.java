@@ -10,6 +10,7 @@ import com.creatix.domain.entity.store.notification.PersonalMessage;
 import com.creatix.domain.entity.store.notification.PersonalMessageNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
+import com.creatix.domain.enums.NotificationType;
 import com.creatix.domain.enums.message.PersonalMessageDeleteStatus;
 import com.creatix.domain.enums.message.PersonalMessageStatusType;
 import com.creatix.message.MessageDeliveryException;
@@ -32,6 +33,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -57,13 +59,13 @@ public class PersonalMessageService {
     private PushNotificationTemplateProcessor templateProcessor;
     @Autowired
     private NotificationDao notificationDao;
-    @ApiModelProperty
+    @Autowired
     private SmsMessageSender smsMessageSender;
 
     public List<PersonalMessage> sendMessageToPropertyManagers(long propertyId, @NotNull final String title, @NotNull final String content) {
         Objects.requireNonNull(title, "Title can not be null");
         Objects.requireNonNull(content, "Content can not be null");
-        Property property = propertyDao.findById(propertyId);
+        final Property property = propertyDao.findById(propertyId);
         if (null == property) {
             throw new EntityNotFoundException(String.format("Entity with id %d not found", propertyId));
         }
@@ -83,7 +85,7 @@ public class PersonalMessageService {
                     personalMessageDao.persist(personalMessage);
 
                     try {
-                        dispatchPersonalMessage(personalMessage);
+                        dispatchPersonalMessage(personalMessage, property);
                     } catch (IOException | TemplateException e) {
                         //TODO: log error
                     }
@@ -93,7 +95,7 @@ public class PersonalMessageService {
         ).collect(Collectors.toList());
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public PersonalMessage sendMessageToTenant(long tenantAccountId, @NotNull final String title, @NotNull final String content) {
         Objects.requireNonNull(title, "Title can not be null");
         Objects.requireNonNull(content, "Content can not be null");
@@ -114,7 +116,12 @@ public class PersonalMessageService {
             personalMessageDao.persist(personalMessage);
 
             try {
-                dispatchPersonalMessage(personalMessage);
+                Set<Property> accountProperties = authorizationManager.getAccountProperties(recipientAccount);
+                if (null != accountProperties && accountProperties.size() == 1) {
+                    dispatchPersonalMessage(personalMessage, accountProperties.iterator().next());
+                } else {
+                    //TODO: log error
+                }
             } catch (IOException | TemplateException e) {
                 //TODO: log error
             }
@@ -131,7 +138,7 @@ public class PersonalMessageService {
         throw new SecurityException(String.format("You are not allowed to sent message to user %d", tenantAccountId));
     }
 
-    public void dispatchPersonalMessage(@NotNull PersonalMessage personalMessage) throws IOException, TemplateException {
+    public void dispatchPersonalMessage(@NotNull PersonalMessage personalMessage, @NotNull Property property) throws IOException, TemplateException {
         Objects.requireNonNull(personalMessage, "Personal message can not be null!");
         if (personalMessage.getMessageStatus() != PersonalMessageStatusType.PENDING) {
             throw new IllegalArgumentException("Message is in invalid state " + personalMessage.getMessageStatus());
@@ -139,9 +146,10 @@ public class PersonalMessageService {
 
         final GenericPushNotification notification = new GenericPushNotification();
         notification.setMessage(templateProcessor.processTemplate(new NewPersonalMessageTemplate(personalMessage)));
-        notification.setTitle("You have new personal message");
+        notification.setTitle("New personal message");
 
         PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
+        personalMessageNotification.setProperty(property);
         personalMessageNotification.setPersonalMessage(personalMessage);
         personalMessageNotification.setAuthor(personalMessage.getFromAccount());
         personalMessageNotification.setDescription(notification.getMessage());

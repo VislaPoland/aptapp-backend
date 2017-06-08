@@ -19,14 +19,10 @@ public class PersonalMessageNotification extends Notification {
     private PersonalMessage personalMessage;
 
     public PersonalMessageNotification() {
-        this.setType(NotificationType.PersonalMessage);
+        this.type = NotificationType.PersonalMessage;
     }
 
     @Override
     public void setType(NotificationType type) {}
 
-    @Override
-    public NotificationType getType() {
-        return NotificationType.PersonalMessage;
-    }
 }
