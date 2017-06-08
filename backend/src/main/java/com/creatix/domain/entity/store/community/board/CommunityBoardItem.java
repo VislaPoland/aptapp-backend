@@ -26,13 +26,13 @@ public class CommunityBoardItem implements AttachmentId {
     @GeneratedValue
     private Long id;
 
-    @Column
+    @Column(length = 255, nullable = false)
     private String title;
 
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition="TEXT", length = 2048, nullable = false)
     private String description;
 
-    @Column
+    @Column(nullable = false)
     private Double price;
 
     @ManyToOne

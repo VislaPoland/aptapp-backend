@@ -42,7 +42,7 @@ public class BusinessProfile implements AttachmentId {
     @OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private BusinessContact contact;
 
-    @Column(length = 120, nullable = false)
+    @Column(length = 2048, nullable = false)
     private String description;
 
     @ManyToOne(optional = false)

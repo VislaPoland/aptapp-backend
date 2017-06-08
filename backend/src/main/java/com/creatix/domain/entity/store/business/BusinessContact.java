@@ -2,6 +2,7 @@ package com.creatix.domain.entity.store.business;
 
 import com.creatix.domain.enums.CommunicationType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Data
+@EqualsAndHashCode(of = "id")
 public class BusinessContact {
 
     @Id
@@ -20,17 +22,17 @@ public class BusinessContact {
     @Column
     @Enumerated(EnumType.STRING)
     private CommunicationType communicationType;
-    @Column
+    @Column(length = 25)
     private String communicationValue;
     @Column
     private String street;
-    @Column
+    @Column(length = 10)
     private String houseNumber;
-    @Column
+    @Column(length = 10)
     private String zipCode;
-    @Column
+    @Column(length = 50)
     private String city;
-    @Column
+    @Column(length = 50)
     private String state;
 
 }

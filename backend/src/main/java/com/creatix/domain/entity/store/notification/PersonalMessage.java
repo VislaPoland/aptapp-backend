@@ -24,10 +24,10 @@ public class PersonalMessage {
     @ManyToOne
     private Account toAccount;
 
-    @Column
+    @Column(length = 255, nullable = false)
     private String title;
 
-    @Column
+    @Column(length = 1024, nullable = false)
     private String content;
 
     @Column

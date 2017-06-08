@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class CommunityBoardCommentController {
     })
     @RequestMapping(path = "", method = RequestMethod.POST)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardCommentDto> createNew(@PathVariable("boardItemId") Long boardItemId, @RequestBody CommunityBoardCommentEditRequest request) {
+    public DataResponse<CommunityBoardCommentDto> createNew(@PathVariable("boardItemId") Long boardItemId, @RequestBody @Valid CommunityBoardCommentEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardComment(
                         communityBoardService.createNewCommentFromRequest(boardItemId, request)
@@ -70,7 +71,7 @@ public class CommunityBoardCommentController {
     })
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardCommentDto> updateItem(@RequestBody CommunityBoardCommentEditRequest request) {
+    public DataResponse<CommunityBoardCommentDto> updateItem(@RequestBody @Valid CommunityBoardCommentEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardComment(
                         communityBoardService.updateCommentFromRequest(request)

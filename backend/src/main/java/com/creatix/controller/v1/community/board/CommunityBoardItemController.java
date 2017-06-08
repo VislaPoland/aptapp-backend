@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +49,7 @@ public class CommunityBoardItemController {
     })
     @RequestMapping(path = "", method = RequestMethod.POST)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody CommunityBoardItemEditRequest request) {
+    public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody @Valid CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
                         communityBoardService.createNewBoardItemFromRequest(propertyId, request)
@@ -62,9 +63,9 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "", method = RequestMethod.PUT)
+    @RequestMapping(path = "/{itemId}", method = RequestMethod.PUT)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardItemDto> updateItem(@RequestBody CommunityBoardItemEditRequest request) {
+    public DataResponse<CommunityBoardItemDto> updateItem(@RequestBody @Valid CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
                         communityBoardService.updateBoardItemFromRequest(request)
@@ -149,7 +150,7 @@ public class CommunityBoardItemController {
     @RequestMapping(path = "/search", method = RequestMethod.GET)
     @RoleSecured
     public PageableDataResponse<List<CommunityBoardItemDto>> searchBoard(@PathVariable("propertyId") Long propertyId,
-                                                        @RequestBody SearchRequest searchRequest) {
+                                                        @RequestBody @Valid SearchRequest searchRequest) {
 
         List<CommunityBoardItem> boardItems = communityBoardService.searchBoardItemsForProperty(propertyId, Collections.singletonList(CommunityBoardStatusType.OPEN), searchRequest.getPageSize() + 1, searchRequest);
         return new PageableDataResponse<>(boardItems
