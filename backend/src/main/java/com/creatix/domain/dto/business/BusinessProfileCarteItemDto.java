@@ -3,6 +3,10 @@ package com.creatix.domain.dto.business;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by Tomas Michalek on 19/04/2017.
@@ -15,9 +19,12 @@ public class BusinessProfileCarteItemDto {
     private Long id;
 
     @ApiModelProperty(required = true)
+    @NotEmpty
     private String name;
 
     @ApiModelProperty(required = true)
+    @NotNull
+    @Min(0)
     private double price;
 
     @ApiModelProperty(value = "Photo URL", required = false)

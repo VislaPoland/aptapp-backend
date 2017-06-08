@@ -78,6 +78,9 @@ dependencies {
 	compile('org.hibernate:hibernate-core:5.2.1.Final')
 	compile('com.querydsl:querydsl-jpa:4.1.3')
 	compile('com.querydsl:querydsl-apt:4.1.3:jpa')
+	//validation
+	compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.4.1.Final'
+
 	// other
 	compile('org.hibernate:hibernate-validator:5.2.4.Final')
 	compile('org.projectlombok:lombok:1.16.10')

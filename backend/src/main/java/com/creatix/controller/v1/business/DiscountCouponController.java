@@ -11,6 +11,7 @@ import com.creatix.security.RoleSecured;
 import com.creatix.service.business.BusinessProfileService;
 import com.creatix.service.business.DiscountCouponService;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
@@ -59,10 +61,11 @@ public class DiscountCouponController {
         );
     }
 
+    @ApiOperation("Creates new discount coupon")
     @RequestMapping(path = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public HttpEntity<DiscountCouponDto> createDiscountCoupon(
-            @RequestBody @NotNull DiscountCouponDto request,
+            @RequestBody @NotNull @Valid DiscountCouponDto request,
             @PathVariable("businessProfileId") Long businessProfileId) {
         return new HttpEntity<>(
                 businessMapper.toDiscountCoupon(
@@ -71,12 +74,24 @@ public class DiscountCouponController {
         );
     }
 
-    @RequestMapping(path = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/{couponId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public HttpEntity<DiscountCouponDto> updateDiscountCoupon(@RequestBody @NotNull DiscountCouponDto request) {
+    public HttpEntity<DiscountCouponDto> updateDiscountCoupon(@RequestBody @NotNull DiscountCouponDto request,
+                                                              @PathVariable("couponId") Long couponId) {
         return new HttpEntity<>(
                 businessMapper.toDiscountCoupon(
                         discountCouponService.updateDiscountCouponFromRequest(request)
+                )
+        );
+    }
+
+    @ApiOperation("Deletes existing discount coupon")
+    @RequestMapping(path = "/{couponId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public HttpEntity<DiscountCouponDto> deleteDiscountCoupon(@PathVariable("couponId") Long couponId) {
+        return new HttpEntity<>(
+                businessMapper.toDiscountCoupon(
+                        discountCouponService.deleteCouponById(couponId)
                 )
         );
     }

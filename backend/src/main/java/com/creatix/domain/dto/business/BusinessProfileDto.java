@@ -4,7 +4,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -18,6 +20,8 @@ public class BusinessProfileDto {
     @ApiModelProperty(value = "Id", required = true, readOnly = true)
     private Long id;
     @ApiModelProperty(value = "Business profile name", required = true)
+    @Size(max = 255)
+    @NotEmpty
     private String name;
     @ApiModelProperty("Latitude")
     private Long lat;
@@ -34,6 +38,8 @@ public class BusinessProfileDto {
     @ApiModelProperty("Contact information")
     private BusinessContactDto contact;
     @ApiModelProperty(value = "Description", required = true)
+    @Size(max = 2048)
+    @NotEmpty
     private String description;
 
     @ApiModelProperty("Id of property business profile belongs to")

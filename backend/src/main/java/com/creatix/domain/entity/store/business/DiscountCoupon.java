@@ -33,7 +33,13 @@ public class DiscountCoupon implements AttachmentId {
     @Column
     private String code;
 
-    @OneToOne
+    @Column
+    private String title;
+
+    @Column
+    private String description;
+
+    @OneToOne(cascade = CascadeType.ALL)
     private DiscountCouponPhoto discountCouponPhoto;
 
 }

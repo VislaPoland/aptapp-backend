@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,7 +67,7 @@ public class PersonalMessageController {
             @RequestParam("offset") Long offset,
             @RequestParam("limit") Long limit) {
     return new DataResponse<>(
-            personalMessageService.listReceivedMessagesForCurrentUser(offset, limit).stream().map(
+            personalMessageService.listSentMessagesForCurrentUser(offset, limit).stream().map(
                     e -> personalMessageMapper.toPersonalMessage(e)
             ).collect(Collectors.toList())
         );
@@ -81,7 +82,7 @@ public class PersonalMessageController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<List<PersonalMessageDto>> createNewPersonalMessage(@RequestBody PersonalMessageRequest request) {
+    public DataResponse<List<PersonalMessageDto>> createNewPersonalMessage(@RequestBody @Valid CreatePersonalMessageRequest request) {
 
         List<PersonalMessage> personalMessageList = null;
         switch (request.getPersonalMessageRequestType()) {
