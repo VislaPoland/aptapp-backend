@@ -46,7 +46,7 @@ public class Notification {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
-    private NotificationType type;
+    protected NotificationType type;
 
     @ManyToOne(optional = false)
     @JoinColumn

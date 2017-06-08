@@ -1,6 +1,8 @@
 package com.creatix.domain.mapper;
 
+import com.creatix.domain.dto.notification.message.PersonalMessageAccountDto;
 import com.creatix.domain.dto.notification.message.PersonalMessageDto;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.notification.PersonalMessage;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
@@ -19,6 +21,12 @@ public class PersonalMessageMapper extends ConfigurableMapper {
     protected void configure(MapperFactory factory) {
         factory.classMap(PersonalMessage.class, PersonalMessageDto.class)
                 .byDefault()
+                .register();
+
+
+        factory.classMap(Account.class, PersonalMessageAccountDto.class)
+                .byDefault()
+                .fieldAToB("id", "userId")
                 .register();
     }
 

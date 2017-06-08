@@ -24,7 +24,7 @@ public class PersonalMessageDao extends DaoBase<PersonalMessage, Long> {
                 .where(personalMessage.toAccount.eq(toAccount).and(
                             personalMessage.deleteStatus.ne(PersonalMessageDeleteStatus.BOTH).and(
                                     personalMessage.deleteStatus.ne(PersonalMessageDeleteStatus.RECIPIENT)
-                            )
+                            ).or(personalMessage.deleteStatus.isNull())
                         )
                 )
                 .offset(offset)
@@ -34,11 +34,11 @@ public class PersonalMessageDao extends DaoBase<PersonalMessage, Long> {
     public List<PersonalMessage> listUserSentMessage(Account fromAccount, long offset, long limit) {
         return queryFactory
                 .selectFrom(personalMessage)
-                .where(personalMessage.toAccount.eq(fromAccount).and(
+                .where(personalMessage.fromAccount.eq(fromAccount).and(
                             personalMessage.deleteStatus.ne(PersonalMessageDeleteStatus.BOTH).and(
                                 personalMessage.deleteStatus.ne(PersonalMessageDeleteStatus.SENDER)
                             )
-                        )
+                        ).or(personalMessage.deleteStatus.isNull())
                 )
                 .offset(offset)
                 .limit(limit)
