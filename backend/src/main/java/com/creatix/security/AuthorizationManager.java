@@ -225,6 +225,15 @@ public class AuthorizationManager {
         }
     }
 
+    public boolean canRead(Property property) {
+        try {
+            this.checkRead(property);
+            return true;
+        } catch (SecurityException e) {
+            return false;
+        }
+    }
+
     // same as read accessibility except Administrator
     public boolean canUpdateProperty(Property property) {
         final Account account = getCurrentAccount();

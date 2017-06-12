@@ -60,10 +60,10 @@ public class PropertyService {
         return item;
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured
     public List<Property> getAllProperties() {
         return propertyDao.findAll().stream()
-                .filter(p -> authorizationManager.canWrite(p))
+                .filter(p -> authorizationManager.canRead(p))
                 .collect(Collectors.toList());
     }
 

@@ -63,7 +63,7 @@ public class PropertyController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
     public DataResponse<List<PropertyDto>> getAllProperties() {
         return new DataResponse<>(propertyService.getAllProperties().stream()
                 .map(p -> mapper.toPropertyDto(p))
@@ -78,7 +78,7 @@ public class PropertyController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
     public DataResponse<PropertyDto> getPropertyDetails(@PathVariable long propertyId) {
         return new DataResponse<>(mapper.toPropertyDto(propertyService.getProperty(propertyId)));
     }
