@@ -25,10 +25,10 @@ public class BusinessProfile implements AttachmentId {
     private String name;
 
     @Column
-    private Long lat;
+    private Double lat;
 
     @Column
-    private Long lng;
+    private Double lng;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<BusinessCategory> businessCategoryList;
