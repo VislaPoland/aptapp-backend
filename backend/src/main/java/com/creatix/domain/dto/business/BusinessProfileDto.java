@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -23,10 +24,13 @@ public class BusinessProfileDto {
     @Size(max = 255)
     @NotEmpty
     private String name;
+
     @ApiModelProperty("Latitude")
-    private Long lat;
+    private Double lat;
+
     @ApiModelProperty("Longitude")
-    private Long lng;
+    private Double lng;
+
     @ApiModelProperty(value = "Whether has business profile image uploaded or not", readOnly = true)
     private boolean isImageUploaded;
     @ApiModelProperty("List of categories business is included in")
