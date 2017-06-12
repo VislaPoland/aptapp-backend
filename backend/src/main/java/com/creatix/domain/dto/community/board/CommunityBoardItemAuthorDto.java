@@ -12,6 +12,8 @@ import lombok.Data;
 public class CommunityBoardItemAuthorDto {
 
     @ApiModelProperty
+    private Long userId;
+    @ApiModelProperty
     private String firstName;
     @ApiModelProperty
     private String lastName;
