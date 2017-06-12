@@ -103,6 +103,8 @@ public class CommunityBoardMapper extends ConfigurableMapper {
                 .register();
 
         factory.classMap(Account.class, CommunityBoardItemAuthorDto.class)
+                .fieldAToB("id", "userId")
+                .fieldBToA("userId", "id")
                 .byDefault()
                 .register();
 
