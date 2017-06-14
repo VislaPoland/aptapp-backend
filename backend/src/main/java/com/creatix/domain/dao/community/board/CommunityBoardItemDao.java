@@ -25,7 +25,7 @@ import static com.creatix.domain.entity.store.community.board.QCommunityBoardIte
 public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
 
 
-    public List<CommunityBoardItem> listByPropertyAndStatus(Property property, List<CommunityBoardStatusType> statusTypes, Long startId, long limit) {
+    public List<CommunityBoardItem> listByPropertyAndStatus(Property property, Long ownerId, List<CommunityBoardStatusType> statusTypes, Long startId, long limit) {
 
 
         BooleanExpression wherePredicate = communityBoardItem.property.eq(property);
@@ -35,6 +35,9 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
             if (null != firstItem) {
                 wherePredicate = wherePredicate.and(communityBoardItem.createdAt.loe(firstItem.getCreatedAt()));
             }
+        }
+        if (null != ownerId) {
+            wherePredicate = wherePredicate.and(communityBoardItem.account.id.eq(ownerId));
         }
         return queryFactory.selectFrom(communityBoardItem)
                 .where(wherePredicate)
@@ -101,7 +104,7 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
         return query.fetch();
     }
 
-    public List<CommunityBoardItem> listByPropertyAnCategories(Property property, List<CommunityBoardStatusType> statusTypes, List<CommunityBoardCategory> categoryList, Long startId, long pageSize) {
+    public List<CommunityBoardItem> listByPropertyAnCategories(Property property, Long ownerId, List<CommunityBoardStatusType> statusTypes, List<CommunityBoardCategory> categoryList, Long startId, long pageSize) {
         BooleanExpression wherePredicate = communityBoardItem.property.eq(property);
         wherePredicate = wherePredicate.and(communityBoardItem.category.in(categoryList));
         wherePredicate = wherePredicate.and(communityBoardItem.communityBoardStatus.in(statusTypes));
@@ -110,6 +113,9 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
             if (null != firstItem) {
                 wherePredicate = wherePredicate.and(communityBoardItem.createdAt.loe(firstItem.getCreatedAt()));
             }
+        }
+        if (null != ownerId) {
+            wherePredicate = wherePredicate.and(communityBoardItem.account.id.eq(ownerId));
         }
         return queryFactory.selectFrom(communityBoardItem)
                 .where(wherePredicate)

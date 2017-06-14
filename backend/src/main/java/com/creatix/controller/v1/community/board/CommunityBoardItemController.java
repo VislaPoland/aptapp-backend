@@ -117,27 +117,22 @@ public class CommunityBoardItemController {
     public PageableDataResponse<List<CommunityBoardItemDto>> listVisibleItems(@PathVariable("propertyId") Long propertyId,
                                                                                            @RequestParam(value = "startId", required = false) Long startId,
                                                                                            @RequestParam(value = "pageSize", required = true) Long pageSize,
+                                                                                           @RequestParam(value = "owner", required = false) Long ownerId,
                                                                                            @RequestParam(value = "categoryList", required = false) String categoryList) {
+        List<CommunityBoardItem> boardItems;
         if (null == categoryList || "".equals(categoryList)) {
-            List<CommunityBoardItem> boardItems = communityBoardService.listBoardItemsForProperty(propertyId, Collections.singletonList(CommunityBoardStatusType.OPEN), startId, pageSize + 1);
-            return new PageableDataResponse<>(boardItems
-                    .stream()
-                    .limit(pageSize)
-                    .map(e-> communityBoardMapper.toCommunityBoardItem(e))
-                    .collect(Collectors.toList()),
-                    pageSize, boardItems.size() > pageSize ? boardItems.get(pageSize.intValue()).getId() : null
-            );
+            boardItems = communityBoardService.listBoardItemsForProperty(propertyId, ownerId, Collections.singletonList(CommunityBoardStatusType.OPEN), startId, pageSize + 1);
         } else {
             List<Long> categoryIdList = StringUtils.splitToLong(categoryList, ",");
-            List<CommunityBoardItem> boardItems = communityBoardService.listBoardItemsForPropertyAndCategory(propertyId, Collections.singletonList(CommunityBoardStatusType.OPEN), categoryIdList, startId, pageSize + 1);
-            return new PageableDataResponse<>(boardItems
-                    .stream()
-                    .limit(pageSize)
-                    .map(e-> communityBoardMapper.toCommunityBoardItem(e))
-                    .collect(Collectors.toList()),
-                    pageSize, boardItems.size() > pageSize ? boardItems.get(pageSize.intValue()).getId() : null
-            );
+            boardItems = communityBoardService.listBoardItemsForPropertyAndCategory(propertyId, ownerId, Collections.singletonList(CommunityBoardStatusType.OPEN), categoryIdList, startId, pageSize + 1);
         }
+        return new PageableDataResponse<>(boardItems
+                .stream()
+                .limit(pageSize)
+                .map(e-> communityBoardMapper.toCommunityBoardItem(e))
+                .collect(Collectors.toList()),
+                pageSize, boardItems.size() > pageSize ? boardItems.get(pageSize.intValue()).getId() : null
+        );
     }
 
 
