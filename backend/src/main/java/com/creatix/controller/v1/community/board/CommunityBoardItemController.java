@@ -7,6 +7,7 @@ import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.community.board.*;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.ApplicationFeatureType;
 import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
 import com.creatix.domain.mapper.CommunityBoardMapper;
 import com.creatix.security.RoleSecured;
@@ -48,7 +49,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "", method = RequestMethod.POST)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody @Valid CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
@@ -64,7 +65,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "/{itemId}", method = RequestMethod.PUT)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemDto> updateItem(@RequestBody @Valid CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
@@ -80,7 +81,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "/{itemId}", method = RequestMethod.GET)
-    @RoleSecured()
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD)
     public DataResponse<CommunityBoardItemDto> getItem(@PathVariable("itemId") Long itemId) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
@@ -96,7 +97,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "/{itemId}", method = RequestMethod.DELETE)
-    @RoleSecured()
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemDto> deleteItem(@PathVariable("itemId") Long itemId) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
@@ -113,7 +114,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "", method = RequestMethod.GET)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD)
     public PageableDataResponse<List<CommunityBoardItemDto>> listVisibleItems(@PathVariable("propertyId") Long propertyId,
                                                                                            @RequestParam(value = "startId", required = false) Long startId,
                                                                                            @RequestParam(value = "pageSize", required = true) Long pageSize,
@@ -143,7 +144,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "/search", method = RequestMethod.GET)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD)
     public PageableDataResponse<List<CommunityBoardItemDto>> searchBoard(@PathVariable("propertyId") Long propertyId,
                                                         @RequestBody @Valid SearchRequest searchRequest) {
 
@@ -165,14 +166,14 @@ public class CommunityBoardItemController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{itemId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemDto> storeCommunityItemPhotos(@RequestParam MultipartFile[] files, @PathVariable("itemId") long itemId) throws IOException {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(communityBoardService.storeBoardItemPhotos(files, itemId))
         );
     }
 
-    @ApiOperation(value = "Upload community item photos")
+    @ApiOperation(value = "Delete community item photos")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),
@@ -180,7 +181,7 @@ public class CommunityBoardItemController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{itemId}/photos/{photoId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemPhotoDto> deleteCommunityItemPhoto(@PathVariable("itemId") long itemId,
                                                                              @PathVariable("photoId") long photoId) throws IOException {
         return new DataResponse<>(
@@ -197,7 +198,7 @@ public class CommunityBoardItemController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/categories", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD)
     public DataResponse<List<CommunityBoardCategoryDto>> listCommunityBoardCategories() {
         return new DataResponse<>(
                 communityBoardService.listCategories()
