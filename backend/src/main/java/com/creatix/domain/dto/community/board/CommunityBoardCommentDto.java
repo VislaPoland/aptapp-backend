@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 /**
  * Created by Tomas Michalek on 12/05/2017.
@@ -41,5 +42,8 @@ public class CommunityBoardCommentDto {
 
     @ApiModelProperty("Comment status")
     private CommunityBoardCommentStatusType status;
+
+    @ApiModelProperty
+    private List<CommunityBoardCommentDto> childComments;
 
 }

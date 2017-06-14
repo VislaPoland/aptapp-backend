@@ -29,7 +29,7 @@ public class CommunityBoardComment {
     @ManyToOne(optional = true)
     private CommunityBoardComment parentComment;
 
-    @OneToMany
+    @OneToMany(mappedBy = "parentComment")
     private List<CommunityBoardComment> childComments;
 
     @ManyToOne(optional = false)
