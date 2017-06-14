@@ -219,7 +219,7 @@ public class AuthorizationManager {
             case PropertyManager:
                 return property.getManagers().contains((PropertyManager) account);
             case AssistantPropertyManager:
-                return property.getManagers().contains(((ManagedEmployee) account).getManager());
+                return property.getManagers().contains(((AssistantPropertyManager) account).getManager());
             default:
                 return false;
         }
