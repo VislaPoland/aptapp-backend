@@ -8,6 +8,7 @@ import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.dto.business.BusinessProfilePhotoDto;
 import com.creatix.domain.dto.business.BusinessSearchRequest;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.ApplicationFeatureType;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.business.BusinessProfileService;
@@ -49,7 +50,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD)
     public DataResponse<List<BusinessProfileDto>> listBusinessProfilesForProperty(@PathVariable Long propertyId) {
         return new DataResponse<>(businessProfileService.listBusinessProfilesForProperty(propertyId)
                 .stream()
@@ -71,7 +72,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/categories/{businessCategoryIdList}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE)
     public DataResponse<List<BusinessProfileDto>> listBusinessProfilesForPropertyAndCategory(
             @PathVariable Long propertyId,
             @PathVariable String businessCategoryIdList) {
@@ -90,7 +91,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/categories/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE)
     public DataResponse<List<BusinessProfileDto>> listBusinessProfilesForPropertyAndCategory(
             @PathVariable Long propertyId,
             @RequestBody BusinessSearchRequest businessSearchRequest) {
@@ -110,7 +111,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE)
     public DataResponse<BusinessProfileDto> getBusinessProfile(@PathVariable("businessProfileId") Long businessProfileId) {
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(
@@ -127,7 +128,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileDto> createBusinessProfile(@RequestBody BusinessProfileDto request,
                                                                   @PathVariable("propertyId") Long propertyId) {
         return new DataResponse<>(
@@ -145,7 +146,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}", method = {RequestMethod.PUT}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileDto> update(@RequestBody BusinessProfileDto request, @PathVariable("businessProfileId") Long businessProfileId) {
         request.setId(businessProfileId);
         return new DataResponse<>(
@@ -161,7 +162,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}", method = {RequestMethod.DELETE}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileDto> delete(@PathVariable("businessProfileId") Long businessProfileId) {
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(businessProfileService.deleteBusinessProfile(businessProfileId))
@@ -176,7 +177,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}/sendNotification", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public void notify(@PathVariable("businessProfileId") Long businessProfileId) {
         businessProfileService.sendNotification(businessProfileId);
     }
@@ -189,7 +190,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}/carte", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE)
     public DataResponse<List<BusinessProfileCarteItemDto>> listCarte(@PathVariable("businessProfileId") Long businessProfileId) {
         return new DataResponse<>(
                 businessProfileService.listCarte(businessProfileId).stream().map(
@@ -206,7 +207,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileDto> storeBusinessProfilePhotos(@RequestParam MultipartFile[] files, @PathVariable long businessProfileId) throws IOException {
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(businessProfileService.storeBusinessProfilePhotos(files, businessProfileId))
@@ -221,7 +222,7 @@ public class BusinessProfileController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}/photos/{photoId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfilePhotoDto> deleteBusinessProfilePhoto(@PathVariable("photoId") Long photoId,
                                                                             @PathVariable("businessProfileId") Long businessProfileId) throws IOException {
         return new DataResponse<>(
