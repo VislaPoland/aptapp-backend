@@ -49,13 +49,13 @@ public class CommunityBoardService {
     @Autowired
     private AttachmentService attachmentService;
 
-    public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, List<CommunityBoardStatusType> statusTypes, Long startId, long pageSize) {
+    public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, Long ownerId, List<CommunityBoardStatusType> statusTypes, Long startId, long pageSize) {
         Property property = getProperty(propertyId);
 
-        return communityBoardItemDao.listByPropertyAndStatus(property, statusTypes, startId, pageSize);
+        return communityBoardItemDao.listByPropertyAndStatus(property, ownerId, statusTypes, startId, pageSize);
     }
 
-    public List<CommunityBoardItem> listBoardItemsForPropertyAndCategory(long propertyId, List<CommunityBoardStatusType> statusTypes, List<Long> categoryIdList, Long startId, long pageSize) {
+    public List<CommunityBoardItem> listBoardItemsForPropertyAndCategory(long propertyId, Long ownerId, List<CommunityBoardStatusType> statusTypes, List<Long> categoryIdList, Long startId, long pageSize) {
         Property property = getProperty(propertyId);
 
         List<CommunityBoardCategory> categoryList = categoryIdList
@@ -64,7 +64,7 @@ public class CommunityBoardService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        return communityBoardItemDao.listByPropertyAnCategories(property, statusTypes, categoryList, startId, pageSize);
+        return communityBoardItemDao.listByPropertyAnCategories(property, ownerId, statusTypes, categoryList, startId, pageSize);
     }
 
     public List<CommunityBoardItem> searchBoardItemsForProperty(long propertyId, List<CommunityBoardStatusType> statusTypes, long pageSize, SearchRequest searchRequest) {
