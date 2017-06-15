@@ -58,6 +58,9 @@ public class CommunityBoardItem implements AttachmentId {
     @Column
     private Boolean showApartmentNumber;
 
+    @Column
+    private Boolean showPhoneNumber;
+
     @OneToMany
     private List<CommunityBoardItemPhoto> photoList;
 

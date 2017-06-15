@@ -9,6 +9,7 @@ import lombok.Data;
 public class PrivacySettingsDto {
 
     private Boolean showEmailAddress;
+    private Boolean showPhoneNumber;
     private Boolean showApartmentNumber;
 
 }
