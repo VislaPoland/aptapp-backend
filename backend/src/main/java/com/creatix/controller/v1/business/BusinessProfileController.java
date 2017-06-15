@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -129,7 +130,7 @@ public class BusinessProfileController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<BusinessProfileDto> createBusinessProfile(@RequestBody BusinessProfileDto request,
+    public DataResponse<BusinessProfileDto> createBusinessProfile(@Valid @RequestBody BusinessProfileDto request,
                                                                   @PathVariable("propertyId") Long propertyId) {
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(

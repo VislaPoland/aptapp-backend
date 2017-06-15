@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,7 +76,7 @@ public class BusinessCategoryController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = {RequestMethod.PUT, RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(AccountRole.Administrator)
-    public DataResponse<BusinessCategoryDto> createBusinessCategory(@RequestBody BusinessCategoryDto businessCategoryDto) {
+    public DataResponse<BusinessCategoryDto> createBusinessCategory(@Valid @RequestBody BusinessCategoryDto businessCategoryDto) {
         return new DataResponse<>(
                 businessMapper.toBusinessCategory(
                     businessProfileService.createOrUpdateBusinessCategory(
