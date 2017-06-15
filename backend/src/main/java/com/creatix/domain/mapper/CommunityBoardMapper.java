@@ -3,7 +3,10 @@ package com.creatix.domain.mapper;
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.dao.community.board.CommunityBoardCategoryDao;
 import com.creatix.domain.dto.community.board.*;
+import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.SubTenant;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.community.board.CommunityBoardCategory;
 import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
@@ -41,11 +44,9 @@ public class CommunityBoardMapper extends ConfigurableMapper {
         factory.classMap(CommunityBoardItem.class, CommunityBoardItemDto.class)
                 .exclude("category")
                 .byDefault()
-                .fieldAToB("showEmailAddress", "privacySettings.showEmailAddress")
-                .fieldAToB("showApartmentNumber", "privacySettings.showApartmentNumber")
-                .fieldBToA("privacySettings.showEmailAddress", "showEmailAddress")
-                .fieldBToA("privacySettings.showApartmentNumber", "showApartmentNumber")
-                .fieldAToB("category", "category")
+                .field("showEmailAddress", "privacySettings.showEmailAddress")
+                .field("showPhoneNumber", "privacySettings.showPhoneNumber")
+                .field("showApartmentNumber", "privacySettings.showApartmentNumber")
                 .customize(new CustomMapper<CommunityBoardItem, CommunityBoardItemDto>() {
                     @Override
                     public void mapBtoA(CommunityBoardItemDto communityBoardItemDto, CommunityBoardItem communityBoardItem, MappingContext context) {
@@ -61,10 +62,9 @@ public class CommunityBoardMapper extends ConfigurableMapper {
         factory.classMap(CommunityBoardItemEditRequest.class, CommunityBoardItem.class)
                 .exclude("category")
                 .byDefault()
-                .fieldAToB("privacySettings.showEmailAddress", "showEmailAddress")
-                .fieldAToB("privacySettings.showApartmentNumber", "showApartmentNumber")
-                .fieldBToA("showEmailAddress", "privacySettings.showEmailAddress")
-                .fieldBToA("showApartmentNumber", "privacySettings.showApartmentNumber")
+                .field("privacySettings.showEmailAddress", "showEmailAddress")
+                .field("privacySettings.showPhoneNumber", "showPhoneNumber")
+                .field("privacySettings.showApartmentNumber", "showApartmentNumber")
                 .fieldBToA("category", "category")
                 .customize(new CustomMapper<CommunityBoardItemEditRequest, CommunityBoardItem>() {
                     @Override
@@ -105,10 +105,35 @@ public class CommunityBoardMapper extends ConfigurableMapper {
         factory.classMap(Account.class, CommunityBoardItemAuthorDto.class)
                 .fieldAToB("id", "userId")
                 .fieldBToA("userId", "id")
+                .exclude("apartment")
                 .byDefault()
+                .customize(new CustomMapper<Account, CommunityBoardItemAuthorDto>() {
+                    @Override
+                    public void mapAtoB(Account account, CommunityBoardItemAuthorDto communityBoardItemAuthorDto, MappingContext context) {
+                        Apartment apartment = null;
+                        switch (account.getRole()) {
+                            case Tenant:
+                                apartment = ((Tenant) account).getApartment();
+                                break;
+                            case SubTenant:
+                                apartment = ((SubTenant) account).getApartment();
+                                break;
+                            default:
+                                break;
+                        }
+                        if (null != apartment) {
+                            communityBoardItemAuthorDto.setApartment(map(apartment, CommunityBoardApartmentInfo.class));
+                        }
+
+                    }
+                })
                 .register();
 
         factory.classMap(CommunityBoardComment.class, CommunityBoardCommentDto.class)
+                .byDefault()
+                .register();
+
+        factory.classMap(Apartment.class, CommunityBoardApartmentInfo.class)
                 .byDefault()
                 .register();
 

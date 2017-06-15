@@ -1,5 +1,6 @@
 package com.creatix.domain.dto.community.board;
 
+import com.creatix.domain.entity.store.Apartment;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,5 +24,7 @@ public class CommunityBoardItemAuthorDto {
     private String primaryPhone;
     @ApiModelProperty
     private String primaryEmail;
+    @ApiModelProperty
+    private CommunityBoardApartmentInfo apartment;
 
 }
