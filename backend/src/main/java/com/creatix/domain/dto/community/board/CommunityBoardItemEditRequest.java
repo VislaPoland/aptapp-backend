@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -22,6 +23,12 @@ import javax.validation.constraints.Size;
 @ToString(of = {"id", "title"})
 @EqualsAndHashCode(of = "id")
 public class CommunityBoardItemEditRequest {
+
+    @Data
+    public static class CategoryIdDto {
+        @NotNull
+        Long id;
+    }
 
     @ApiModelProperty
     private Long id;
@@ -42,7 +49,8 @@ public class CommunityBoardItemEditRequest {
 
     @NotNull
     @ApiModelProperty
-    private CommunityBoardCategory category;
+    @Valid
+    private CategoryIdDto category;
 
     @NotNull
     @ApiModelProperty
@@ -52,6 +60,7 @@ public class CommunityBoardItemEditRequest {
     @ApiModelProperty
     private CommunityBoardStatusType communityBoardStatus;
 
+    @ApiModelProperty
     private PrivacySettingsDto privacySettings;
 
 }
