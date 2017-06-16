@@ -1,5 +1,6 @@
 package com.creatix.service.community.board;
 
+import com.creatix.domain.dao.NotificationDao;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.community.board.CommunityBoardCategoryDao;
 import com.creatix.domain.dao.community.board.CommunityBoardCommentDao;
@@ -10,11 +11,18 @@ import com.creatix.domain.entity.store.community.board.CommunityBoardCategory;
 import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItemPhoto;
+import com.creatix.domain.entity.store.notification.CommentNotification;
+import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.community.board.CommunityBoardCommentStatusType;
 import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
 import com.creatix.domain.mapper.CommunityBoardMapper;
+import com.creatix.message.PushNotificationTemplateProcessor;
+import com.creatix.message.push.GenericPushNotification;
+import com.creatix.message.template.push.NewCommunityItemCommentTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.service.AttachmentService;
+import com.creatix.service.message.PushNotificationService;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +56,12 @@ public class CommunityBoardService {
     private CommunityBoardMapper communityBoardMapper;
     @Autowired
     private AttachmentService attachmentService;
+    @Autowired
+    private PushNotificationTemplateProcessor templateProcessor;
+    @Autowired
+    private NotificationDao notificationDao;
+    @Autowired
+    private PushNotificationService pushNotificationService;
 
     public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, Long ownerId, List<CommunityBoardStatusType> statusTypes, Long startId, long pageSize) {
         Property property = getProperty(propertyId);
@@ -210,8 +224,34 @@ public class CommunityBoardService {
 
         communityBoardCommentDao.persist(comment);
 
+        try {
+            this.dispatchNotification(comment);
+        } catch (IOException | TemplateException e) {
+            //TODO: log error
+            e.printStackTrace();
+        }
+
         return comment;
 
+    }
+
+    public void dispatchNotification(@NotNull CommunityBoardComment comment) throws IOException, TemplateException {
+        Objects.requireNonNull(comment, "Comment can not be null!");
+
+        final GenericPushNotification pushNotification = new GenericPushNotification();
+        pushNotification.setMessage(templateProcessor.processTemplate(new NewCommunityItemCommentTemplate(comment)));
+        pushNotification.setTitle("New comment");
+
+        CommentNotification storedNotification = new CommentNotification();
+        storedNotification.setProperty(comment.getCommunityBoardItem().getProperty());
+        storedNotification.setCommunityBoardComment(comment);
+        storedNotification.setAuthor(comment.getAuthor());
+        storedNotification.setDescription(pushNotification.getMessage());
+        storedNotification.setStatus(NotificationStatus.Pending);
+        storedNotification.setTitle(pushNotification.getTitle());
+        notificationDao.persist(storedNotification);
+
+        pushNotificationService.sendNotification(pushNotification, comment.getCommunityBoardItem().getAccount());
     }
 
     public CommunityBoardComment updateCommentFromRequest(CommunityBoardCommentEditRequest request) {
