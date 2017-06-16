@@ -47,6 +47,7 @@ public class CommunityBoardMapper extends ConfigurableMapper {
                 .field("showEmailAddress", "privacySettings.showEmailAddress")
                 .field("showPhoneNumber", "privacySettings.showPhoneNumber")
                 .field("showApartmentNumber", "privacySettings.showApartmentNumber")
+                .fieldAToB("category", "category")
                 .customize(new CustomMapper<CommunityBoardItem, CommunityBoardItemDto>() {
                     @Override
                     public void mapBtoA(CommunityBoardItemDto communityBoardItemDto, CommunityBoardItem communityBoardItem, MappingContext context) {
