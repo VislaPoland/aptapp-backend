@@ -78,7 +78,7 @@ public class DiscountCouponController {
     @ApiOperation("Updates existing discount coupon")
     @RequestMapping(path = "/{couponId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public HttpEntity<DiscountCouponDto> updateDiscountCoupon(@RequestBody @NotNull DiscountCouponDto request,
+    public HttpEntity<DiscountCouponDto> updateDiscountCoupon(@RequestBody @Valid @NotNull DiscountCouponDto request,
                                                               @PathVariable("couponId") Long couponId) {
         return new HttpEntity<>(
                 businessMapper.toDiscountCoupon(

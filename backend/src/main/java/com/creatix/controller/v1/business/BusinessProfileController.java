@@ -95,7 +95,7 @@ public class BusinessProfileController {
     @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE)
     public DataResponse<List<BusinessProfileDto>> listBusinessProfilesForPropertyAndCategory(
             @PathVariable Long propertyId,
-            @RequestBody BusinessSearchRequest businessSearchRequest) {
+            @RequestBody @Valid BusinessSearchRequest businessSearchRequest) {
         return new DataResponse<>(businessProfileService.searchBusinesses(propertyId,
                                     businessSearchRequest.getName(),
                                     businessSearchRequest.getBusinessCategoryId())
@@ -148,7 +148,7 @@ public class BusinessProfileController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileId}", method = {RequestMethod.PUT}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<BusinessProfileDto> update(@RequestBody BusinessProfileDto request, @PathVariable("businessProfileId") Long businessProfileId) {
+    public DataResponse<BusinessProfileDto> update(@RequestBody @Valid BusinessProfileDto request, @PathVariable("businessProfileId") Long businessProfileId) {
         request.setId(businessProfileId);
         return new DataResponse<>(
                 businessMapper.toBusinessProfile(businessProfileService.updateBusinessProfileFromRequest(request))
