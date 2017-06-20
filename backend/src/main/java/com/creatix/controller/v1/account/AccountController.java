@@ -92,7 +92,7 @@ public class AccountController {
     @RoleSecured
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/me/profile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updateSelfProfile(@RequestBody @Valid UpdateAccountProfileRequest request) {
+    public DataResponse<AccountDto> updateSelfProfile(@Valid @RequestBody UpdateAccountProfileRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateAccount(authorizationManager.getCurrentAccount(), request)));
     }
 
@@ -105,7 +105,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/me/password", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<AccountDto> changePassword(@RequestBody @Valid UpdatePasswordRequest request) {
+    public DataResponse<AccountDto> changePassword(@Valid @RequestBody UpdatePasswordRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateAccountPasswordFromRequest(request)));
     }
 
@@ -118,7 +118,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/me/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<AccountDto> setPassword(@RequestBody @Valid CreatePasswordRequest request) {
+    public DataResponse<AccountDto> setPassword(@Valid @RequestBody CreatePasswordRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.createAccountPasswordFromRequest(request)));
     }
 
@@ -130,7 +130,7 @@ public class AccountController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{accountId}/profile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updateProfile(@PathVariable Long accountId, @RequestBody @Valid UpdateAccountProfileRequest request) {
+    public DataResponse<AccountDto> updateProfile(@PathVariable Long accountId, @Valid @RequestBody UpdateAccountProfileRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateAccountFromRequest(accountId, request)));
     }
 
@@ -156,7 +156,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured(AccountRole.Administrator)
     @RequestMapping(value = "/administrators", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createAdministrator(@RequestBody @Valid PersistAdministratorRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+    public DataResponse<AccountDto> createAdministrator(@Valid @RequestBody PersistAdministratorRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createAdministrator(request)));
     }
 
@@ -169,7 +169,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured(AccountRole.Administrator)
     @RequestMapping(value = "/administrators/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updateAdministrator(@PathVariable Long accountId, @RequestBody @Valid PersistAdministratorRequest request) {
+    public DataResponse<AccountDto> updateAdministrator(@PathVariable Long accountId, @Valid @RequestBody PersistAdministratorRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateAdministrator(accountId, request)));
     }
 
@@ -182,7 +182,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured(AccountRole.Administrator)
     @RequestMapping(value = "/property-owners", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createPropertyOwner(@RequestBody @Valid PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public DataResponse<AccountDto> createPropertyOwner(@Valid @RequestBody PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createPropertyOwner(request)));
     }
 
@@ -195,7 +195,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured(AccountRole.Administrator)
     @RequestMapping(value = "/property-owners/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updatePropertyOwner(@PathVariable Long accountId, @RequestBody @Valid PersistPropertyOwnerRequest request) {
+    public DataResponse<AccountDto> updatePropertyOwner(@PathVariable Long accountId, @Valid @RequestBody PersistPropertyOwnerRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updatePropertyOwner(accountId, request)));
     }
 
@@ -208,7 +208,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     @RequestMapping(value = "/property-managers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createPropertyManager(@RequestBody @Valid PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public DataResponse<AccountDto> createPropertyManager(@Valid @RequestBody PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createPropertyManager(request)));
     }
 
@@ -221,7 +221,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     @RequestMapping(value = "/property-managers/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updatePropertyManager(@PathVariable Long accountId, @RequestBody @Valid PersistPropertyManagerRequest request) {
+    public DataResponse<AccountDto> updatePropertyManager(@PathVariable Long accountId, @Valid @RequestBody PersistPropertyManagerRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updatePropertyManager(accountId, request)));
     }
 
@@ -234,7 +234,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyManager})
     @RequestMapping(value = "/security-guys", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createSecurityGuy(@RequestBody @Valid PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public DataResponse<AccountDto> createSecurityGuy(@Valid @RequestBody PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createSecurityGuy(request)));
     }
 
@@ -247,7 +247,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.Security})
     @RequestMapping(value = "/security-guys/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updateSecurityGuy(@PathVariable Long accountId, @RequestBody @Valid PersistSecurityGuyRequest request) {
+    public DataResponse<AccountDto> updateSecurityGuy(@PathVariable Long accountId, @Valid @RequestBody PersistSecurityGuyRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateSecurityGuy(accountId, request)));
     }
 
@@ -260,7 +260,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyManager})
     @RequestMapping(value = "/maintenance-guys", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createMaintenanceGuy(@RequestBody @Valid PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public DataResponse<AccountDto> createMaintenanceGuy(@Valid @RequestBody PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createMaintenanceGuy(request)));
     }
 
@@ -273,7 +273,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.Maintenance})
     @RequestMapping(value = "/maintenance-guys/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updateMaintenanceGuy(@PathVariable Long accountId, @RequestBody @Valid PersistMaintenanceGuyRequest request) {
+    public DataResponse<AccountDto> updateMaintenanceGuy(@PathVariable Long accountId, @Valid @RequestBody PersistMaintenanceGuyRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateMaintenanceGuy(accountId, request)));
     }    
     
@@ -286,7 +286,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     @RequestMapping(value = "/assistant-property-managers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> createAssistantPropertyManager(@RequestBody @Valid PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public DataResponse<AccountDto> createAssistantPropertyManager(@Valid @RequestBody PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         return new DataResponse<>(mapper.toAccountDto(accountService.createAssistantPropertyManager(request)));
     }
 
@@ -299,7 +299,7 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner})
     @RequestMapping(value = "/assistant-property-managers/{accountId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AccountDto> updateAssistantPropertyManager(@PathVariable Long accountId, @RequestBody @Valid PersistAssistantPropertyManagerRequest request) {
+    public DataResponse<AccountDto> updateAssistantPropertyManager(@PathVariable Long accountId, @Valid @RequestBody PersistAssistantPropertyManagerRequest request) {
         return new DataResponse<>(mapper.toAccountDto(accountService.updateAssistantPropertyManager(accountId, request)));
     }
 

@@ -7,8 +7,11 @@ import com.creatix.domain.enums.community.board.CommunityBoardItemType;
 import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.Date;
@@ -27,29 +30,37 @@ public class CommunityBoardItem implements AttachmentId {
     private Long id;
 
     @Column(length = 255, nullable = false)
+    @NotBlank
     private String title;
 
     @Column(columnDefinition="TEXT", length = 2048, nullable = false)
+    @NotBlank
     private String description;
 
     @Column(nullable = false)
+    @Min(0)
     private Double price;
 
     @ManyToOne
+    @NotNull
     private CommunityBoardCategory category;
 
     @Column
     @Enumerated(EnumType.STRING)
+    @NotNull
     private CommunityBoardItemType communityBoardItemType;
 
     @Column
     @Enumerated(EnumType.STRING)
+    @NotNull
     private CommunityBoardStatusType communityBoardStatus;
 
     @ManyToOne
+    @NotNull
     private Property property;
 
     @ManyToOne
+    @NotNull
     private Account account;
 
     @Column

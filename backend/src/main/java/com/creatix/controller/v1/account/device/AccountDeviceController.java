@@ -42,7 +42,7 @@ public class AccountDeviceController {
     @JsonView(Views.Public.class)
     @RoleSecured
     @RequestMapping(value = "/notifications", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<Boolean> register(@PathVariable Long accountId, @RequestBody @Valid AccountDeviceDto request) {
+    public DataResponse<Boolean> register(@PathVariable Long accountId, @Valid @RequestBody AccountDeviceDto request) {
         Object deviceObject = httpSession.getAttribute(this.deviceProperties.getSessionKeyDevice());
         if (deviceObject instanceof Device == false) {
             throw new SecurityException("Device is not recognized.");

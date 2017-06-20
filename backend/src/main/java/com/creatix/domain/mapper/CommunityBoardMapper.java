@@ -19,6 +19,7 @@ import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
 import java.time.OffsetDateTime;
@@ -148,6 +149,7 @@ public class CommunityBoardMapper extends ConfigurableMapper {
         return this.map(communityBoardItem, CommunityBoardItemDto.class);
     }
 
+    @Valid
     public CommunityBoardItem toCommunityBoardItem(@NotNull CommunityBoardItemEditRequest communityBoardItem) {
         Objects.requireNonNull(communityBoardItem, "Community board item must not be null");
         return this.map(communityBoardItem, CommunityBoardItem.class);

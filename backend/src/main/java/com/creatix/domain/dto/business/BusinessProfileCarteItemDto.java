@@ -18,13 +18,13 @@ public class BusinessProfileCarteItemDto {
     @ApiModelProperty
     private Long id;
 
-    @ApiModelProperty(required = true)
     @NotEmpty
+    @ApiModelProperty(required = true)
     private String name;
 
-    @ApiModelProperty(required = true)
-    @NotNull
     @Min(0)
+    @NotNull
+    @ApiModelProperty(required = true)
     private double price;
 
     @ApiModelProperty(value = "Photo URL", required = false)

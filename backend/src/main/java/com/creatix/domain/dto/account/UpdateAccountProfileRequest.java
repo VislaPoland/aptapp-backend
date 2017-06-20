@@ -3,13 +3,17 @@ package com.creatix.domain.dto.account;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
 
 @ApiModel
 @Data
 public class UpdateAccountProfileRequest {
 
+    @NotBlank
     @ApiModelProperty(value = "First name")
     private String firstName;
+    @NotBlank
     @ApiModelProperty(value = "Last name")
     private String lastName;
     @ApiModelProperty(value = "Company name")
@@ -18,7 +22,7 @@ public class UpdateAccountProfileRequest {
     private String primaryPhone;
     @ApiModelProperty(value = "Web url")
     private String website;
-
+    @Email
     @ApiModelProperty(value = "Secondary email address")
     private String secondaryEmail;
     @ApiModelProperty(value = "Secondary phone number")
