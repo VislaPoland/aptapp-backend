@@ -29,4 +29,8 @@ public class UpdateAccountProfileRequest {
     private String secondaryPhone;
     @ApiModelProperty(value = "Indicate that sms message notifications are enabled/disabled")
     private Boolean enableSms;
+    @ApiModelProperty
+    private Boolean isTacAccepted;
+    @ApiModelProperty
+    private Boolean isPrivacyPolicyAccepted;
 }
