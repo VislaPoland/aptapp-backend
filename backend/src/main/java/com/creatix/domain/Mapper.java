@@ -35,6 +35,8 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,6 +52,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class Mapper {
+
+    private final Logger logger = LoggerFactory.getLogger(Mapper.class);
 
     private MapperFactory mapperFactory;
 
@@ -121,6 +125,20 @@ public class Mapper {
                                 accountDto.setProperty(toPropertyDto(apartment.getProperty()));
                                 accountDto.setApartment(toApartmentDto(apartment));
                             }
+                        }
+
+                        try {
+                            switch (account.getRole()) {
+                                case Tenant:
+                                case SubTenant:
+                                    accountDto.setIsPrivacyPolicyAccepted(((TenantBase) account).getIsPrivacyPolicyAccepted());
+                                    accountDto.setIsTacAccepted(((TenantBase) account).getIsTacAccepted());
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } catch (ClassCastException e) {
+                            logger.error("Role and class type mismatch.", e);
                         }
                     }
                 })
@@ -410,6 +428,23 @@ public class Mapper {
                         }
                         if ( account instanceof PropertyOwner ) {
                             ((PropertyOwner) account).setWebsite(request.getWebsite());
+                        }
+
+                        try {
+                            switch (account.getRole()) {
+                                case Tenant:
+                                    ((Tenant) account).setIsPrivacyPolicyAccepted(request.getIsPrivacyPolicyAccepted());
+                                    ((Tenant) account).setIsTacAccepted(request.getIsTacAccepted());
+                                    break;
+                                case SubTenant:
+                                    ((SubTenant) account).setIsPrivacyPolicyAccepted(request.getIsPrivacyPolicyAccepted());
+                                    ((SubTenant) account).setIsTacAccepted(request.getIsTacAccepted());
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } catch (ClassCastException e) {
+                            logger.error("Role and class type mismatch.", e);
                         }
                     }
                 })

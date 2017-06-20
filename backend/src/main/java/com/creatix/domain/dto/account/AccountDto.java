@@ -54,4 +54,9 @@ public class AccountDto {
     @ApiModelProperty(value = "Associated apartment")
     private ApartmentDto apartment;
 
+    @ApiModelProperty
+    private Boolean isTacAccepted;
+    @ApiModelProperty
+    private Boolean isPrivacyPolicyAccepted;
+
 }

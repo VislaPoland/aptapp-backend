@@ -3,6 +3,7 @@ package com.creatix.service.business;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.business.BusinessCategoryDao;
 import com.creatix.domain.dao.business.BusinessProfileDao;
+import com.creatix.domain.dto.business.BusinessProfileCreateRequest;
 import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.business.BusinessCategory;
@@ -102,15 +103,20 @@ public class BusinessProfileService {
 
     @NotNull
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public BusinessProfile createBusinessProfileFromRequest(@NotNull BusinessProfileDto businessProfileDto, long propertyId) {
-        Objects.requireNonNull(businessProfileDto, "Business profile must not be null");
+    public BusinessProfile createBusinessProfileFromRequest(@NotNull BusinessProfileCreateRequest request, long propertyId) {
+        Objects.requireNonNull(request, "Business profile must not be null");
 
         Property property = findPropertyById(propertyId);
 
         if (authorizationManager.canWrite(property)) {
-            BusinessProfile businessProfile = businessMapper.toBusinessProfile(businessProfileDto);
+            BusinessProfile businessProfile = businessMapper.toBusinessProfile(request);
             businessProfile.setProperty(property);
             businessProfileDao.persist(businessProfile);
+
+            if (request.isShouldSentNotification()) {
+                this.sendNotification(businessProfile.getId());
+            }
+
             return businessProfile;
         }
 
