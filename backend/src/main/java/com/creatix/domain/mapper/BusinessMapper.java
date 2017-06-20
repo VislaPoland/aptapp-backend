@@ -1,6 +1,7 @@
 package com.creatix.domain.mapper;
 
 import com.creatix.configuration.ApplicationProperties;
+import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.business.BusinessCategoryDao;
 import com.creatix.domain.dto.business.*;
 import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
@@ -30,6 +31,8 @@ public class BusinessMapper extends ConfigurableMapper {
 
     @Autowired
     private BusinessCategoryDao businessCategoryDao;
+    @Autowired
+    private PropertyDao propertyDao;
 
     @Override
     protected void configure(MapperFactory factory) {
@@ -54,6 +57,29 @@ public class BusinessMapper extends ConfigurableMapper {
                     }
                 })
                 .register();
+
+        factory.classMap(BusinessProfileCreateRequest.class, BusinessProfile.class)
+                .exclude("propertyId")
+                .exclude("businessCategoryList")
+                .exclude("shouldSentNotification")
+                .byDefault()
+                .customize(new CustomMapper<BusinessProfileCreateRequest, BusinessProfile>() {
+                    @Override
+                    public void mapAtoB(BusinessProfileCreateRequest businessProfileCreateRequest, BusinessProfile businessProfile, MappingContext context) {
+                        if (null != businessProfileCreateRequest.getPropertyId()) {
+                            businessProfile.setProperty(
+                                    propertyDao.findById(businessProfileCreateRequest.getPropertyId())
+                            );
+                        }
+                        businessProfile.setBusinessCategoryList(
+                                businessProfileCreateRequest.getBusinessCategoryList().stream().map(
+                                        c -> businessCategoryDao.findById(c.getId())
+                                ).collect(Collectors.toList())
+                        );
+                    }
+                })
+                .register();
+
         factory.classMap(BusinessCategory.class, BusinessCategoryDto.class)
                 .byDefault()
                 .register();
@@ -159,6 +185,11 @@ public class BusinessMapper extends ConfigurableMapper {
     public BusinessProfileDto toBusinessProfile(@NotNull BusinessProfile businessProfile) {
         Objects.requireNonNull(businessProfile, "Business profile must not be null");
         return this.map(businessProfile, BusinessProfileDto.class);
+    }
+
+    public BusinessProfile toBusinessProfile(@NotNull BusinessProfileCreateRequest businessProfile) {
+        Objects.requireNonNull(businessProfile, "Business profile request must not be null");
+        return this.map(businessProfile, BusinessProfile.class);
     }
 
     public BusinessProfile toBusinessProfile(@NotNull BusinessProfileDto businessProfileDto) {
