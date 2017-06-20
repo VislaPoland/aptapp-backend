@@ -50,7 +50,7 @@ public class CommunityBoardItemController {
     })
     @RequestMapping(path = "", method = RequestMethod.POST)
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody @Valid CommunityBoardItemEditRequest request) {
+    public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @Valid @RequestBody CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
                         communityBoardService.createNewBoardItemFromRequest(propertyId, request)
@@ -66,7 +66,7 @@ public class CommunityBoardItemController {
     })
     @RequestMapping(path = "/{itemId}", method = RequestMethod.PUT)
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardItemDto> updateItem(@RequestBody @Valid CommunityBoardItemEditRequest request) {
+    public DataResponse<CommunityBoardItemDto> updateItem(@Valid @RequestBody CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardItem(
                         communityBoardService.updateBoardItemFromRequest(request)
@@ -146,7 +146,7 @@ public class CommunityBoardItemController {
     @RequestMapping(path = "/search", method = RequestMethod.GET)
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD)
     public PageableDataResponse<List<CommunityBoardItemDto>> searchBoard(@PathVariable("propertyId") Long propertyId,
-                                                        @RequestBody @Valid SearchRequest searchRequest) {
+                                                        @Valid @RequestBody SearchRequest searchRequest) {
 
         List<CommunityBoardItem> boardItems = communityBoardService.searchBoardItemsForProperty(propertyId, Collections.singletonList(CommunityBoardStatusType.OPEN), searchRequest.getPageSize() + 1, searchRequest);
         return new PageableDataResponse<>(boardItems

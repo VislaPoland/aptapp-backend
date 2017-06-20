@@ -56,7 +56,7 @@ public class CommunityBoardCommentController {
     })
     @RequestMapping(path = "", method = RequestMethod.POST)
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardCommentDto> createNew(@PathVariable("boardItemId") Long boardItemId, @RequestBody @Valid CommunityBoardCommentEditRequest request) {
+    public DataResponse<CommunityBoardCommentDto> createNew(@PathVariable("boardItemId") Long boardItemId, @Valid @RequestBody CommunityBoardCommentEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardComment(
                         communityBoardService.createNewCommentFromRequest(boardItemId, request)
@@ -72,7 +72,7 @@ public class CommunityBoardCommentController {
     })
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardCommentDto> updateItem(@RequestBody @Valid CommunityBoardCommentEditRequest request) {
+    public DataResponse<CommunityBoardCommentDto> updateItem(@Valid @RequestBody CommunityBoardCommentEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardComment(
                         communityBoardService.updateCommentFromRequest(request)

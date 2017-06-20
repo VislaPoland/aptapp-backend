@@ -82,7 +82,7 @@ public class PersonalMessageController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<List<PersonalMessageDto>> createNewPersonalMessage(@RequestBody @Valid CreatePersonalMessageRequest request) {
+    public DataResponse<List<PersonalMessageDto>> createNewPersonalMessage(@Valid @RequestBody CreatePersonalMessageRequest request) {
 
         List<PersonalMessage> personalMessageList = null;
         switch (request.getPersonalMessageRequestType()) {

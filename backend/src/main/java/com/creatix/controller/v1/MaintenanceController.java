@@ -81,7 +81,7 @@ public class MaintenanceController {
     @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceSlotScheduleDto> createMaintenanceSlotSchedule(
             @PathVariable Long propertyId,
-            @RequestBody @Valid PersistMaintenanceSlotScheduleRequest request) {
+            @Valid @RequestBody PersistMaintenanceSlotScheduleRequest request) {
         return new DataResponse<>(mapper.toMaintenanceSlotScheduleDto(slotService.createSchedule(propertyId, request)));
     }
 

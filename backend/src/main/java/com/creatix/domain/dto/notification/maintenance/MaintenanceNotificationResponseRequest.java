@@ -8,9 +8,9 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
-@ApiModel
 @Getter
 @Setter
+@ApiModel
 @NoArgsConstructor
 public class MaintenanceNotificationResponseRequest {
 
@@ -20,8 +20,8 @@ public class MaintenanceNotificationResponseRequest {
     }
 
 
-    @ApiModelProperty(value = "Response", required = true)
     @NotNull
+    @ApiModelProperty(value = "Response", required = true)
     private ResponseType response;
     @ApiModelProperty(value = "ID of the selected slot unit")
     private Long slotUnitId;

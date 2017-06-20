@@ -44,7 +44,7 @@ public class BusinessProfileCarteController {
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileCarteItemDto> createCartItem(
-            @RequestBody @Valid BusinessProfileCarteItemDto request,
+            @Valid @RequestBody BusinessProfileCarteItemDto request,
             @PathVariable("businessProfileId") long businessProfileId) {
         return new DataResponse<>(
                 businessMapper.toBusinessProfileCarteItem(
@@ -62,7 +62,7 @@ public class BusinessProfileCarteController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "{businessProfileCartItemId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<BusinessProfileCarteItemDto> updateCartItem(@RequestBody @Valid BusinessProfileCarteItemDto request) {
+    public DataResponse<BusinessProfileCarteItemDto> updateCartItem(@Valid @RequestBody BusinessProfileCarteItemDto request) {
         return new DataResponse<>(
                 businessMapper.toBusinessProfileCarteItem(
                         businessProfileCarteService.updateFromRequest(request)

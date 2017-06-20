@@ -36,7 +36,7 @@ public class AuthController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/verify-code", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<LoginResponse> verifyCode(@RequestBody @Valid ActivationCode codeRequest) {
+    public DataResponse<LoginResponse> verifyCode(@Valid @RequestBody ActivationCode codeRequest) {
         Account activatedAccount = accountService.activateAccount(codeRequest.getCode());
 
         return new DataResponse<>(accountService.createLoginResponse(activatedAccount.getPrimaryEmail()));
@@ -49,7 +49,7 @@ public class AuthController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/attempt", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<LoginResponse> signIn(@RequestBody @Valid LoginRequest loginRequest) {
+    public DataResponse<LoginResponse> signIn(@Valid @RequestBody LoginRequest loginRequest) {
         accountService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         return new DataResponse<>(accountService.createLoginResponse(loginRequest.getEmail()));
     }

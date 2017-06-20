@@ -45,7 +45,7 @@ public class AccountResetController {
     @JsonView(Views.Public.class)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     @RequestMapping(value = "/reset/code", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<String> resetCode(@RequestBody @Valid ResetCodeRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+    public DataResponse<String> resetCode(@Valid @RequestBody ResetCodeRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return new DataResponse<>(accountService.resetActivationCode(request));
     }
 
@@ -57,7 +57,7 @@ public class AccountResetController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/request-reset/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<Void> askPasswordReset(@RequestBody @Valid AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public DataResponse<Void> askPasswordReset(@Valid @RequestBody AskResetPasswordRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         accountService.resetPasswordFromRequest(request);
         return new DataResponse<>();
     }
@@ -70,7 +70,7 @@ public class AccountResetController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/reset/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<Void> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+    public DataResponse<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         accountService.resetAccountPasswordFromRequest(request);
         return new DataResponse<>();
     }

@@ -92,7 +92,7 @@ public class PropertyController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator})
-    public DataResponse<PropertyDto> createProperty(@RequestBody @Valid CreatePropertyRequest request) {
+    public DataResponse<PropertyDto> createProperty(@Valid @RequestBody CreatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDto(propertyService.createFromRequest(request)));
     }
 
@@ -105,7 +105,7 @@ public class PropertyController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<PropertyDto> updateProperty(@PathVariable Long propertyId, @RequestBody @Valid UpdatePropertyRequest request) {
+    public DataResponse<PropertyDto> updateProperty(@PathVariable Long propertyId, @Valid @RequestBody UpdatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDto(propertyService.updateFromRequest(propertyId, request)));
     }
 
