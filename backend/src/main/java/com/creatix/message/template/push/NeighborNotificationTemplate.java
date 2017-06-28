@@ -37,6 +37,10 @@ public class NeighborNotificationTemplate extends PushMessageTemplate {
                 return "Please Quiet Guests";
             case "stopSmoking":
                 return "This is a Non-smoking Building";
+            case "takeOutYourGarbage":
+                return "Please Take Out Your Garbage";
+            case "greatNeighbor":
+                return "You are a great neighbor. Thank you";
             default:
                 return titleEnumString;
         }
