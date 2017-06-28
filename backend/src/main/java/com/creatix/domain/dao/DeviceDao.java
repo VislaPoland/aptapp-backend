@@ -21,4 +21,9 @@ public class DeviceDao extends AbstractDeviceDao<Device> {
                 .fetchOne();
     }
 
+    public void clearInvalidToken(String token) {
+        queryFactory.update(QDevice.device).setNull(QDevice.device.pushToken).where(
+                QDevice.device.pushToken.toLowerCase().eq(token.toLowerCase())
+        ).execute();
+    }
 }
