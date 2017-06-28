@@ -1,6 +1,11 @@
 package com.creatix.service.business;
 
+import com.creatix.domain.dao.ApartmentDao;
+import com.creatix.domain.dao.NotificationDao;
+import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.TenantDao;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
 import com.creatix.message.PushNotificationTemplateProcessor;
@@ -37,6 +42,8 @@ public class BusinessNotificationExecutor {
     private PushNotificationService pushNotificationService;
     @Autowired
     private PushNotificationTemplateProcessor templateProcessor;
+    @Autowired
+    private ApartmentDao apartmentDao;
 
     @Async
     public void sendNotification(@NotNull  final BusinessProfile businessProfile){
@@ -56,7 +63,7 @@ public class BusinessNotificationExecutor {
             );
         }
 
-        apartmentService.getApartmentsByPropertyId(businessProfile.getProperty().getId())
+        apartmentDao.findByProperty(businessProfile.getProperty())
                 .stream()
                 .flatMap(apartment -> tenantDao.listTenantsForApartment(apartment).stream())
                 .parallel()
@@ -89,7 +96,7 @@ public class BusinessNotificationExecutor {
         }
 
         final BusinessProfile businessProfile = discountCoupon.getBusinessProfile();
-        apartmentService.getApartmentsByPropertyId(businessProfile.getProperty().getId())
+        apartmentDao.findByProperty(businessProfile.getProperty())
                 .stream()
                 .flatMap(apartment -> tenantDao.listTenantsForApartment(apartment).stream())
                 .parallel()
