@@ -1,1 +1,1 @@
-New discount coupon is available for ${businessName}
+Cha-Ching! New savings were just added to an existing Marketplace business!

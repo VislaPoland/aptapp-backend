@@ -1,27 +1,26 @@
 package com.creatix.domain.entity.store.notification;
 
+import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.enums.NotificationType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
- * Created by kvimbi on 29/05/2017.
+ * Created by kvimbi on 27/06/2017.
  */
-@Entity
 @Data
+@Entity
 @EqualsAndHashCode(callSuper = true)
-public class PersonalMessageNotification extends Notification {
+public class BusinessProfileNotification extends Notification {
 
     @ManyToOne
-    @JoinColumn
-    private PersonalMessage personalMessage;
+    private BusinessProfile businessProfile;
 
-    public PersonalMessageNotification() {
-        this.type = NotificationType.PersonalMessage;
+    public BusinessProfileNotification() {
+        this.type = NotificationType.BusinessProfile;
     }
 
     @Override

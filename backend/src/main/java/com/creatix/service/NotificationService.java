@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -174,15 +175,16 @@ public class NotificationService {
         final Property property = targetApartment.getProperty();
         authorizationManager.checkRead(property);
 
-        notification.setType(NotificationType.Neighborhood);
-        notification.setAuthor(authorizationManager.getCurrentAccount());
-        notification.setProperty(property);
-        notification.setStatus(NotificationStatus.Pending);
-        notification.setTargetApartment(targetApartment);
-        neighborhoodNotificationDao.persist(notification);
-
         final Tenant tenant = targetApartment.getTenant();
         if ( tenant != null ) {
+
+            notification.setType(NotificationType.Neighborhood);
+            notification.setAuthor(authorizationManager.getCurrentAccount());
+            notification.setProperty(property);
+            notification.setStatus(NotificationStatus.Pending);
+            notification.setRecipient(targetApartment.getTenant());
+            neighborhoodNotificationDao.persist(notification);
+
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
             }
@@ -198,7 +200,7 @@ public class NotificationService {
         final NeighborhoodNotification notification = getOrElseThrow(notificationId, neighborhoodNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
 
-        final Tenant tenant = notification.getTargetApartment().getTenant();
+        final Tenant tenant = notification.getRecipientAsTenant();
         if ( tenant != null ) {
             if ( authorizationManager.isSelf(tenant) ) {
                 notification.setStatus(NotificationStatus.Resolved);

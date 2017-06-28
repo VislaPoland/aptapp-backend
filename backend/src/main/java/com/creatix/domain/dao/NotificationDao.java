@@ -26,6 +26,43 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
     @Autowired
     private AuthorizationManager authorizationManager;
 
+
+    public List<Notification> findReceivedBusinessProfileNotifications(@Nullable Long startId,
+                                                                       @NotNull Account account,
+                                                                       int pageSize) {
+        final QNotification qNotification = QNotification.notification;
+        return queryFactory.selectFrom(qNotification)
+                .where()
+                .orderBy(qNotification.updatedAt.desc())
+                .limit(pageSize)
+                .fetch();
+    }
+    public List<Notification> findReceivedCommunityBoardCommentNotifications(@Nullable Long startId,
+                                                                             @NotNull Account account,
+                                                                             int pageSize) {
+        final QNotification qNotification = QNotification.notification;
+        //Find all notifications about comments, that are linked to community board items created by me
+        BooleanExpression predicate = qNotification.as(QCommentNotification.class).communityBoardComment.communityBoardItem.account.eq(account);
+        return queryFactory.selectFrom(qNotification)
+                .where(predicate)
+                .orderBy(qNotification.updatedAt.desc())
+                .limit(pageSize)
+                .fetch();
+    }
+    public List<Notification> findReceivedPersonalMessageNotifications(@Nullable Long startId,
+                                                                       @NotNull Account account,
+                                                                       int pageSize) {
+        final QNotification qNotification = QNotification.notification;
+        // Find all notification items that have linked personal message to my account
+        BooleanExpression predicate = qNotification.as(QPersonalMessageNotification.class).personalMessage.toAccount.eq(account);
+        return queryFactory.selectFrom(qNotification)
+                .where(predicate)
+                .orderBy(qNotification.updatedAt.desc())
+                .limit(pageSize)
+                .fetch();
+    }
+
+
     public List<Notification> findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
             @NotNull NotificationRequestType requestType,
             @Nullable NotificationStatus notificationStatus,
@@ -54,10 +91,11 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         }
         else if ( requestType == NotificationRequestType.Received ) {
 
-            if ( account instanceof Tenant ) {
-                // tenant is recipient
-                predicate = predicate.and(qNotification.as(QNeighborhoodNotification.class).targetApartment.tenant.id.eq(account.getId())).and(qNotification.instanceOf(NeighborhoodNotification.class));
-            }
+            predicate = predicate.and(
+                    qNotification.property.eq(authorizationManager.getCurrentProperty(account)).or(
+                            qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                    ));
+
             if ( account instanceof MaintenanceEmployee ) {
                 // maintenance is recipient
                 predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class));
@@ -83,8 +121,6 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         else if ( notificationType == NotificationType.Neighborhood ) {
             predicate = predicate.and(qNotification.instanceOf(NeighborhoodNotification.class));
         }
-
-        predicate = predicate.and(qNotification.property.eq(authorizationManager.getCurrentProperty(account)));
 
         return queryFactory.selectFrom(qNotification)
                 .where(predicate)

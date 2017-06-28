@@ -20,7 +20,10 @@ public class NeighborNotificationTemplate extends PushMessageTemplate {
     }
 
     public String getTimestamp() {
-        return formatTimestamp(notification.getCreatedAt(), notification.getTargetApartment().getProperty().getZoneId());
+        return formatTimestamp(
+                notification.getCreatedAt(),
+                notification.getProperty().getZoneId()
+        );
     }
 
     private String translateTileFromEnumString(String titleEnumString) {
