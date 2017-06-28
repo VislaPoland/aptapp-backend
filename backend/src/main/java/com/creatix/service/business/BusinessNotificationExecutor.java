@@ -8,6 +8,9 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
+import com.creatix.domain.entity.store.notification.BusinessProfileNotification;
+import com.creatix.domain.entity.store.notification.DiscountCouponNotification;
+import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.message.PushNotificationTemplateProcessor;
 import com.creatix.message.push.BusinessProfileCreatedPush;
 import com.creatix.message.push.DiscountCouponCreatedPush;
@@ -16,6 +19,7 @@ import com.creatix.message.template.push.businessProfile.DiscountCouponCreatedTe
 import com.creatix.service.apartment.ApartmentService;
 import com.creatix.service.message.PushNotificationService;
 import freemarker.template.TemplateException;
+import lombok.experimental.Accessors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 /**
@@ -44,6 +49,36 @@ public class BusinessNotificationExecutor {
     private PushNotificationTemplateProcessor templateProcessor;
     @Autowired
     private ApartmentDao apartmentDao;
+    @Autowired
+    private NotificationDao notificationDao;
+
+    private BusinessProfileNotification storeBusinessProfileNotification(Account author, BusinessProfile businessProfile) {
+        BusinessProfileNotification notification = new BusinessProfileNotification();
+        notification.setCreatedAt(OffsetDateTime.now());
+        notification.setUpdatedAt(OffsetDateTime.now());
+        notification.setBusinessProfile(businessProfile);
+        notification.setAuthor(author);
+        notification.setTitle("New Business!");
+        notification.setDescription("Hey, there is a new business opened in your area!");
+        notification.setProperty(businessProfile.getProperty());
+        notification.setStatus(NotificationStatus.Pending);
+        notificationDao.persist(notification);
+        return notification;
+    }
+
+    private DiscountCouponNotification storeDiscountCouponNotification(Account author, DiscountCoupon discountCoupon) {
+        DiscountCouponNotification notification = new DiscountCouponNotification();
+        notification.setCreatedAt(OffsetDateTime.now());
+        notification.setUpdatedAt(OffsetDateTime.now());
+        notification.setDiscountCoupon(discountCoupon);
+        notification.setAuthor(author);
+        notification.setTitle("New Business!");
+        notification.setDescription("Hey, there is a new business opened in your area!");
+        notification.setProperty(discountCoupon.getBusinessProfile().getProperty());
+        notification.setStatus(NotificationStatus.Pending);
+        notificationDao.persist(notification);
+        return notification;
+    }
 
     @Async
     public void sendNotification(@NotNull  final BusinessProfile businessProfile){
@@ -69,6 +104,7 @@ public class BusinessNotificationExecutor {
                 .parallel()
                 .forEach(tenant -> {
                     try {
+                        this.storeBusinessProfileNotification(businessProfile.getProperty().getOwner(), businessProfile);
                         pushNotificationService.sendNotification(notification, tenant);
                     } catch (IOException exception) {
                         logger.error(
@@ -102,6 +138,7 @@ public class BusinessNotificationExecutor {
                 .parallel()
                 .forEach(tenant -> {
                     try {
+                        storeDiscountCouponNotification(businessProfile.getProperty().getOwner(), discountCoupon);
                         pushNotificationService.sendNotification(notification, tenant);
                     } catch (IOException exception) {
                         logger.error(
