@@ -33,6 +33,6 @@ public class CommunityItemUpdatedSubscriberTemplate extends PushMessageTemplate 
     }
 
     public String getTitle() {
-        return "Item had been updated";
+        return "Item update";
     }
 }
