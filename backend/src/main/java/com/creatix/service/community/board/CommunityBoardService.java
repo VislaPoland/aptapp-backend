@@ -281,7 +281,7 @@ public class CommunityBoardService {
         }
 
         Set<Account> subscribers = getSubscribers(this.listCommentsForBoardItem(communityBoardItem.getId()));
-        subscribers.parallelStream()
+        subscribers.stream()
                 .filter(account -> ! (account.equals(communityBoardItem.getAccount()) || account.equals(authorizationManager.getCurrentAccount())))
                 .forEach(account -> {
                     CommunityBoardItemUpdatedSubscriberNotification  storedNotification = new CommunityBoardItemUpdatedSubscriberNotification();
