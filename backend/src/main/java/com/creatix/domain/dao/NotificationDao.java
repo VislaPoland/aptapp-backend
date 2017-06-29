@@ -91,10 +91,11 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         }
         else if ( requestType == NotificationRequestType.Received ) {
 
-            if ( account instanceof Tenant ) {
-                // tenant is recipient
-                predicate = predicate.and(qNotification.as(QNeighborhoodNotification.class).targetApartment.tenant.id.eq(account.getId())).and(qNotification.instanceOf(NeighborhoodNotification.class));
-            }
+            predicate = predicate.and(
+                    qNotification.property.eq(authorizationManager.getCurrentProperty(account)).or(
+                            qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                    ));
+
             if ( account instanceof MaintenanceEmployee ) {
                 // maintenance is recipient
                 predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class));
@@ -120,8 +121,6 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         else if ( notificationType == NotificationType.Neighborhood ) {
             predicate = predicate.and(qNotification.instanceOf(NeighborhoodNotification.class));
         }
-
-        predicate = predicate.and(qNotification.property.eq(authorizationManager.getCurrentProperty(account)));
 
         return queryFactory.selectFrom(qNotification)
                 .where(predicate)

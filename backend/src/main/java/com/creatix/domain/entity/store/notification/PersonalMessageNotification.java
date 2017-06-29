@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
@@ -16,6 +17,7 @@ import javax.persistence.ManyToOne;
 public class PersonalMessageNotification extends Notification {
 
     @ManyToOne
+    @JoinColumn
     private PersonalMessage personalMessage;
 
     public PersonalMessageNotification() {

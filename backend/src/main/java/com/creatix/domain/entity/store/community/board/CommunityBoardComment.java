@@ -3,6 +3,8 @@ package com.creatix.domain.entity.store.community.board;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.community.board.CommunityBoardCommentStatusType;
 import lombok.Data;
+import org.hibernate.annotations.JoinFormula;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -30,6 +32,7 @@ public class CommunityBoardComment {
     private CommunityBoardComment parentComment;
 
     @OneToMany(mappedBy = "parentComment")
+    @Where(clause = "status = 'APPROVED'")
     private List<CommunityBoardComment> childComments;
 
     @ManyToOne(optional = false)

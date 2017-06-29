@@ -149,9 +149,9 @@ public class PersonalMessageService {
         notification.setTitle("New personal message");
 
         PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
-        personalMessageNotification.setProperty(property);
         personalMessageNotification.setPersonalMessage(personalMessage);
         personalMessageNotification.setAuthor(personalMessage.getFromAccount());
+        personalMessageNotification.setRecipient(personalMessage.getToAccount());
         personalMessageNotification.setDescription(notification.getMessage());
         personalMessageNotification.setStatus(NotificationStatus.Pending);
         personalMessageNotification.setTitle(notification.getTitle());

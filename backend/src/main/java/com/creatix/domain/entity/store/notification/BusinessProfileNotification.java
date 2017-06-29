@@ -11,8 +11,8 @@ import javax.persistence.ManyToOne;
 /**
  * Created by kvimbi on 27/06/2017.
  */
-@Entity
 @Data
+@Entity
 @EqualsAndHashCode(callSuper = true)
 public class BusinessProfileNotification extends Notification {
 

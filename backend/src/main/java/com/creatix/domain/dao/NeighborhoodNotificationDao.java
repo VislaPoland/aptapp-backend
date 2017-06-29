@@ -34,7 +34,7 @@ public class NeighborhoodNotificationDao extends AbstractNotificationDao<Neighbo
                     case AssistantPropertyManager:
                         return predicate.and(neighborhoodNotification.property.eq(((AssistantPropertyManager) a).getManager().getManagedProperty()));
                     case Tenant:
-                        return predicate.and(neighborhoodNotification.targetApartment.eq(((Tenant) a).getApartment()));
+                        return predicate.and(neighborhoodNotification.recipient.eq(a));
                     default:
                         return null;
                 }

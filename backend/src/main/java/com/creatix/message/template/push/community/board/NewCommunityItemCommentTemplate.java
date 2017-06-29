@@ -1,6 +1,7 @@
-package com.creatix.message.template.push;
+package com.creatix.message.template.push.community.board;
 
 import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
+import com.creatix.message.template.push.PushMessageTemplate;
 
 /**
  * Created by kvimbi on 15/06/2017.

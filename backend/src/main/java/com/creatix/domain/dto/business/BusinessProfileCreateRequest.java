@@ -2,6 +2,7 @@ package com.creatix.domain.dto.business;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Size;
@@ -11,6 +12,7 @@ import java.util.List;
  * Created by kvimbi on 20/06/2017.
  */
 @Data
+@Accessors(chain = true)
 public class BusinessProfileCreateRequest {
 
     @ApiModelProperty(value = "Business profile name", required = true)

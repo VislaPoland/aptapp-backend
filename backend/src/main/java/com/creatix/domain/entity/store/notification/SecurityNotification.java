@@ -10,9 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
+@Data
 @Entity
 @BatchSize(size = 40)
-@Data
 @EqualsAndHashCode(callSuper = true)
 public class SecurityNotification extends Notification {
 

@@ -72,8 +72,8 @@ public class BusinessNotificationExecutor {
         notification.setUpdatedAt(OffsetDateTime.now());
         notification.setDiscountCoupon(discountCoupon);
         notification.setAuthor(author);
-        notification.setTitle("New Business!");
-        notification.setDescription("Hey, there is a new business opened in your area!");
+        notification.setTitle("New Coupon Available!");
+        notification.setDescription("Hey, there is new discount coupon available!");
         notification.setProperty(discountCoupon.getBusinessProfile().getProperty());
         notification.setStatus(NotificationStatus.Pending);
         notificationDao.persist(notification);
@@ -85,6 +85,7 @@ public class BusinessNotificationExecutor {
         Objects.requireNonNull(businessProfile);
 
         final BusinessProfileCreatedPush notification = new BusinessProfileCreatedPush(businessProfile.getId());
+        notification.setTitle("New Business!");
         try {
             notification.setMessage(
                     templateProcessor.processTemplate(new BusinessProfileCreatedTemplate(businessProfile))
@@ -98,13 +99,14 @@ public class BusinessNotificationExecutor {
             );
         }
 
+        this.storeBusinessProfileNotification(businessProfile.getProperty().getOwner(), businessProfile);
+
         apartmentDao.findByProperty(businessProfile.getProperty())
                 .stream()
                 .flatMap(apartment -> tenantDao.listTenantsForApartment(apartment).stream())
                 .parallel()
                 .forEach(tenant -> {
                     try {
-                        this.storeBusinessProfileNotification(businessProfile.getProperty().getOwner(), businessProfile);
                         pushNotificationService.sendNotification(notification, tenant);
                     } catch (IOException exception) {
                         logger.error(
@@ -123,6 +125,7 @@ public class BusinessNotificationExecutor {
         Objects.requireNonNull(discountCoupon);
 
         final DiscountCouponCreatedPush notification = new DiscountCouponCreatedPush(discountCoupon.getId());
+        notification.setTitle("New Coupon Available!");
         try {
             notification.setMessage(
                     templateProcessor.processTemplate(new DiscountCouponCreatedTemplate(discountCoupon))
@@ -131,6 +134,8 @@ public class BusinessNotificationExecutor {
             e.printStackTrace();
         }
 
+        storeDiscountCouponNotification(discountCoupon.getBusinessProfile().getProperty().getOwner(), discountCoupon);
+
         final BusinessProfile businessProfile = discountCoupon.getBusinessProfile();
         apartmentDao.findByProperty(businessProfile.getProperty())
                 .stream()
@@ -138,7 +143,6 @@ public class BusinessNotificationExecutor {
                 .parallel()
                 .forEach(tenant -> {
                     try {
-                        storeDiscountCouponNotification(businessProfile.getProperty().getOwner(), discountCoupon);
                         pushNotificationService.sendNotification(notification, tenant);
                     } catch (IOException exception) {
                         logger.error(

@@ -1,1 +1,1 @@
-${businessName} has just opened near you. Check it out!
+Lucky you! A fun new business was added to the Marketplace just for you and your neighbours to use. Everyone likes a discount!
