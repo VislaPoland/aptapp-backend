@@ -21,9 +21,9 @@ public class CommunityBoardCategoryDto {
     @ApiModelProperty("Id")
     private Long id;
 
-    @ApiModelProperty("Title of category")
+    @ApiModelProperty("Name of category")
     @Size(max = 255)
     @NotEmpty
-    private String title;
+    private String name;
 
 }
