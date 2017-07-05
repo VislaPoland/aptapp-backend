@@ -40,12 +40,16 @@ public class BusinessMapper extends ConfigurableMapper {
 
         factory.classMap(BusinessProfile.class, BusinessProfileDto.class)
                 .exclude("hasImage")
+                .exclude("contact.id")
                 .fieldAToB("property.id", "propertyId")
                 .byDefault()
                 .customize(new CustomMapper<BusinessProfile, BusinessProfileDto>() {
                     @Override
                     public void mapAtoB(BusinessProfile businessProfile, BusinessProfileDto businessProfileDto, MappingContext context) {
                         businessProfileDto.setImageUploaded(businessProfile.getDefaultPhotoId() != null);
+                        if (null != businessProfileDto.getContact() && null != businessProfile.getContact()) {
+                            businessProfileDto.getContact().setId(businessProfile.getContact().getId());
+                        }
                     }
                     @Override
                     public void mapBtoA(BusinessProfileDto businessProfileDto, BusinessProfile businessProfile, MappingContext context) {

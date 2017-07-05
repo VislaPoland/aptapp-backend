@@ -5,6 +5,7 @@ import com.creatix.domain.entity.store.attachment.AttachmentId;
 import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.Email;
 
 import javax.persistence.*;
 import java.util.List;
@@ -23,6 +24,9 @@ public class BusinessProfile implements AttachmentId {
 
     @Column(length = 120, nullable = false)
     private String name;
+
+    @Column
+    private String website;
 
     @Column
     private Double lat;
