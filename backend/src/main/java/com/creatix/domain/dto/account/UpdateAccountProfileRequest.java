@@ -10,10 +10,8 @@ import org.hibernate.validator.constraints.NotBlank;
 @Data
 public class UpdateAccountProfileRequest {
 
-    @NotBlank
     @ApiModelProperty(value = "First name")
     private String firstName;
-    @NotBlank
     @ApiModelProperty(value = "Last name")
     private String lastName;
     @ApiModelProperty(value = "Company name")
