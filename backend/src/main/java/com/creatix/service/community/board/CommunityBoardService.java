@@ -132,6 +132,7 @@ public class CommunityBoardService {
 
         dispatchSubscriberNotification(
                 existingItem,
+                null,
                 new CommunityItemUpdatedSubscriberTemplate(existingItem, CommunityItemUpdatedSubscriberTemplate.EventType.UPDATED)
         );
 
@@ -160,6 +161,7 @@ public class CommunityBoardService {
 
         dispatchSubscriberNotification(
                 communityBoardItem,
+                null,
                 new CommunityItemUpdatedSubscriberTemplate(communityBoardItem, CommunityItemUpdatedSubscriberTemplate.EventType.DELETED)
         );
 
@@ -268,7 +270,7 @@ public class CommunityBoardService {
         return subscribers;
     }
 
-    private void dispatchSubscriberNotification(final CommunityBoardItem communityBoardItem, final CommunityItemUpdatedSubscriberTemplate template) {
+    private void dispatchSubscriberNotification(final CommunityBoardItem communityBoardItem, final CommunityBoardComment communityBoardComment, final CommunityItemUpdatedSubscriberTemplate template) {
         Objects.requireNonNull(communityBoardItem, "Board item can not be null!");
         Objects.requireNonNull(template, "Template can not be null!");
 
@@ -286,6 +288,7 @@ public class CommunityBoardService {
                 .forEach(account -> {
                     CommunityBoardItemUpdatedSubscriberNotification  storedNotification = new CommunityBoardItemUpdatedSubscriberNotification();
                     storedNotification.setCommunityBoardItem(communityBoardItem);
+                    storedNotification.setCommunityBoardComment(communityBoardComment);
                     storedNotification.setAuthor(communityBoardItem.getAccount());
                     storedNotification.setRecipient(account);
                     storedNotification.setDescription(pushNotification.getMessage());
@@ -344,7 +347,8 @@ public class CommunityBoardService {
             // root comment notify all people
             dispatchSubscriberNotification(
                     comment.getCommunityBoardItem(),
-                    new CommunityItemUpdatedSubscriberTemplate(comment.getCommunityBoardItem(), CommunityItemUpdatedSubscriberTemplate.EventType.DELETED)
+                    comment,
+                    new CommunityItemUpdatedSubscriberTemplate(comment.getCommunityBoardItem(), CommunityItemUpdatedSubscriberTemplate.EventType.NEW_COMMENT)
             );
             dispatchNotificationToItemOwner(comment);
         } else {

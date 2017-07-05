@@ -10,8 +10,8 @@ import com.creatix.domain.dto.account.*;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.apartment.BasicApartmentDto;
 import com.creatix.domain.dto.apartment.PersistApartmentRequest;
-import com.creatix.domain.dto.notification.NotificationDto;
-import com.creatix.domain.dto.notification.NotificationPhotoDto;
+import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
+import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
 import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
@@ -237,6 +237,23 @@ public class Mapper {
                         }
                     }
                 })
+                .register();
+        mapperFactory.classMap(CommentNotification.class, CommentNotificationDto.class)
+                .customize(new CustomMapper<CommentNotification, CommentNotificationDto>() {
+                    @Override
+                    public void mapAtoB(CommentNotification commentNotification, CommentNotificationDto commentNotificationDto, MappingContext context) {
+                        commentNotificationDto.setCommunityBoardItem(
+                                this.mapperFacade.map(commentNotification.getCommunityBoardComment().getCommunityBoardItem(), CommunityBoardItemDto.class)
+                        );
+                    }
+                })
+                .byDefault()
+                .register();
+        mapperFactory.classMap(BusinessProfileNotification.class, BusinessProfileNotificationDto.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(CommunityBoardItemUpdatedSubscriberNotification.class, CommunityBoardItemUpdatedSubscriberNotificationDto.class)
+                .byDefault()
                 .register();
         mapperFactory.classMap(SecurityNotification.class, SecurityNotificationDto.class)
                 .byDefault()
@@ -600,10 +617,16 @@ public class Mapper {
         return mapperFactory.getMapperFacade().map(property, PropertyDto.class);
     }
 
-    public NotificationDto toNotificationDto(@NotNull Notification n) {
+    public <T extends NotificationDto, S extends Notification> T toNotificationDto(@NotNull S n, Class<T> clazz) {
         Objects.requireNonNull(n);
-        return mapperFactory.getMapperFacade().map(n, NotificationDto.class);
+        return mapperFactory.getMapperFacade().map(n, clazz);
     }
+
+    public CommentNotificationDto toNotificationDto(@NotNull CommentNotification n) {
+        Objects.requireNonNull(n);
+        return mapperFactory.getMapperFacade().map(n, CommentNotificationDto.class);
+    }
+
 
     public SecurityNotificationDto toSecurityNotificationDto(@NotNull SecurityNotification n) {
         Objects.requireNonNull(n);

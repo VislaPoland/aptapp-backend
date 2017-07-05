@@ -1,1 +1,1 @@
-Psst! A Community Board post you commented on has new activity. Check it out before it’s too late!
+Psst! A Community Board post you commented on has new activity. Check it out before it's too late!

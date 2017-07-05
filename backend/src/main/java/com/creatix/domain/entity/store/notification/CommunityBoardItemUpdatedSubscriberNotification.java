@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store.notification;
 
+import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
 import com.creatix.domain.enums.NotificationType;
 import lombok.Data;
@@ -18,6 +19,9 @@ public class CommunityBoardItemUpdatedSubscriberNotification extends Notificatio
 
     @ManyToOne
     private CommunityBoardItem communityBoardItem;
+
+    @ManyToOne
+    private CommunityBoardComment communityBoardComment;
 
     public CommunityBoardItemUpdatedSubscriberNotification() {
         this.type = NotificationType.CommunityBoardItemUpdatedSubscriber;
