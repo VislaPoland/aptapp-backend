@@ -5,6 +5,7 @@ import com.creatix.domain.enums.NotificationType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -16,7 +17,7 @@ import javax.persistence.ManyToOne;
 @EqualsAndHashCode(callSuper = true)
 public class BusinessProfileNotification extends Notification {
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private BusinessProfile businessProfile;
 
     public BusinessProfileNotification() {

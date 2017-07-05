@@ -5,6 +5,9 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.Views;
+import com.creatix.domain.dto.notification.BusinessProfileNotificationDto;
+import com.creatix.domain.dto.notification.CommentNotificationDto;
+import com.creatix.domain.dto.notification.CommunityBoardItemUpdatedSubscriberNotificationDto;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
@@ -15,14 +18,12 @@ import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotification
 import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
-import com.creatix.domain.entity.store.notification.MaintenanceNotification;
-import com.creatix.domain.entity.store.notification.NotificationPhoto;
-import com.creatix.domain.entity.store.notification.SecurityNotification;
+import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.NotificationService;
 import com.creatix.service.AttachmentService;
+import com.creatix.service.NotificationService;
 import com.fasterxml.jackson.annotation.JsonView;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
@@ -59,6 +60,19 @@ public class NotificationController {
     @Autowired
     private AttachmentService attachmentService;
 
+
+    private Class<? extends NotificationDto> getMappingClass(Class clazz) {
+        if (clazz.equals(CommentNotification.class)) {
+            return CommentNotificationDto.class;
+        } else if (clazz.equals(BusinessProfileNotification.class)) {
+            return BusinessProfileNotificationDto.class;
+        } else if (clazz.equals(CommunityBoardItemUpdatedSubscriberNotification.class)) {
+            return CommunityBoardItemUpdatedSubscriberNotificationDto.class;
+        } else {
+            return NotificationDto.class;
+        }
+    }
+
     //general
     @ApiOperation(value = "Filter notifications")
     @ApiResponses(value = {
@@ -74,7 +88,7 @@ public class NotificationController {
             @RequestParam(required = false) Long startId,
             @RequestParam(required = false) NotificationStatus notificationStatus,
             @RequestParam(required = false) NotificationType notificationType) {
-        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, pageSize), n -> mapper.toNotificationDto(n));
+        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, pageSize), n -> mapper.toNotificationDto(n, this.getMappingClass(n.getClass())));
     }
 
     @ApiOperation(value = "Get single maintenance notification")
@@ -225,7 +239,12 @@ public class NotificationController {
     @RequestMapping(path = "/{notificationId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<NotificationDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long notificationId) throws IOException {
-        return new DataResponse<>(mapper.toNotificationDto(attachmentService.storeNotificationPhotos(files, notificationId)));
+        return new DataResponse<>(
+                mapper.toNotificationDto(
+                        attachmentService.storeNotificationPhotos(files, notificationId),
+                        NotificationDto.class
+                )
+        );
     }
 
     @ApiOperation(value = "Download notification photo")

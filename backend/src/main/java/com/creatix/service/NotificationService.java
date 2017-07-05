@@ -183,6 +183,7 @@ public class NotificationService {
             notification.setProperty(property);
             notification.setStatus(NotificationStatus.Pending);
             notification.setRecipient(targetApartment.getTenant());
+            notification.setTargetApartment(targetApartment);
             neighborhoodNotificationDao.persist(notification);
 
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {

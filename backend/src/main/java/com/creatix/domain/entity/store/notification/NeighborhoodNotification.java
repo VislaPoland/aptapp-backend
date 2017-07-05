@@ -20,6 +20,10 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class NeighborhoodNotification extends Notification {
 
+    @ManyToOne
+    @JoinColumn
+    private Apartment targetApartment;
+
     @Column
     @Enumerated(EnumType.STRING)
     private NeighborhoodNotificationResponse response;
