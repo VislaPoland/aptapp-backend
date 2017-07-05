@@ -25,6 +25,9 @@ public class BusinessProfileDto {
     @NotEmpty
     private String name;
 
+    @ApiModelProperty("Business profile website")
+    private String website;
+
     @ApiModelProperty("Latitude")
     private Double lat;
 
