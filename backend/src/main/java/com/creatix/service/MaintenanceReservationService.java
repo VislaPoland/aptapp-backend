@@ -140,7 +140,7 @@ public class MaintenanceReservationService {
         return notification;
     }
 
-    @RoleSecured(AccountRole.Tenant)
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceNotification tenantRespondToMaintenanceReschedule(@NotNull MaintenanceNotification notification, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(response, "Notification response dto is null");
@@ -157,7 +157,7 @@ public class MaintenanceReservationService {
 
         final MaintenanceReservation reservation = reservations.get(0);
 
-        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), notification.getTargetApartment().getTenant())) ) {
+        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), notification.getAuthor()) )) {
             throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservation.getId()));
         }
 
