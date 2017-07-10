@@ -3,6 +3,7 @@ package com.creatix.domain.entity.store.business;
 import com.creatix.domain.entity.store.attachment.AttachmentId;
 import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @Accessors(chain = true)
+@EqualsAndHashCode(of = "id")
 public class DiscountCoupon implements AttachmentId {
 
     public static final int UNLIMITED_USE = -1;
