@@ -21,9 +21,11 @@ public class CreateMaintenanceNotificationRequest {
     @NotNull
     @ApiModelProperty(value = "ID of the selected slot unit", required = true)
     private Long slotUnitId;
-    @ApiModelProperty(value = "Target apartment unit number", required = true)
-    @NotNull
+
+    @ApiModelProperty(value = "Deprecated! Target apartment unit number")
+    @Deprecated
     private String unitNumber;
+
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
     @NotNull
     private Boolean accessIfNotAtHome;

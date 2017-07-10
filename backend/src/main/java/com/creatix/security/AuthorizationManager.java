@@ -247,7 +247,7 @@ public class AuthorizationManager {
         if ( account instanceof Tenant ) {
             final Tenant tenant = (Tenant) account;
             if ( reservation.getNotification() != null ) {
-                return Objects.equals(tenant, reservation.getNotification().getTargetApartment().getTenant());
+                return Objects.equals(tenant, reservation.getNotification().getAuthor());
             }
         }
         else if ( account instanceof EmployeeBase ) {

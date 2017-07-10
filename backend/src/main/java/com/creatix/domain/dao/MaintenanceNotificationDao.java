@@ -42,7 +42,7 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
                     case Maintenance:
                         return predicate.and(maintenanceNotification.property.eq(((MaintenanceEmployee) a).getManager().getManagedProperty()));
                     case Tenant:
-                        return predicate.and(maintenanceNotification.targetApartment.eq(((Tenant) a).getApartment()));
+                        return predicate.and(maintenanceNotification.author.eq(a));
                     default:
                         return null;
                 }

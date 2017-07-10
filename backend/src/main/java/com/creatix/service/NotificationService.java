@@ -146,8 +146,7 @@ public class NotificationService {
         return notification;
     }
 
-    public MaintenanceNotification saveMaintenanceNotification(@NotNull String targetUnitNumber, @NotNull MaintenanceNotification notification, @NotNull Long slotUnitId) throws IOException, TemplateException {
-        Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
+    public MaintenanceNotification saveMaintenanceNotification(@Deprecated String targetUnitNumber, @NotNull MaintenanceNotification notification, @NotNull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(slotUnitId, "slot unit id is null");
 
@@ -155,7 +154,9 @@ public class NotificationService {
         notification.setAuthor(authorizationManager.getCurrentAccount());
         notification.setProperty(authorizationManager.getCurrentProperty());
         notification.setStatus(NotificationStatus.Pending);
-        notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
+        if (null != targetUnitNumber) {
+            notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
+        }
         maintenanceNotificationDao.persist(notification);
 
         maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
@@ -259,14 +260,14 @@ public class NotificationService {
         throw new SecurityException("You are not eligible to respond to security notifications from another property");
     }
 
-    @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant})
+    @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceNotification respondToMaintenanceNotification(@NotNull Long notificationId, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
 
         if ( authorizationManager.hasAnyOfRoles(AccountRole.Maintenance) ) {
             return maintenanceReservationService.employeeRespondToMaintenanceNotification(notification, response);
         }
-        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant) ) {
+        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager) ) {
             return maintenanceReservationService.tenantRespondToMaintenanceReschedule(notification, response);
         }
         else {
