@@ -76,7 +76,7 @@ public class NotificationService {
     public PageableDataResponse<List<Notification>> filterNotifications(
             @NotNull NotificationRequestType requestType,
             @Nullable NotificationStatus notificationStatus,
-            @Nullable NotificationType notificationType,
+            @Nullable List<NotificationType> notificationType,
             @Nullable Long startId,
             int pageSize) {
         Objects.requireNonNull(requestType, "Request type is null");

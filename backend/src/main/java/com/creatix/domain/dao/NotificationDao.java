@@ -18,6 +18,10 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Repository
 @Transactional
@@ -66,7 +70,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
     public List<Notification> findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
             @NotNull NotificationRequestType requestType,
             @Nullable NotificationStatus notificationStatus,
-            @Nullable NotificationType notificationType,
+            @Nullable List<NotificationType> notificationTypeList,
             @Nullable Long startId,
             @NotNull Account account,
             int pageSize) {
@@ -112,14 +116,38 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         }
 
 
-        if ( notificationType == NotificationType.Maintenance ) {
-            predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class));
-        }
-        else if ( notificationType == NotificationType.Security ) {
-            predicate = predicate.and(qNotification.instanceOf(SecurityNotification.class));
-        }
-        else if ( notificationType == NotificationType.Neighborhood ) {
-            predicate = predicate.and(qNotification.instanceOf(NeighborhoodNotification.class));
+        if (null != notificationTypeList) {
+            Optional<BooleanExpression> reduce = notificationTypeList
+                .parallelStream()
+                .map(
+                    nt -> {
+                        switch (nt) {
+                            case BusinessProfile:
+                                return BusinessProfileNotification.class;
+                            case Comment:
+                                return CommentNotification.class;
+                            case CommunityBoardItemUpdatedSubscriber:
+                                return CommunityBoardItemUpdatedSubscriberNotification.class;
+                            case DiscountCoupon:
+                                return DiscountCouponNotification.class;
+                            case Maintenance:
+                                return MaintenanceNotification.class;
+                            case Neighborhood:
+                                return NeighborhoodNotification.class;
+                            case PersonalMessage:
+                                return PersonalMessageNotification.class;
+                            case Security:
+                                return SecurityNotification.class;
+                            default:
+                                return null;
+                        }
+                    }
+                )
+                .map(qNotification::instanceOf)
+                .reduce(BooleanExpression::or);
+            if (reduce.isPresent()) {
+                predicate = predicate.and(reduce.get());
+            }
         }
 
         return queryFactory.selectFrom(qNotification)
