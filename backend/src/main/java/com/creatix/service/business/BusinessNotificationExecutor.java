@@ -72,7 +72,7 @@ public class BusinessNotificationExecutor {
         notification.setUpdatedAt(OffsetDateTime.now());
         notification.setDiscountCoupon(discountCoupon);
         notification.setAuthor(author);
-        notification.setTitle("New Coupon Available!");
+        notification.setTitle("New Coupon!");
         notification.setDescription("Hey, there is new discount coupon available!");
         notification.setProperty(discountCoupon.getBusinessProfile().getProperty());
         notification.setStatus(NotificationStatus.Pending);

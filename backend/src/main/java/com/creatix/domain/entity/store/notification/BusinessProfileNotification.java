@@ -17,7 +17,7 @@ import javax.persistence.ManyToOne;
 @EqualsAndHashCode(callSuper = true)
 public class BusinessProfileNotification extends Notification {
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private BusinessProfile businessProfile;
 
     public BusinessProfileNotification() {
