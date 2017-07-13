@@ -26,7 +26,6 @@ public class CreateMaintenanceNotificationRequest {
     @Deprecated
     private String unitNumber;
 
-    @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
-    @NotNull
+    @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home")
     private Boolean accessIfNotAtHome;
 }
