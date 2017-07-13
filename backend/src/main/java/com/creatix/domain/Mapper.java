@@ -255,6 +255,9 @@ public class Mapper {
         mapperFactory.classMap(CommunityBoardItemUpdatedSubscriberNotification.class, CommunityBoardItemUpdatedSubscriberNotificationDto.class)
                 .byDefault()
                 .register();
+        mapperFactory.classMap(DiscountCouponNotification.class, DiscountCouponNotificationDto.class)
+                .byDefault()
+                .register();
         mapperFactory.classMap(SecurityNotification.class, SecurityNotificationDto.class)
                 .byDefault()
                 .register();
