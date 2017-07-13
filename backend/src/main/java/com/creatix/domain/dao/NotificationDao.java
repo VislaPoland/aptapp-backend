@@ -11,6 +11,7 @@ import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,18 +96,42 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         }
         else if ( requestType == NotificationRequestType.Received ) {
 
-            predicate = predicate.and(
-                    qNotification.property.eq(authorizationManager.getCurrentProperty(account)).or(
-                            qNotification.recipient.eq(authorizationManager.getCurrentAccount())
-                    ));
-
-            if ( account instanceof MaintenanceEmployee ) {
-                // maintenance is recipient
-                predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class));
-            }
-            else if ( account instanceof SecurityEmployee ) {
-                // security is recipient
-                predicate = predicate.and(qNotification.instanceOf(SecurityNotification.class));
+            switch (account.getRole()) {
+                case Tenant:
+                case SubTenant:
+                case PropertyManager:
+                case AssistantPropertyManager:
+                    predicate = predicate.and(
+                            qNotification.instanceOfAny(
+                                    BusinessProfileNotification.class,
+                                    DiscountCouponNotification.class
+                            ).and(
+                                    qNotification.property.eq(
+                                            authorizationManager.getCurrentProperty(account)
+                                    )
+                            )
+                    ).or(
+                            qNotification.recipient.eq(account)
+                    );
+                    break;
+                case Maintenance:
+                    predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class)).and(
+                            qNotification.property.eq(
+                                    authorizationManager.getCurrentProperty(account)
+                            ).or(
+                                    qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                            )
+                    );
+                    break;
+                case Security:
+                    predicate = predicate.and(qNotification.instanceOf(SecurityNotification.class)).and(
+                            qNotification.property.eq(
+                                    authorizationManager.getCurrentProperty(account)
+                            ).or(
+                                    qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                            )
+                    );
+                    break;
             }
         }
 
