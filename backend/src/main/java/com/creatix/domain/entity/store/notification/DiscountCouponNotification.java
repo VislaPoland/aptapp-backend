@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store.notification;
 
+import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
 import com.creatix.domain.enums.NotificationType;
 import lombok.Data;
@@ -18,6 +19,9 @@ public class DiscountCouponNotification extends Notification {
 
     @ManyToOne
     DiscountCoupon discountCoupon;
+
+    @ManyToOne
+    BusinessProfile businessProfile;
 
     public DiscountCouponNotification() {
         this.type = NotificationType.DiscountCoupon;
