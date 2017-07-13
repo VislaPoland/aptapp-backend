@@ -28,8 +28,8 @@ public class MaintenanceNotification extends Notification {
     private Apartment targetApartment;
 
     @Column
-    @NotNull
     private Boolean accessIfNotAtHome;
+
     @OneToMany(mappedBy = "notification")
     private List<MaintenanceReservation> reservations;
 

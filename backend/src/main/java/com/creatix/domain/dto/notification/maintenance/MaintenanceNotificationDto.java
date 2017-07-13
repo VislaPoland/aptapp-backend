@@ -25,7 +25,7 @@ public class MaintenanceNotificationDto extends NotificationDto {
     @Deprecated
     private BasicApartmentDto targetApartment;
 
-    @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
+    @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home")
     private Boolean accessIfNotAtHome;
 
     @JsonView(Views.NotificationsWithReservation.class)
