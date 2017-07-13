@@ -1,7 +1,6 @@
 package com.creatix.domain;
 
 import com.creatix.configuration.ApplicationProperties;
-import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.dao.AssistantPropertyManagerDao;
 import com.creatix.domain.dao.ManagedEmployeeDao;
 import com.creatix.domain.dto.AddressDto;
@@ -66,10 +65,6 @@ public class Mapper {
     private ApplicationProperties applicationProperties;
     @Autowired
     private AuthorizationManager authorizationManager;
-
-    //TODO: Hacking! (remove in future!)
-    @Autowired
-    ApartmentDao apartmentDao;
 
     @Autowired
     public Mapper(MapperFactory mapperFactory) {
@@ -265,13 +260,6 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
                 .byDefault()
-                .customize(new CustomMapper<MaintenanceNotification, MaintenanceNotificationDto>() {
-                    @Override
-                    public void mapAtoB(MaintenanceNotification maintenanceNotification, MaintenanceNotificationDto maintenanceNotificationDto, MappingContext context) {
-                        //TODO: Hacking! (remove in future!)
-                        maintenanceNotificationDto.setTargetApartment(Mapper.this.toApartmentDto(apartmentDao.findById(19987L)));
-                    }
-                })
                 .register();
         mapperFactory.classMap(NeighborhoodNotification.class, NeighborhoodNotificationDto.class)
                 .byDefault()
