@@ -290,6 +290,7 @@ public class CommunityBoardService {
                     storedNotification.setCommunityBoardItem(communityBoardItem);
                     storedNotification.setCommunityBoardComment(communityBoardComment);
                     storedNotification.setAuthor(communityBoardItem.getAccount());
+                    storedNotification.setProperty(communityBoardItem.getProperty());
                     storedNotification.setRecipient(account);
                     storedNotification.setDescription(pushNotification.getMessage());
                     storedNotification.setStatus(NotificationStatus.Pending);
@@ -314,6 +315,7 @@ public class CommunityBoardService {
         CommentNotification storedNotification = new CommentNotification();
         storedNotification.setCommunityBoardComment(comment);
         storedNotification.setAuthor(comment.getAuthor());
+        storedNotification.setProperty(comment.getCommunityBoardItem().getProperty());
         storedNotification.setRecipient(comment.getCommunityBoardItem().getAccount());
         storedNotification.setDescription(pushNotification.getMessage());
         storedNotification.setStatus(NotificationStatus.Pending);
@@ -331,6 +333,7 @@ public class CommunityBoardService {
         CommentNotification storedNotification = new CommentNotification();
         storedNotification.setCommunityBoardComment(comment);
         storedNotification.setAuthor(comment.getAuthor());
+        storedNotification.setProperty(comment.getCommunityBoardItem().getProperty());
         storedNotification.setRecipient(comment.getParentComment().getAuthor());
         storedNotification.setDescription(pushNotification.getMessage());
         storedNotification.setStatus(NotificationStatus.Pending);

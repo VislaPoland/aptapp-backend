@@ -99,8 +99,6 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             switch (account.getRole()) {
                 case Tenant:
                 case SubTenant:
-                case PropertyManager:
-                case AssistantPropertyManager:
                     predicate = predicate.and(
                             qNotification.instanceOfAny(
                                     BusinessProfileNotification.class,
@@ -112,6 +110,16 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                             )
                     ).or(
                             qNotification.recipient.eq(account)
+                    );
+                    break;
+                case PropertyManager:
+                case AssistantPropertyManager:
+                    predicate = predicate.and(
+                            qNotification.property.eq(
+                                    authorizationManager.getCurrentProperty(account)
+                            ).or(
+                                    qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                            )
                     );
                     break;
                 case Maintenance:
