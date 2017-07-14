@@ -128,16 +128,14 @@ public class MaintenanceReservationService {
 
         final MaintenanceNotificationResponseRequest.ResponseType responseType = response.getResponse();
         if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
-            employeeConfirmReservation(reservation, response.getNote());
+            return employeeConfirmReservation(reservation, response.getNote()).getNotification();
         }
         else if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Reschedule ) {
-            employeeRescheduleReservation(reservation, response.getSlotUnitId(), response.getNote());
+            return employeeRescheduleReservation(reservation, response.getSlotUnitId(), response.getNote()).getNotification();
         }
         else {
             throw new IllegalArgumentException("Unsupported response type: " + responseType);
         }
-
-        return notification;
     }
 
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
