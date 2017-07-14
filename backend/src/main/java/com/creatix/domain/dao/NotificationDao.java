@@ -121,6 +121,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                                     qNotification.recipient.eq(authorizationManager.getCurrentAccount())
                             )
                     );
+                    break;
                 case Maintenance:
                     predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class)).and(
                             qNotification.property.eq(
