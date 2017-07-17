@@ -81,4 +81,15 @@ public class CommunityBoardItem implements AttachmentId {
     @Column(nullable = false)
     private OffsetDateTime updatedAt;
 
+    @PrePersist
+    public void prePersist() {
+        if ( this.createdAt == null ) {
+            this.createdAt = OffsetDateTime.now();
+            this.updatedAt = OffsetDateTime.now();
+        }
+        else {
+            this.updatedAt = OffsetDateTime.now();
+        }
+    }
+
 }

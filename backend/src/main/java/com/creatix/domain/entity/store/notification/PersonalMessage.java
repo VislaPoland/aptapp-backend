@@ -6,6 +6,7 @@ import com.creatix.domain.enums.message.PersonalMessageStatusType;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by Tomas Michalek on 26/05/2017.
@@ -35,7 +36,8 @@ public class PersonalMessage {
     private PersonalMessageStatusType messageStatus;
 
     @Column
+    @NotNull
     @Enumerated(EnumType.STRING)
-    private PersonalMessageDeleteStatus deleteStatus;
+    private PersonalMessageDeleteStatus deleteStatus = PersonalMessageDeleteStatus.NONE;
 
 }

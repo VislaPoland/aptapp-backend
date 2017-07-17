@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
@@ -42,10 +44,13 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Controller for HTML pages.
@@ -140,25 +145,22 @@ class IndexController {
     public void validationExceptionHandling(Exception ex, HttpServletResponse response) throws IOException {
         MethodArgumentNotValidException validException = (MethodArgumentNotValidException) ex;
         List<ObjectError> errors = validException.getBindingResult().getAllErrors();
-        final HashMap<String, HashMap<String, String>> validationErrorMap = new HashMap<>();
-        errors.forEach(e -> {
-            if (e instanceof FieldError) {
-                FieldError fieldError = (FieldError)e;
-                if ( ! validationErrorMap.containsKey(fieldError.getField())) {
-                    validationErrorMap.put(fieldError.getField(), new HashMap<>());
-                }
-                validationErrorMap.get(fieldError.getField())
-                        .put(
-                                "code",
-                                fieldError.getCodes()[fieldError.getCodes().length - 1]
-                        );
-                validationErrorMap.get(fieldError.getField())
-                        .put(
-                                "message",
-                                fieldError.getDefaultMessage()
-                        );
-            }
-        });
+        Map<String, Map<String, String>> validationErrorMap = errors.stream()
+            .filter(e -> e instanceof FieldError)
+            .map(e -> (FieldError) e)
+            .map(fieldError -> {
+                Map<String, String> fieldMap = new HashMap<>();
+                fieldMap.put(
+                        "code",
+                        fieldError.getCodes()[fieldError.getCodes().length - 1]
+                );
+                fieldMap.put(
+                        "message",
+                        fieldError.getDefaultMessage()
+                );
+                return new ImmutablePair<>(fieldError.getField(), fieldMap);
+            })
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         final ValidationErrorMessage errorMessage = new ValidationErrorMessage();
         fillErrorMessage(ex, HttpStatus.UNPROCESSABLE_ENTITY, errorMessage);
         errorMessage.setValidationErrors(validationErrorMap);
@@ -201,6 +203,6 @@ class IndexController {
     @Data
     @EqualsAndHashCode(callSuper = true)
     private static class ValidationErrorMessage extends ErrorMessage {
-        private HashMap<String, HashMap<String, String>> validationErrors;
+        private Map<String, Map<String, String>> validationErrors;
     }
 }

@@ -211,7 +211,7 @@ public class PersonalMessageService {
                 PersonalMessage messageById = getMessageById(messageId);
                 if (null != messageById) {
                     Account currentAccount = authorizationManager.getCurrentAccount();
-                    if (null == messageById.getDeleteStatus()) {
+                    if (messageById.getDeleteStatus() == PersonalMessageDeleteStatus.NONE) {
                         //No one deleted message yet, so set one of them
                         if (messageById.getFromAccount().equals(currentAccount)) {
                             messageById.setDeleteStatus(PersonalMessageDeleteStatus.SENDER);

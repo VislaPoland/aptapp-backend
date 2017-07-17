@@ -5,6 +5,10 @@ package com.creatix.domain.enums.message;
  */
 public enum PersonalMessageDeleteStatus {
 
+    /**
+     * Default value, to avoid null handling
+     */
+    NONE,
     SENDER, RECIPIENT, BOTH
 
 }

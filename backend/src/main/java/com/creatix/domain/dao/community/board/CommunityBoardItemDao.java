@@ -124,16 +124,4 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
                 .fetch();
     }
 
-    @Override
-    public void persist(CommunityBoardItem entity) {
-        if ( entity.getCreatedAt() == null ) {
-            entity.setCreatedAt(OffsetDateTime.now());
-            entity.setUpdatedAt(OffsetDateTime.now());
-        }
-        else {
-            entity.setUpdatedAt(OffsetDateTime.now());
-        }
-
-        super.persist(entity);
-    }
 }

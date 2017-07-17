@@ -37,7 +37,9 @@ public class NeighborhoodNotification extends Notification {
     @Transient
     public Tenant getRecipientAsTenant() {
         // Guard
-        if (null == this.getRecipient()) return null;
+        if (null == this.getRecipient()) {
+            return null;
+        }
 
         switch (this.getRecipient().getRole()) {
             case Tenant:
