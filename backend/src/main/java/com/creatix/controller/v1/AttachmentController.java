@@ -2,6 +2,7 @@ package com.creatix.controller.v1;
 
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.Views;
+import com.creatix.domain.enums.util.ImageSize;
 import com.creatix.service.AttachmentService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
@@ -32,16 +33,30 @@ public class AttachmentController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/{attachmentId}/{fileName:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{attachmentId}/{fileName:.+}/{size}", method = RequestMethod.GET)
     @ResponseBody
-    public HttpEntity<byte[]> downloadPhoto(@PathVariable Long attachmentId, @PathVariable String fileName) throws IOException {
-        AttachmentService.DownloadAttachment attachmentFileData = attachmentService.downloadAttachment(attachmentId, fileName);
+    public HttpEntity<byte[]> downloadResizedPhoto(@PathVariable Long attachmentId, @PathVariable String fileName, @PathVariable ImageSize size) throws IOException {
+        AttachmentService.DownloadAttachment attachmentFileData = attachmentService.downloadAttachment(attachmentId, fileName, size);
 
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(attachmentFileData.getMediaType());
         headers.setContentLength(attachmentFileData.getFileContent().length);
 
         return new HttpEntity<>(attachmentFileData.getFileContent(), headers);
+    }
+
+
+    @ApiOperation(value = "Download original attachment")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{attachmentId}/{fileName:.+}", method = RequestMethod.GET)
+    @ResponseBody
+    public HttpEntity<byte[]> downloadAttachment(@PathVariable Long attachmentId, @PathVariable String fileName) throws IOException {
+        return downloadResizedPhoto(attachmentId, fileName, ImageSize.ORIGINAL);
     }
 
 }

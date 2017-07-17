@@ -9,7 +9,7 @@ import com.creatix.domain.entity.store.business.BusinessCategory;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.BusinessProfileCarteItem;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
-import com.creatix.domain.entity.store.photo.BusinessProfilePhoto;
+import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.AuthorizationManager;

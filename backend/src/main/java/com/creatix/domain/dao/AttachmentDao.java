@@ -1,6 +1,6 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.store.photo.Attachment;
+import com.creatix.domain.entity.store.attachment.Attachment;
 import org.springframework.stereotype.Repository;
 
 /**

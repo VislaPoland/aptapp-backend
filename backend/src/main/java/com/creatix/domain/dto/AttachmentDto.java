@@ -1,8 +1,7 @@
 package com.creatix.domain.dto;
 
-import com.creatix.domain.entity.store.photo.AttachedEntityType;
-import com.creatix.domain.entity.store.photo.AttachedEntityType;
-import com.creatix.domain.entity.store.photo.AttachmentMediaType;
+import com.creatix.domain.entity.store.attachment.AttachedEntityType;
+import com.creatix.domain.entity.store.attachment.AttachmentMediaType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

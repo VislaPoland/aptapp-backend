@@ -5,7 +5,7 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * @author kvimbi
+ * @author Tomas Michalek
  *         23/02/2017
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -4,7 +4,7 @@ import com.creatix.domain.dao.business.BusinessProfileCarteItemDao;
 import com.creatix.domain.dto.business.BusinessProfileCarteItemDto;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.BusinessProfileCarteItem;
-import com.creatix.domain.entity.store.photo.BusinessProfileCartePhoto;
+import com.creatix.domain.entity.store.attachment.BusinessProfileCartePhoto;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.service.AttachmentService;

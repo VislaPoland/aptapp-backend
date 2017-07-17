@@ -6,12 +6,15 @@ import com.creatix.domain.dao.NotificationPhotoDao;
 import com.creatix.domain.dao.AttachmentDao;
 import com.creatix.domain.entity.store.notification.Notification;
 import com.creatix.domain.entity.store.notification.NotificationPhoto;
-import com.creatix.domain.entity.store.photo.Attachment;
-import com.creatix.domain.entity.store.photo.AttachmentId;
-import com.creatix.domain.entity.store.photo.AttachmentMediaType;
-import com.creatix.domain.entity.store.photo.AttachmentObjectFactory;
+import com.creatix.domain.entity.store.attachment.Attachment;
+import com.creatix.domain.entity.store.attachment.AttachmentId;
+import com.creatix.domain.entity.store.attachment.AttachmentMediaType;
+import com.creatix.domain.entity.store.attachment.AttachmentObjectFactory;
+import com.creatix.domain.enums.util.ImageSize;
+import com.creatix.util.ImageUtil;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -21,8 +24,9 @@ import javax.persistence.Entity;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -131,10 +135,34 @@ public class AttachmentService {
     }
 
     public DownloadAttachment downloadAttachment(long attachmentId, @NotNull String fileName) throws IOException {
+        return downloadAttachment(attachmentId, fileName, ImageSize.ORIGINAL);
+    }
+
+    public DownloadAttachment downloadAttachment(long attachmentId, @NotNull String fileName, ImageSize imageSize) throws IOException {
         Attachment attachment = attachmentDao.findById(attachmentId);
 
         if (attachment != null && fileName.equals(attachment.getFileName())) {
-            final File attachmentFile = new File(attachment.getFilePath());
+
+            String filePath = attachment.getFilePath();
+            if (imageSize != ImageSize.ORIGINAL) {
+                filePath += "_" + imageSize.name();
+            }
+            final File attachmentFile = new File(filePath);
+
+            // Create resized version?
+            if (! attachmentFile.exists() && imageSize != ImageSize.ORIGINAL) {
+                final File originalAttachmentFile = new File(attachment.getFilePath());
+                if (originalAttachmentFile.exists()) {
+                    byte[] resizeImageToJpeg = ImageUtil.resizeImageToJpeg(
+                            FileUtils.readFileToByteArray(originalAttachmentFile),
+                            imageSize
+                    );
+                    IOUtils.write(resizeImageToJpeg, new FileOutputStream(attachmentFile));
+                } else {
+                    throw new EntityNotFoundException(String.format("Attachment id=%s not found", fileName));
+                }
+            }
+
             if (attachmentFile.exists()) {
                 try {
                     return new DownloadAttachment(
