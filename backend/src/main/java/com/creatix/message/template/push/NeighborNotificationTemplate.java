@@ -20,7 +20,10 @@ public class NeighborNotificationTemplate extends PushMessageTemplate {
     }
 
     public String getTimestamp() {
-        return formatTimestamp(notification.getCreatedAt(), notification.getTargetApartment().getProperty().getZoneId());
+        return formatTimestamp(
+                notification.getCreatedAt(),
+                notification.getProperty().getZoneId()
+        );
     }
 
     private String translateTileFromEnumString(String titleEnumString) {
@@ -37,6 +40,10 @@ public class NeighborNotificationTemplate extends PushMessageTemplate {
                 return "Please Quiet Guests";
             case "stopSmoking":
                 return "This is a Non-smoking Building";
+            case "takeOutYourGarbage":
+                return "Please Take Out Your Garbage";
+            case "greatNeighbor":
+                return "You are a great neighbor. Thank you";
             default:
                 return titleEnumString;
         }

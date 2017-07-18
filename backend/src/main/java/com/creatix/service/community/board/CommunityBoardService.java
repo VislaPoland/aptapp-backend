@@ -1,36 +1,53 @@
 package com.creatix.service.community.board;
 
+import com.creatix.domain.dao.NotificationDao;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.community.board.CommunityBoardCategoryDao;
 import com.creatix.domain.dao.community.board.CommunityBoardCommentDao;
 import com.creatix.domain.dao.community.board.CommunityBoardItemDao;
-import com.creatix.domain.dto.community.board.CommunityBoardCommentDto;
-import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
+import com.creatix.domain.dto.community.board.CommunityBoardCommentEditRequest;
+import com.creatix.domain.dto.community.board.CommunityBoardItemEditRequest;
 import com.creatix.domain.dto.community.board.SearchRequest;
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.community.board.CommunityBoardCategory;
 import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
 import com.creatix.domain.entity.store.community.board.CommunityBoardItemPhoto;
+import com.creatix.domain.entity.store.notification.CommentNotification;
+import com.creatix.domain.entity.store.notification.CommunityBoardItemUpdatedSubscriberNotification;
+import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.community.board.CommunityBoardCommentStatusType;
 import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
 import com.creatix.domain.mapper.CommunityBoardMapper;
+import com.creatix.message.PushNotificationTemplateProcessor;
+import com.creatix.message.push.GenericPushNotification;
+import com.creatix.message.template.push.community.board.CommunityItemUpdatedSubscriberTemplate;
+import com.creatix.message.template.push.community.board.NewCommunityItemCommentReplyTemplate;
+import com.creatix.message.template.push.community.board.NewCommunityItemCommentTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.service.AttachmentService;
+import com.creatix.service.message.PushNotificationService;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 10/05/2017.
  */
 @Service
+@Transactional
 public class CommunityBoardService {
 
     @Autowired
@@ -47,25 +64,43 @@ public class CommunityBoardService {
     private CommunityBoardMapper communityBoardMapper;
     @Autowired
     private AttachmentService attachmentService;
+    @Autowired
+    private PushNotificationTemplateProcessor templateProcessor;
+    @Autowired
+    private NotificationDao notificationDao;
+    @Autowired
+    private PushNotificationService pushNotificationService;
 
-    public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, long offset, long limit) {
+    public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, Long ownerId, List<CommunityBoardStatusType> statusTypes, Long startId, long pageSize) {
         Property property = getProperty(propertyId);
 
-        return communityBoardItemDao.listByProperty(property, offset, limit);
+        return communityBoardItemDao.listByPropertyAndStatus(property, ownerId, statusTypes, startId, pageSize);
     }
 
-    public List<CommunityBoardItem> searchBoardItemsForProperty(long propertyId, SearchRequest searchRequest) {
-        Objects.requireNonNull(searchRequest, "Serach request can not be null");
+    public List<CommunityBoardItem> listBoardItemsForPropertyAndCategory(long propertyId, Long ownerId, List<CommunityBoardStatusType> statusTypes, List<Long> categoryIdList, Long startId, long pageSize) {
+        Property property = getProperty(propertyId);
+
+        List<CommunityBoardCategory> categoryList = categoryIdList
+                .stream()
+                .map(categoryId -> communityBoardCategoryDao.findById(categoryId))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return communityBoardItemDao.listByPropertyAnCategories(property, ownerId, statusTypes, categoryList, startId, pageSize);
+    }
+
+    public List<CommunityBoardItem> searchBoardItemsForProperty(long propertyId, List<CommunityBoardStatusType> statusTypes, long pageSize, SearchRequest searchRequest) {
+        Objects.requireNonNull(searchRequest, "Search request can not be null");
 
         Property property = getProperty(propertyId);
         CommunityBoardCategory communityBoardCategory = null;
         if (null != searchRequest.getCommunityBoardCategoryId()) {
             communityBoardCategory = communityBoardCategoryDao.findById(searchRequest.getCommunityBoardCategoryId());
         }
-        return communityBoardItemDao.searchFromRequest(property, searchRequest, communityBoardCategory);
+        return communityBoardItemDao.searchFromRequest(property, statusTypes, pageSize, searchRequest, communityBoardCategory);
     }
 
-    public CommunityBoardItem createNewBoardItemFromRequest(long propertyId, CommunityBoardItemDto request) {
+    public CommunityBoardItem createNewBoardItemFromRequest(long propertyId, CommunityBoardItemEditRequest request) {
         if (null != request.getId()) {
             throw new IllegalArgumentException(String.format("Request ID must be null, got %d instead", request.getId()));
         }
@@ -81,7 +116,7 @@ public class CommunityBoardService {
         return boardItem;
     }
 
-    public CommunityBoardItem updateBoardItemFromRequest(CommunityBoardItemDto request) {
+    public CommunityBoardItem updateBoardItemFromRequest(CommunityBoardItemEditRequest request) {
         Objects.requireNonNull(request.getId(), "ID must not be null");
 
         CommunityBoardItem existingItem = getBoardItemById(request.getId());
@@ -94,6 +129,12 @@ public class CommunityBoardService {
 
         communityBoardMapper.map(request, existingItem);
         communityBoardItemDao.persist(existingItem);
+
+        dispatchSubscriberNotification(
+                existingItem,
+                null,
+                new CommunityItemUpdatedSubscriberTemplate(existingItem, CommunityItemUpdatedSubscriberTemplate.EventType.UPDATED)
+        );
 
         return existingItem;
     }
@@ -117,6 +158,13 @@ public class CommunityBoardService {
         );
         communityBoardItem.setCommunityBoardStatus(CommunityBoardStatusType.DELETED);
         communityBoardItemDao.persist(communityBoardItem);
+
+        dispatchSubscriberNotification(
+                communityBoardItem,
+                null,
+                new CommunityItemUpdatedSubscriberTemplate(communityBoardItem, CommunityItemUpdatedSubscriberTemplate.EventType.DELETED)
+        );
+
         return communityBoardItem;
     }
 
@@ -163,7 +211,7 @@ public class CommunityBoardService {
     }
 
     @NotNull
-    public CommunityBoardComment createNewCommentFromRequest(long boardId, @NotNull CommunityBoardCommentDto request) {
+    public CommunityBoardComment createNewCommentFromRequest(long boardId, @NotNull CommunityBoardCommentEditRequest request) {
         Objects.requireNonNull(request, "Request must not be null");
 
         if (null != request.getId()) {
@@ -193,14 +241,129 @@ public class CommunityBoardService {
         comment.setCommunityBoardItem(boardItem);
         comment.setAuthor(authorizationManager.getCurrentAccount());
         comment.setParentComment(parentComment);
+        comment.setStatus(CommunityBoardCommentStatusType.APPROVED);
 
         communityBoardCommentDao.persist(comment);
+
+        try {
+            this.dispatchNotifications(comment);
+        } catch (IOException | TemplateException e) {
+            //TODO: log error
+            e.printStackTrace();
+        }
 
         return comment;
 
     }
 
-    public CommunityBoardComment updateCommentFromRequest(CommunityBoardCommentDto request) {
+    private Set<Account> getSubscribers(List<CommunityBoardComment> commentList) {
+        // Guard
+        if (null == commentList) return new HashSet<>();
+
+        HashSet<Account> subscribers = new HashSet<>();
+        commentList.stream()
+                .filter(comment -> comment.getStatus() != CommunityBoardCommentStatusType.DELETED)
+                .forEach(comment -> {
+                    subscribers.add(comment.getAuthor());
+                    subscribers.addAll(getSubscribers(comment.getChildComments()));
+                });
+        return subscribers;
+    }
+
+    private void dispatchSubscriberNotification(final CommunityBoardItem communityBoardItem, final CommunityBoardComment communityBoardComment, final CommunityItemUpdatedSubscriberTemplate template) {
+        Objects.requireNonNull(communityBoardItem, "Board item can not be null!");
+        Objects.requireNonNull(template, "Template can not be null!");
+
+        final GenericPushNotification pushNotification = new GenericPushNotification();
+        pushNotification.setTitle(template.getTitle());
+        try {
+            pushNotification.setMessage(templateProcessor.processTemplate(template));
+        } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+        }
+
+        Set<Account> subscribers = getSubscribers(this.listCommentsForBoardItem(communityBoardItem.getId()));
+        subscribers.stream()
+                .filter(account -> ! (account.equals(communityBoardItem.getAccount()) || account.equals(authorizationManager.getCurrentAccount())))
+                .forEach(account -> {
+                    CommunityBoardItemUpdatedSubscriberNotification  storedNotification = new CommunityBoardItemUpdatedSubscriberNotification();
+                    storedNotification.setCommunityBoardItem(communityBoardItem);
+                    storedNotification.setCommunityBoardComment(communityBoardComment);
+                    storedNotification.setAuthor(communityBoardItem.getAccount());
+                    storedNotification.setProperty(communityBoardItem.getProperty());
+                    storedNotification.setRecipient(account);
+                    storedNotification.setDescription(pushNotification.getMessage());
+                    storedNotification.setStatus(NotificationStatus.Pending);
+                    storedNotification.setTitle(pushNotification.getTitle());
+                    notificationDao.persist(storedNotification);
+
+                    try {
+                        pushNotificationService.sendNotification(pushNotification, account);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+
+    }
+
+    private void dispatchNotificationToItemOwner(@NotNull CommunityBoardComment comment) throws IOException, TemplateException {
+        final GenericPushNotification pushNotification = new GenericPushNotification();
+        pushNotification.setMessage(templateProcessor.processTemplate(new NewCommunityItemCommentTemplate(comment)));
+        pushNotification.setTitle("New comment");
+
+        CommentNotification storedNotification = new CommentNotification();
+        storedNotification.setCommunityBoardComment(comment);
+        storedNotification.setAuthor(comment.getAuthor());
+        storedNotification.setProperty(comment.getCommunityBoardItem().getProperty());
+        storedNotification.setRecipient(comment.getCommunityBoardItem().getAccount());
+        storedNotification.setDescription(pushNotification.getMessage());
+        storedNotification.setStatus(NotificationStatus.Pending);
+        storedNotification.setTitle(pushNotification.getTitle());
+        notificationDao.persist(storedNotification);
+
+        pushNotificationService.sendNotification(pushNotification, comment.getCommunityBoardItem().getAccount());
+    }
+
+    private void dispatchNotificationOfCommentReply(@NotNull CommunityBoardComment comment) throws IOException, TemplateException {
+        final GenericPushNotification pushNotification = new GenericPushNotification();
+        pushNotification.setMessage(templateProcessor.processTemplate(new NewCommunityItemCommentReplyTemplate((comment))));
+        pushNotification.setTitle("New comment reply");
+
+        CommentNotification storedNotification = new CommentNotification();
+        storedNotification.setCommunityBoardComment(comment);
+        storedNotification.setAuthor(comment.getAuthor());
+        storedNotification.setProperty(comment.getCommunityBoardItem().getProperty());
+        storedNotification.setRecipient(comment.getParentComment().getAuthor());
+        storedNotification.setDescription(pushNotification.getMessage());
+        storedNotification.setStatus(NotificationStatus.Pending);
+        storedNotification.setTitle(pushNotification.getTitle());
+        notificationDao.persist(storedNotification);
+
+        pushNotificationService.sendNotification(pushNotification, comment.getCommunityBoardItem().getAccount());
+    }
+
+    private void dispatchNotifications(@NotNull CommunityBoardComment comment) throws IOException, TemplateException {
+        Objects.requireNonNull(comment, "Comment can not be null!");
+
+        if (null == comment.getParentComment()) {
+            // root comment notify all people
+            dispatchSubscriberNotification(
+                    comment.getCommunityBoardItem(),
+                    comment,
+                    new CommunityItemUpdatedSubscriberTemplate(comment.getCommunityBoardItem(), CommunityItemUpdatedSubscriberTemplate.EventType.NEW_COMMENT)
+            );
+            dispatchNotificationToItemOwner(comment);
+        } else {
+            dispatchNotificationOfCommentReply(comment);
+            if ( ! comment.getParentComment().getAuthor().equals(comment.getCommunityBoardItem().getAccount())) {
+                dispatchNotificationToItemOwner(comment);
+            }
+        }
+
+    }
+
+    public CommunityBoardComment updateCommentFromRequest(CommunityBoardCommentEditRequest request) {
         Objects.requireNonNull(request, "Request object must not be null");
         Objects.requireNonNull(request.getId(), "ID of object for edditing must not be null");
 
@@ -252,4 +415,18 @@ public class CommunityBoardService {
     }
 
 
+    public CommunityBoardItemPhoto deleteCommunityItemPhoto(long photoId) {
+        CommunityBoardItemPhoto attachment = (CommunityBoardItemPhoto) attachmentService.findById(photoId);
+
+        if (authorizationManager.canWrite(attachment.getCommunityBoardItem().getProperty())) {
+            return (CommunityBoardItemPhoto) attachmentService.deleteAttachment(attachment);
+        }
+
+        throw new SecurityException(String.format("You are not eligible to update item with id=%d",
+                attachment.getCommunityBoardItem().getId()));
+    }
+
+    public List<CommunityBoardCategory> listCategories() {
+        return communityBoardCategoryDao.listAll();
+    }
 }

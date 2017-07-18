@@ -10,8 +10,8 @@ import com.creatix.domain.dto.account.*;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.apartment.BasicApartmentDto;
 import com.creatix.domain.dto.apartment.PersistApartmentRequest;
-import com.creatix.domain.dto.notification.NotificationDto;
-import com.creatix.domain.dto.notification.NotificationPhotoDto;
+import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
+import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
 import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
@@ -35,6 +35,8 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,6 +52,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class Mapper {
+
+    private final Logger logger = LoggerFactory.getLogger(Mapper.class);
 
     private MapperFactory mapperFactory;
 
@@ -69,10 +73,10 @@ public class Mapper {
     }
 
     private String createNotificationPhotoDownloadUrl(NotificationPhoto photo) throws MalformedURLException, URISyntaxException {
-        return applicationProperties.buildBackendUrl(String.format("api/attachments/%d/%s", photo.getNotification().getId(), photo.getFileName())).toString();
+        return applicationProperties.buildBackendUrl(String.format("api/notifications/%d/photos/%s", photo.getNotification().getId(), photo.getFileName())).toString();
     }
     private String createPropertyPhotoDownloadUrl(PropertyPhoto photo) throws MalformedURLException, URISyntaxException {
-        return applicationProperties.buildBackendUrl(String.format("api/attachments/%d/%s", photo.getProperty().getId(), photo.getFileName())).toString();
+        return applicationProperties.buildBackendUrl(String.format("api/properties/%d/photos/%s", photo.getProperty().getId(), photo.getFileName())).toString();
     }
 
     private void configure(MapperFactory mapperFactory) {
@@ -121,6 +125,20 @@ public class Mapper {
                                 accountDto.setProperty(toPropertyDto(apartment.getProperty()));
                                 accountDto.setApartment(toApartmentDto(apartment));
                             }
+                        }
+
+                        try {
+                            switch (account.getRole()) {
+                                case Tenant:
+                                case SubTenant:
+                                    accountDto.setIsPrivacyPolicyAccepted(((TenantBase) account).getIsPrivacyPolicyAccepted());
+                                    accountDto.setIsTacAccepted(((TenantBase) account).getIsTacAccepted());
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } catch (ClassCastException e) {
+                            logger.error("Role and class type mismatch.", e);
                         }
                     }
                 })
@@ -219,6 +237,26 @@ public class Mapper {
                         }
                     }
                 })
+                .register();
+        mapperFactory.classMap(CommentNotification.class, CommentNotificationDto.class)
+                .customize(new CustomMapper<CommentNotification, CommentNotificationDto>() {
+                    @Override
+                    public void mapAtoB(CommentNotification commentNotification, CommentNotificationDto commentNotificationDto, MappingContext context) {
+                        commentNotificationDto.setCommunityBoardItem(
+                                this.mapperFacade.map(commentNotification.getCommunityBoardComment().getCommunityBoardItem(), CommunityBoardItemDto.class)
+                        );
+                    }
+                })
+                .byDefault()
+                .register();
+        mapperFactory.classMap(BusinessProfileNotification.class, BusinessProfileNotificationDto.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(CommunityBoardItemUpdatedSubscriberNotification.class, CommunityBoardItemUpdatedSubscriberNotificationDto.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(DiscountCouponNotification.class, DiscountCouponNotificationDto.class)
+                .byDefault()
                 .register();
         mapperFactory.classMap(SecurityNotification.class, SecurityNotificationDto.class)
                 .byDefault()
@@ -411,6 +449,23 @@ public class Mapper {
                         if ( account instanceof PropertyOwner ) {
                             ((PropertyOwner) account).setWebsite(request.getWebsite());
                         }
+
+                        try {
+                            switch (account.getRole()) {
+                                case Tenant:
+                                    ((Tenant) account).setIsPrivacyPolicyAccepted(request.getIsPrivacyPolicyAccepted());
+                                    ((Tenant) account).setIsTacAccepted(request.getIsTacAccepted());
+                                    break;
+                                case SubTenant:
+                                    ((SubTenant) account).setIsPrivacyPolicyAccepted(request.getIsPrivacyPolicyAccepted());
+                                    ((SubTenant) account).setIsTacAccepted(request.getIsTacAccepted());
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } catch (ClassCastException e) {
+                            logger.error("Role and class type mismatch.", e);
+                        }
                     }
                 })
                 .register();
@@ -565,10 +620,16 @@ public class Mapper {
         return mapperFactory.getMapperFacade().map(property, PropertyDto.class);
     }
 
-    public NotificationDto toNotificationDto(@NotNull Notification n) {
+    public <T extends NotificationDto, S extends Notification> T toNotificationDto(@NotNull S n, Class<T> clazz) {
         Objects.requireNonNull(n);
-        return mapperFactory.getMapperFacade().map(n, NotificationDto.class);
+        return mapperFactory.getMapperFacade().map(n, clazz);
     }
+
+    public CommentNotificationDto toNotificationDto(@NotNull CommentNotification n) {
+        Objects.requireNonNull(n);
+        return mapperFactory.getMapperFacade().map(n, CommentNotificationDto.class);
+    }
+
 
     public SecurityNotificationDto toSecurityNotificationDto(@NotNull SecurityNotification n) {
         Objects.requireNonNull(n);

@@ -1,10 +1,13 @@
 package com.creatix.domain.mapper;
 
 import com.creatix.configuration.ApplicationProperties;
+import com.creatix.domain.dao.PropertyDao;
+import com.creatix.domain.dao.business.BusinessCategoryDao;
 import com.creatix.domain.dto.business.*;
 import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
 import com.creatix.domain.entity.store.business.*;
 import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
+import com.creatix.domain.enums.ContactType;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 13/04/2017.
@@ -25,20 +29,61 @@ public class BusinessMapper extends ConfigurableMapper {
     @Autowired
     private ApplicationProperties applicationProperties;
 
+    @Autowired
+    private BusinessCategoryDao businessCategoryDao;
+    @Autowired
+    private PropertyDao propertyDao;
+
     @Override
     protected void configure(MapperFactory factory) {
         super.configure(factory);
 
         factory.classMap(BusinessProfile.class, BusinessProfileDto.class)
                 .exclude("hasImage")
+                .exclude("contact.id")
+                .fieldAToB("property.id", "propertyId")
                 .byDefault()
                 .customize(new CustomMapper<BusinessProfile, BusinessProfileDto>() {
                     @Override
                     public void mapAtoB(BusinessProfile businessProfile, BusinessProfileDto businessProfileDto, MappingContext context) {
                         businessProfileDto.setImageUploaded(businessProfile.getDefaultPhotoId() != null);
+                        if (null != businessProfileDto.getContact() && null != businessProfile.getContact()) {
+                            businessProfileDto.getContact().setId(businessProfile.getContact().getId());
+                        }
+                    }
+                    @Override
+                    public void mapBtoA(BusinessProfileDto businessProfileDto, BusinessProfile businessProfile, MappingContext context) {
+                        businessProfile.setBusinessCategoryList(
+                            businessProfileDto.getBusinessCategoryList().stream().map(
+                                    c -> businessCategoryDao.findById(c.getId())
+                            ).collect(Collectors.toList())
+                        );
                     }
                 })
                 .register();
+
+        factory.classMap(BusinessProfileCreateRequest.class, BusinessProfile.class)
+                .exclude("propertyId")
+                .exclude("businessCategoryList")
+                .exclude("shouldSentNotification")
+                .byDefault()
+                .customize(new CustomMapper<BusinessProfileCreateRequest, BusinessProfile>() {
+                    @Override
+                    public void mapAtoB(BusinessProfileCreateRequest businessProfileCreateRequest, BusinessProfile businessProfile, MappingContext context) {
+                        if (null != businessProfileCreateRequest.getPropertyId()) {
+                            businessProfile.setProperty(
+                                    propertyDao.findById(businessProfileCreateRequest.getPropertyId())
+                            );
+                        }
+                        businessProfile.setBusinessCategoryList(
+                                businessProfileCreateRequest.getBusinessCategoryList().stream().map(
+                                        c -> businessCategoryDao.findById(c.getId())
+                                ).collect(Collectors.toList())
+                        );
+                    }
+                })
+                .register();
+
         factory.classMap(BusinessCategory.class, BusinessCategoryDto.class)
                 .byDefault()
                 .register();
@@ -146,6 +191,11 @@ public class BusinessMapper extends ConfigurableMapper {
         return this.map(businessProfile, BusinessProfileDto.class);
     }
 
+    public BusinessProfile toBusinessProfile(@NotNull BusinessProfileCreateRequest businessProfile) {
+        Objects.requireNonNull(businessProfile, "Business profile request must not be null");
+        return this.map(businessProfile, BusinessProfile.class);
+    }
+
     public BusinessProfile toBusinessProfile(@NotNull BusinessProfileDto businessProfileDto) {
         Objects.requireNonNull(businessProfileDto, "Business profile must not be null");
         return this.map(businessProfileDto, BusinessProfile.class);
@@ -186,4 +236,8 @@ public class BusinessMapper extends ConfigurableMapper {
         return this.map(businessProfileCarteItemDto, BusinessProfileCarteItem.class);
     }
 
+    public BusinessProfilePhotoDto toBusinessProfilePhoto(@NotNull BusinessProfilePhoto businessProfilePhoto) {
+        Objects.requireNonNull(businessProfilePhoto, "Profile photo object can not be null");
+        return this.map(businessProfilePhoto, BusinessProfilePhotoDto.class);
+    }
 }

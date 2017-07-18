@@ -1,5 +1,6 @@
 package com.creatix.service.business;
 
+import com.creatix.domain.dao.AttachmentDao;
 import com.creatix.domain.dao.business.BusinessProfileDao;
 import com.creatix.domain.dao.business.DiscountCouponDao;
 import com.creatix.domain.dao.business.DiscountCouponUsageDao;
@@ -34,10 +35,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.EnumMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -45,6 +44,7 @@ import java.util.concurrent.ConcurrentMap;
  * Created by Tomas Michalek on 12/04/2017.
  */
 @Service
+@Transactional
 public class DiscountCouponService {
 
     private final Logger logger = LoggerFactory.getLogger(BusinessNotificationExecutor.class);
@@ -260,8 +260,13 @@ public class DiscountCouponService {
 
     }
 
-    public DiscountCoupon storeBusinessProfilePhotos(MultipartFile[] files, long couponId) {
+    public DiscountCoupon storeDiscountCouponPhotos(MultipartFile[] files, long couponId) {
         final DiscountCoupon discountCoupon = findCouponById(couponId);
+
+        if (discountCoupon.getDiscountCouponPhoto() != null) {
+            attachmentService.deleteAttachmentFiles(Collections.singletonList(discountCoupon.getDiscountCouponPhoto()));
+        }
+
         List<DiscountCouponPhoto> photoStoreList;
         try {
             photoStoreList = attachmentService.storeAttachments(files, foreignKeyObject -> {
@@ -279,5 +284,18 @@ public class DiscountCouponService {
         } else {
             throw new IllegalArgumentException("Unable to store photo for business profile");
         }
+    }
+
+    public DiscountCoupon deleteCouponById(long couponId) {
+        final DiscountCoupon discountCoupon = findCouponById(couponId);
+        if (authorizationManager.canWrite(discountCoupon.getBusinessProfile().getProperty())) {
+            discountCouponDao.delete(discountCoupon);
+            return discountCoupon;
+        }
+
+        throw new SecurityException(
+                String.format("You are not eligible to create or modify discount coupons for property %d",
+                        discountCoupon.getBusinessProfile().getProperty().getId())
+        );
     }
 }

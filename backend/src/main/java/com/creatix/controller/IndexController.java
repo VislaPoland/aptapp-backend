@@ -5,8 +5,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
@@ -22,6 +25,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.StreamUtils;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
@@ -29,13 +34,23 @@ import org.springframework.web.servlet.view.RedirectView;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Controller for HTML pages.
@@ -121,9 +136,37 @@ class IndexController {
         handleException(ex, HttpStatus.NOT_FOUND, response);
     }
 
-    @ExceptionHandler({NullPointerException.class, DataIntegrityViolationException.class, ConstraintViolationException.class, IllegalArgumentException.class, IllegalStateException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler({NullPointerException.class, DataIntegrityViolationException.class, ConstraintViolationException.class, IllegalArgumentException.class, IllegalStateException.class})
     public void integrityViolation(Exception ex, HttpServletResponse response) throws IOException {
         handleException(ex, HttpStatus.UNPROCESSABLE_ENTITY, response);
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    public void validationExceptionHandling(Exception ex, HttpServletResponse response) throws IOException {
+        MethodArgumentNotValidException validException = (MethodArgumentNotValidException) ex;
+        List<ObjectError> errors = validException.getBindingResult().getAllErrors();
+        Map<String, Map<String, String>> validationErrorMap = errors.stream()
+            .filter(e -> e instanceof FieldError)
+            .map(e -> (FieldError) e)
+            .map(fieldError -> {
+                Map<String, String> fieldMap = new HashMap<>();
+                fieldMap.put(
+                        "code",
+                        fieldError.getCodes()[fieldError.getCodes().length - 1]
+                );
+                fieldMap.put(
+                        "message",
+                        fieldError.getDefaultMessage()
+                );
+                return new ImmutablePair<>(fieldError.getField(), fieldMap);
+            })
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        final ValidationErrorMessage errorMessage = new ValidationErrorMessage();
+        fillErrorMessage(ex, HttpStatus.UNPROCESSABLE_ENTITY, errorMessage);
+        errorMessage.setValidationErrors(validationErrorMap);
+        response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getOutputStream().print(jsonMapper.writeValueAsString(errorMessage));
     }
 
     private void handleException(Exception ex, HttpStatus status, HttpServletResponse resp) throws IOException {
@@ -131,15 +174,20 @@ class IndexController {
         resp.setStatus(status.value());
         resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        final String exceptionMessage = StringUtils.trim(StringUtils.isEmpty(ex.getMessage()) ? status.getReasonPhrase() : ex.getMessage());
         final ErrorMessage errorMessage = new ErrorMessage();
+        fillErrorMessage(ex, status, errorMessage);
+        resp.getOutputStream().print(jsonMapper.writeValueAsString(errorMessage));
+    }
+
+    private ErrorMessage fillErrorMessage(Exception ex, HttpStatus status, ErrorMessage errorMessage) {
+        final String exceptionMessage = StringUtils.trim(StringUtils.isEmpty(ex.getMessage()) ? status.getReasonPhrase() : ex.getMessage());
         errorMessage.setError(exceptionMessage);
         errorMessage.setException(ex.getClass().getCanonicalName());
         errorMessage.setMessage(exceptionMessage);
         errorMessage.setStatus(status.value());
         errorMessage.setTimestamp(System.currentTimeMillis());
         errorMessage.setPath(httpServletRequest.getServletPath());
-        resp.getOutputStream().print(jsonMapper.writeValueAsString(errorMessage));
+        return errorMessage;
     }
 
     @Data
@@ -150,5 +198,11 @@ class IndexController {
         private String exception;
         private String message;
         private String path;
+    }
+
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    private static class ValidationErrorMessage extends ErrorMessage {
+        private Map<String, Map<String, String>> validationErrors;
     }
 }

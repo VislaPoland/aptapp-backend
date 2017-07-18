@@ -20,11 +20,16 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class MaintenanceNotificationDto extends NotificationDto {
-    @ApiModelProperty(value = "Target apartment", required = true)
+
+    @ApiModelProperty(value = "Deprecated! Expect this to be null. <br />Target apartment")
+    @Deprecated
     private BasicApartmentDto targetApartment;
-    @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home", required = true)
+
+    @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home")
     private Boolean accessIfNotAtHome;
+
     @JsonView(Views.NotificationsWithReservation.class)
     @ApiModelProperty(value = "Maintenance reservations")
     private List<MaintenanceReservationDto> reservations;
+
 }

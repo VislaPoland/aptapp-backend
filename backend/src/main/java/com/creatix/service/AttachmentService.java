@@ -1,30 +1,31 @@
 package com.creatix.service;
 
 import com.creatix.configuration.FileUploadProperties;
+import com.creatix.domain.dao.AttachmentDao;
 import com.creatix.domain.dao.NotificationDao;
 import com.creatix.domain.dao.NotificationPhotoDao;
-import com.creatix.domain.dao.AttachmentDao;
-import com.creatix.domain.entity.store.notification.Notification;
-import com.creatix.domain.entity.store.notification.NotificationPhoto;
 import com.creatix.domain.entity.store.attachment.Attachment;
 import com.creatix.domain.entity.store.attachment.AttachmentId;
 import com.creatix.domain.entity.store.attachment.AttachmentMediaType;
 import com.creatix.domain.entity.store.attachment.AttachmentObjectFactory;
+import com.creatix.domain.entity.store.notification.Notification;
+import com.creatix.domain.entity.store.notification.NotificationPhoto;
 import com.creatix.domain.enums.util.ImageSize;
 import com.creatix.util.ImageUtil;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,11 +35,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 19/04/2017.
  */
 @Service
+@Transactional
 public class AttachmentService {
 
 
@@ -104,8 +107,12 @@ public class AttachmentService {
         ArrayList<T> storedAttachmentsList = new ArrayList<>(files.length);
 
         for ( MultipartFile file : files ) {
+            String[] fileExtensions = file.getOriginalFilename().split("\\.");
+            if (fileExtensions.length == 0) {
+                throw new IllegalArgumentException("Invalid file name, unrecognized extension");
+            }
             // move uploaded file to file repository
-            final String fileName = String.format("%d-%s", fkId, UUID.randomUUID().toString());
+            final String fileName = String.format("%d-%s.%s", fkId, UUID.randomUUID().toString(), fileExtensions[fileExtensions.length - 1]);
             final Path attachmentFilePath = Paths.get(uploadProperties.getRepositoryPath(), fileName);
             Files.createDirectories(attachmentFilePath.getParent());
             file.transferTo(attachmentFilePath.toFile());
@@ -171,6 +178,11 @@ public class AttachmentService {
                     );
                 } catch (IOException e) {
                     throw new EntityNotFoundException(String.format("Unable to read attachments file %s", fileName));
+                } catch (InvalidMediaTypeException invalidMediaTypeEx) {
+                    return new DownloadAttachment(
+                            FileUtils.readFileToByteArray(attachmentFile),
+                            MediaType.APPLICATION_OCTET_STREAM
+                    );
                 }
             } else {
                 throw new EntityNotFoundException(String.format("Unable to locate attachments file %s", fileName));
@@ -178,6 +190,49 @@ public class AttachmentService {
         }
 
         throw new EntityNotFoundException(String.format("Attachment id=%s not found", fileName));
+    }
+
+    public Attachment deleteAttachmentById(long attachmentId) {
+        Attachment attachment = attachmentDao.findById(attachmentId);
+        if (null == attachment) {
+            throw new EntityNotFoundException(String.format("Attachment id=%d not found", attachmentId));
+        }
+
+        return deleteAttachment(attachment);
+    }
+
+
+    public Attachment deleteAttachment(@NotNull Attachment attachment) {
+        Objects.requireNonNull(attachment, "Attachment object can not be null");
+        if (null != attachment.getFilePath()) {
+            File file = new File(attachment.getFilePath());
+            if (file.exists()) {
+                boolean delete = file.delete();
+            }
+        }
+        attachmentDao.delete(attachment);
+
+        return attachment;
+    }
+
+    public Attachment findById(long attachmentId) {
+        return attachmentDao.findById(attachmentId);
+    }
+
+
+    public List<Attachment> deleteAttachmentFiles(List<? extends Attachment> attachmentList) {
+        Objects.requireNonNull(attachmentList, "Attachment list can not be null");
+        return attachmentList
+                .parallelStream()
+                .filter(
+                        e -> null != e && null != e.getFilePath()
+                ).map(attachment -> {
+                    File file = new File(attachment.getFilePath());
+                    if (file.exists()) {
+                        boolean delete = file.delete();
+                    }
+                    return attachment;
+                }).collect(Collectors.toList());
     }
 
 }

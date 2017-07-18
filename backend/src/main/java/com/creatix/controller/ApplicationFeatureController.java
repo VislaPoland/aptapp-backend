@@ -41,7 +41,7 @@ public class ApplicationFeatureController {
     })
     @RequestMapping(path = "/{applicationFeatureId}/{status}", method = RequestMethod.PUT)
     @JsonView(Views.Public.class)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<ApplicationFeatureDto> persistFeaturesForProperty(@PathVariable Long applicationFeatureId, @PathVariable boolean status) {
         return new DataResponse<>(
                 mapper.toApplicationFeatureDto(applicationFeatureService.updateFeatureStatus(applicationFeatureId, status))

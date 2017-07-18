@@ -5,6 +5,9 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.Views;
+import com.creatix.domain.dto.notification.BusinessProfileNotificationDto;
+import com.creatix.domain.dto.notification.CommentNotificationDto;
+import com.creatix.domain.dto.notification.CommunityBoardItemUpdatedSubscriberNotificationDto;
 import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
@@ -15,14 +18,12 @@ import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotification
 import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
-import com.creatix.domain.entity.store.notification.MaintenanceNotification;
-import com.creatix.domain.entity.store.notification.NotificationPhoto;
-import com.creatix.domain.entity.store.notification.SecurityNotification;
+import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.NotificationService;
 import com.creatix.service.AttachmentService;
+import com.creatix.service.NotificationService;
 import com.fasterxml.jackson.annotation.JsonView;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
@@ -43,7 +44,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -59,6 +63,19 @@ public class NotificationController {
     @Autowired
     private AttachmentService attachmentService;
 
+
+    private Class<? extends NotificationDto> getMappingClass(Class clazz) {
+        if (clazz.equals(CommentNotification.class)) {
+            return CommentNotificationDto.class;
+        } else if (clazz.equals(BusinessProfileNotification.class)) {
+            return BusinessProfileNotificationDto.class;
+        } else if (clazz.equals(CommunityBoardItemUpdatedSubscriberNotification.class)) {
+            return CommunityBoardItemUpdatedSubscriberNotificationDto.class;
+        } else {
+            return NotificationDto.class;
+        }
+    }
+
     //general
     @ApiOperation(value = "Filter notifications")
     @ApiResponses(value = {
@@ -73,8 +90,21 @@ public class NotificationController {
             @RequestParam int pageSize,
             @RequestParam(required = false) Long startId,
             @RequestParam(required = false) NotificationStatus notificationStatus,
-            @RequestParam(required = false) NotificationType notificationType) {
-        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, pageSize), n -> mapper.toNotificationDto(n));
+            @RequestParam(required = false) String notificationType) {
+
+        List<NotificationType> notificationTypeList = null;
+        if (null != notificationType) {
+            notificationTypeList = Arrays.stream(notificationType.split(",")).map(
+                    e -> {
+                        try {
+                            return NotificationType.valueOf(e);
+                        } catch (IllegalArgumentException exception) {
+                            return null;
+                        }
+                    }
+            ).filter(Objects::nonNull).collect(Collectors.toList());
+        }
+        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationTypeList, startId, pageSize), n -> mapper.toNotificationDto(n, this.getMappingClass(n.getClass())));
     }
 
     @ApiOperation(value = "Get single maintenance notification")
@@ -99,7 +129,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security}, feature = ApplicationFeatureType.MAINTENANCE)
-    public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@RequestBody @Valid CreateMaintenanceNotificationRequest dto) throws IOException, TemplateException {
+    public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@Valid @RequestBody CreateMaintenanceNotificationRequest dto) throws IOException, TemplateException {
         MaintenanceNotification n = mapper.fromMaintenanceNotificationRequest(dto);
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n, dto.getSlotUnitId())));
     }
@@ -144,7 +174,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/security", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.SECURITY)
-    public DataResponse<SecurityNotificationDto> saveSecurityNotification(@RequestBody @Valid CreateSecurityNotificationRequest dto) throws IOException, TemplateException {
+    public DataResponse<SecurityNotificationDto> saveSecurityNotification(@Valid @RequestBody CreateSecurityNotificationRequest dto) throws IOException, TemplateException {
         SecurityNotification n = mapper.fromSecurityNotificationRequest(dto);
         return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.saveSecurityNotification(n)));
     }
@@ -158,7 +188,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/security/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Security}, feature = ApplicationFeatureType.SECURITY)
-    public DataResponse<SecurityNotificationDto> respondToSecurityNotification(@PathVariable long notificationId, @RequestBody @Valid SecurityNotificationResponseRequest request) throws IOException, TemplateException {
+    public DataResponse<SecurityNotificationDto> respondToSecurityNotification(@PathVariable long notificationId, @Valid @RequestBody SecurityNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.respondToSecurityNotification(notificationId, request)));
     }
 
@@ -171,7 +201,7 @@ public class NotificationController {
     @JsonView(Views.NotificationsWithReservation.class)
     @RequestMapping(path = "/maintenance/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Maintenance, AccountRole.Tenant}, feature = ApplicationFeatureType.MAINTENANCE)
-    public DataResponse<MaintenanceNotificationDto> respondToMaintenanceNotification(@PathVariable Long notificationId, @RequestBody @Valid MaintenanceNotificationResponseRequest request) throws IOException, TemplateException {
+    public DataResponse<MaintenanceNotificationDto> respondToMaintenanceNotification(@PathVariable Long notificationId, @Valid @RequestBody MaintenanceNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.respondToMaintenanceNotification(notificationId, request)));
     }
 
@@ -197,7 +227,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(feature = ApplicationFeatureType.NEIGHBORHOOD)
-    public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@RequestBody @Valid CreateNeighborhoodNotificationRequest dto) throws MessageDeliveryException, TemplateException, IOException {
+    public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@Valid @RequestBody CreateNeighborhoodNotificationRequest dto) throws MessageDeliveryException, TemplateException, IOException {
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(dto.getUnitNumber(), mapper.fromNeighborhoodNotificationRequest(dto))));
     }
 
@@ -211,7 +241,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Tenant}, feature = ApplicationFeatureType.NEIGHBORHOOD)
-    public DataResponse<NeighborhoodNotificationDto> respondToNeighborhoodNotification(@PathVariable long notificationId, @RequestBody @Valid NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
+    public DataResponse<NeighborhoodNotificationDto> respondToNeighborhoodNotification(@PathVariable long notificationId, @Valid @RequestBody NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.respondToNeighborhoodNotification(notificationId, request)));
     }
 
@@ -225,7 +255,12 @@ public class NotificationController {
     @RequestMapping(path = "/{notificationId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<NotificationDto> storeNotificationPhotos(@RequestParam MultipartFile[] files, @PathVariable long notificationId) throws IOException {
-        return new DataResponse<>(mapper.toNotificationDto(attachmentService.storeNotificationPhotos(files, notificationId)));
+        return new DataResponse<>(
+                mapper.toNotificationDto(
+                        attachmentService.storeNotificationPhotos(files, notificationId),
+                        NotificationDto.class
+                )
+        );
     }
 
     @ApiOperation(value = "Download notification photo")

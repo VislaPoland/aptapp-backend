@@ -304,9 +304,8 @@ public class AccountService {
     @RoleSecured(AccountRole.Administrator)
     public Account createAdministrator(@NotNull PersistAdministratorRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Objects.requireNonNull(request);
-        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
-        final Account account = new Account();
+        final Account account = this.getEntityInstance(request.getPrimaryEmail(), Account.class);
         account.setRole(AccountRole.Administrator);
         mapper.fillAccount(request, account);
         account.setActive(true);
@@ -338,9 +337,8 @@ public class AccountService {
     @RoleSecured(AccountRole.Administrator)
     public Account createPropertyOwner(@NotNull PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
-        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
-        final PropertyOwner account = new PropertyOwner();
+        final PropertyOwner account = this.getEntityInstance(request.getPrimaryEmail(), PropertyOwner.class);
         account.setRole(AccountRole.PropertyOwner);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -372,7 +370,6 @@ public class AccountService {
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public PropertyManager createPropertyManager(@NotNull PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
-        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         Property managedProperty;
         if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
@@ -385,7 +382,7 @@ public class AccountService {
             managedProperty = authorizationManager.getCurrentProperty();
         }
 
-        final PropertyManager account = new PropertyManager();
+        final PropertyManager account = this.getEntityInstance(request.getPrimaryEmail(), PropertyManager.class);
         account.setRole(AccountRole.PropertyManager);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -432,11 +429,10 @@ public class AccountService {
     @RoleSecured({AccountRole.PropertyManager})
     public SecurityEmployee createSecurityGuy(@NotNull PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
-        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
 
-        final SecurityEmployee account = new SecurityEmployee();
+        final SecurityEmployee account = this.getEntityInstance(request.getPrimaryEmail(), SecurityEmployee.class);
         account.setRole(AccountRole.Security);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -469,11 +465,10 @@ public class AccountService {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public MaintenanceEmployee createMaintenanceGuy(@NotNull PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
-        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
 
-        final MaintenanceEmployee account = new MaintenanceEmployee();
+        final MaintenanceEmployee account = this.getEntityInstance(request.getPrimaryEmail(), MaintenanceEmployee.class);
         account.setRole(AccountRole.Maintenance);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -506,7 +501,6 @@ public class AccountService {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public AssistantPropertyManager createAssistantPropertyManager(@NotNull PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
-        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         final Account currentAccount = authorizationManager.getCurrentAccount();
         final PropertyManager manager;
@@ -525,7 +519,7 @@ public class AccountService {
             throw new SecurityException("Not allowed to perform action");
         }
 
-        final AssistantPropertyManager account = new AssistantPropertyManager();
+        final AssistantPropertyManager account = this.getEntityInstance(request.getPrimaryEmail(), AssistantPropertyManager.class);
         account.setRole(AccountRole.AssistantPropertyManager);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -605,6 +599,39 @@ public class AccountService {
 
         if ( accountDao.findByEmail(email) != null ) {
             throw new IllegalArgumentException(String.format("Account %s already exists.", email));
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private <T extends Account> T getEntityInstance(String email, Class<T> clazz) {
+        Objects.requireNonNull(email, "Email must not be null");
+
+        Account byEmail = accountDao.findByEmail(email);
+        if ( byEmail == null ) {
+            try {
+                return clazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new IllegalArgumentException("Unable to create new account");
+            }
+        } else {
+            if (byEmail.isDeleted() && ! byEmail.getActive()) {
+                if (byEmail.getClass().isInstance(clazz)) {
+                    byEmail.setActive(true);
+                    byEmail.setDeletedAt(null);
+                    return (T) byEmail;
+                } else {
+                    accountDao.delete(byEmail);
+
+                    try {
+                        return clazz.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e2) {
+                        throw new IllegalArgumentException("Unable to create new account");
+                    }
+                }
+            } else {
+                throw new IllegalArgumentException(String.format("Account %s already exists.", email));
+            }
         }
     }
 

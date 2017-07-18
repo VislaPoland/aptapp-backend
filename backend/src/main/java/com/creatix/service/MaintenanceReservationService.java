@@ -128,19 +128,17 @@ public class MaintenanceReservationService {
 
         final MaintenanceNotificationResponseRequest.ResponseType responseType = response.getResponse();
         if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
-            employeeConfirmReservation(reservation, response.getNote());
+            return employeeConfirmReservation(reservation, response.getNote()).getNotification();
         }
         else if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Reschedule ) {
-            employeeRescheduleReservation(reservation, response.getSlotUnitId(), response.getNote());
+            return employeeRescheduleReservation(reservation, response.getSlotUnitId(), response.getNote()).getNotification();
         }
         else {
             throw new IllegalArgumentException("Unsupported response type: " + responseType);
         }
-
-        return notification;
     }
 
-    @RoleSecured(AccountRole.Tenant)
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceNotification tenantRespondToMaintenanceReschedule(@NotNull MaintenanceNotification notification, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(response, "Notification response dto is null");
@@ -157,7 +155,7 @@ public class MaintenanceReservationService {
 
         final MaintenanceReservation reservation = reservations.get(0);
 
-        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), notification.getTargetApartment().getTenant())) ) {
+        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), notification.getAuthor()) )) {
             throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservation.getId()));
         }
 

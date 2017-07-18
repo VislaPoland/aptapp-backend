@@ -5,6 +5,7 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.business.BusinessProfileCarteItemDto;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.ApplicationFeatureType;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.business.BusinessProfileCarteService;
@@ -40,10 +41,10 @@ public class BusinessProfileCarteController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileCarteItemDto> createCartItem(
-            @RequestBody @Valid BusinessProfileCarteItemDto request,
+            @Valid @RequestBody BusinessProfileCarteItemDto request,
             @PathVariable("businessProfileId") long businessProfileId) {
         return new DataResponse<>(
                 businessMapper.toBusinessProfileCarteItem(
@@ -52,16 +53,16 @@ public class BusinessProfileCarteController {
         );
     }
 
-    @ApiOperation(value = "Update property", notes = "Update existing carte. This endpoint can only be called by account with Administrator role.")
+    @ApiOperation(value = "Update existing carte item", notes = "Update existing carte. This endpoint can only be called by account with Administrator role.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<BusinessProfileCarteItemDto> updateCartItem(@RequestBody @Valid BusinessProfileCarteItemDto request) {
+    @RequestMapping(value = "{businessProfileCartItemId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public DataResponse<BusinessProfileCarteItemDto> updateCartItem(@Valid @RequestBody BusinessProfileCarteItemDto request) {
         return new DataResponse<>(
                 businessMapper.toBusinessProfileCarteItem(
                         businessProfileCarteService.updateFromRequest(request)
@@ -69,7 +70,7 @@ public class BusinessProfileCarteController {
         );
     }
 
-    @ApiOperation(value = "Delete property", notes = "Delete existing business profile cart item.")
+    @ApiOperation(value = "Delete existing carte item", notes = "Delete existing business profile cart item.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
@@ -77,13 +78,13 @@ public class BusinessProfileCarteController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{businessProfileCartItemId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Administrator})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileCarteItemDto> deleteCartItem(@PathVariable Long businessProfileCartItemId) {
         return new DataResponse<>(businessMapper.toBusinessProfileCarteItem(businessProfileCarteService.deleteCarteItem(businessProfileCartItemId)));
     }
 
 
-    @ApiOperation(value = "Upload notification photo")
+    @ApiOperation(value = "Upload carte item photo")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 401, message = "Unauthorized"),
@@ -91,7 +92,7 @@ public class BusinessProfileCarteController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileCartItemId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileCarteItemDto> storeCartItemPhoto(@RequestParam MultipartFile[] files, @PathVariable long businessProfileCartItemId) throws IOException {
         return new DataResponse<>(
                 businessMapper.toBusinessProfileCarteItem(businessProfileCarteService.storeBusinessProfilePhotos(files, businessProfileCartItemId))

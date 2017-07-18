@@ -2,7 +2,9 @@ package com.creatix.controller.v1.community.board;
 
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.community.board.CommunityBoardCommentDto;
+import com.creatix.domain.dto.community.board.CommunityBoardCommentEditRequest;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.ApplicationFeatureType;
 import com.creatix.domain.mapper.CommunityBoardMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.community.board.CommunityBoardService;
@@ -12,6 +14,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +38,7 @@ public class CommunityBoardCommentController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "", method = RequestMethod.GET)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<List<CommunityBoardCommentDto>> listAllComments(@PathVariable("boardItemId") Long boardItemId) {
         return new DataResponse<>(
                 communityBoardService.listCommentsForBoardItem(boardItemId).stream().map(
@@ -52,11 +55,11 @@ public class CommunityBoardCommentController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "", method = RequestMethod.POST)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardCommentDto> createNew(@PathVariable("propertyId") Long propertyId, @RequestBody CommunityBoardCommentDto request) {
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
+    public DataResponse<CommunityBoardCommentDto> createNew(@PathVariable("boardItemId") Long boardItemId, @Valid @RequestBody CommunityBoardCommentEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardComment(
-                        communityBoardService.createNewCommentFromRequest(propertyId, request)
+                        communityBoardService.createNewCommentFromRequest(boardItemId, request)
                 )
         );
     }
@@ -68,8 +71,8 @@ public class CommunityBoardCommentController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "", method = RequestMethod.PUT)
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
-    public DataResponse<CommunityBoardCommentDto> updateItem(@RequestBody CommunityBoardCommentDto request) {
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
+    public DataResponse<CommunityBoardCommentDto> updateItem(@Valid @RequestBody CommunityBoardCommentEditRequest request) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardComment(
                         communityBoardService.updateCommentFromRequest(request)
@@ -84,7 +87,7 @@ public class CommunityBoardCommentController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "/{commentId}", method = RequestMethod.DELETE)
-    @RoleSecured()
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardCommentDto> deleteComment(@PathVariable("commentId") Long commentId) {
         return new DataResponse<>(
                 communityBoardMapper.toCommunityBoardComment(

@@ -1,16 +1,22 @@
 package com.creatix.service.message;
 
 import com.creatix.configuration.PushNotificationProperties;
+import com.creatix.domain.dao.DeviceDao;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.device.Device;
-import com.creatix.message.push.GenericPushNotification;
 import com.creatix.message.PushNotificationTemplateProcessor;
+import com.creatix.message.push.GenericPushNotification;
 import com.creatix.message.template.push.PushMessageTemplate;
 import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 import com.notnoop.apns.*;
+import com.notnoop.apns.internal.Utilities;
+import com.notnoop.exceptions.ApnsDeliveryErrorException;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,20 +26,64 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
 @Transactional
 public class PushNotificationService {
 
+    private final Logger logger = LoggerFactory.getLogger(PushNotificationService.class);
+
     @Autowired
     private PushNotificationProperties pushNotificationProperties;
     @Autowired
     private PushNotificationTemplateProcessor templateProcessor;
+    @Autowired
+    private DeviceDao deviceDao;
 
     private ApnsService apnsService;
     private Sender gcmSender;
+
+    private final ApnsDelegate apnsDelegate = new ApnsDelegate() {
+        @Override
+        public void messageSent(ApnsNotification message, boolean resent) {
+
+        }
+
+        @Override
+        public void messageSendFailed(ApnsNotification message, Throwable e) {
+            if (e instanceof ApnsDeliveryErrorException) {
+                ApnsDeliveryErrorException exception = (ApnsDeliveryErrorException) e;
+                logger.error(String.format("Error sending apple push message! %s", message.toString()), e);
+                switch (exception.getDeliveryError()) {
+                    case INVALID_TOKEN:
+                        deviceDao.clearInvalidToken(Utilities.encodeHex(message.getDeviceToken()));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        @Override
+        public void connectionClosed(DeliveryError e, int messageIdentifier) {
+
+        }
+
+        @Override
+        public void cacheLengthExceeded(int newCacheLength) {
+
+        }
+
+        @Override
+        public void notificationsResent(int resendCount) {
+
+        }
+    };
 
     @PostConstruct
     private void init() {
@@ -49,7 +99,7 @@ public class PushNotificationService {
         else {
             builder.withProductionDestination();
         }
-        this.apnsService = builder.build();
+        this.apnsService = builder.withDelegate(this.apnsDelegate).build();
 
         if ( this.pushNotificationProperties.getGoogleCloudMessagingKey() == null ) {
             throw new IllegalStateException("Google GCM key property is null");
@@ -133,7 +183,10 @@ public class PushNotificationService {
         }
 
         final Message message = messageBuilder.build();
-        this.gcmSender.send(message, device.getPushToken(), 1);
+        Result result = this.gcmSender.send(message, device.getPushToken(), 1);
+        if (result.getErrorCodeName() != null || (result.getFailure() != null && result.getFailure() > 0)) {
+            logger.error(result.toString());
+        }
     }
 
     private Map<String, String> attributesAsMap(Map<String, String> attributes) {

@@ -15,11 +15,11 @@ import javax.persistence.ManyToOne;
 @Data
 public class BusinessProfilePhoto extends Attachment {
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     private BusinessProfile businessProfile;
 
     public BusinessProfilePhoto() {
-        this.setAttachedEntityType(AttachedEntityType.BUSINESS_PROFILE);
+        this.attachedEntityType = AttachedEntityType.BUSINESS_PROFILE;
     }
 
     @Override

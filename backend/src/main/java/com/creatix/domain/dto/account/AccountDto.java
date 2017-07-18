@@ -24,6 +24,9 @@ public class AccountDto {
     @ApiModelProperty(value = "Role", required = true)
     private AccountRole role;
 
+    @ApiModelProperty("Indicates whether the account is activated or not")
+    private Boolean active;
+
     @ApiModelProperty(value = "First name", required = true)
     private String firstName;
 
@@ -53,5 +56,10 @@ public class AccountDto {
 
     @ApiModelProperty(value = "Associated apartment")
     private ApartmentDto apartment;
+
+    @ApiModelProperty
+    private Boolean isTacAccepted;
+    @ApiModelProperty
+    private Boolean isPrivacyPolicyAccepted;
 
 }

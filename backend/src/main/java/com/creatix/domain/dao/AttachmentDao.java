@@ -9,4 +9,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AttachmentDao extends DaoBase<Attachment, Long> {
 
+    @Override
+    public void delete(Attachment entity) {
+        super.delete(entity);
+        em.flush();
+    }
 }

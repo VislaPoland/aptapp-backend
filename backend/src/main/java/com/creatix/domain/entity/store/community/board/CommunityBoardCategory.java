@@ -19,6 +19,6 @@ public class CommunityBoardCategory {
     private Long id;
 
     @Column
-    String title;
+    String name;
 
 }

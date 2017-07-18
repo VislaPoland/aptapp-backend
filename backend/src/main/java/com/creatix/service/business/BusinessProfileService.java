@@ -3,6 +3,7 @@ package com.creatix.service.business;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.business.BusinessCategoryDao;
 import com.creatix.domain.dao.business.BusinessProfileDao;
+import com.creatix.domain.dto.business.BusinessProfileCreateRequest;
 import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.business.BusinessCategory;
@@ -20,15 +21,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Michalek on 12/04/2017.
  */
 @Service
+@Transactional
 public class BusinessProfileService {
 
     @Autowired
@@ -54,17 +59,20 @@ public class BusinessProfileService {
         return businessProfileDao.listBusinessesForProperty(property);
     }
 
-    public List<BusinessProfile> listBusinessesForPropertyAndCategory(long propertyId, long businessCategoryId) {
+    public List<BusinessProfile> listBusinessesForPropertyAndCategories(long propertyId, List<Long> businessCategoryIdList) {
         Property property = findPropertyById(propertyId);
 
         authorizationManager.checkRead(property);
 
-        BusinessCategory category = businessCategoryDao.findById(businessCategoryId);
-        if (null == category) {
-            throw new EntityNotFoundException(String.format("Category %d not found", businessCategoryId));
+        List<BusinessCategory> businessCategoryList = businessCategoryIdList
+                .parallelStream()
+                .map(id -> businessCategoryDao.findById(id))
+                .collect(Collectors.toList());
+        if (businessCategoryList.size() == 0) {
+            return Collections.emptyList();
         }
 
-        return businessProfileDao.listBusinessesForPropertyAndCategory(property, category);
+        return businessProfileDao.listBusinessesForPropertyAndCategories(property, businessCategoryList);
     }
 
     public List<BusinessProfile> searchBusinesses(long propertyId, @NotNull String name, long businessCategoryId) {
@@ -95,15 +103,20 @@ public class BusinessProfileService {
 
     @NotNull
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public BusinessProfile createBusinessProfileFromRequest(@NotNull BusinessProfileDto businessProfileDto, long propertyId) {
-        Objects.requireNonNull(businessProfileDto, "Business profile must not be null");
+    public BusinessProfile createBusinessProfileFromRequest(@NotNull BusinessProfileCreateRequest request, long propertyId) {
+        Objects.requireNonNull(request, "Business profile must not be null");
 
         Property property = findPropertyById(propertyId);
 
         if (authorizationManager.canWrite(property)) {
-            BusinessProfile businessProfile = businessMapper.toBusinessProfile(businessProfileDto);
+            BusinessProfile businessProfile = businessMapper.toBusinessProfile(request);
             businessProfile.setProperty(property);
             businessProfileDao.persist(businessProfile);
+
+            if (request.isShouldSentNotification()) {
+                this.sendNotification(businessProfile.getId());
+            }
+
             return businessProfile;
         }
 
@@ -188,6 +201,9 @@ public class BusinessProfileService {
         if (null == businessProfile) {
             throw new EntityNotFoundException(String.format("Business profile %d not found", businessProfileId));
         }
+
+        authorizationManager.checkRead(businessProfile.getProperty());
+
         return businessProfile;
     }
 
@@ -216,5 +232,30 @@ public class BusinessProfileService {
         businessProfileDao.persist(businessProfile);
 
         return businessProfile;
+    }
+
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public BusinessProfile deleteBusinessProfile(long businessProfileId) {
+        BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
+        if (authorizationManager.canWrite(businessProfile.getProperty())) {
+            attachmentService.deleteAttachmentFiles(businessProfile.getBusinessProfilePhotoList());
+            businessProfileDao.delete(businessProfile);
+            return businessProfile;
+        }
+
+        throw new SecurityException(String.format("You are not eligible to delete business profile with id=%d",
+                businessProfile.getId()));
+    }
+
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public BusinessProfilePhoto deleteBusinessProfilePhoto(long photoId) {
+        BusinessProfilePhoto attachment = (BusinessProfilePhoto) attachmentService.findById(photoId);
+
+        if (authorizationManager.canWrite(attachment.getBusinessProfile().getProperty())) {
+            return (BusinessProfilePhoto) attachmentService.deleteAttachment(attachment);
+        }
+
+        throw new SecurityException(String.format("You are not eligible to update business profile with id=%d",
+                attachment.getBusinessProfile().getId()));
     }
 }

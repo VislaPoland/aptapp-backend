@@ -23,7 +23,7 @@ public class BusinessProfileCarteItem implements AttachmentId {
     @Column(nullable = false)
     private double price;
 
-    @OneToOne(optional = true)
+    @OneToOne(optional = true, cascade = {CascadeType.ALL})
     BusinessProfileCartePhoto businessProfileCartePhoto;
 
     @ManyToOne(optional = false)

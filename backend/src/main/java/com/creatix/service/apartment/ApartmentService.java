@@ -75,6 +75,12 @@ public class ApartmentService {
     }
 
 
+    /**
+     * Note: Requires active session!
+     *
+     * @param propertyId
+     * @return
+     */
     public List<Apartment> getApartmentsByPropertyId(long propertyId) {
         final Property property = propertyDao.findById(propertyId);
         authorizationManager.checkRead(property);

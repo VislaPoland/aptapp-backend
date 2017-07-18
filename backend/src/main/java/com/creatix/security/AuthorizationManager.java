@@ -14,7 +14,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class contains all authorization checks.
@@ -216,9 +219,18 @@ public class AuthorizationManager {
             case PropertyManager:
                 return property.getManagers().contains((PropertyManager) account);
             case AssistantPropertyManager:
-                return property.getManagers().contains(((ManagedEmployee) account).getManager());
+                return property.getManagers().contains(((AssistantPropertyManager) account).getManager());
             default:
                 return false;
+        }
+    }
+
+    public boolean canRead(Property property) {
+        try {
+            this.checkRead(property);
+            return true;
+        } catch (SecurityException e) {
+            return false;
         }
     }
 
@@ -235,7 +247,7 @@ public class AuthorizationManager {
         if ( account instanceof Tenant ) {
             final Tenant tenant = (Tenant) account;
             if ( reservation.getNotification() != null ) {
-                return Objects.equals(tenant, reservation.getNotification().getTargetApartment().getTenant());
+                return Objects.equals(tenant, reservation.getNotification().getAuthor());
             }
         }
         else if ( account instanceof EmployeeBase ) {
@@ -367,6 +379,72 @@ public class AuthorizationManager {
             case Administrator:
                 // he can do anything
                 break;
+        }
+    }
+
+
+    public Set<Property> getAccountProperties(Account account) {
+        switch (account.getRole()) {
+            case Administrator:
+                return Collections.emptySet();
+            case PropertyOwner:
+                return ((PropertyOwner) account).getOwnedProperties();
+            case PropertyManager:
+                return Collections.singleton(((PropertyManager) account).getManagedProperty());
+            case AssistantPropertyManager:
+                return Collections.singleton(((AssistantPropertyManager) account).getManager().getManagedProperty());
+            case Maintenance:
+                return Collections.singleton(((MaintenanceEmployee) account).getManager().getManagedProperty());
+            case Security:
+                return Collections.singleton(((SecurityEmployee) account).getManager().getManagedProperty());
+            case Tenant:
+                return Collections.singleton(((Tenant)account).getApartment().getProperty());
+            case SubTenant:
+                return Collections.singleton(((SubTenant)account).getApartment().getProperty());
+            default:
+                return Collections.emptySet();
+        }
+    }
+
+    private Set<Property> getIntersection(Set<Property> set1, Set<Property> set2) {
+        if (set1 == null || set2 == null) {
+            return Collections.emptySet();
+        }
+        return set1.stream().filter(set2::contains).collect(Collectors.toSet());
+    }
+
+    /**
+     * Account 1 is eligible to sent message to account 2 in case:
+     * <ol>
+     *     <li>source account is administrator</li>
+     *     <li>source account is {@link AccountRole#PropertyOwner} or {@link AccountRole#PropertyManager}, or
+     *      {@link AccountRole#AssistantPropertyManager} and have at least one property in common</li>
+     *     <li>source account is either {@link AccountRole#Tenant} or {@link AccountRole#SubTenant} and destination is
+     *     either {@link AccountRole#PropertyOwner}, {@link AccountRole#PropertyManager} or
+     *      {@link AccountRole#AssistantPropertyManager}</li>
+     * </ol>
+     *
+     * @param fromAccount
+     * @param toAccount
+     * @return
+     */
+    public boolean canSendMessage(Account fromAccount, Account toAccount){
+        switch (fromAccount.getRole()) {
+            case Administrator:
+                return true;
+            case PropertyOwner:
+            case PropertyManager:
+            case AssistantPropertyManager:
+                return getIntersection(getAccountProperties(fromAccount), getAccountProperties(toAccount)).size() > 0;
+            case Tenant:
+            case SubTenant:
+                return getIntersection(getAccountProperties(fromAccount), getAccountProperties(toAccount)).size() > 0 && (
+                        toAccount.getRole() == AccountRole.PropertyOwner ||
+                                toAccount.getRole() == AccountRole.PropertyManager ||
+                                toAccount.getRole() == AccountRole.AssistantPropertyManager
+                );
+            default:
+                return false;
         }
     }
 }

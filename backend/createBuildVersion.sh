@@ -15,9 +15,9 @@ numberOfModifiedFiles=$(($untrackedNumber + $modifiedNumber))
 
 [[ -d ./build/tmp/ ]] || mkdir -p ./build/tmp/
 
-fullVersion="`git describe 2>/dev/null`"
+fullVersion="`git describe --exact-match 2>/dev/null`"
 
-if [[ "$fullVersion" =~ ^v[0-9a-z\.]+$ && ${numberOfModifiedFiles} == 0 ]]; then
+if [[ "$fullVersion" =~ ^v[0-9a-z\.\-]+$ && ${numberOfModifiedFiles} == 0 ]]; then
     version="$fullVersion-$commit_hash"
 else
     timestamp=`date +"%Y%m%dT%H%M%S"`

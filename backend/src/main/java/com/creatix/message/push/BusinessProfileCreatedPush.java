@@ -10,7 +10,7 @@ public class BusinessProfileCreatedPush extends GenericPushNotification {
     public BusinessProfileCreatedPush(long businessProfileId) {
         super();
 
-        if (this.getAttributes().containsKey(BUSINESS_PROFILE_ID_ATTRIBUTE_KEY)) {
+        if ( ! this.getAttributes().containsKey(BUSINESS_PROFILE_ID_ATTRIBUTE_KEY)) {
             getAttributes().put(
                     BUSINESS_PROFILE_ID_ATTRIBUTE_KEY,
                     String.valueOf(businessProfileId)

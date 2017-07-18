@@ -14,21 +14,22 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(indexes = {
-    @Index(columnList = "target_apartment_id")
-})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MaintenanceNotification extends Notification {
 
+    /**
+     * @deprecated Should not rely on this field, can and will be null for most of the time
+     */
     @QueryInit("tenant")
     @ManyToOne
-    @NotNull
+    @Deprecated
     private Apartment targetApartment;
+
     @Column
-    @NotNull
     private Boolean accessIfNotAtHome;
+
     @OneToMany(mappedBy = "notification")
     private List<MaintenanceReservation> reservations;
 

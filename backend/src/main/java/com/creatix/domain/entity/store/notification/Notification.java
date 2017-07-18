@@ -4,8 +4,11 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
@@ -17,13 +20,15 @@ import java.util.List;
 
 @Entity
 @Table(indexes = {
+        @Index(columnList = "author_id"),
+        @Index(columnList = "recipient_id"),
         @Index(columnList = "property_id")
 })
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "id")
-public class Notification {
+public abstract class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
@@ -46,7 +51,7 @@ public class Notification {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
-    private NotificationType type;
+    protected NotificationType type;
 
     @ManyToOne(optional = false)
     @JoinColumn
@@ -66,7 +71,13 @@ public class Notification {
     @OneToMany(mappedBy = "notification")
     private List<NotificationPhoto> photos = new ArrayList<>(1);
 
-    @ManyToOne(optional = false)
-    @NotNull
+    @Column
+    public String groupId;
+
+    @ManyToOne
+    @JoinColumn
+    private Account recipient;
+
+    @ManyToOne(optional = true)
     private Property property;
 }

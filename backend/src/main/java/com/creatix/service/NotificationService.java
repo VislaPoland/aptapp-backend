@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -75,7 +76,7 @@ public class NotificationService {
     public PageableDataResponse<List<Notification>> filterNotifications(
             @NotNull NotificationRequestType requestType,
             @Nullable NotificationStatus notificationStatus,
-            @Nullable NotificationType notificationType,
+            @Nullable List<NotificationType> notificationType,
             @Nullable Long startId,
             int pageSize) {
         Objects.requireNonNull(requestType, "Request type is null");
@@ -145,8 +146,7 @@ public class NotificationService {
         return notification;
     }
 
-    public MaintenanceNotification saveMaintenanceNotification(@NotNull String targetUnitNumber, @NotNull MaintenanceNotification notification, @NotNull Long slotUnitId) throws IOException, TemplateException {
-        Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
+    public MaintenanceNotification saveMaintenanceNotification(@Deprecated String targetUnitNumber, @NotNull MaintenanceNotification notification, @NotNull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(slotUnitId, "slot unit id is null");
 
@@ -154,7 +154,9 @@ public class NotificationService {
         notification.setAuthor(authorizationManager.getCurrentAccount());
         notification.setProperty(authorizationManager.getCurrentProperty());
         notification.setStatus(NotificationStatus.Pending);
-        notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
+        if (null != targetUnitNumber) {
+            notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
+        }
         maintenanceNotificationDao.persist(notification);
 
         maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
@@ -174,15 +176,17 @@ public class NotificationService {
         final Property property = targetApartment.getProperty();
         authorizationManager.checkRead(property);
 
-        notification.setType(NotificationType.Neighborhood);
-        notification.setAuthor(authorizationManager.getCurrentAccount());
-        notification.setProperty(property);
-        notification.setStatus(NotificationStatus.Pending);
-        notification.setTargetApartment(targetApartment);
-        neighborhoodNotificationDao.persist(notification);
-
         final Tenant tenant = targetApartment.getTenant();
         if ( tenant != null ) {
+
+            notification.setType(NotificationType.Neighborhood);
+            notification.setAuthor(authorizationManager.getCurrentAccount());
+            notification.setProperty(property);
+            notification.setStatus(NotificationStatus.Pending);
+            notification.setRecipient(targetApartment.getTenant());
+            notification.setTargetApartment(targetApartment);
+            neighborhoodNotificationDao.persist(notification);
+
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
             }
@@ -198,7 +202,7 @@ public class NotificationService {
         final NeighborhoodNotification notification = getOrElseThrow(notificationId, neighborhoodNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
 
-        final Tenant tenant = notification.getTargetApartment().getTenant();
+        final Tenant tenant = notification.getRecipientAsTenant();
         if ( tenant != null ) {
             if ( authorizationManager.isSelf(tenant) ) {
                 notification.setStatus(NotificationStatus.Resolved);
@@ -256,14 +260,14 @@ public class NotificationService {
         throw new SecurityException("You are not eligible to respond to security notifications from another property");
     }
 
-    @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant})
+    @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceNotification respondToMaintenanceNotification(@NotNull Long notificationId, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
 
         if ( authorizationManager.hasAnyOfRoles(AccountRole.Maintenance) ) {
             return maintenanceReservationService.employeeRespondToMaintenanceNotification(notification, response);
         }
-        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant) ) {
+        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager) ) {
             return maintenanceReservationService.tenantRespondToMaintenanceReschedule(notification, response);
         }
         else {

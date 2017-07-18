@@ -11,6 +11,7 @@ import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,10 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Repository
 @Transactional
@@ -26,10 +31,11 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
     @Autowired
     private AuthorizationManager authorizationManager;
 
+
     public List<Notification> findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
             @NotNull NotificationRequestType requestType,
             @Nullable NotificationStatus notificationStatus,
-            @Nullable NotificationType notificationType,
+            @Nullable List<NotificationType> notificationTypeList,
             @Nullable Long startId,
             @NotNull Account account,
             int pageSize) {
@@ -54,17 +60,50 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         }
         else if ( requestType == NotificationRequestType.Received ) {
 
-            if ( account instanceof Tenant ) {
-                // tenant is recipient
-                predicate = predicate.and(qNotification.as(QNeighborhoodNotification.class).targetApartment.tenant.id.eq(account.getId())).and(qNotification.instanceOf(NeighborhoodNotification.class));
-            }
-            if ( account instanceof MaintenanceEmployee ) {
-                // maintenance is recipient
-                predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class));
-            }
-            else if ( account instanceof SecurityEmployee ) {
-                // security is recipient
-                predicate = predicate.and(qNotification.instanceOf(SecurityNotification.class));
+            switch (account.getRole()) {
+                case Tenant:
+                case SubTenant:
+                    predicate = predicate.and(
+                            qNotification.instanceOfAny(
+                                    BusinessProfileNotification.class,
+                                    DiscountCouponNotification.class
+                            ).and(
+                                    qNotification.property.eq(
+                                            authorizationManager.getCurrentProperty(account)
+                                    )
+                            )
+                    ).or(
+                            qNotification.recipient.eq(account)
+                    );
+                    break;
+                case PropertyManager:
+                case AssistantPropertyManager:
+                    predicate = predicate.and(
+                            qNotification.property.eq(
+                                    authorizationManager.getCurrentProperty(account)
+                            ).or(
+                                    qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                            )
+                    );
+                    break;
+                case Maintenance:
+                    predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class)).and(
+                            qNotification.property.eq(
+                                    authorizationManager.getCurrentProperty(account)
+                            ).or(
+                                    qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                            )
+                    );
+                    break;
+                case Security:
+                    predicate = predicate.and(qNotification.instanceOf(SecurityNotification.class)).and(
+                            qNotification.property.eq(
+                                    authorizationManager.getCurrentProperty(account)
+                            ).or(
+                                    qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                            )
+                    );
+                    break;
             }
         }
 
@@ -74,17 +113,39 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         }
 
 
-        if ( notificationType == NotificationType.Maintenance ) {
-            predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class));
+        if (null != notificationTypeList) {
+            Optional<BooleanExpression> reduce = notificationTypeList
+                .stream()
+                .map(
+                    nt -> {
+                        switch (nt) {
+                            case BusinessProfile:
+                                return BusinessProfileNotification.class;
+                            case Comment:
+                                return CommentNotification.class;
+                            case CommunityBoardItemUpdatedSubscriber:
+                                return CommunityBoardItemUpdatedSubscriberNotification.class;
+                            case DiscountCoupon:
+                                return DiscountCouponNotification.class;
+                            case Maintenance:
+                                return MaintenanceNotification.class;
+                            case Neighborhood:
+                                return NeighborhoodNotification.class;
+                            case PersonalMessage:
+                                return PersonalMessageNotification.class;
+                            case Security:
+                                return SecurityNotification.class;
+                            default:
+                                return null;
+                        }
+                    }
+                )
+                .map(qNotification::instanceOf)
+                .reduce(BooleanExpression::or);
+            if (reduce.isPresent()) {
+                predicate = predicate.and(reduce.get());
+            }
         }
-        else if ( notificationType == NotificationType.Security ) {
-            predicate = predicate.and(qNotification.instanceOf(SecurityNotification.class));
-        }
-        else if ( notificationType == NotificationType.Neighborhood ) {
-            predicate = predicate.and(qNotification.instanceOf(NeighborhoodNotification.class));
-        }
-
-        predicate = predicate.and(qNotification.property.eq(authorizationManager.getCurrentProperty(account)));
 
         return queryFactory.selectFrom(qNotification)
                 .where(predicate)

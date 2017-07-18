@@ -130,4 +130,10 @@ public class AccountDao extends DaoBase<Account, Long> {
 
         super.persist(account);
     }
+
+    @Override
+    public void delete(Account entity) {
+        super.delete(entity);
+        this.em.flush();
+    }
 }

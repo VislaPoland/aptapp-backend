@@ -67,7 +67,7 @@ public class EventController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<EventSlotDto> createEventSlot(@PathVariable Long propertyId, @RequestBody @Valid PersistEventSlotRequest request) throws IOException, TemplateException {
+    public DataResponse<EventSlotDto> createEventSlot(@PathVariable Long propertyId, @Valid @RequestBody PersistEventSlotRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toEventSlotDto(slotService.createEventSlot(propertyId, request)));
     }
 
