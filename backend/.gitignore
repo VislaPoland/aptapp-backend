@@ -1,5 +1,6 @@
 .idea
 *.iml
+*.directory
 out
 /build
 /classes

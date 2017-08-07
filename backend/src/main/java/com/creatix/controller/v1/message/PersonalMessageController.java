@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,10 +86,10 @@ public class PersonalMessageController {
         List<PersonalMessage> personalMessageList = null;
         switch (request.getPersonalMessageRequestType()) {
             case TO_TENANT:
-                personalMessageList = Collections.singletonList(personalMessageService.sendMessageToTenant(request.getRecipientId(), request.getTitle(), request.getContent()));
+                personalMessageList = personalMessageService.sendMessageToTenant(request.getRecipients(), request.getTitle(), request.getContent());
                 break;
             case TO_PROPERTY_MANAGER:
-                personalMessageList = personalMessageService.sendMessageToPropertyManagers(request.getRecipientId(), request.getTitle(), request.getContent());
+                personalMessageList = personalMessageService.sendMessageToPropertyManagers(request.getPropertyId(), request.getTitle(), request.getContent());
                 break;
         }
 

@@ -383,7 +383,7 @@ public class AuthorizationManager {
     }
 
 
-    public Set<Property> getAccountProperties(Account account) {
+    public @NotNull Set<Property> getAccountProperties(Account account) {
         switch (account.getRole()) {
             case Administrator:
                 return Collections.emptySet();
@@ -446,5 +446,9 @@ public class AuthorizationManager {
             default:
                 return false;
         }
+    }
+
+    public boolean canSendMessageTo(Account toAccount){
+        return canSendMessage(getCurrentAccount(), toAccount);
     }
 }

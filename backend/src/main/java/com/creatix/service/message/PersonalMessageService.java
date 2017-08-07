@@ -10,7 +10,6 @@ import com.creatix.domain.entity.store.notification.PersonalMessage;
 import com.creatix.domain.entity.store.notification.PersonalMessageNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
-import com.creatix.domain.enums.NotificationType;
 import com.creatix.domain.enums.message.PersonalMessageDeleteStatus;
 import com.creatix.domain.enums.message.PersonalMessageStatusType;
 import com.creatix.message.MessageDeliveryException;
@@ -18,12 +17,13 @@ import com.creatix.message.PushNotificationTemplateProcessor;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.push.GenericPushNotification;
 import com.creatix.message.template.push.NewPersonalMessageTemplate;
-import com.creatix.message.template.sms.SmsMessageTemplate;
 import com.creatix.message.template.sms.TenantPersonalMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import freemarker.template.TemplateException;
-import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +31,9 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -44,6 +44,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PersonalMessageService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PersonalMessageService.class);
 
     @Autowired
     private PersonalMessageDao personalMessageDao;
@@ -70,24 +72,26 @@ public class PersonalMessageService {
             throw new EntityNotFoundException(String.format("Entity with id %d not found", propertyId));
         }
 
+
         //throws exception in case of security violation
         authorizationManager.checkRead(property);
 
         return property.getManagers().parallelStream().map(
-                propertyManager -> {
+                recipientAccount -> {
                     Account currentAccount = authorizationManager.getCurrentAccount();
                     PersonalMessage personalMessage = new PersonalMessage();
                     personalMessage.setFromAccount(currentAccount);
-                    personalMessage.setToAccount(propertyManager);
+                    personalMessage.setToAccount(recipientAccount);
                     personalMessage.setTitle(title);
                     personalMessage.setContent(content);
                     personalMessage.setMessageStatus(PersonalMessageStatusType.PENDING);
                     personalMessageDao.persist(personalMessage);
 
                     try {
-                        dispatchPersonalMessage(personalMessage, property);
-                    } catch (IOException | TemplateException e) {
-                        //TODO: log error
+                        dispatchPersonalMessage(personalMessage);
+                    }
+                    catch ( IOException | TemplateException e ) {
+                        logger.error(String.format("Failed to dispatch message to account %d", recipientAccount.getId()), e);
                     }
 
                     return personalMessage;
@@ -95,51 +99,62 @@ public class PersonalMessageService {
         ).collect(Collectors.toList());
     }
 
-    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public PersonalMessage sendMessageToTenant(long tenantAccountId, @NotNull final String title, @NotNull final String content) {
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
+    public List<PersonalMessage> sendMessageToTenant(List<Long> tenantAccountIdList, @NotNull final String title, @NotNull final String content) {
         Objects.requireNonNull(title, "Title can not be null");
         Objects.requireNonNull(content, "Content can not be null");
 
-        Account recipientAccount = accountDao.findById(tenantAccountId);
-        if (null == recipientAccount) {
-            throw new EntityNotFoundException(String.format("Tenant with id %d not found", tenantAccountId));
-        }
+        final List<PersonalMessage> messages = new ArrayList<>(tenantAccountIdList.size());
 
-        Account currentAccount = authorizationManager.getCurrentAccount();
-        if (authorizationManager.canSendMessage(currentAccount, recipientAccount)) {
-            PersonalMessage personalMessage = new PersonalMessage();
-            personalMessage.setFromAccount(currentAccount);
-            personalMessage.setToAccount(recipientAccount);
-            personalMessage.setTitle(title);
-            personalMessage.setContent(content);
-            personalMessage.setMessageStatus(PersonalMessageStatusType.PENDING);
-            personalMessageDao.persist(personalMessage);
+        for ( Long tenantAccountId : tenantAccountIdList ) {
 
-            try {
-                Set<Property> accountProperties = authorizationManager.getAccountProperties(recipientAccount);
-                if (null != accountProperties && accountProperties.size() == 1) {
-                    dispatchPersonalMessage(personalMessage, accountProperties.iterator().next());
-                } else {
-                    //TODO: log error
+            final Account recipientAccount = accountDao.findById(tenantAccountId);
+            if ( null == recipientAccount ) {
+                throw new EntityNotFoundException(String.format("Tenant with id %d not found", tenantAccountId));
+            }
+            if ( (recipientAccount.getRole() != AccountRole.Tenant) && (recipientAccount.getRole() != AccountRole.SubTenant) ) {
+                throw new SecurityException(String.format("Recipient %d must be tenant or sub-tenant", recipientAccount.getId()));
+            }
+
+            if ( authorizationManager.canSendMessageTo(recipientAccount) ) {
+                final PersonalMessage personalMessage = new PersonalMessage();
+                personalMessage.setFromAccount(authorizationManager.getCurrentAccount());
+                personalMessage.setToAccount(recipientAccount);
+                personalMessage.setTitle(title);
+                personalMessage.setContent(content);
+                personalMessage.setMessageStatus(PersonalMessageStatusType.PENDING);
+                personalMessageDao.persist(personalMessage);
+
+                try {
+                    dispatchPersonalMessage(personalMessage);
                 }
-            } catch (IOException | TemplateException e) {
-                //TODO: log error
-            }
+                catch ( IOException | TemplateException e ) {
+                    logger.error(String.format("Failed to dispatch message to account %d", recipientAccount.getId()), e);
+                }
 
-            try {
-                smsMessageSender.send(new TenantPersonalMessageTemplate(recipientAccount.getPrimaryPhone(), personalMessage));
-            } catch (IOException | TemplateException | MessageDeliveryException e) {
-                //TODO: log error
-            }
+                if ( StringUtils.isNotBlank(recipientAccount.getPrimaryPhone()) ) {
+                    try {
+                        smsMessageSender.send(new TenantPersonalMessageTemplate(recipientAccount.getPrimaryPhone(), personalMessage));
+                    }
+                    catch ( IOException | TemplateException | MessageDeliveryException e ) {
+                        logger.error(String.format("Failed to send sms for account %d to phone number %s", recipientAccount.getId(), recipientAccount.getPrimaryPhone()), e);
+                    }
+                }
 
-            return personalMessage;
+                messages.add(personalMessage);
+            }
+            else {
+                throw new SecurityException(String.format("You are not allowed to sent message to user %d", tenantAccountId));
+            }
         }
 
-        throw new SecurityException(String.format("You are not allowed to sent message to user %d", tenantAccountId));
+        return messages;
     }
 
-    public void dispatchPersonalMessage(@NotNull PersonalMessage personalMessage, @NotNull Property property) throws IOException, TemplateException {
+    private void dispatchPersonalMessage(@NotNull PersonalMessage personalMessage) throws IOException, TemplateException {
         Objects.requireNonNull(personalMessage, "Personal message can not be null!");
+        Objects.requireNonNull(personalMessage.getToAccount(), "Recipient is missing");
+        Objects.requireNonNull(personalMessage.getFromAccount(), "Sender is missing");
         if (personalMessage.getMessageStatus() != PersonalMessageStatusType.PENDING) {
             throw new IllegalArgumentException("Message is in invalid state " + personalMessage.getMessageStatus());
         }
@@ -148,7 +163,7 @@ public class PersonalMessageService {
         notification.setMessage(templateProcessor.processTemplate(new NewPersonalMessageTemplate(personalMessage)));
         notification.setTitle("New personal message");
 
-        PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
+        final PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
         personalMessageNotification.setPersonalMessage(personalMessage);
         personalMessageNotification.setAuthor(personalMessage.getFromAccount());
         personalMessageNotification.setRecipient(personalMessage.getToAccount());

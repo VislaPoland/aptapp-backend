@@ -28,7 +28,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 idea {
-//    1. Go to Preferences -> Build, Execution, Deployment -> Annotation Processors;
+//    1. Go to Settings -> Build, Execution, Deployment -> Compiler -> Annotation Processors;
 //    2. Check Enable annotation processing checkbox;
 //    3. In "Store generated sources relative to:" select Module content root.
 	module {
