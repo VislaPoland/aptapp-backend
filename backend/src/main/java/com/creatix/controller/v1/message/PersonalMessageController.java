@@ -79,7 +79,7 @@ public class PersonalMessageController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<PersonalMessageDto>> createNewPersonalMessage(@Valid @RequestBody CreatePersonalMessageRequest request) {
 

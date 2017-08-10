@@ -64,7 +64,8 @@ public class PersonalMessageService {
     @Autowired
     private SmsMessageSender smsMessageSender;
 
-    public List<PersonalMessage> sendMessageToPropertyManagers(long propertyId, @NotNull final String title, @NotNull final String content) {
+    public List<PersonalMessage> sendMessageToPropertyManagers(@NotNull Long propertyId, @NotNull final String title, @NotNull final String content) {
+        Objects.requireNonNull(propertyId, "Property id can not be null");
         Objects.requireNonNull(title, "Title can not be null");
         Objects.requireNonNull(content, "Content can not be null");
         final Property property = propertyDao.findById(propertyId);
@@ -100,7 +101,8 @@ public class PersonalMessageService {
     }
 
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
-    public List<PersonalMessage> sendMessageToTenant(List<Long> tenantAccountIdList, @NotNull final String title, @NotNull final String content) {
+    public List<PersonalMessage> sendMessageToTenant(@NotNull List<Long> tenantAccountIdList, @NotNull final String title, @NotNull final String content) {
+        Objects.requireNonNull(title, "Tenant account id list can not be null");
         Objects.requireNonNull(title, "Title can not be null");
         Objects.requireNonNull(content, "Content can not be null");
 
