@@ -1,6 +1,5 @@
 package com.creatix.configuration.versioning;
 
-import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.AbstractRequestCondition;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
@@ -36,21 +35,7 @@ public class VersionRequestMapper extends RequestMappingHandlerMapping {
         }
 
         private double getVersionNumberFromRequest(HttpServletRequest request) {
-            String requestURI = request.getRequestURI();
-            if (! requestURI.matches("/api/v?[0-9_.]+.*") ) {
-                return -1.0;
-            }
-            String[] split = requestURI.split("/");
-            if (split.length > 1) {
-                String versionNumber = split[2];
-                try {
-                    return Double.valueOf(versionNumber.replace("_", ".").replace("v", ""));
-                } catch (NumberFormatException e) {
-                    System.err.println(requestURI);
-                    e.printStackTrace();
-                }
-            }
-            return 0.0;
+            return VersionDetector.detect(request.getRequestURI());
         }
 
         @Override
@@ -69,7 +54,7 @@ public class VersionRequestMapper extends RequestMappingHandlerMapping {
         @Override
         public ApiVersionTypeCondition getMatchingCondition(HttpServletRequest request) {
             double requestVersionNumber = getVersionNumberFromRequest(request);
-            return  requestVersionNumber == -1.0 ||
+            return  requestVersionNumber == VersionDetector.NO_VERSIONING ||
                     (requestVersionNumber >= this.minVersion && (this.maxVersion < this.minVersion || requestVersionNumber <= this.maxVersion)) ?
                     this :
                     null;
