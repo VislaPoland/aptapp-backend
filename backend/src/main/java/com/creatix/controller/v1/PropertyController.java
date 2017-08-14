@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 @RestController
 @Transactional
 @RequestMapping(path = {"/api/properties", "/api/v1/properties"})
-@ApiVersion(minVersion = 1.0)
+@ApiVersion(1.0)
 public class PropertyController {
     @Autowired
     private Mapper mapper;
@@ -201,8 +201,8 @@ public class PropertyController {
     @ApiOperation(value = "Get application features configuration for property")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 403, message = "Forbidden")
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{propertyId}/features", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
