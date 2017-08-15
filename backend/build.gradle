@@ -13,7 +13,7 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath('org.springframework.build.gradle:propdeps-plugin:0.0.9')
+		classpath('io.spring.gradle:propdeps-plugin:0.0.9.RELEASE')
 	}
 }
 apply plugin: 'propdeps'
@@ -22,7 +22,7 @@ apply plugin: 'propdeps-idea'
 apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'idea'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -39,9 +39,7 @@ idea {
 
 repositories {
 	mavenCentral()
-	maven { url "https://repo.spring.io/snapshot" }
-	maven { url "https://repo.spring.io/milestone" }
-    maven { url 'https://repo.spring.io/libs-milestone' }
+	maven { url 'http://repo.spring.io/plugins-release' }
 }
 
 task createBuildVersionFile(type:Exec) {
@@ -83,21 +81,21 @@ dependencies {
 
 	// other
 	compile('org.hibernate:hibernate-validator:5.2.4.Final')
-	compile('org.projectlombok:lombok:1.16.10')
-	compile('io.jsonwebtoken:jjwt:0.6.0')
-	compile('com.bedatadriven:jackson-datatype-jts:2.2')
-	compile('org.apache.commons:commons-lang3:3.4')
+	compile('org.projectlombok:lombok:1.16.18')
+	compile('io.jsonwebtoken:jjwt:0.7.0')
+	compile('com.bedatadriven:jackson-datatype-jts:2.4')
+	compile('org.apache.commons:commons-lang3:3.6')
 	compile('io.springfox:springfox-swagger2:2.7.0')
 	compile('commons-io:commons-io:2.5')
 	compile('ma.glasnost.orika:orika-core:1.5.1')
 	compile('org.freemarker:freemarker:2.3.23')
 	compile('com.twilio.sdk:twilio-java-sdk:7.0.0-rc-10')
 	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0')
-    compile('com.googlecode.json-simple:json-simple:1.1')
-	compile group: 'com.google.zxing', name: 'core', version: '3.3.0'
+    compile('com.googlecode.json-simple:json-simple:1.1.1')
+	compile('com.google.zxing:core:3.3.0')
 
 	//	APNS
-	compile('com.notnoop.apns:apns:1.0.0.Beta3')
+	compile('com.notnoop.apns:apns:1.0.0.Beta6')
 
 	runtime('io.springfox:springfox-swagger-ui:2.7.0')
 	runtime('org.postgresql:postgresql:42.1.4')
