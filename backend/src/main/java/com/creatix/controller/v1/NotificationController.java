@@ -104,7 +104,8 @@ public class NotificationController {
                     }
             ).filter(Objects::nonNull).collect(Collectors.toList());
         }
-        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationTypeList, startId, pageSize), n -> mapper.toNotificationDto(n, this.getMappingClass(n.getClass())));
+        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationTypeList, startId, pageSize),
+                n -> mapper.toNotificationDto(n, this.getMappingClass(n.getClass())));
     }
 
     @ApiOperation(value = "Get single maintenance notification")

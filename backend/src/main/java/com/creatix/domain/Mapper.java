@@ -16,6 +16,7 @@ import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotifica
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
 import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationDto;
+import com.creatix.domain.dto.notification.personal.PersonalMessageNotificationDto;
 import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.*;
@@ -265,6 +266,9 @@ public class Mapper {
                 .byDefault()
                 .register();
         mapperFactory.classMap(NeighborhoodNotification.class, NeighborhoodNotificationDto.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(PersonalMessageNotification.class, PersonalMessageNotificationDto.class)
                 .byDefault()
                 .register();
 
