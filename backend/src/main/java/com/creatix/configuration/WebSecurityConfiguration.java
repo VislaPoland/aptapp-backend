@@ -6,10 +6,8 @@ import com.creatix.security.EntryPointUnauthorizedHandler;
 import com.creatix.security.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -24,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.Filter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -93,8 +90,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/verify-code").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v*/auth/verify-code").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/auth/attempt").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v*/auth/attempt").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/attempt", "/api/auth/logout").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v*/auth/attempt", "/api/v*/auth/logout").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/account/request-reset/password").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v*/account/request-reset/password").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/account/reset/password").permitAll()

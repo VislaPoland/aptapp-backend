@@ -10,10 +10,10 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
-import com.creatix.service.message.EmailMessageService;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.template.email.*;
 import com.creatix.security.*;
+import com.creatix.service.message.EmailMessageService;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
@@ -558,7 +558,6 @@ public class AccountService {
         emailMessageService.send(new ResetPasswordMessageTemplate(account, applicationProperties));
     }
 
-    @RoleSecured
     public void logout() {
         Object deviceObject = httpSession.getAttribute(this.deviceProperties.getSessionKeyDevice());
         if ( deviceObject instanceof Device ) {

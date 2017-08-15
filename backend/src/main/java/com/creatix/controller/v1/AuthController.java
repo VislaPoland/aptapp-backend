@@ -3,7 +3,6 @@ package com.creatix.controller.v1;
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.*;
 import com.creatix.domain.entity.store.account.Account;
-import com.creatix.security.RoleSecured;
 import com.creatix.service.AccountService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
@@ -60,7 +59,6 @@ public class AuthController {
             @ApiResponse(code = 401, message = "Unauthorized")
     })
     @JsonView(Views.Public.class)
-    @RoleSecured
     @RequestMapping(value = "/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<Void> logout() {
         accountService.logout();
