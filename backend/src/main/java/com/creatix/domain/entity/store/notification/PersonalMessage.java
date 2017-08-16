@@ -4,6 +4,7 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.message.PersonalMessageDeleteStatus;
 import com.creatix.domain.enums.message.PersonalMessageStatusType;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -39,5 +40,16 @@ public class PersonalMessage {
     @NotNull
     @Enumerated(EnumType.STRING)
     private PersonalMessageDeleteStatus deleteStatus = PersonalMessageDeleteStatus.NONE;
+
+
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    public PersonalMessageGroup personalMessageGroup;
+
+    @PrePersist
+    @PreUpdate
+    private void beforeCreateOrUpdate() {
+        this.title = StringUtils.trimToEmpty(this.title);
+        this.content = StringUtils.trimToEmpty(this.content);
+    }
 
 }

@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * Created by Tomas Michalek on 26/05/2017.
@@ -26,6 +27,9 @@ public class PersonalMessageDto {
 
     @ApiModelProperty
     private PersonalMessageAccountDto toAccount;
+
+    @ApiModelProperty(name = "recipients", notes = "For group messages this property stores all message recipients")
+    private List<PersonalMessageAccountDto> recipients;
 
     @NotEmpty
     @Size(max = 255)

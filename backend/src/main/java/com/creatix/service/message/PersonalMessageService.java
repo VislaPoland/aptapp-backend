@@ -1,12 +1,10 @@
 package com.creatix.service.message;
 
-import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.dao.NotificationDao;
-import com.creatix.domain.dao.PersonalMessageDao;
-import com.creatix.domain.dao.PropertyDao;
+import com.creatix.domain.dao.*;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.notification.PersonalMessage;
+import com.creatix.domain.entity.store.notification.PersonalMessageGroup;
 import com.creatix.domain.entity.store.notification.PersonalMessageNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
@@ -63,6 +61,8 @@ public class PersonalMessageService {
     private NotificationDao notificationDao;
     @Autowired
     private SmsMessageSender smsMessageSender;
+    @Autowired
+    private PersonalMessageGroupDao personalMessageGroupDao;
 
     public List<PersonalMessage> sendMessageToPropertyManagers(@NotNull Long propertyId, @NotNull final String title, @NotNull final String content) {
         Objects.requireNonNull(propertyId, "Property id can not be null");
@@ -77,6 +77,9 @@ public class PersonalMessageService {
         //throws exception in case of security violation
         authorizationManager.checkRead(property);
 
+        final PersonalMessageGroup personalMessageGroup = new PersonalMessageGroup();
+        personalMessageGroupDao.persist(personalMessageGroup);
+
         return property.getManagers().parallelStream().map(
                 recipientAccount -> {
                     Account currentAccount = authorizationManager.getCurrentAccount();
@@ -86,6 +89,7 @@ public class PersonalMessageService {
                     personalMessage.setTitle(title);
                     personalMessage.setContent(content);
                     personalMessage.setMessageStatus(PersonalMessageStatusType.PENDING);
+                    personalMessage.setPersonalMessageGroup(personalMessageGroup);
                     personalMessageDao.persist(personalMessage);
 
                     try {
@@ -106,8 +110,10 @@ public class PersonalMessageService {
         Objects.requireNonNull(title, "Title can not be null");
         Objects.requireNonNull(content, "Content can not be null");
 
-        final List<PersonalMessage> messages = new ArrayList<>(tenantAccountIdList.size());
+        final PersonalMessageGroup personalMessageGroup = new PersonalMessageGroup();
+        personalMessageGroupDao.persist(personalMessageGroup);
 
+        final List<PersonalMessage> messages = new ArrayList<>(tenantAccountIdList.size());
         for ( Long tenantAccountId : tenantAccountIdList ) {
 
             final Account recipientAccount = accountDao.findById(tenantAccountId);
@@ -125,6 +131,7 @@ public class PersonalMessageService {
                 personalMessage.setTitle(title);
                 personalMessage.setContent(content);
                 personalMessage.setMessageStatus(PersonalMessageStatusType.PENDING);
+                personalMessage.setPersonalMessageGroup(personalMessageGroup);
                 personalMessageDao.persist(personalMessage);
 
                 try {

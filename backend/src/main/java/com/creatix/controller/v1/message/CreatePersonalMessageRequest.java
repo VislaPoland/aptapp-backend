@@ -25,7 +25,6 @@ public class CreatePersonalMessageRequest {
     @ApiParam(name = "property id", value = "Property id of the recipient")
     private Long propertyId;
 
-    @NotEmpty
     @Size(max = 255)
     private String title;
 

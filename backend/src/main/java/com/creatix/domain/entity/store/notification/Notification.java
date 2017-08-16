@@ -4,11 +4,8 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
@@ -70,9 +67,6 @@ public abstract class Notification {
 
     @OneToMany(mappedBy = "notification")
     private List<NotificationPhoto> photos = new ArrayList<>(1);
-
-    @Column
-    public String groupId;
 
     @ManyToOne
     @JoinColumn
