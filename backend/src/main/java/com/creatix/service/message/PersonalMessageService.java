@@ -89,7 +89,7 @@ public class PersonalMessageService {
                     personalMessage.setTitle(title);
                     personalMessage.setContent(content);
                     personalMessage.setMessageStatus(PersonalMessageStatusType.PENDING);
-                    personalMessage.setPersonalMessageGroup(personalMessageGroup);
+                    personalMessageGroup.addMessage(personalMessage);
                     personalMessageDao.persist(personalMessage);
 
                     try {
@@ -130,7 +130,7 @@ public class PersonalMessageService {
                 personalMessage.setTitle(title);
                 personalMessage.setContent(content);
                 personalMessage.setMessageStatus(PersonalMessageStatusType.PENDING);
-                personalMessage.setPersonalMessageGroup(personalMessageGroup);
+                personalMessageGroup.addMessage(personalMessage);
                 personalMessageDao.persist(personalMessage);
 
                 try {

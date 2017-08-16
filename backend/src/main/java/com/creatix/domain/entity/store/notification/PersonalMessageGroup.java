@@ -5,8 +5,11 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @BatchSize(size = 40)
@@ -20,7 +23,14 @@ public class PersonalMessageGroup {
     private Long id;
 
     @OneToMany(mappedBy = "personalMessageGroup")
-    private List<PersonalMessage> messages;
+    private List<PersonalMessage> messages = new ArrayList<>(0);
+
+    public void addMessage(@NotNull PersonalMessage message) {
+        Objects.requireNonNull(message, "message");
+
+        message.setPersonalMessageGroup(this);
+        messages.add(message);
+    }
 
     @Column(nullable = false)
     private OffsetDateTime createdAt;
