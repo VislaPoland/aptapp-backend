@@ -27,8 +27,10 @@ public class PersonalMessageMapper extends ConfigurableMapper {
                 .customize(new CustomMapper<PersonalMessage, PersonalMessageDto>() {
                     @Override
                     public void mapAtoB(PersonalMessage a, PersonalMessageDto b, MappingContext context) {
-                        if ( a.getPersonalMessageGroup() != null ) {
-                            b.setRecipients(factory.getMapperFacade().mapAsList(a.getPersonalMessageGroup().getMessages().stream().map(PersonalMessage::getToAccount).collect(Collectors.toList()), PersonalMessageAccountDto.class));
+                        if ( (a.getPersonalMessageGroup() != null) && (a.getPersonalMessageGroup().getMessages() != null) ) {
+                            b.setRecipients(factory.getMapperFacade().mapAsList(a.getPersonalMessageGroup().getMessages().stream()
+                                    .filter(pm -> pm.getToAccount() != null)
+                                    .map(PersonalMessage::getToAccount).collect(Collectors.toList()), PersonalMessageAccountDto.class));
                         }
                     }
                 })
