@@ -106,8 +106,7 @@ public class PersonalMessageService {
 
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
     public List<PersonalMessage> sendMessageToTenant(@NotNull List<Long> tenantAccountIdList, @NotNull final String title, @NotNull final String content) {
-        Objects.requireNonNull(title, "Tenant account id list can not be null");
-        Objects.requireNonNull(title, "Title can not be null");
+        Objects.requireNonNull(tenantAccountIdList, "Tenant account id list can not be null");
         Objects.requireNonNull(content, "Content can not be null");
 
         final PersonalMessageGroup personalMessageGroup = new PersonalMessageGroup();
