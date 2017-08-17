@@ -2,17 +2,37 @@ package com.creatix.service;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.SlotUtils;
-import com.creatix.domain.dao.*;
-import com.creatix.domain.dto.property.slot.*;
-import com.creatix.domain.entity.store.*;
+import com.creatix.domain.dao.DaoBase;
+import com.creatix.domain.dao.EventInviteDao;
+import com.creatix.domain.dao.EventSlotDao;
+import com.creatix.domain.dao.MaintenanceSlotDao;
+import com.creatix.domain.dao.MaintenanceSlotScheduleDao;
+import com.creatix.domain.dao.PropertyDao;
+import com.creatix.domain.dao.SlotDao;
+import com.creatix.domain.dao.SlotUnitDao;
+import com.creatix.domain.dto.account.AccountDto;
+import com.creatix.domain.dto.property.slot.EventSlotDetailDto;
+import com.creatix.domain.dto.property.slot.MaintenanceSlotDto;
+import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
+import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
+import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
+import com.creatix.domain.dto.property.slot.SlotDto;
+import com.creatix.domain.entity.store.EventInvite;
+import com.creatix.domain.entity.store.EventSlot;
+import com.creatix.domain.entity.store.MaintenanceSlot;
+import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
+import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.Slot;
+import com.creatix.domain.entity.store.SlotUnit;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.AudienceType;
+import com.creatix.domain.enums.EventInviteResponse;
 import com.creatix.domain.enums.ReservationStatus;
-import com.creatix.service.message.PushNotificationService;
 import com.creatix.message.template.push.EventNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.message.PushNotificationService;
 import com.creatix.service.property.PropertyService;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +43,20 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.time.*;
-import java.util.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,6 +86,8 @@ public class SlotService {
     private AccountService accountService;
     @Autowired
     private PushNotificationService pushNotificationService;
+    @Autowired
+    private EventInviteDao eventInviteDao;
 
     public ScheduledSlotsResponse getSlotsByFilter(@NotNull Long propertyId, LocalDate beginDate, LocalDate endDate, Long startId, Integer pageSize) {
         Objects.requireNonNull(propertyId, "Property id is required");
@@ -151,20 +185,33 @@ public class SlotService {
             recipients = Collections.emptyList();
         }
 
+        Set<EventInvite> invites = new HashSet<>();
         for ( Account recipient : recipients ) {
             pushNotificationService.sendNotification(new EventNotificationTemplate(slot), recipient);
+            final EventInvite invite = new EventInvite();
+            invite.setAttendant(recipient);
+            invite.setEvent(slot);
+            invite.setResponse(EventInviteResponse.Invited);
+            invites.add(invite);
+            eventInviteDao.persist(invite);
         }
+        slot.setInvites(invites);
 
         return slot;
+    }
+
+    private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
+        final T item = dao.findById(id);
+        if ( item == null ) {
+            throw ex;
+        }
+        return item;
     }
 
     public EventSlot deleteEventSlotById(@NotNull Long slotId) {
         Objects.requireNonNull(slotId);
 
-        final EventSlot slot = eventSlotDao.findById(slotId);
-        if ( slot == null ) {
-            throw new EntityNotFoundException(String.format("Slot id=%d nto found", slotId));
-        }
+        final EventSlot slot = getOrElseThrow(slotId, eventSlotDao, new EntityNotFoundException(String.format("Slot id=%d not found", slotId)));
 
         eventSlotDao.delete(slot);
 
@@ -181,7 +228,47 @@ public class SlotService {
         final OffsetDateTime beginDt = beginDate.atStartOfDay().atOffset(property.getZoneOffset(beginDate.atStartOfDay()));
         final OffsetDateTime endDt = endDate.atTime(23, 59, 59).atOffset(property.getZoneOffset(endDate.atTime(23, 59, 59)));
 
-        return eventSlotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
+        return eventSlotDao.findByPropertyIdAndAccountAndStartBetween(propertyId, authorizationManager.getCurrentAccount(), beginDt, endDt);
+    }
+
+    public EventSlotDetailDto getEventDetailWithFilteredAttendants(@NotNull Long slotId, String filter) {
+        Objects.requireNonNull(slotId);
+
+        final EventSlot eventSlot = getOrElseThrow(slotId, eventSlotDao, new EntityNotFoundException(String.format("Slot id=%d not found", slotId)));
+
+        final Account account = authorizationManager.getCurrentAccount();
+        if ( !AccountRole.PropertyManager.equals(account.getRole())
+                && !AccountRole.AssistantPropertyManager.equals(account.getRole())
+                && !eventInviteDao.isUserInvitedToEvent(slotId, account) ) {
+            throw new SecurityException("Not allowed to read event detail without invitation");
+        }
+
+        List<EventInvite> invites = eventInviteDao.findByEventSlotIdFilterByAttendantNameOrderByAttendantFirstNameAsc(slotId, filter);
+
+        final EventSlotDetailDto detailDto = mapper.toEventSlotDetailDto(eventSlot);
+        detailDto.setResponses(invites.stream()
+                .collect(Collectors.groupingBy(EventInvite::getResponse)).entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
+                        .map(i -> mapper.toEventSlotDetailAccountDto(i.getAttendant()))
+                        .collect(Collectors.toList()))));
+
+        return detailDto;
+    }
+
+    public void respondToEventInvite(@NotNull Long slotId, @NotNull EventInviteResponse response) {
+        Objects.requireNonNull(slotId);
+        Objects.requireNonNull(response);
+
+        final EventSlot eventSlot = getOrElseThrow(slotId, eventSlotDao, new EntityNotFoundException(String.format("Slot id=%d not found", slotId)));
+        final Account account = authorizationManager.getCurrentAccount();
+
+        if ( !eventInviteDao.isUserInvitedToEvent(slotId, account) ) {
+            throw new SecurityException("Not allowed to respond to an event invitation without the existing invitation");
+        }
+
+        final EventInvite invite = eventInviteDao.findBySlotIdAndAccount(slotId, account);
+        invite.setResponse(response);
+        eventInviteDao.persist(invite);
     }
 
     private Slot createMaintenanceSlotFromSchedule(@NotNull LocalDate date, @NotNull MaintenanceSlotSchedule schedule) {

@@ -5,9 +5,11 @@ import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
+import com.creatix.domain.dto.property.slot.EventSlotDetailDto;
 import com.creatix.domain.dto.property.slot.EventSlotDto;
 import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.EventInviteResponse;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.SlotService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -20,7 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -40,7 +47,7 @@ public class EventController {
     private Mapper mapper;
 
 
-    @ApiOperation(value = "Get events", notes = "Get all events for single proerty where event begin time falls within desired time span.")
+    @ApiOperation(value = "Get events", notes = "Get all events for single property where event begin time falls within desired time span.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
@@ -54,7 +61,7 @@ public class EventController {
             @ApiParam(example = "2016-07-01") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDate,
             @ApiParam(example = "2016-07-31") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return new DataResponse<>(slotService.getEventSlotsByPropertyIdAndTimeRange(propertyId, beginDate, endDate).stream()
-        .map(e -> mapper.toEventSlotDto(e))
+                .map(e -> mapper.toEventSlotDto(e))
                 .collect(Collectors.toList()));
     }
 
@@ -69,6 +76,34 @@ public class EventController {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<EventSlotDto> createEventSlot(@PathVariable Long propertyId, @Valid @RequestBody PersistEventSlotRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toEventSlotDto(slotService.createEventSlot(propertyId, request)));
+    }
+
+    @ApiOperation(value = "Get event detail", notes = "Get event detail including attendants list with their responses based on privilege.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/{eventSlotId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<EventSlotDetailDto> getEventDetailWithFilteredAttendants(
+            @PathVariable Long eventSlotId, @RequestParam(required = false) String filter) {
+        return new DataResponse<>(slotService.getEventDetailWithFilteredAttendants(eventSlotId, filter));
+    }
+
+    @ApiOperation(value = "Respond to event invitation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/{eventSlotId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<Void> respondToEventInvite(@PathVariable Long eventSlotId, @RequestParam EventInviteResponse response) {
+        slotService.respondToEventInvite(eventSlotId, response);
+        return new DataResponse<>();
     }
 
     @ApiOperation(value = "Delete event slot")

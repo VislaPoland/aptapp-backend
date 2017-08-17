@@ -33,6 +33,7 @@ import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.EventInviteResponse;
 import com.creatix.security.AuthorizationManager;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
@@ -527,6 +528,12 @@ public class Mapper {
         mapperFactory.classMap(EventSlot.class, EventSlotDto.class)
                 .byDefault()
                 .register();
+        mapperFactory.classMap(Account.class, EventSlotDetailDto.AccountDto.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(EventSlot.class, EventSlotDetailDto.class)
+                .byDefault()
+                .register();
 
         mapperFactory.classMap(ApplicationFeature.class, ApplicationFeatureDto.class)
                 .byDefault()
@@ -746,6 +753,16 @@ public class Mapper {
         Objects.requireNonNull(req);
         Objects.requireNonNull(slot);
         mapperFactory.getMapperFacade().map(req, slot);
+    }
+
+    public EventSlotDetailDto.AccountDto toEventSlotDetailAccountDto(@NotNull Account account) {
+        Objects.requireNonNull(account);
+        return mapperFactory.getMapperFacade().map(account, EventSlotDetailDto.AccountDto.class);
+    }
+
+    public EventSlotDetailDto toEventSlotDetailDto(@NotNull EventSlot slot) {
+        Objects.requireNonNull(slot);
+        return mapperFactory.getMapperFacade().map(slot, EventSlotDetailDto.class);
     }
 
     public SlotDto toSlotDto(@NotNull Slot slot) {
