@@ -1,11 +1,11 @@
 package com.creatix.controller.v1.message;
 
 import com.creatix.configuration.versioning.ApiVersion;
+import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.notification.message.PersonalMessageDto;
 import com.creatix.domain.entity.store.notification.PersonalMessage;
-import com.creatix.domain.mapper.PersonalMessageMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PersonalMessageService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -31,7 +31,7 @@ public class PersonalMessageController {
     @Autowired
     private PersonalMessageService personalMessageService;
     @Autowired
-    private PersonalMessageMapper personalMessageMapper;
+    private Mapper mapper;
 
     @ApiOperation(value = "List of received personal messages")
     @ApiResponses(value = {
@@ -48,7 +48,7 @@ public class PersonalMessageController {
     return new DataResponse<>(
             personalMessageService.listReceivedMessagesForCurrentUser(offset, limit)
                     .stream()
-                    .map(e -> personalMessageMapper.toPersonalMessage(e))
+                    .map(e -> mapper.toPersonalMessage(e))
                     .collect(Collectors.toList())
         );
     }
@@ -67,7 +67,7 @@ public class PersonalMessageController {
             @RequestParam("limit") Long limit) {
     return new DataResponse<>(
             personalMessageService.listSentMessagesForCurrentUser(offset, limit).stream().map(
-                    e -> personalMessageMapper.toPersonalMessage(e)
+                    e -> mapper.toPersonalMessage(e)
             ).collect(Collectors.toList())
         );
     }
@@ -96,7 +96,7 @@ public class PersonalMessageController {
         return new DataResponse<>(
                 personalMessageList
                         .stream()
-                        .map(e -> personalMessageMapper.toPersonalMessage(e))
+                        .map(e -> mapper.toPersonalMessage(e))
                         .collect(Collectors.toList())
         );
     }
@@ -112,7 +112,7 @@ public class PersonalMessageController {
     @RoleSecured
     public DataResponse<PersonalMessageDto> getPersonalMessage(@PathVariable("messageId") Long messageId) {
         return new DataResponse<>(
-                personalMessageMapper.toPersonalMessage(
+                mapper.toPersonalMessage(
                         personalMessageService.getMessageById(messageId)
                 )
         );
@@ -129,7 +129,7 @@ public class PersonalMessageController {
     @RoleSecured
     public DataResponse<PersonalMessageDto> deletePersonalMessage(@PathVariable("messageId") Long messageId) {
         return new DataResponse<>(
-                personalMessageMapper.toPersonalMessage(
+                mapper.toPersonalMessage(
                         personalMessageService.deleteMessage(messageId)
                 )
         );

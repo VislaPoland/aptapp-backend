@@ -14,6 +14,8 @@ import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
 import com.creatix.domain.dto.notification.*;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
+import com.creatix.domain.dto.notification.message.PersonalMessageAccountDto;
+import com.creatix.domain.dto.notification.message.PersonalMessageDto;
 import com.creatix.domain.dto.notification.neighborhood.CreateNeighborhoodNotificationRequest;
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationDto;
 import com.creatix.domain.dto.notification.personal.PersonalMessageNotificationDto;
@@ -541,6 +543,26 @@ public class Mapper {
                     }
                 })
                 .register();
+
+        mapperFactory.classMap(PersonalMessage.class, PersonalMessageDto.class)
+                .byDefault()
+                .customize(new CustomMapper<PersonalMessage, PersonalMessageDto>() {
+                    @Override
+                    public void mapAtoB(PersonalMessage a, PersonalMessageDto b, MappingContext context) {
+                        if ( (a.getPersonalMessageGroup() != null) && (a.getPersonalMessageGroup().getMessages() != null) ) {
+                            b.setRecipients(mapperFactory.getMapperFacade().mapAsList(a.getPersonalMessageGroup().getMessages().stream()
+                                    .filter(pm -> pm.getToAccount() != null)
+                                    .map(PersonalMessage::getToAccount).collect(Collectors.toList()), PersonalMessageAccountDto.class));
+                        }
+                    }
+                })
+                .register();
+
+
+        mapperFactory.classMap(Account.class, PersonalMessageAccountDto.class)
+                .byDefault()
+                .fieldAToB("id", "userId")
+                .register();
     }
 
     public PropertyPhotoDto toPropertyPhotoDto(@NotNull PropertyPhoto propertyPhoto) {
@@ -748,5 +770,15 @@ public class Mapper {
         return new PageableDataResponse<>(response.getData().stream()
                 .map(mappingFunction)
                 .collect(Collectors.toList()), response.getPageSize(), response.getNextId());
+    }
+
+    public PersonalMessage toPersonalMessage(@NotNull PersonalMessageDto personalMessageDto) {
+        Objects.requireNonNull(personalMessageDto, "Personal message object can not be null");
+        return mapperFactory.getMapperFacade().map(personalMessageDto, PersonalMessage.class);
+    }
+
+    public PersonalMessageDto toPersonalMessage(@NotNull PersonalMessage personalMessage) {
+        Objects.requireNonNull(personalMessage, "Personal message object can not be null");
+        return mapperFactory.getMapperFacade().map(personalMessage, PersonalMessageDto.class);
     }
 }
