@@ -1,11 +1,9 @@
 package com.creatix.service.business;
 
-import com.creatix.domain.dao.AttachmentDao;
 import com.creatix.domain.dao.business.BusinessProfileDao;
 import com.creatix.domain.dao.business.DiscountCouponDao;
 import com.creatix.domain.dao.business.DiscountCouponUsageDao;
 import com.creatix.domain.dto.business.DiscountCouponDto;
-import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
@@ -133,7 +131,7 @@ public class DiscountCouponService {
      */
     @Transactional
     @NotNull
-    @RoleSecured({AccountRole.Tenant, AccountRole.SubTenant})
+    @RoleSecured
     public DiscountCouponDto useDiscountCoupon(long discountCouponId) {
         synchronized (getLockObject(discountCouponId)) {
             try {

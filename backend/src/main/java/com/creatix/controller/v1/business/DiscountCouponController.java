@@ -3,7 +3,6 @@ package com.creatix.controller.v1.business;
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.dto.business.DiscountCouponDto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.ApplicationFeatureType;
@@ -12,7 +11,6 @@ import com.creatix.security.RoleSecured;
 import com.creatix.service.business.BusinessProfileService;
 import com.creatix.service.business.DiscountCouponService;
 import com.fasterxml.jackson.annotation.JsonView;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -121,8 +119,8 @@ public class DiscountCouponController {
 
     @ApiOperation("Use discount coupon")
     @RequestMapping(path = "/{couponId}/use", method = RequestMethod.PUT)
-    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE)
-    public HttpEntity<DiscountCouponDto> userDiscountCoupon(@PathVariable("couponId") @NotNull Long couponId) {
+    @RoleSecured
+    public HttpEntity<DiscountCouponDto> useDiscountCoupon(@PathVariable("couponId") @NotNull Long couponId) {
         return new HttpEntity<>(discountCouponService.useDiscountCoupon(couponId));
     }
 
