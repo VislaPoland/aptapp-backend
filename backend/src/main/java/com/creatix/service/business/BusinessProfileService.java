@@ -3,14 +3,12 @@ package com.creatix.service.business;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.business.BusinessCategoryDao;
 import com.creatix.domain.dao.business.BusinessProfileDao;
+import com.creatix.domain.dao.business.DiscountCouponUsageDao;
 import com.creatix.domain.dto.business.BusinessProfileCreateRequest;
 import com.creatix.domain.dto.business.BusinessProfileDto;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.business.BusinessCategory;
-import com.creatix.domain.entity.store.business.BusinessProfile;
-import com.creatix.domain.entity.store.business.BusinessProfileCarteItem;
-import com.creatix.domain.entity.store.business.DiscountCoupon;
 import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
+import com.creatix.domain.entity.store.business.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.mapper.BusinessMapper;
 import com.creatix.security.AuthorizationManager;
@@ -50,6 +48,8 @@ public class BusinessProfileService {
     private BusinessNotificationExecutor businessNotificationExecutor;
     @Autowired
     private AttachmentService attachmentService;
+    @Autowired
+    private DiscountCouponUsageDao discountCouponUsageDao;
 
     public List<BusinessProfile> listBusinessProfilesForProperty(long propertyId) {
         Property property = findPropertyById(propertyId);
@@ -177,11 +177,19 @@ public class BusinessProfileService {
 
     @NotNull
     public List<DiscountCoupon> listBusinessDiscountCoupons(long businessProfileId) {
-        BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
+        final BusinessProfile businessProfile = findBusinessProfileById(businessProfileId);
+        final List<DiscountCoupon> discountCoupons = businessProfile.getDiscountCouponList();
 
-        authorizationManager.checkRead(businessProfile.getProperty());
+        if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.SubTenant, AccountRole.Security, AccountRole.Maintenance) ) {
+            for ( DiscountCoupon discountCoupon : discountCoupons ) {
+                final DiscountCouponUsage couponUsage = discountCouponUsageDao.findById(new DiscountCouponUsage.IdKey(authorizationManager.getCurrentAccount(),discountCoupon));
+                if ( couponUsage != null ) {
+                    discountCoupon.setAvailableUses(couponUsage.getUsesLeft());
+                }
+            }
+        }
 
-        return businessProfile.getDiscountCouponList();
+        return discountCoupons;
     }
 
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})

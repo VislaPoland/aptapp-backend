@@ -50,7 +50,7 @@ public class DiscountCouponController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE)
+    @RoleSecured
     public DataResponse<List<DiscountCouponDto>> listDiscountCoupons(@PathVariable("businessProfileId") Long businessProfileId) {
         return new DataResponse<>(
                 businessProfileService.listBusinessDiscountCoupons(businessProfileId)
