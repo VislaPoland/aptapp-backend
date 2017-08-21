@@ -2,7 +2,6 @@ package com.creatix.domain.entity.store.business;
 
 import com.creatix.domain.entity.store.account.Account;
 import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -28,10 +27,10 @@ public class DiscountCouponUsage {
             this.discountCoupon = discountCoupon;
         }
 
-        @OneToOne(optional = false)
+        @ManyToOne(optional = false)
         private Account account;
 
-        @OneToOne(optional = false)
+        @ManyToOne(optional = false)
         private DiscountCoupon discountCoupon;
     }
 
