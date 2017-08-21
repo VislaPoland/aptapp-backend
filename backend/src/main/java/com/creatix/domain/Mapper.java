@@ -22,6 +22,8 @@ import com.creatix.domain.dto.notification.personal.PersonalMessageNotificationD
 import com.creatix.domain.dto.notification.security.CreateSecurityNotificationRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.*;
+import com.creatix.domain.dto.property.message.CreatePredefinedMessageRequest;
+import com.creatix.domain.dto.property.message.PredefinedMessageDto;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
@@ -33,7 +35,6 @@ import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.AccountRole;
-import com.creatix.domain.enums.EventInviteResponse;
 import com.creatix.security.AuthorizationManager;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
@@ -290,7 +291,12 @@ public class Mapper {
                 })
                 .register();
 
-
+        mapperFactory.classMap(PredefinedMessageDto.class, PredefinedMessage.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(CreatePredefinedMessageRequest.class, PredefinedMessage.class)
+                .byDefault()
+                .register();
 
         mapperFactory.classMap(CreateSecurityNotificationRequest.class, SecurityNotification.class)
                 .byDefault()
@@ -721,6 +727,12 @@ public class Mapper {
 
         return mapperFactory.getMapperFacade().map(request, SubTenant.class);
     }
+
+    public PredefinedMessageDto toPredefinedMessageDto(@NotNull PredefinedMessage entity) {
+        Objects.requireNonNull(entity);
+        return mapperFactory.getMapperFacade().map(entity, PredefinedMessageDto.class);
+    }
+
 
     public void fillSubTenant(@NotNull PersistSubTenantRequest request, @NotNull SubTenant entity) {
         Objects.requireNonNull(request);

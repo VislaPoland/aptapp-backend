@@ -1,10 +1,10 @@
 package com.creatix.security;
 
 import com.creatix.domain.dao.AccountDao;
-import com.creatix.domain.entity.store.MaintenanceReservation;
-import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,6 +222,13 @@ public class AuthorizationManager {
                 return property.getManagers().contains(((AssistantPropertyManager) account).getManager());
             default:
                 return false;
+        }
+    }
+
+    public void checkWrite(@NotNull Property property) {
+        Objects.requireNonNull(property, "property");
+        if ( !(canWrite(property)) ) {
+            throw new SecurityException(String.format("Not allowed to modify property id=%d", property.getId()));
         }
     }
 

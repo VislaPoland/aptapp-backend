@@ -82,6 +82,9 @@ public class Property {
     @OneToMany(mappedBy = "property")
     private List<PropertyPhoto> photos = new ArrayList<>(1);
 
+    @OneToMany(mappedBy = "property")
+    private List<PredefinedMessage> predefinedMessages;
+
     @Transient
     public ZoneOffset getZoneOffset(LocalDateTime dt) {
         return getZoneId().getRules().getOffset(dt);
