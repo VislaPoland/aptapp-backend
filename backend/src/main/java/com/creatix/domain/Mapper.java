@@ -294,6 +294,9 @@ public class Mapper {
         mapperFactory.classMap(PredefinedMessageDto.class, PredefinedMessage.class)
                 .byDefault()
                 .register();
+        mapperFactory.classMap(PredefinedMessage.class, PredefinedMessageDto.class)
+                .byDefault()
+                .register();
         mapperFactory.classMap(CreatePredefinedMessageRequest.class, PredefinedMessage.class)
                 .byDefault()
                 .register();
