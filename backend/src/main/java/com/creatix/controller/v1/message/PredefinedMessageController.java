@@ -16,7 +16,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,7 +27,8 @@ import java.util.stream.Collectors;
 /**
  * Created by Tomas Sedlak on 21.8.2017.
  */
-@Controller
+@RestController
+@Transactional
 @RequestMapping(path = {"/api/properties/{propertyId}/messages/predefined", "/api/v1/properties/{propertyId}/messages/predefined"})
 @ApiVersion(1.0)
 public class PredefinedMessageController {
