@@ -46,7 +46,7 @@ public class PredefinedMessageController {
     @JsonView(Views.Public.class)
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<List<PredefinedMessageDto>> getPredefinedMessages(@PathVariable Long propertyId) {
+    public DataResponse<List<PredefinedMessageDto>> getPredefinedMessages(@NotNull @PathVariable Long propertyId) {
         return new DataResponse<>(predefinedMessageService.getPredefinedMessages(propertyId).stream()
                 .map(pm -> mapper.toPredefinedMessageDto(pm))
                 .collect(Collectors.toList()));
@@ -61,7 +61,7 @@ public class PredefinedMessageController {
     @JsonView(Views.Public.class)
     @PostMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
-    public HttpEntity<PredefinedMessageDto> createPredefinedMessage(@PathVariable Long propertyId, @RequestBody @NotNull @Valid CreatePredefinedMessageRequest req) {
+    public HttpEntity<PredefinedMessageDto> createPredefinedMessage(@NotNull @PathVariable Long propertyId, @RequestBody @NotNull @Valid CreatePredefinedMessageRequest req) {
         return new HttpEntity<>(mapper.toPredefinedMessageDto(predefinedMessageService.createFromRequest(req, propertyId)));
     }
 
@@ -74,20 +74,20 @@ public class PredefinedMessageController {
     @JsonView(Views.Public.class)
     @PutMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
-    public HttpEntity<PredefinedMessageDto> updatePredefinedMessage(PredefinedMessageDto messageDto) {
+    public HttpEntity<PredefinedMessageDto> updatePredefinedMessage(@RequestBody @NotNull @Valid PredefinedMessageDto messageDto) {
         return new HttpEntity<>(mapper.toPredefinedMessageDto(predefinedMessageService.updateFromRequest(messageDto)));
     }
 
-    @ApiOperation(value = "Update existing predefined message for property")
+    @ApiOperation(value = "Delete existing predefined message for property")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @DeleteMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/{messageId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
-    public HttpEntity<PredefinedMessageDto> deletePredefinedMessage(Long messageId) {
+    public HttpEntity<PredefinedMessageDto> deletePredefinedMessage(@NotNull @PathVariable Long messageId) {
         return new HttpEntity<>(mapper.toPredefinedMessageDto(predefinedMessageService.deleteById(messageId)));
     }
 }
