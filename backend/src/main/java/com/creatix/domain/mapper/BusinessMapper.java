@@ -4,10 +4,11 @@ import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.business.BusinessCategoryDao;
 import com.creatix.domain.dto.business.*;
+import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import com.creatix.domain.entity.store.attachment.DiscountCouponPhoto;
 import com.creatix.domain.entity.store.business.*;
-import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
-import com.creatix.domain.enums.ContactType;
+import com.creatix.domain.enums.AccountRole;
+import com.creatix.security.AuthorizationManager;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -28,7 +29,8 @@ public class BusinessMapper extends ConfigurableMapper {
 
     @Autowired
     private ApplicationProperties applicationProperties;
-
+    @Autowired
+    private AuthorizationManager authorizationManager;
     @Autowired
     private BusinessCategoryDao businessCategoryDao;
     @Autowired
@@ -111,7 +113,9 @@ public class BusinessMapper extends ConfigurableMapper {
                     @Override
                     public void mapAtoB(DiscountCouponUsage discountCouponUsage, DiscountCouponDto discountCouponDto, MappingContext context) {
                         map(discountCouponUsage.getId().getDiscountCoupon(), discountCouponDto);
-                        discountCouponDto.setAvailableUses(discountCouponUsage.getUsesLeft());
+                        if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.SubTenant) ) {
+                            discountCouponDto.setAvailableUses(discountCouponUsage.getUsesLeft());
+                        }
                     }
 
                     @Override
