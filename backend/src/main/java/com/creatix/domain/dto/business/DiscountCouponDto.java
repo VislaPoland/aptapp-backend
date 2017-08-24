@@ -5,7 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by Tomas Michalek on 13/04/2017.
@@ -39,5 +40,8 @@ public class DiscountCouponDto {
 
     @ApiModelProperty(value = "Photo image for coupon")
     private DiscountCouponPhotoDto discountCouponPhoto;
+
+    @ApiModelProperty(value = "Business profile")
+    private BusinessProfileDto businessProfile;
 
 }
