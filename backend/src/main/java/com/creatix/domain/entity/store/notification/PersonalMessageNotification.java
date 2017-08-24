@@ -18,7 +18,7 @@ public class PersonalMessageNotification extends Notification {
 
     @ManyToOne
     @JoinColumn
-    private PersonalMessage personalMessage;
+    private PersonalMessageGroup personalMessageGroup;
 
     public PersonalMessageNotification() {
         this.type = NotificationType.PersonalMessage;

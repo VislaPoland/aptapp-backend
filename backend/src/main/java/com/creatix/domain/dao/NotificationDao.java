@@ -10,6 +10,7 @@ import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
@@ -52,6 +53,10 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             startDt = startNotification.getUpdatedAt();
         }
 
+        final QPersonalMessageGroup qPersonalMessageGroup = QPersonalMessageGroup.personalMessageGroup;
+        final QPersonalMessage qPersonalMessage = QPersonalMessage.personalMessage;
+
+
         BooleanExpression predicate = qNotification.updatedAt.after(startDt).not();
 
 
@@ -63,17 +68,13 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             switch (account.getRole()) {
                 case Tenant:
                 case SubTenant:
-                    predicate = predicate.and(
-                            qNotification.instanceOfAny(
-                                    BusinessProfileNotification.class,
-                                    DiscountCouponNotification.class
-                            ).and(
-                                    qNotification.property.eq(
-                                            authorizationManager.getCurrentProperty(account)
-                                    )
-                            )
-                    ).or(
-                            qNotification.recipient.eq(account)
+                    predicate = predicate.andAnyOf(
+                            Expressions.allOf(
+                                    qNotification.instanceOfAny(BusinessProfileNotification.class, DiscountCouponNotification.class),
+                                    qNotification.property.eq(authorizationManager.getCurrentProperty(account))
+                            ),
+                            qNotification.recipient.eq(account),
+                            qPersonalMessage.toAccount.eq(account)
                     );
                     break;
                 case PropertyManager:
@@ -81,7 +82,8 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                     predicate = predicate.and(
                             qNotification.property.eq(
                                     authorizationManager.getCurrentProperty(account)
-                            ).or(
+                            )
+                            .or(
                                     qNotification.recipient.eq(authorizationManager.getCurrentAccount())
                             )
                     );
@@ -90,7 +92,8 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                     predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class)).and(
                             qNotification.property.eq(
                                     authorizationManager.getCurrentProperty(account)
-                            ).or(
+                            )
+                            .or(
                                     qNotification.recipient.eq(authorizationManager.getCurrentAccount())
                             )
                     );
@@ -99,7 +102,8 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                     predicate = predicate.and(qNotification.instanceOf(SecurityNotification.class)).and(
                             qNotification.property.eq(
                                     authorizationManager.getCurrentProperty(account)
-                            ).or(
+                            )
+                            .or(
                                     qNotification.recipient.eq(authorizationManager.getCurrentAccount())
                             )
                     );
@@ -147,7 +151,13 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             }
         }
 
+
+
+
         return queryFactory.selectFrom(qNotification)
+                .distinct()
+                .leftJoin(qNotification.as(QPersonalMessageNotification.class).personalMessageGroup, qPersonalMessageGroup)
+                .leftJoin(qPersonalMessageGroup.messages, qPersonalMessage)
                 .where(predicate)
                 .orderBy(qNotification.updatedAt.desc())
                 .limit(pageSize)

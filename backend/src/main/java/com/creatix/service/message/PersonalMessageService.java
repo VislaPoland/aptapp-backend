@@ -80,7 +80,7 @@ public class PersonalMessageService {
         final PersonalMessageGroup personalMessageGroup = new PersonalMessageGroup();
         personalMessageGroupDao.persist(personalMessageGroup);
 
-        return property.getManagers().parallelStream().map(
+        final List<PersonalMessage> messages = property.getManagers().parallelStream().map(
                 recipientAccount -> {
                     Account currentAccount = authorizationManager.getCurrentAccount();
                     PersonalMessage personalMessage = new PersonalMessage();
@@ -102,6 +102,10 @@ public class PersonalMessageService {
                     return personalMessage;
                 }
         ).collect(Collectors.toList());
+
+        createPersonalMessageNotification(personalMessageGroup);
+
+        return messages;
     }
 
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
@@ -156,6 +160,8 @@ public class PersonalMessageService {
             }
         }
 
+        createPersonalMessageNotification(personalMessageGroup);
+
         return messages;
     }
 
@@ -171,19 +177,24 @@ public class PersonalMessageService {
         notification.setMessage(templateProcessor.processTemplate(new NewPersonalMessageTemplate(personalMessage)));
         notification.setTitle("New personal message");
 
-        final PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
-        personalMessageNotification.setPersonalMessage(personalMessage);
-        personalMessageNotification.setAuthor(personalMessage.getFromAccount());
-        personalMessageNotification.setRecipient(personalMessage.getToAccount());
-        personalMessageNotification.setDescription(notification.getMessage());
-        personalMessageNotification.setStatus(NotificationStatus.Pending);
-        personalMessageNotification.setTitle(notification.getTitle());
-        notificationDao.persist(personalMessageNotification);
+
 
         pushNotificationService.sendNotification(notification, personalMessage.getToAccount());
 
         personalMessage.setMessageStatus(PersonalMessageStatusType.DELIVERED);
         personalMessageDao.persist(personalMessage);
+    }
+
+    private void createPersonalMessageNotification(@NotNull PersonalMessageGroup personalMessageGroup) {
+        final PersonalMessage message = personalMessageGroup.getMessages().stream().findFirst().orElseThrow(() -> new IllegalStateException("Message group is empty"));
+        final PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
+        personalMessageNotification.setPersonalMessageGroup(personalMessageGroup);
+        personalMessageNotification.setAuthor(authorizationManager.getCurrentAccount());
+        personalMessageNotification.setRecipient(message.getToAccount());
+        personalMessageNotification.setDescription(message.getContent());
+        personalMessageNotification.setStatus(NotificationStatus.Pending);
+        personalMessageNotification.setTitle(message.getTitle());
+        notificationDao.persist(personalMessageNotification);
     }
 
     @RoleSecured

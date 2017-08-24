@@ -28,9 +28,6 @@ public class PersonalMessageDto {
     @ApiModelProperty
     private PersonalMessageAccountDto toAccount;
 
-    @ApiModelProperty(name = "recipients", notes = "For group messages this property stores all message recipients")
-    private List<PersonalMessageAccountDto> recipients;
-
     @NotEmpty
     @Size(max = 255)
     @ApiModelProperty

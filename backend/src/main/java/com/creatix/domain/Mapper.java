@@ -274,6 +274,23 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(PersonalMessageNotification.class, PersonalMessageNotificationDto.class)
                 .byDefault()
+                .customize(new CustomMapper<PersonalMessageNotification, PersonalMessageNotificationDto>() {
+                    @Override
+                    public void mapAtoB(PersonalMessageNotification a, PersonalMessageNotificationDto b, MappingContext context) {
+                        final PersonalMessage personalMessage = a.getPersonalMessageGroup().getMessages().stream()
+                                .filter(m -> Objects.equals(m.getToAccount(), authorizationManager.getCurrentAccount()))
+                                .findFirst().orElse(null);
+                        if ( personalMessage != null ) {
+                            b.setPersonalMessage(toPersonalMessage(personalMessage));
+                        }
+                        if ( (a.getPersonalMessageGroup() != null) && (a.getPersonalMessageGroup().getMessages() != null) ) {
+                            b.setRecipients(mapperFactory.getMapperFacade().mapAsList(a.getPersonalMessageGroup().getMessages().stream()
+                                    .filter(pm -> pm.getToAccount() != null)
+                                    .map(PersonalMessage::getToAccount).collect(Collectors.toList()), PersonalMessageAccountDto.class));
+                        }
+
+                    }
+                })
                 .register();
 
         mapperFactory.classMap(NotificationPhoto.class, NotificationPhotoDto.class)
@@ -562,16 +579,6 @@ public class Mapper {
 
         mapperFactory.classMap(PersonalMessage.class, PersonalMessageDto.class)
                 .byDefault()
-                .customize(new CustomMapper<PersonalMessage, PersonalMessageDto>() {
-                    @Override
-                    public void mapAtoB(PersonalMessage a, PersonalMessageDto b, MappingContext context) {
-                        if ( (a.getPersonalMessageGroup() != null) && (a.getPersonalMessageGroup().getMessages() != null) ) {
-                            b.setRecipients(mapperFactory.getMapperFacade().mapAsList(a.getPersonalMessageGroup().getMessages().stream()
-                                    .filter(pm -> pm.getToAccount() != null)
-                                    .map(PersonalMessage::getToAccount).collect(Collectors.toList()), PersonalMessageAccountDto.class));
-                        }
-                    }
-                })
                 .register();
 
 

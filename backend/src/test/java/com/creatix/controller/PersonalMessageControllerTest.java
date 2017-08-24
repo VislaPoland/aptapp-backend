@@ -67,9 +67,6 @@ public class PersonalMessageControllerTest {
         assertTrue(notification instanceof PersonalMessageNotificationDto);
         final PersonalMessageNotificationDto pmNotif = (PersonalMessageNotificationDto) notification;
         assertNotNull(pmNotif.getPersonalMessage());
-        assertNotNull(pmNotif.getPersonalMessage().getRecipients());
-        assertEquals(2, pmNotif.getPersonalMessage().getRecipients().size());
-        assertTrue(pmNotif.getPersonalMessage().getRecipients().stream().map(PersonalMessageAccountDto::getUserId).collect(Collectors.toSet()).containsAll(Arrays.asList(3L, 451L)));
     }
 
 }
