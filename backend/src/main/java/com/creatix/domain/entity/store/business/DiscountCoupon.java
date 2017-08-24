@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by Tomas Michalek on 12/04/2017.
@@ -43,5 +44,8 @@ public class DiscountCoupon implements AttachmentId {
 
     @OneToOne(cascade = CascadeType.ALL)
     private DiscountCouponPhoto discountCouponPhoto;
+
+    @OneToMany(mappedBy = "id.discountCoupon",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<DiscountCouponUsage> discountCouponUsages;
 
 }
