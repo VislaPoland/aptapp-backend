@@ -10,18 +10,23 @@ import com.creatix.domain.dto.tenant.TenantDto;
 import com.creatix.domain.dto.tenant.VehicleDto;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.TenantType;
+import com.creatix.message.MessageDeliveryException;
 import com.creatix.mock.WithMockCustomUser;
 import com.creatix.service.TenantService;
+import freemarker.template.TemplateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -111,5 +116,33 @@ public class TenantControllerTest {
             }
         });
     }
+
+    @Test(expected = AccessDeniedException.class)
+    @WithMockCustomUser("apt2@test.com")
+    public void denyCreateTenantForSubtenantRoleTest() throws Exception {
+        PersistTenantRequest request = new PersistTenantRequest();
+        request.setType(TenantType.Owner);
+        request.setApartmentId(23L);
+        request.setFirstName("Michael");
+        request.setLastName("Johnson");
+        request.setPrimaryPhone("00000000000");
+        request.setPrimaryEmail("nonexistingemail@test.com");
+
+        ParkingStallDto parkingStallDto1 = new ParkingStallDto();
+        parkingStallDto1.setNumber("76/D");
+        request.setParkingStalls(new ArrayList<>());
+        request.getParkingStalls().add(parkingStallDto1);
+
+        VehicleDto vehicleDto = new VehicleDto();
+        vehicleDto.setColor("red");
+        vehicleDto.setMake("Toyota");
+        vehicleDto.setModel("Camry");
+        vehicleDto.setYear(2016);
+        request.setVehicles(new ArrayList<>());
+        request.getVehicles().add(vehicleDto);
+
+        tenantController.createTenant(request);
+    }
+
 
 }

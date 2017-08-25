@@ -236,7 +236,7 @@ public class NotificationService {
             if ( request.getResponse() == SecurityNotificationResponseType.NoIssueFound ) {
                 final Account account = notification.getAuthor();
 
-                if ( account.getRole() == AccountRole.Tenant ) {
+                if ( account.getRole() == AccountRole.Tenant || account.getRole() == AccountRole.SubTenant ) {
                     pushNotificationService.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), account);
                 }
                 else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
@@ -246,7 +246,7 @@ public class NotificationService {
             else if ( request.getResponse() == SecurityNotificationResponseType.Resolved ) {
                 final Account account = notification.getAuthor();
 
-                if ( account.getRole() == AccountRole.Tenant ) {
+                if ( account.getRole() == AccountRole.Tenant || account.getRole() == AccountRole.SubTenant ) {
                     pushNotificationService.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), account);
                 }
                 else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
@@ -260,14 +260,14 @@ public class NotificationService {
         throw new SecurityException("You are not eligible to respond to security notifications from another property");
     }
 
-    @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceNotification respondToMaintenanceNotification(@NotNull Long notificationId, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
 
         if ( authorizationManager.hasAnyOfRoles(AccountRole.Maintenance) ) {
             return maintenanceReservationService.employeeRespondToMaintenanceNotification(notification, response);
         }
-        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager) ) {
+        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager) ) {
             return maintenanceReservationService.tenantRespondToMaintenanceReschedule(notification, response);
         }
         else {

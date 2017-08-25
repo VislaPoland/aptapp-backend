@@ -12,6 +12,7 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.message.template.email.SubTenantActivationMessageTemplate;
 import com.creatix.service.message.EmailMessageService;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.template.email.TenantActivationMessageTemplate;
@@ -166,18 +167,18 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.Tenant})
-    public SubTenant createSubTenant(@NotNull PersistSubTenantRequest request) {
+    public SubTenant createSubTenant(@NotNull PersistSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return createSubTenant(authorizationManager.getCurrentAccount().getId(), request);
     }
 
-    @RoleSecured({AccountRole.Tenant})
-    public SubTenant createSubTenant(Long tenantId, @NotNull PersistSubTenantRequest request) {
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
+    public SubTenant createSubTenant(Long tenantId, @NotNull PersistSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Objects.requireNonNull(request);
 
         preventAccountDuplicity(request.getEmail(), null);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if ( authorizationManager.isSelf(tenant) ) {
+        if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
             final SubTenant subTenant = mapper.toSubTenant(request);
             subTenant.setCompanyName(tenant.getCompanyName());
             subTenant.setRole(AccountRole.SubTenant);
@@ -185,8 +186,12 @@ public class TenantService {
             accountService.setActionToken(subTenant);
             subTenant.setParentTenant(tenant);
             subTenantDao.persist(subTenant);
+
+            emailMessageService.send(new SubTenantActivationMessageTemplate(subTenant, applicationProperties));
+
             return subTenant;
         }
+
         throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
     }
 
@@ -200,12 +205,12 @@ public class TenantService {
         return updateSubTenant(authorizationManager.getCurrentAccount().getId(), subTenantId, request);
     }
 
-    @RoleSecured({AccountRole.Tenant})
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public SubTenant updateSubTenant(Long tenantId, Long subTenantId, @NotNull PersistSubTenantRequest request) {
         Objects.requireNonNull(request);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if ( authorizationManager.isSelf(tenant) ) {
+        if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
             final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
             preventAccountDuplicity(request.getEmail(), subTenant.getPrimaryEmail());
 
@@ -224,10 +229,10 @@ public class TenantService {
         deleteSubTenant(authorizationManager.getCurrentAccount().getId(), subTenantId);
     }
 
-    @RoleSecured({AccountRole.Tenant})
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public void deleteSubTenant(Long tenantId, Long subTenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if ( authorizationManager.isSelf(tenant) ) {
+        if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
             final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
 
             if ( tenant.getSubTenants().contains(subTenant) ) {
