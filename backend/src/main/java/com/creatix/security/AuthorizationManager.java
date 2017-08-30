@@ -88,6 +88,7 @@ public class AuthorizationManager {
 
         switch ( account.getRole() ) {
             case Tenant:
+            case SubTenant:
                 return ((Tenant) account).getApartment().getProperty();
             case PropertyManager:
                 return ((PropertyManager) account).getManagedProperty();
@@ -144,6 +145,7 @@ public class AuthorizationManager {
                 allowed = property.getManagers().contains(((ManagedEmployee) this.getCurrentAccount()).getManager());
                 break;
             case Tenant:
+            case SubTenant:
                 allowed = Objects.equals(property, ((Tenant) getCurrentAccount()).getApartment().getProperty());
                 break;
         }

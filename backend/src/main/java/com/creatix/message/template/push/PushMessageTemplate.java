@@ -29,7 +29,6 @@ public abstract class PushMessageTemplate implements MessageTemplate {
     String translateRoleNameFromEnum(AccountRole role) {
         switch ( role ) {
             case Tenant:
-                return "Neighbor";
             case SubTenant:
                 return "Neighbor";
             case AssistantPropertyManager:

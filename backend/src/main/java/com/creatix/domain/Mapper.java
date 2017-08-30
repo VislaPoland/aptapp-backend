@@ -236,7 +236,7 @@ public class Mapper {
                     @Override
                     public void mapAtoB(Notification notification, NotificationDto notificationDto, MappingContext context) {
 
-                        if ( !(authorizationManager.hasCurrentAccount()) || authorizationManager.hasAnyOfRoles(AccountRole.Tenant) ) {
+                        if ( !(authorizationManager.hasCurrentAccount()) || authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.SubTenant) ) {
                             // only authenticated non-tenant accounts are allowed to see author of the notification
                             notificationDto.setAuthor(null);
                         }

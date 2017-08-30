@@ -50,7 +50,7 @@ public class MaintenanceReservationService {
     @Autowired
     private MaintenanceNotificationDao maintenanceNotificationDao;
 
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
+    @RoleSecured(value = {AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
     MaintenanceReservation createMaintenanceReservation(@NotNull MaintenanceNotification maintenanceNotification, @NotNull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(maintenanceNotification, "Maintenance notification is null");
         Objects.requireNonNull(slotUnitId, "Slot unit id is null");
@@ -138,7 +138,7 @@ public class MaintenanceReservationService {
         }
     }
 
-    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceNotification tenantRespondToMaintenanceReschedule(@NotNull MaintenanceNotification notification, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(response, "Notification response dto is null");

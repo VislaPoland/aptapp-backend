@@ -155,8 +155,8 @@ public class TenantController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/subs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant})
-    public DataResponse<SubTenantDto> createSubTenant(@PathVariable Long tenantId, @Valid @RequestBody PersistSubTenantRequest request) {
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
+    public DataResponse<SubTenantDto> createSubTenant(@PathVariable Long tenantId, @Valid @RequestBody PersistSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return new DataResponse<>(mapper.toSubTenantDto(tenantService.createSubTenant(tenantId, request)));
     }
 
@@ -171,7 +171,7 @@ public class TenantController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/me/subs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant})
-    public DataResponse<SubTenantDto> createSubTenant(@Valid @RequestBody PersistSubTenantRequest request) {
+    public DataResponse<SubTenantDto> createSubTenant(@Valid @RequestBody PersistSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return new DataResponse<>(mapper.toSubTenantDto(tenantService.createSubTenant(request)));
     }
 
@@ -199,7 +199,7 @@ public class TenantController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant})
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public DataResponse<SubTenantDto> updateSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId, @Valid @RequestBody PersistSubTenantRequest request) {
         return new DataResponse<>(mapper.toSubTenantDto(tenantService.updateSubTenant(tenantId, subTenantId, request)));
     }
@@ -228,7 +228,7 @@ public class TenantController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant})
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public DataResponse<Void> deleteSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId) {
         tenantService.deleteSubTenant(tenantId, subTenantId);
         return new DataResponse<>();
