@@ -12,12 +12,12 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
-import com.creatix.message.template.email.SubTenantActivationMessageTemplate;
-import com.creatix.service.message.EmailMessageService;
 import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.template.email.SubTenantActivationMessageTemplate;
 import com.creatix.message.template.email.TenantActivationMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.message.EmailMessageService;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -175,7 +175,7 @@ public class TenantService {
     public SubTenant createSubTenant(Long tenantId, @NotNull PersistSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Objects.requireNonNull(request);
 
-        preventAccountDuplicity(request.getEmail(), null);
+        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
@@ -212,7 +212,7 @@ public class TenantService {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
             final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
-            preventAccountDuplicity(request.getEmail(), subTenant.getPrimaryEmail());
+            preventAccountDuplicity(request.getPrimaryEmail(), subTenant.getPrimaryEmail());
 
             if ( tenant.getSubTenants().contains(subTenant) ) {
                 mapper.fillSubTenant(request, subTenant);

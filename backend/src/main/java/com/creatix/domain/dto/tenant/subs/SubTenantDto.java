@@ -7,6 +7,7 @@ import com.creatix.domain.enums.TenantType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @ApiModel
 @Data
@@ -15,19 +16,22 @@ public class SubTenantDto {
     private Long id;
 
     @ApiModelProperty(value = "First name", required = true)
+    @NotEmpty
     private String firstName;
 
     @ApiModelProperty(value = "Last name", required = true)
+    @NotEmpty
     private String lastName;
 
     @ApiModelProperty(value = "Full name", required = true)
     private String fullName;
 
     @ApiModelProperty(value = "Phone number", required = true)
-    private String phone;
+    private String primaryPhone;
 
     @ApiModelProperty(value = "Email address", required = true)
-    private String email;
+    @NotEmpty
+    private String primaryEmail;
 
     @ApiModelProperty(value = "Company name")
     private String companyName;

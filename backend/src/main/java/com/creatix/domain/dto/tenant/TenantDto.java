@@ -49,10 +49,10 @@ public class TenantDto extends AccountDto {
         private String fullName;
 
         @ApiModelProperty(value = "Phone number", required = true)
-        private String phone;
+        private String primaryPhone;
 
         @ApiModelProperty(value = "Email address", required = true)
-        private String email;
+        private String primaryEmail;
 
         @ApiModelProperty(value = "Company name")
         private String companyName;

@@ -451,21 +451,15 @@ public class Mapper {
 
         mapperFactory.classMap(SubTenant.class, SubTenantDto.class)
                 .byDefault()
-                .field("primaryPhone", "phone")
-                .field("primaryEmail", "email")
                 .field("parentTenant.id", "parentTenantId")
                 .register();
 
         mapperFactory.classMap(SubTenant.class, TenantDto.SubTenantDto.class)
                 .byDefault()
-                .field("primaryPhone", "phone")
-                .field("primaryEmail", "email")
                 .register();
 
         mapperFactory.classMap(PersistSubTenantRequest.class, SubTenant.class)
                 .byDefault()
-                .field("phone", "primaryPhone")
-                .field("email", "primaryEmail")
                 .register();
 
         mapperFactory.classMap(UpdateAccountProfileRequest.class, Account.class)

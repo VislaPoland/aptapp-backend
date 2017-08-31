@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 
@@ -12,19 +13,19 @@ import javax.validation.constraints.NotNull;
 public class PersistSubTenantRequest {
 
     @ApiModelProperty(value = "First name", required = true)
-    @NotNull
+    @NotEmpty
     private String firstName;
 
     @ApiModelProperty(value = "Last name", required = true)
-    @NotNull
+    @NotEmpty
     private String lastName;
 
     @ApiModelProperty(value = "Phone number", required = true)
     @NotNull
-    private String phone;
+    private String primaryPhone;
 
     @ApiModelProperty(value = "Email address", required = true)
-    @NotNull
+    @NotEmpty
     @Email
-    private String email;
+    private String primaryEmail;
 }
