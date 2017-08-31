@@ -85,7 +85,7 @@ public class Account {
     @Temporal(TemporalType.TIMESTAMP)
     private Date deletedAt;
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
     private Set<Device> devices;
 
     @Transient
