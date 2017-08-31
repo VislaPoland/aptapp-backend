@@ -145,8 +145,10 @@ public class AuthorizationManager {
                 allowed = property.getManagers().contains(((ManagedEmployee) this.getCurrentAccount()).getManager());
                 break;
             case Tenant:
-            case SubTenant:
                 allowed = Objects.equals(property, ((Tenant) getCurrentAccount()).getApartment().getProperty());
+                break;
+            case SubTenant:
+                allowed = Objects.equals(property, ((SubTenant) getCurrentAccount()).getApartment().getProperty());
                 break;
         }
         if ( !(allowed) ) {
