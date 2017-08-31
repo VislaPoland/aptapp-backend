@@ -88,8 +88,9 @@ public class AuthorizationManager {
 
         switch ( account.getRole() ) {
             case Tenant:
-            case SubTenant:
                 return ((Tenant) account).getApartment().getProperty();
+            case SubTenant:
+                return ((SubTenant) account).getApartment().getProperty();
             case PropertyManager:
                 return ((PropertyManager) account).getManagedProperty();
             case AssistantPropertyManager:
