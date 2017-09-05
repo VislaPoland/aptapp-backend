@@ -5,6 +5,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
+    <!-- On production server run "db.changelog-prod_to_1.0.xml" before this migrations! -->
+
     <include file="classpath:db/changelog/db.changelog-1.0.xml"/>
     <include file="classpath:db/changelog/db.changelog-1.1.xml"/>
 </databaseChangeLog>
