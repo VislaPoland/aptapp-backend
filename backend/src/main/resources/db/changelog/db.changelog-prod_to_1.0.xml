@@ -2,14 +2,27 @@
 
 <!--
     This file will convert production database to 1.0 state.
-    Run only on production database, before deploying new application version.
     Do not forget to backup database before running this change log.
 -->
 
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
-    <changeSet author="Tomas Sedlak (generated)" id="changelog-1.0">
+    <changeSet author="Tomas Sedlak (generated)" id="changelog-prod_to_1.0">
+
+        <!-- This whole change set should be ran only if migrating from production database -->
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="account" />
+            <not>
+                <tableExists tableName="event_invite" />
+            </not>
+            <not>
+                <tableExists tableName="personal_message_group" />
+            </not>
+            <not>
+                <tableExists tableName="predefined_message" />
+            </not>
+        </preConditions>
 
         <createTable tableName="event_invite">
             <column name="id" type="BIGINT">
