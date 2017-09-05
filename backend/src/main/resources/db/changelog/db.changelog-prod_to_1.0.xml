@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!--
+    This file will convert production database to 1.0 state.
+    Run only on production database, before deploying new application version.
+    Do not forget to backup database before running this change log.
+-->
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="Tomas Sedlak (generated)" id="changelog-1.0">
+
+        <createTable tableName="event_invite">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="response" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attendant_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="personal_message_group">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="predefined_message">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <addColumn tableName="notification">
+            <column name="personal_message_group_id" type="int8"/>
+        </addColumn>
+    
+    
+        <addColumn tableName="personal_message">
+            <column name="personal_message_group_id" type="int8"/>
+        </addColumn>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="account_pkey" tableName="account"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="address_pkey" tableName="address"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="apartment_neighbor_pkey" tableName="apartment_neighbor"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="apartment_pkey" tableName="apartment"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="application_feature_pkey" tableName="application_feature"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="attachment_pkey" tableName="attachment"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="business_category_pkey" tableName="business_category"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="business_contact_pkey" tableName="business_contact"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="business_profile_carte_item_pkey" tableName="business_profile_carte_item"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="business_profile_pkey" tableName="business_profile"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="community_board_category_pkey" tableName="community_board_category"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="community_board_comment_pkey" tableName="community_board_comment"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="community_board_item_pkey" tableName="community_board_item"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="contact_pkey" tableName="contact"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="device_pkey" tableName="device"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="discount_coupon_pkey" tableName="discount_coupon"/>
+    
+    
+        <addPrimaryKey columnNames="account_id, discount_coupon_id" constraintName="discount_coupon_usage_pkey" tableName="discount_coupon_usage"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="event_invite_pkey" tableName="event_invite"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="facility_pkey" tableName="facility"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="maintenance_reservation_pkey" tableName="maintenance_reservation"/>
+    
+    
+        <addPrimaryKey columnNames="reservations_id, units_id" constraintName="maintenance_reservation_units_pkey" tableName="maintenance_reservation_units"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="maintenance_slot_schedule_pkey" tableName="maintenance_slot_schedule"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="notification_photo_pkey" tableName="notification_photo"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="notification_pkey" tableName="notification"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="parking_stall_pkey" tableName="parking_stall"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="personal_message_group_pkey" tableName="personal_message_group"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="personal_message_pkey" tableName="personal_message"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="predefined_message_pkey" tableName="predefined_message"/>
+    
+    
+        <addPrimaryKey columnNames="property_id, contacts_id" constraintName="property_contacts_pkey" tableName="property_contacts"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="property_photo_pkey" tableName="property_photo"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="property_pkey" tableName="property"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="slot_pkey" tableName="slot"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="slot_unit_pkey" tableName="slot_unit"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="vehicle_pkey" tableName="vehicle"/>
+    
+    
+        <addUniqueConstraint columnNames="primary_email" constraintName="uk_fqmeept8m2utiisu2adk11kk8" tableName="account"/>
+    
+    
+        <addUniqueConstraint columnNames="action_token" constraintName="uk_sih04bbt98wn0r4i19552bj6x" tableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="contacts_id" baseTableName="property_contacts" constraintName="FK1352a84hrj3lc8680x5cungyv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="contact"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_carte_photo_id" baseTableName="business_profile_carte_item" constraintName="FK192cwj6yp36jskidm1hhw1wfu" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="attachment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="attachment" constraintName="FK1p1wxg89onbm4yy65wv3hjyaa" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="to_account_id" baseTableName="personal_message" constraintName="FK2xxx1smbolr2qj4c4jou5nwtv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="personal_message_group_id" baseTableName="personal_message" constraintName="FK3dlmkg0e6m3dgo3se6nlm41ts" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="personal_message_group"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="apartment_id" baseTableName="apartment_neighbor" constraintName="FK4dxcsir6fn01ctsgndks8g13s" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="notification_id" baseTableName="maintenance_reservation" constraintName="FK4jhckovtii8fhtio9u1y37tj1" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="notification"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="property_contacts" constraintName="FK4wpjxgv2l8s39aqmop70bshqm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="account_id" baseTableName="device" constraintName="FK4ymqlu5vehympt66vlvs3wkf9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="target_apartment_id" baseTableName="notification" constraintName="FK56nl61yh9pbrac00i64gj13dd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="left_id" baseTableName="apartment" constraintName="FK5h8ptub7hvjawm1badkc80f8e" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment_neighbor"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="notification" constraintName="FK5q70g4hiic3kml8cs3j06id4s" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="notification" constraintName="FK65iryb1txcf687w7va2prjvbs" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="author_id" baseTableName="notification" constraintName="FK6bcg6ojhy8fbwhi5holfu4y9m" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="slot" constraintName="FK7iigcn1xp0hadbjscuaokilhi" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_carte_item_id" baseTableName="attachment" constraintName="FK7khfmir2ur8lndjl4ip6oevjm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile_carte_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="manager_id" baseTableName="account" constraintName="FK7li6h1pv9fyxv5enj14dxqvsc" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="business_profile_carte_item" constraintName="FK7mns09ix3yofvnr9iobslutes" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="schedule_id" baseTableName="property" constraintName="FK7w4nqwhw2261vw04fsfqv857l" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="maintenance_slot_schedule"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="event_id" baseTableName="event_invite" constraintName="FK7x84t30gw4855a184tkwkdjje" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slot"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="below_id" baseTableName="apartment" constraintName="FK84xsrbwfh1f1xaeel9df42vn3" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment_neighbor"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="reservations_id" baseTableName="maintenance_reservation_units" constraintName="FK86y74okcskrj82k635mhb0fi6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="maintenance_reservation"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="account_id" baseTableName="community_board_item" constraintName="FK8abrltms7g1u0mhy1ryplrkrc" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="community_board_item" constraintName="FK8t0omtjudkihku7h6bu7clf5c" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_category"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_item_id" baseTableName="community_board_item_photo_list" constraintName="FK90ymrb077m6iwed96y2li94c" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_item_id" baseTableName="notification" constraintName="FK93jvp945c12awb3vum1s0e36b" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="discount_coupon" constraintName="FK9pl5qad23ec8rnumtq2i407pd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="notification_id" baseTableName="notification_photo" constraintName="FK9qawt8xujfuv0yomfkctr7nu5" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="notification"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="right_id" baseTableName="apartment" constraintName="FKa452c9oe9qtjpdiyg3rd8xsji" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment_neighbor"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_category_list_id" baseTableName="business_profile_business_category_list" constraintName="FKaduhrr93bpknsl6nammxqmc82" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_category"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="slot_id" baseTableName="maintenance_reservation" constraintName="FKc3k7hj9i1qjpac7c3avk1a051" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slot"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="apartment" constraintName="FKc3lb81e85108s70gi5l3g2qoe" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="parent_comment_id" baseTableName="community_board_comment" constraintName="FKc5x7mc91ej8owotbb7lqg4lbf" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_comment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="community_board_item" constraintName="FKc8wi130y2gh6xua19ropk5lh7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_item_id" baseTableName="community_board_comment" constraintName="FKca50s0c40uk4m239v7yhr4m67" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_comment_id" baseTableName="notification" constraintName="FKcc11h8hw7uu9d1yxv60pu67uy" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_comment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="notification" constraintName="FKcv7xh2334rplo6xm5mdpa1sg2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="facility" constraintName="FKde5nwpgij6atm33vix5stubtt" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="attendant_id" baseTableName="event_invite" constraintName="FKdo04ocrulijcmwuct7idmqm8i" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="schedule_id" baseTableName="slot" constraintName="FKdof06c3ew4kjuiotglodvem0j" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="maintenance_slot_schedule"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="above_id" baseTableName="apartment" constraintName="FKehf0w7lv4cooqlf0k9k6oicg2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment_neighbor"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="discount_coupon_id" baseTableName="discount_coupon_usage" constraintName="FKepyk68038okmhpdam1cwh6l6d" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="discount_coupon"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="discount_coupon_id" baseTableName="attachment" constraintName="FKgwohecckh9sm3gtm6h57smm0w" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="discount_coupon"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="property" constraintName="FKhn57k0oalhnxkodp35tlv9d5x" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="address"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="using_tenant_id" baseTableName="parking_stall" constraintName="FKhng5q1gcsa4ne2eja3w4ebhl0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="units_id" baseTableName="maintenance_reservation_units" constraintName="FKikhqnkmvtvlwmadlpm3borc87" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slot_unit"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="application_feature" constraintName="FKims4st5mnqqbtrcf9nmimm7av" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="contact_id" baseTableName="business_profile" constraintName="FKir6y4sihgpn0vaw414c36ovw5" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_contact"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="property" constraintName="FKja0m33gxwwocaqmq2js99l757" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="account_id" baseTableName="discount_coupon_usage" constraintName="FKjxco38ivag9h7aojvncu670x1" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="personal_message_group_id" baseTableName="notification" constraintName="FKl2w3fmqm2g5xpha4lajhi1ary" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="personal_message_group"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="predefined_message" constraintName="FKli17w1xgcjo46dh3u7948jv4f" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="maintenance_slot_schedule_id" baseTableName="maintenance_slot_schedule_days_of_week" constraintName="FKly4t7vcgunfawg5nckwwjpiyy" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="maintenance_slot_schedule"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_item_id" baseTableName="attachment" constraintName="FKm0ib55lh3hu556hjexu1nygiq" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="author_id" baseTableName="community_board_comment" constraintName="FKm920oy47mhvk2i9yx5wt28t1a" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="parent_tenant_id" baseTableName="account" constraintName="FKmba9bj1dc67e116qaj0x212py" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="employee_id" baseTableName="maintenance_reservation" constraintName="FKmv6rn0bully6let4muhl29vwx" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="apartment_id" baseTableName="account" constraintName="FKn0xpcwrer535sc94bd5mrvas3" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="from_account_id" baseTableName="personal_message" constraintName="FKnfesnctt0le8rghyi3xter3ns" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="vehicle" constraintName="FKnrrlg60pw59mljpeietwyryn6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="property_photo" constraintName="FKotuj7oltuji023m3vwe8ygeoo" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="managed_property_id" baseTableName="account" constraintName="FKpv09sx1nu9y52nm4paplebit6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="photo_list_id" baseTableName="community_board_item_photo_list" constraintName="FKqhnqosw6ul13pcw8vw937fjl4" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="attachment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="slot_id" baseTableName="slot_unit" constraintName="FKr833s8ygrivc8iestdqivy20x" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slot"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="business_profile" constraintName="FKr8bd5124xd4u6eak3yh7ft2jl" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="discount_coupon_id" baseTableName="notification" constraintName="FKsa7mtby5c0n05nep0qu8b3x7d" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="discount_coupon"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="business_profile_business_category_list" constraintName="FKsnvgnvhtws20m5jl945rc3okr" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="discount_coupon_photo_id" baseTableName="discount_coupon" constraintName="FKv1pemmpq6wcn3d4f29iqfjep" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="attachment"/>
+    
+    
+        <dropUniqueConstraint constraintName="uk_hy8q04ifr1orx94kh1n77tkgw" tableName="discount_coupon_usage"/>
+    
+    
+        <dropUniqueConstraint constraintName="uk_jtd4r9jcpl0bp94dgl2yvwbhy" tableName="discount_coupon_usage"/>
+    
+    
+        <dropTable tableName="business_profile_business_profile_carte"/>
+    
+    
+        <dropTable tableName="business_profile_business_profile_photo_list"/>
+    
+    
+        <dropTable tableName="business_profile_discount_coupon_list"/>
+    
+    
+        <dropColumn columnName="behind_id" tableName="apartment"/>
+    
+    
+        <dropColumn columnName="country" tableName="contact"/>
+    
+    
+        <dropColumn columnName="group_id" tableName="notification"/>
+    
+    
+        <dropColumn columnName="house_number" tableName="contact"/>
+    
+    
+        <dropColumn columnName="opposite_id" tableName="apartment"/>
+    
+    
+        <dropColumn columnName="personal_message_id" tableName="notification"/>
+    
+    
+        <dropColumn columnName="state" tableName="contact"/>
+    
+    
+        <dropColumn columnName="street" tableName="contact"/>
+    
+    
+        <dropColumn columnName="target_role" tableName="maintenance_slot_schedule"/>
+    
+    
+        <dropColumn columnName="title" tableName="community_board_category"/>
+    
+    
+        <dropColumn columnName="zip_code" tableName="contact"/>
+    
+    
+        <addNotNullConstraint columnDataType="bigint" columnName="account_id" tableName="community_board_item"/>
+    
+    
+        <addNotNullConstraint columnDataType="bigint" columnName="category_id" tableName="community_board_item"/>
+    
+    
+        <modifyDataType columnName="city" newDataType="varchar(50)" tableName="business_contact"/>
+    
+    
+        <modifyDataType columnName="communication_value" newDataType="varchar(25)" tableName="business_contact"/>
+    
+    
+        <addNotNullConstraint columnDataType="varchar(255)" columnName="community_board_item_type" tableName="community_board_item"/>
+    
+    
+        <addNotNullConstraint columnDataType="varchar(255)" columnName="community_board_status" tableName="community_board_item"/>
+    
+    
+        <addNotNullConstraint columnDataType="bigint" columnName="contact_id" tableName="business_profile"/>
+    
+    
+        <modifyDataType columnName="content" newDataType="varchar(1024)" tableName="personal_message"/>
+        <addNotNullConstraint columnDataType="varchar(1024)" columnName="content" tableName="personal_message"/>
+    
+    
+        <addNotNullConstraint columnDataType="varchar(255)" columnName="delete_status" tableName="personal_message"/>
+    
+    
+        <modifyDataType columnName="description" newDataType="varchar(2048)" tableName="business_profile"/>
+    
+    
+        <addNotNullConstraint columnDataType="clob" columnName="description" tableName="community_board_item"/>
+    
+    
+        <modifyDataType columnName="description" newDataType="varchar(2048)" tableName="slot"/>
+    
+    
+        <modifyDataType columnName="dtype" newDataType="varchar(31)" tableName="notification"/>
+    
+    
+        <addNotNullConstraint columnDataType="bool" columnName="enable_sms" tableName="property"/>
+    
+    
+        <modifyDataType columnName="house_number" newDataType="varchar(10)" tableName="business_contact"/>
+    
+    
+        <addNotNullConstraint columnDataType="float8" columnName="price" tableName="community_board_item" defaultNullValue="0"/>
+    
+    
+        <addNotNullConstraint columnDataType="bigint" columnName="property_id" tableName="community_board_item"/>
+    
+    
+        <modifyDataType columnName="state" newDataType="varchar(50)" tableName="business_contact"/>
+    
+    
+        <addNotNullConstraint columnDataType="varchar(255)" columnName="title" tableName="community_board_item"/>
+    
+    
+        <addNotNullConstraint columnDataType="varchar(255)" columnName="title" tableName="personal_message"/>
+    </changeSet>
+</databaseChangeLog>
