@@ -22,7 +22,7 @@ public class ApartmentDto extends BasicApartmentDto {
     private Long propertyId;
 
     @ApiModelProperty(value = "Floor number")
-    private Integer floor;
+    private String floor;
 
     @ApiModelProperty(value = "Tenant ID")
     private Long tenantId;
@@ -52,7 +52,7 @@ public class ApartmentDto extends BasicApartmentDto {
         @ApiModelProperty(required = true)
         private String unitNumber;
         @ApiModelProperty(value = "Floor number")
-        private Integer floor;
+        private String floor;
     }
 
     @ApiModel

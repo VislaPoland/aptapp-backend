@@ -99,6 +99,8 @@ dependencies {
 	// https://github.com/springfox/springfox/issues/1804
 	runtime('io.springfox:springfox-swagger-ui:2.5.0')
 	runtime('org.postgresql:postgresql:42.1.4')
+	// Liquibase migrations
+	runtime('org.liquibase:liquibase-core:3.5.3')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')

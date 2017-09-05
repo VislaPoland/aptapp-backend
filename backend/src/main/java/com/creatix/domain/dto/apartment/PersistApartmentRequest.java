@@ -20,7 +20,7 @@ public class PersistApartmentRequest {
 
     @ApiModelProperty(value = "Floor number")
     @NotNull
-    private Integer floor;
+    private String floor;
 
     @ApiModelProperty(required = true)
     @NotNull

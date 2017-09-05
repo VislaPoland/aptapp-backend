@@ -16,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -58,7 +57,7 @@ public class ApartmentServiceTest extends TestContext {
         assertNotNull(property.getId());
 
         final PersistApartmentRequest req = new PersistApartmentRequest();
-        req.setFloor(2);
+        req.setFloor("2");
         req.setUnitNumber("28");
         final PersistApartmentRequest.NeighborsDto neighbors = new PersistApartmentRequest.NeighborsDto();
         req.setNeighbors(neighbors);
@@ -75,7 +74,7 @@ public class ApartmentServiceTest extends TestContext {
         assertNotNull(apartment.getNeighbors().getAbove());
         assertEquals("37", apartment.getNeighbors().getAbove().getUnitNumber());
         assertEquals(Long.valueOf(37), apartment.getNeighbors().getAbove().getApartment().getId());
-        assertEquals(Integer.valueOf(2), apartment.getFloor());
+        assertEquals("2", apartment.getFloor());
         assertNotNull(apartment.getNeighbors().getAbove().getId());
     }
 

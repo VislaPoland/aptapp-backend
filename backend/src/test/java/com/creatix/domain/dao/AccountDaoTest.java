@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -40,11 +41,11 @@ public class AccountDaoTest {
 
         final List<Account> accounts = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), propertyIdList);
         assertNotNull(accounts);
-        assertEquals(7, accounts.size());
+        assertEquals(8, accounts.size());
 
         final List<Account> accountsAll = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), Collections.emptyList());
         assertNotNull(accountsAll);
-        assertEquals(8, accountsAll.size());
+        assertEquals(9, accountsAll.size());
     }
 
 }

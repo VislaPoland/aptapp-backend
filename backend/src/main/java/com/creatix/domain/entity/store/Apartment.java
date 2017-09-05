@@ -33,8 +33,8 @@ public class Apartment {
     @NotNull
     private String unitNumber;
 
-    @Column
-    private Integer floor;
+    @Column(length = 16)
+    private String floor;
 
     @ManyToOne(optional = false)
     @JoinColumn

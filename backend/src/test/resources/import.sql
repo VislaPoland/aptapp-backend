@@ -66,29 +66,29 @@ INSERT INTO public.account (dtype, id, active, company_name, first_name, last_na
 
 
 -- apartments
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (11, '11', 1, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (12, '12', 1, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (13, '13', 1, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (14, '14', 1, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (15, '15', 1, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (16, '16', 1, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (17, '17', 1, 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (11, '11', '1', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (12, '12', '1', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (13, '13', '1', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (14, '14', '1', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (15, '15', '1', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (16, '16', '1', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (17, '17', '1', 1);
 
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (21, '21', 2, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (22, '22', 2, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (23, '23', 2, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (24, '24', 2, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (25, '25', 2, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (26, '26', 2, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (27, '27', 2, 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (21, '21', '2', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (22, '22', '2', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (23, '23', '2', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (24, '24', '2', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (25, '25', '2', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (26, '26', '2', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (27, '27', '2', 1);
 
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (31, '31', 3, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (32, '32', 3, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (33, '33', 3, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (34, '34', 3, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (35, '35', 3, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (36, '36', 3, 1);
-INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (37, '37', 3, 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (31, '31', '3', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (32, '32', '3', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (33, '33', '3', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (34, '34', '3', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (35, '35', '3', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (36, '36', '3', 1);
+INSERT INTO public.apartment (id, unit_number, floor, property_id) VALUES (37, '37', '3', 1);
 
 INSERT INTO public.apartment_neighbor (id, unit_number, apartment_id) VALUES (11, '11', 11);
 INSERT INTO public.apartment_neighbor (id, unit_number, apartment_id) VALUES (12, '12', 12);

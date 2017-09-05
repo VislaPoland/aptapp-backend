@@ -10,6 +10,6 @@ public class CommunityBoardApartmentInfo {
 
     private Long id;
     private String unitNumber;
-    private Integer floor;
+    private String floor;
 
 }

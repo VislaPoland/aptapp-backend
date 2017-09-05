@@ -1,0 +1,1189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Tomas Sedlak (generated)" id="changelog-1.0">
+
+        <!-- This whole change set should be ran only if database is empty -->
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="account" />
+            </not>
+        </preConditions>
+
+        <createSequence sequenceName="hibernate_sequence"/>
+    
+    
+        <createTable tableName="account">
+            <column name="dtype" type="VARCHAR(31)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_token" type="VARCHAR(128)"/>
+            <column name="action_token_valid_until" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="active" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="company_name" type="VARCHAR(255)"/>
+            <column name="created_at" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(255)"/>
+            <column name="primary_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primary_phone" type="VARCHAR(255)"/>
+            <column name="role" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secondary_email" type="VARCHAR(255)"/>
+            <column name="secondary_phone" type="VARCHAR(255)"/>
+            <column name="updated_at" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="website" type="VARCHAR(255)"/>
+            <column name="is_privacy_policy_accepted" type="BOOL"/>
+            <column name="is_tac_accepted" type="BOOL"/>
+            <column name="enable_sms" type="BOOL"/>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="manager_id" type="BIGINT"/>
+            <column name="managed_property_id" type="BIGINT"/>
+            <column name="parent_tenant_id" type="BIGINT"/>
+            <column name="apartment_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="address">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="house_number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="street_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="town" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="zip_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="apartment">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="above_id" type="BIGINT"/>
+            <column name="below_id" type="BIGINT"/>
+            <column name="left_id" type="BIGINT"/>
+            <column name="right_id" type="BIGINT"/>
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="floor" type="INT"/>
+        </createTable>
+    
+    
+        <createTable tableName="apartment_neighbor">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_number" type="VARCHAR(255)"/>
+            <column name="apartment_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="application_feature">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="application_feature_type" type="VARCHAR(255)"/>
+            <column name="enabled" type="BOOL"/>
+            <column name="property_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="attachment">
+            <column name="dtype" type="VARCHAR(31)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attached_entity_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attachment_media_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_path" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="business_profile_carte_item_id" type="BIGINT"/>
+            <column name="business_profile_id" type="BIGINT"/>
+            <column name="discount_coupon_id" type="BIGINT"/>
+            <column name="community_board_item_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="business_category">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="business_contact">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city" type="VARCHAR(50)"/>
+            <column name="communication_type" type="VARCHAR(255)"/>
+            <column name="communication_value" type="VARCHAR(25)"/>
+            <column name="house_number" type="VARCHAR(10)"/>
+            <column name="state" type="VARCHAR(50)"/>
+            <column name="street" type="VARCHAR(255)"/>
+            <column name="zip_code" type="VARCHAR(10)"/>
+        </createTable>
+    
+    
+        <createTable tableName="business_profile">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="default_photo_id" type="BIGINT"/>
+            <column name="description" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lat" type="FLOAT8"/>
+            <column name="lng" type="FLOAT8"/>
+            <column name="name" type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="website" type="VARCHAR(255)"/>
+            <column name="contact_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="business_profile_business_category_list">
+            <column name="business_profile_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="business_category_list_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="business_profile_carte_item">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="business_profile_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="business_profile_carte_photo_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="community_board_category">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    
+    
+        <createTable tableName="community_board_comment">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="VARCHAR(255)"/>
+            <column name="created_at" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="author_id" type="BIGINT"/>
+            <column name="community_board_item_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_comment_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="community_board_item">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="community_board_item_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="community_board_status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="show_apartment_number" type="BOOL"/>
+            <column name="show_email_address" type="BOOL"/>
+            <column name="show_phone_number" type="BOOL"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="community_board_item_photo_list">
+            <column name="community_board_item_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="photo_list_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="contact">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="device">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="platform" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="push_token" type="VARCHAR(255)"/>
+            <column name="udid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="version" type="VARCHAR(255)"/>
+            <column name="account_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="discount_coupon">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="available_uses" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="enabled" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="business_profile_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="discount_coupon_photo_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="discount_coupon_usage">
+            <column name="uses_left" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="discount_coupon_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="event_invite">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="response" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attendant_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="facility">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(4096)"/>
+            <column name="location" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="opening_hours" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="maintenance_reservation">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="begin_time" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="capacity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration_minutes" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="note" type="VARCHAR(2048)"/>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="employee_id" type="BIGINT"/>
+            <column name="notification_id" type="BIGINT"/>
+            <column name="slot_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="maintenance_reservation_units">
+            <column name="reservations_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="units_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="maintenance_slot_schedule">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="begin_time" type="TIME WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="TIME WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="initial_capacity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time_zone" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_duration_minutes" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="maintenance_slot_schedule_days_of_week">
+            <column name="maintenance_slot_schedule_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="days_of_week" type="VARCHAR(255)"/>
+        </createTable>
+    
+    
+        <createTable tableName="notification">
+            <column name="dtype" type="VARCHAR(31)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="description" type="VARCHAR(100)"/>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="access_if_not_at_home" type="BOOL"/>
+            <column name="response" type="VARCHAR(255)"/>
+            <column name="author_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_id" type="BIGINT"/>
+            <column name="recipient_id" type="BIGINT"/>
+            <column name="business_profile_id" type="BIGINT"/>
+            <column name="community_board_comment_id" type="BIGINT"/>
+            <column name="community_board_item_id" type="BIGINT"/>
+            <column name="discount_coupon_id" type="BIGINT"/>
+            <column name="target_apartment_id" type="BIGINT"/>
+            <column name="personal_message_group_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="notification_photo">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_path" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notification_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="parking_stall">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="using_tenant_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="personal_message">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delete_status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message_status" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_account_id" type="BIGINT"/>
+            <column name="personal_message_group_id" type="BIGINT"/>
+            <column name="to_account_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="personal_message_group">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="predefined_message">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="property">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delete_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="enable_sms" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time_zone" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="schedule_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="property_contacts">
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contacts_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="property_photo">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_path" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="slot">
+            <column name="dtype" type="VARCHAR(31)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="begin_time" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="TIMESTAMP(6) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_duration_minutes" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="audience" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(2048)"/>
+            <column name="location" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="schedule_id" type="BIGINT"/>
+        </createTable>
+    
+    
+        <createTable tableName="slot_unit">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="capacity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="initial_capacity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="offset" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slot_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <createTable tableName="vehicle">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="color" type="VARCHAR(255)"/>
+            <column name="license_plate" type="VARCHAR(255)"/>
+            <column name="make" type="VARCHAR(255)"/>
+            <column name="model" type="VARCHAR(255)"/>
+            <column name="year" type="INT"/>
+            <column name="owner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="account_pkey" tableName="account"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="address_pkey" tableName="address"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="apartment_neighbor_pkey" tableName="apartment_neighbor"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="apartment_pkey" tableName="apartment"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="application_feature_pkey" tableName="application_feature"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="attachment_pkey" tableName="attachment"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="business_category_pkey" tableName="business_category"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="business_contact_pkey" tableName="business_contact"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="business_profile_carte_item_pkey" tableName="business_profile_carte_item"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="business_profile_pkey" tableName="business_profile"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="community_board_category_pkey" tableName="community_board_category"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="community_board_comment_pkey" tableName="community_board_comment"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="community_board_item_pkey" tableName="community_board_item"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="contact_pkey" tableName="contact"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="device_pkey" tableName="device"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="discount_coupon_pkey" tableName="discount_coupon"/>
+    
+    
+        <addPrimaryKey columnNames="account_id, discount_coupon_id" constraintName="discount_coupon_usage_pkey" tableName="discount_coupon_usage"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="event_invite_pkey" tableName="event_invite"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="facility_pkey" tableName="facility"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="maintenance_reservation_pkey" tableName="maintenance_reservation"/>
+    
+    
+        <addPrimaryKey columnNames="reservations_id, units_id" constraintName="maintenance_reservation_units_pkey" tableName="maintenance_reservation_units"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="maintenance_slot_schedule_pkey" tableName="maintenance_slot_schedule"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="notification_photo_pkey" tableName="notification_photo"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="notification_pkey" tableName="notification"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="parking_stall_pkey" tableName="parking_stall"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="personal_message_group_pkey" tableName="personal_message_group"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="personal_message_pkey" tableName="personal_message"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="predefined_message_pkey" tableName="predefined_message"/>
+    
+    
+        <addPrimaryKey columnNames="property_id, contacts_id" constraintName="property_contacts_pkey" tableName="property_contacts"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="property_photo_pkey" tableName="property_photo"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="property_pkey" tableName="property"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="slot_pkey" tableName="slot"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="slot_unit_pkey" tableName="slot_unit"/>
+    
+    
+        <addPrimaryKey columnNames="id" constraintName="vehicle_pkey" tableName="vehicle"/>
+    
+    
+        <addUniqueConstraint columnNames="unit_number, property_id" constraintName="UK9o7mjaiboffujs6ctxdh82dmj" tableName="apartment"/>
+    
+    
+        <addUniqueConstraint columnNames="slot_id, offset" constraintName="UKoxw1c940o8iwoxua14ipno6fy" tableName="slot_unit"/>
+    
+    
+        <addUniqueConstraint columnNames="property_id, application_feature_type" constraintName="UKs5pessj9x2rhbcx4bawaq3hiu" tableName="application_feature"/>
+    
+    
+        <addUniqueConstraint columnNames="address_id" constraintName="uk_5ly66b153lksl8njtd39hj6mq" tableName="property"/>
+    
+    
+        <addUniqueConstraint columnNames="primary_email" constraintName="uk_fqmeept8m2utiisu2adk11kk8" tableName="account"/>
+    
+    
+        <addUniqueConstraint columnNames="photo_list_id" constraintName="uk_g52p7ee58etay22wyo275ifbo" tableName="community_board_item_photo_list"/>
+    
+    
+        <addUniqueConstraint columnNames="action_token" constraintName="uk_sih04bbt98wn0r4i19552bj6x" tableName="account"/>
+    
+    
+        <addUniqueConstraint columnNames="contact_id" constraintName="uk_suf220r6xs2vmfiifky117yqe" tableName="business_profile"/>
+    
+    
+        <addUniqueConstraint columnNames="contacts_id" constraintName="uk_t7olm2p3rry677iuhgsuvy8lv" tableName="property_contacts"/>
+    
+    
+        <createIndex indexName="IDX1fvn2ttvg7ow1xtpvw8xpb32y" tableName="account">
+            <column name="parent_tenant_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDX1sc1x40rtfv2fpd6t8ru6pby1" tableName="facility">
+            <column name="property_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDX22eic87slr9x79wvo0giy0fo1" tableName="maintenance_reservation">
+            <column name="slot_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDX2bkhj3228atnk18vshn8hk6jw" tableName="apartment_neighbor">
+            <column name="apartment_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDX2vbgvffsf29q5c6nntnqdtwuo" tableName="apartment">
+            <column name="below_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDX3hrs9qhyj9ealsgeyxyj6e2f7" tableName="apartment">
+            <column name="right_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDX3id8tbpnk40tqo2eag7pthmfl" tableName="maintenance_reservation">
+            <column name="employee_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDX50hfakotqstyd201xxvx48wdi" tableName="property_photo">
+            <column name="property_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDX5sjvcyu0pg5tmfc575rk33jr1" tableName="slot">
+            <column name="begin_time"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXaerxogce3cwxq7hfloqwa6vpa" tableName="account">
+            <column name="manager_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXcw6i6efq53vfbje6gf4nginql" tableName="maintenance_reservation">
+            <column name="status"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXde2i41mjca4ajig6jocq30n5q" tableName="notification">
+            <column name="recipient_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXdti39chx1c5gpykxehn2ln1k3" tableName="slot_unit">
+            <column name="slot_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXee5toikq70m1x4ot5cdbup1y0" tableName="notification">
+            <column name="author_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXeh1igskysusjhyasv6xi2gde3" tableName="slot">
+            <column name="end_time"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXg33k8wcrps8suddvmxpf2k3hn" tableName="slot">
+            <column name="property_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXhtw1fi2v6stuug3lr9ef51lkt" tableName="notification">
+            <column name="target_apartment_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXi16spbf1xaguwn0ptmoe2e6ni" tableName="vehicle">
+            <column name="owner_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXiab7mihm0newe8qvt1smxs0tl" tableName="apartment">
+            <column name="property_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXict4jqfiupblnuitdioj5dndo" tableName="device">
+            <column name="account_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXih7r1tx315qvcpb3lusj0b2v3" tableName="property">
+            <column name="owner_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXjkm0p46hk6ywox9vm558ammsq" tableName="account">
+            <column name="apartment_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXjqmpwsn1atpo7gu2lpexn3tj7" tableName="property">
+            <column name="schedule_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXkh3ck953q602ngkhcn10qhuod" tableName="notification_photo">
+            <column name="notification_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXl78089x2qy9gjpuhg34473iwg" tableName="apartment">
+            <column name="above_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXp2sugm92j45j8xy41bypimekk" tableName="parking_stall">
+            <column name="using_tenant_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXp473fp10m52831c1ewjmfqv3h" tableName="notification">
+            <column name="property_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXpxv7brn5bk718ljx88bh9yd0q" tableName="maintenance_reservation_units">
+            <column name="units_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXqt4jd59fvgm2g34shnedrfpis" tableName="maintenance_reservation_units">
+            <column name="reservations_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXr32jakm213ern12kubtjn18mi" tableName="apartment">
+            <column name="left_id"/>
+        </createIndex>
+    
+    
+        <createIndex indexName="IDXruqop48quytxidhluwrt6jba0" tableName="slot">
+            <column name="schedule_id"/>
+        </createIndex>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="contacts_id" baseTableName="property_contacts" constraintName="FK1352a84hrj3lc8680x5cungyv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="contact"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_carte_photo_id" baseTableName="business_profile_carte_item" constraintName="FK192cwj6yp36jskidm1hhw1wfu" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="attachment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="attachment" constraintName="FK1p1wxg89onbm4yy65wv3hjyaa" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="to_account_id" baseTableName="personal_message" constraintName="FK2xxx1smbolr2qj4c4jou5nwtv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="personal_message_group_id" baseTableName="personal_message" constraintName="FK3dlmkg0e6m3dgo3se6nlm41ts" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="personal_message_group"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="apartment_id" baseTableName="apartment_neighbor" constraintName="FK4dxcsir6fn01ctsgndks8g13s" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="notification_id" baseTableName="maintenance_reservation" constraintName="FK4jhckovtii8fhtio9u1y37tj1" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="notification"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="property_contacts" constraintName="FK4wpjxgv2l8s39aqmop70bshqm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="account_id" baseTableName="device" constraintName="FK4ymqlu5vehympt66vlvs3wkf9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="target_apartment_id" baseTableName="notification" constraintName="FK56nl61yh9pbrac00i64gj13dd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="left_id" baseTableName="apartment" constraintName="FK5h8ptub7hvjawm1badkc80f8e" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment_neighbor"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="notification" constraintName="FK5q70g4hiic3kml8cs3j06id4s" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="notification" constraintName="FK65iryb1txcf687w7va2prjvbs" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="author_id" baseTableName="notification" constraintName="FK6bcg6ojhy8fbwhi5holfu4y9m" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="slot" constraintName="FK7iigcn1xp0hadbjscuaokilhi" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_carte_item_id" baseTableName="attachment" constraintName="FK7khfmir2ur8lndjl4ip6oevjm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile_carte_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="manager_id" baseTableName="account" constraintName="FK7li6h1pv9fyxv5enj14dxqvsc" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="business_profile_carte_item" constraintName="FK7mns09ix3yofvnr9iobslutes" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="schedule_id" baseTableName="property" constraintName="FK7w4nqwhw2261vw04fsfqv857l" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="maintenance_slot_schedule"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="event_id" baseTableName="event_invite" constraintName="FK7x84t30gw4855a184tkwkdjje" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slot"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="below_id" baseTableName="apartment" constraintName="FK84xsrbwfh1f1xaeel9df42vn3" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment_neighbor"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="reservations_id" baseTableName="maintenance_reservation_units" constraintName="FK86y74okcskrj82k635mhb0fi6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="maintenance_reservation"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="account_id" baseTableName="community_board_item" constraintName="FK8abrltms7g1u0mhy1ryplrkrc" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="community_board_item" constraintName="FK8t0omtjudkihku7h6bu7clf5c" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_category"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_item_id" baseTableName="community_board_item_photo_list" constraintName="FK90ymrb077m6iwed96y2li94c" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_item_id" baseTableName="notification" constraintName="FK93jvp945c12awb3vum1s0e36b" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="discount_coupon" constraintName="FK9pl5qad23ec8rnumtq2i407pd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="notification_id" baseTableName="notification_photo" constraintName="FK9qawt8xujfuv0yomfkctr7nu5" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="notification"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="right_id" baseTableName="apartment" constraintName="FKa452c9oe9qtjpdiyg3rd8xsji" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment_neighbor"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_category_list_id" baseTableName="business_profile_business_category_list" constraintName="FKaduhrr93bpknsl6nammxqmc82" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_category"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="slot_id" baseTableName="maintenance_reservation" constraintName="FKc3k7hj9i1qjpac7c3avk1a051" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slot"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="apartment" constraintName="FKc3lb81e85108s70gi5l3g2qoe" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="parent_comment_id" baseTableName="community_board_comment" constraintName="FKc5x7mc91ej8owotbb7lqg4lbf" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_comment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="community_board_item" constraintName="FKc8wi130y2gh6xua19ropk5lh7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_item_id" baseTableName="community_board_comment" constraintName="FKca50s0c40uk4m239v7yhr4m67" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_comment_id" baseTableName="notification" constraintName="FKcc11h8hw7uu9d1yxv60pu67uy" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_comment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="notification" constraintName="FKcv7xh2334rplo6xm5mdpa1sg2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="facility" constraintName="FKde5nwpgij6atm33vix5stubtt" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="attendant_id" baseTableName="event_invite" constraintName="FKdo04ocrulijcmwuct7idmqm8i" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="schedule_id" baseTableName="slot" constraintName="FKdof06c3ew4kjuiotglodvem0j" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="maintenance_slot_schedule"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="above_id" baseTableName="apartment" constraintName="FKehf0w7lv4cooqlf0k9k6oicg2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment_neighbor"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="discount_coupon_id" baseTableName="discount_coupon_usage" constraintName="FKepyk68038okmhpdam1cwh6l6d" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="discount_coupon"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="discount_coupon_id" baseTableName="attachment" constraintName="FKgwohecckh9sm3gtm6h57smm0w" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="discount_coupon"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="property" constraintName="FKhn57k0oalhnxkodp35tlv9d5x" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="address"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="using_tenant_id" baseTableName="parking_stall" constraintName="FKhng5q1gcsa4ne2eja3w4ebhl0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="units_id" baseTableName="maintenance_reservation_units" constraintName="FKikhqnkmvtvlwmadlpm3borc87" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slot_unit"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="application_feature" constraintName="FKims4st5mnqqbtrcf9nmimm7av" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="contact_id" baseTableName="business_profile" constraintName="FKir6y4sihgpn0vaw414c36ovw5" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_contact"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="property" constraintName="FKja0m33gxwwocaqmq2js99l757" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="account_id" baseTableName="discount_coupon_usage" constraintName="FKjxco38ivag9h7aojvncu670x1" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="personal_message_group_id" baseTableName="notification" constraintName="FKl2w3fmqm2g5xpha4lajhi1ary" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="personal_message_group"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="predefined_message" constraintName="FKli17w1xgcjo46dh3u7948jv4f" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="maintenance_slot_schedule_id" baseTableName="maintenance_slot_schedule_days_of_week" constraintName="FKly4t7vcgunfawg5nckwwjpiyy" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="maintenance_slot_schedule"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="community_board_item_id" baseTableName="attachment" constraintName="FKm0ib55lh3hu556hjexu1nygiq" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="community_board_item"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="author_id" baseTableName="community_board_comment" constraintName="FKm920oy47mhvk2i9yx5wt28t1a" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="parent_tenant_id" baseTableName="account" constraintName="FKmba9bj1dc67e116qaj0x212py" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="employee_id" baseTableName="maintenance_reservation" constraintName="FKmv6rn0bully6let4muhl29vwx" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="apartment_id" baseTableName="account" constraintName="FKn0xpcwrer535sc94bd5mrvas3" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="apartment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="from_account_id" baseTableName="personal_message" constraintName="FKnfesnctt0le8rghyi3xter3ns" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="vehicle" constraintName="FKnrrlg60pw59mljpeietwyryn6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="account"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="property_photo" constraintName="FKotuj7oltuji023m3vwe8ygeoo" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="managed_property_id" baseTableName="account" constraintName="FKpv09sx1nu9y52nm4paplebit6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="photo_list_id" baseTableName="community_board_item_photo_list" constraintName="FKqhnqosw6ul13pcw8vw937fjl4" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="attachment"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="slot_id" baseTableName="slot_unit" constraintName="FKr833s8ygrivc8iestdqivy20x" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slot"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="business_profile" constraintName="FKr8bd5124xd4u6eak3yh7ft2jl" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="discount_coupon_id" baseTableName="notification" constraintName="FKsa7mtby5c0n05nep0qu8b3x7d" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="discount_coupon"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="business_profile_id" baseTableName="business_profile_business_category_list" constraintName="FKsnvgnvhtws20m5jl945rc3okr" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="business_profile"/>
+    
+    
+        <addForeignKeyConstraint baseColumnNames="discount_coupon_photo_id" baseTableName="discount_coupon" constraintName="FKv1pemmpq6wcn3d4f29iqfjep" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="attachment"/>
+    </changeSet>
+</databaseChangeLog>

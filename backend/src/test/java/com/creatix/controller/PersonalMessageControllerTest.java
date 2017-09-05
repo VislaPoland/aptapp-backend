@@ -9,7 +9,6 @@ import com.creatix.controller.v1.message.PersonalMessageRequestType;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.NotificationDto;
-import com.creatix.domain.dto.notification.message.PersonalMessageAccountDto;
 import com.creatix.domain.dto.notification.message.PersonalMessageDto;
 import com.creatix.domain.dto.notification.personal.PersonalMessageNotificationDto;
 import com.creatix.domain.enums.NotificationRequestType;
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -66,7 +64,7 @@ public class PersonalMessageControllerTest {
         final NotificationDto notification = notifications.getData().get(0);
         assertTrue(notification instanceof PersonalMessageNotificationDto);
         final PersonalMessageNotificationDto pmNotif = (PersonalMessageNotificationDto) notification;
-        assertNotNull(pmNotif.getPersonalMessage());
+        assertNull(pmNotif.getPersonalMessage());
     }
 
 }
