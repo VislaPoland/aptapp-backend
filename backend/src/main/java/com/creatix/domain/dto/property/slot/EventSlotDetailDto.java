@@ -7,15 +7,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Map;
 
 @ApiModel
 @Getter
 @Setter
 public class EventSlotDetailDto extends EventSlotDto {
 
-    @ApiModelProperty(value = "List of responses to the event", example = "{'Going':[{'id':0,'firstName':'','lastName':''}], 'Maybe':[]}", dataType = "java.util.Map<EventInviteResponse, java.util.List<AccountDto>>")
-	private Map<EventInviteResponse, List<AccountDto>> responses;
+    @ApiModelProperty(value = "List of responses to the event", notes = "API version 'v1' or newer")
+	private List<Rsvp> responses;
 
 	@ApiModel
     @Getter
@@ -27,5 +26,15 @@ public class EventSlotDetailDto extends EventSlotDto {
         private String firstName;
         @ApiModelProperty(required = true)
         private String lastName;
+    }
+
+    @ApiModel
+    @Getter
+    @Setter
+    public static class Rsvp {
+        @ApiModelProperty(required = true)
+        private EventInviteResponse response;
+        @ApiModelProperty(required = true)
+        private AccountDto attendant;
     }
 }

@@ -2,28 +2,9 @@ package com.creatix.service;
 
 import com.creatix.domain.Mapper;
 import com.creatix.domain.SlotUtils;
-import com.creatix.domain.dao.DaoBase;
-import com.creatix.domain.dao.EventInviteDao;
-import com.creatix.domain.dao.EventSlotDao;
-import com.creatix.domain.dao.MaintenanceSlotDao;
-import com.creatix.domain.dao.MaintenanceSlotScheduleDao;
-import com.creatix.domain.dao.PropertyDao;
-import com.creatix.domain.dao.SlotDao;
-import com.creatix.domain.dao.SlotUnitDao;
-import com.creatix.domain.dto.account.AccountDto;
-import com.creatix.domain.dto.property.slot.EventSlotDetailDto;
-import com.creatix.domain.dto.property.slot.MaintenanceSlotDto;
-import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
-import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
-import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
-import com.creatix.domain.dto.property.slot.SlotDto;
-import com.creatix.domain.entity.store.EventInvite;
-import com.creatix.domain.entity.store.EventSlot;
-import com.creatix.domain.entity.store.MaintenanceSlot;
-import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
-import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.Slot;
-import com.creatix.domain.entity.store.SlotUnit;
+import com.creatix.domain.dao.*;
+import com.creatix.domain.dto.property.slot.*;
+import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.AudienceType;
@@ -43,20 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -243,14 +212,15 @@ public class SlotService {
             throw new SecurityException("Not allowed to read event detail without invitation");
         }
 
-        List<EventInvite> invites = eventInviteDao.findByEventSlotIdFilterByAttendantNameOrderByAttendantFirstNameAsc(slotId, filter);
 
         final EventSlotDetailDto detailDto = mapper.toEventSlotDetailDto(eventSlot);
-        detailDto.setResponses(invites.stream()
-                .collect(Collectors.groupingBy(EventInvite::getResponse)).entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                        .map(i -> mapper.toEventSlotDetailAccountDto(i.getAttendant()))
-                        .collect(Collectors.toList()))));
+        final List<EventInvite> invites = eventInviteDao.findByEventSlotIdFilterByAttendantNameOrderByAttendantFirstNameAsc(slotId, filter);
+        detailDto.setResponses(invites.stream().map(invite -> {
+            final EventSlotDetailDto.Rsvp dao = new EventSlotDetailDto.Rsvp();
+            dao.setResponse(invite.getResponse());
+            dao.setAttendant(mapper.toEventSlotDetailAccountDto(invite.getAttendant()));
+            return dao;
+        }).collect(Collectors.toList()));
 
         return detailDto;
     }
