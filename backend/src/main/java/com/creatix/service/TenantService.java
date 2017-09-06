@@ -4,7 +4,8 @@ import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
-import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
+import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
+import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ParkingStall;
 import com.creatix.domain.entity.store.Vehicle;
@@ -167,12 +168,12 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.Tenant})
-    public SubTenant createSubTenant(@NotNull PersistSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+    public SubTenant createSubTenant(@NotNull CreateSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return createSubTenant(authorizationManager.getCurrentAccount().getId(), request);
     }
 
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public SubTenant createSubTenant(Long tenantId, @NotNull PersistSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+    public SubTenant createSubTenant(Long tenantId, @NotNull CreateSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Objects.requireNonNull(request);
 
         preventAccountDuplicity(request.getPrimaryEmail(), null);
@@ -201,18 +202,17 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.Tenant})
-    public SubTenant updateSubTenant(Long subTenantId, @NotNull PersistSubTenantRequest request) {
+    public SubTenant updateSubTenant(Long subTenantId, @NotNull UpdateSubTenantRequest request) {
         return updateSubTenant(authorizationManager.getCurrentAccount().getId(), subTenantId, request);
     }
 
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public SubTenant updateSubTenant(Long tenantId, Long subTenantId, @NotNull PersistSubTenantRequest request) {
+    public SubTenant updateSubTenant(Long tenantId, Long subTenantId, @NotNull UpdateSubTenantRequest request) {
         Objects.requireNonNull(request);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
             final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
-            preventAccountDuplicity(request.getPrimaryEmail(), subTenant.getPrimaryEmail());
 
             if ( tenant.getSubTenants().contains(subTenant) ) {
                 mapper.fillSubTenant(request, subTenant);

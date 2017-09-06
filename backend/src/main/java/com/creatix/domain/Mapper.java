@@ -29,8 +29,9 @@ import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
 import com.creatix.domain.dto.tenant.VehicleDto;
-import com.creatix.domain.dto.tenant.subs.PersistSubTenantRequest;
+import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
+import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
@@ -458,7 +459,10 @@ public class Mapper {
                 .byDefault()
                 .register();
 
-        mapperFactory.classMap(PersistSubTenantRequest.class, SubTenant.class)
+        mapperFactory.classMap(CreateSubTenantRequest.class, SubTenant.class)
+                .byDefault()
+                .register();
+        mapperFactory.classMap(UpdateSubTenantRequest.class, SubTenant.class)
                 .byDefault()
                 .register();
 
@@ -726,7 +730,7 @@ public class Mapper {
         return mapperFactory.getMapperFacade().map(subTenant, com.creatix.domain.dto.tenant.subs.SubTenantDto.class);
     }
 
-    public SubTenant toSubTenant(@NotNull PersistSubTenantRequest request) {
+    public SubTenant toSubTenant(@NotNull CreateSubTenantRequest request) {
         Objects.requireNonNull(request);
 
         return mapperFactory.getMapperFacade().map(request, SubTenant.class);
@@ -738,7 +742,7 @@ public class Mapper {
     }
 
 
-    public void fillSubTenant(@NotNull PersistSubTenantRequest request, @NotNull SubTenant entity) {
+    public void fillSubTenant(@NotNull UpdateSubTenantRequest request, @NotNull SubTenant entity) {
         Objects.requireNonNull(request);
         Objects.requireNonNull(entity);
 
