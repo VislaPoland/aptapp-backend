@@ -28,4 +28,7 @@ public class PersistSubTenantRequest {
     @NotEmpty
     @Email
     private String primaryEmail;
+
+    @ApiModelProperty(value = "Company name")
+    private String companyName;
 }
