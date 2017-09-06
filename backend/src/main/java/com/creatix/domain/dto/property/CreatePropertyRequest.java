@@ -7,12 +7,14 @@ import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @ApiModel
 @Data
 public class CreatePropertyRequest {
 
     @NotEmpty
+    @Size(max = 255)
     @ApiModelProperty(value = "Name of property", required = true)
     private String name;
 
@@ -26,7 +28,12 @@ public class CreatePropertyRequest {
 
     @NotNull
     @ApiModelProperty(value = "Time zone of the property")
+    @Size(max = 255)
     private String timeZone;
+
+    @ApiModelProperty(value = "Pay rent page url")
+    @Size(max = 512)
+    private String payRentUrl;
 
     @NotNull
     @ApiModelProperty(value = "Enable/disable sms notifications", required = true, notes = "Indicate that sms message notifications are enabled/disabled")

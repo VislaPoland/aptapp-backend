@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -56,6 +57,10 @@ public class Property {
     @Column(nullable = false)
     @NotNull
     private String timeZone;
+
+    @Column(length = 512)
+    @Length(max = 512)
+    private String payRentUrl;
 
     @ManyToOne(optional = false)
     @JoinColumn

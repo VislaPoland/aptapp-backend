@@ -2,7 +2,10 @@ package com.creatix.domain.dto.property;
 
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
-import com.creatix.domain.enums.*;
+import com.creatix.domain.enums.CommunicationType;
+import com.creatix.domain.enums.ContactType;
+import com.creatix.domain.enums.FacilityType;
+import com.creatix.domain.enums.PropertyStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -45,6 +48,8 @@ public class PropertyDto {
     private Boolean enableSms;
     @ApiModelProperty(value = "Property status")
     private PropertyStatus status;
+    @ApiModelProperty(value = "Pay rent page url")
+    private String payRentUrl;
 
     @ApiModel
     @Data
