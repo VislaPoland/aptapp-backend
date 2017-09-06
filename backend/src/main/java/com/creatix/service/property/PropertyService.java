@@ -2,11 +2,9 @@ package com.creatix.service.property;
 
 import com.creatix.configuration.FileUploadProperties;
 import com.creatix.domain.Mapper;
-import com.creatix.domain.dao.DaoBase;
-import com.creatix.domain.dao.PropertyDao;
-import com.creatix.domain.dao.PropertyOwnerDao;
-import com.creatix.domain.dao.PropertyPhotoDao;
+import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.CreatePropertyRequest;
+import com.creatix.domain.dto.property.PropertyStatsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.PropertyPhoto;
@@ -28,10 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +36,8 @@ public class PropertyService {
     private PropertyDao propertyDao;
     @Autowired
     private PropertyOwnerDao propertyOwnerDao;
+    @Autowired
+    private AccountDao accountDao;
 
     @Autowired
     private Mapper mapper;
@@ -129,6 +126,7 @@ public class PropertyService {
     }
 
 
+    @RoleSecured
     public Property storePropertyPhotos(MultipartFile[] files, long propertyId) throws IOException {
 
         final Property property = getProperty(propertyId);
@@ -179,4 +177,17 @@ public class PropertyService {
         return photo;
     }
 
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public @NotNull PropertyStatsDto getPropertyStats(@NotNull Long propertyId) {
+        Objects.requireNonNull(propertyId, "property id");
+
+        final PropertyStatsDto stats = new PropertyStatsDto();
+        stats.setId(propertyId);
+        stats.setEmployeeCount(accountDao.countByRoleAndActivationStatus(EnumSet.of(AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security), null));
+        stats.setActivatedEmployeeCount(accountDao.countByRoleAndActivationStatus(EnumSet.of(AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security), true));
+        stats.setResidentCount(accountDao.countByRoleAndActivationStatus(EnumSet.of(AccountRole.Tenant, AccountRole.SubTenant), null));
+        stats.setActivatedResidentCount(accountDao.countByRoleAndActivationStatus(EnumSet.of(AccountRole.Tenant, AccountRole.SubTenant), true));
+
+        return stats;
+    }
 }

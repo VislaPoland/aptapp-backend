@@ -6,10 +6,7 @@ import com.creatix.domain.dto.ApplicationFeatureDto;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.property.CreatePropertyRequest;
-import com.creatix.domain.dto.property.PropertyDto;
-import com.creatix.domain.dto.property.PropertyPhotoDto;
-import com.creatix.domain.dto.property.UpdatePropertyRequest;
+import com.creatix.domain.dto.property.*;
 import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
 import com.creatix.domain.dto.property.slot.SlotDto;
 import com.creatix.domain.entity.store.PropertyPhoto;
@@ -211,5 +208,18 @@ public class PropertyController {
         return new DataResponse<>(applicationFeatureService.listFeaturesByProperty(propertyId).stream().map(
                 applicationFeature -> mapper.toApplicationFeatureDto(applicationFeature)
         ).collect(Collectors.toList()));
+    }
+
+    @ApiOperation(value = "Get property stats")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @GetMapping(path = "/{propertyId}/stats", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public DataResponse<PropertyStatsDto> getPropertyStats(@PathVariable Long propertyId) {
+        return new DataResponse<>(propertyService.getPropertyStats(propertyId));
     }
 }

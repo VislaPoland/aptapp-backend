@@ -2,6 +2,7 @@ package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
+import com.querydsl.core.BooleanBuilder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,13 +10,13 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static com.creatix.domain.entity.store.account.QAccount.account;
+import static com.creatix.domain.entity.store.account.QAssistantPropertyManager.assistantPropertyManager;
 import static com.creatix.domain.entity.store.account.QMaintenanceEmployee.maintenanceEmployee;
 import static com.creatix.domain.entity.store.account.QPropertyManager.propertyManager;
 import static com.creatix.domain.entity.store.account.QPropertyOwner.propertyOwner;
 import static com.creatix.domain.entity.store.account.QSecurityEmployee.securityEmployee;
 import static com.creatix.domain.entity.store.account.QSubTenant.subTenant;
 import static com.creatix.domain.entity.store.account.QTenant.tenant;
-import static com.creatix.domain.entity.store.account.QAssistantPropertyManager.assistantPropertyManager;
 
 @Repository
 @Transactional
@@ -135,5 +136,16 @@ public class AccountDao extends DaoBase<Account, Long> {
     public void delete(Account entity) {
         super.delete(entity);
         this.em.flush();
+    }
+
+    public long countByRoleAndActivationStatus(@NotNull Collection<AccountRole> roles, Boolean isActive) {
+        Objects.requireNonNull(roles, "roles");
+
+        final BooleanBuilder builder = new BooleanBuilder(account.role.in(roles).and(account.deletedAt.isNull()));
+        if ( isActive != null ) {
+            builder.and(account.active.eq(isActive));
+        }
+
+        return queryFactory.selectFrom(account).where(builder).fetchCount();
     }
 }
