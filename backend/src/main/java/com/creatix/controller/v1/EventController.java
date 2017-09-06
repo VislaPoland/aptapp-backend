@@ -22,12 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -37,7 +32,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @Transactional
-@RequestMapping(path = {"/api/properties/{propertyId}/events", "/api/v1/properties/{propertyId}/events"})
 @ApiVersion(1.0)
 public class EventController {
 
@@ -54,7 +48,7 @@ public class EventController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = {"/api/properties/{propertyId}/events", "/api/v1/properties/{propertyId}/events"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<List<EventSlotDto>> getEvents(
             @PathVariable Long propertyId,
@@ -72,7 +66,7 @@ public class EventController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = {"/api/properties/{propertyId}/events", "/api/v1/properties/{propertyId}/events"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<EventSlotDto> createEventSlot(@PathVariable Long propertyId, @Valid @RequestBody PersistEventSlotRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toEventSlotDto(slotService.createEventSlot(propertyId, request)));
@@ -85,7 +79,7 @@ public class EventController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/{eventSlotId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = {"/api/properties/{propertyId}/events/{eventSlotId}", "/api/v1/events/{eventSlotId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<EventSlotDetailDto> getEventDetailWithFilteredAttendants(
             @PathVariable Long eventSlotId, @RequestParam(required = false) String filter) {
@@ -99,7 +93,7 @@ public class EventController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/{eventSlotId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/api/v1/events/{eventSlotId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<Void> respondToEventInvite(@PathVariable Long eventSlotId, @RequestParam EventInviteResponse response) {
         slotService.respondToEventInvite(eventSlotId, response);
@@ -113,7 +107,7 @@ public class EventController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/{eventSlotId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = {"/api/properties/{propertyId}/events/{eventSlotId}", "/api/v1/events/{eventSlotId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<EventSlotDto> deleteEventSlot(@PathVariable Long eventSlotId) {
         return new DataResponse<>(mapper.toEventSlotDto(slotService.deleteEventSlotById(eventSlotId)));

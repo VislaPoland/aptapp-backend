@@ -13,7 +13,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class EventSlotDetailDto extends EventSlotDto {
-	@ApiModelProperty(value = "List of responses to the event")
+
+    @ApiModelProperty(value = "List of responses to the event", example = "{'Going':[{'id':0,'firstName':'','lastName':''}], 'Maybe':[]}", dataType = "java.util.Map<EventInviteResponse, java.util.List<AccountDto>>")
 	private Map<EventInviteResponse, List<AccountDto>> responses;
 
 	@ApiModel
