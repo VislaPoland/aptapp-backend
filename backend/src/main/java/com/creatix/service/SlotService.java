@@ -200,7 +200,7 @@ public class SlotService {
         return eventSlotDao.findByPropertyIdAndAccountAndStartBetween(propertyId, authorizationManager.getCurrentAccount(), beginDt, endDt);
     }
 
-    public EventSlotDetailDto getEventDetailWithFilteredAttendants(@NotNull Long slotId, String filter) {
+    public EventSlotDetailDto getEventDetail(@NotNull Long slotId) {
         Objects.requireNonNull(slotId);
 
         final EventSlot eventSlot = getOrElseThrow(slotId, eventSlotDao, new EntityNotFoundException(String.format("Slot id=%d not found", slotId)));
@@ -214,7 +214,7 @@ public class SlotService {
 
 
         final EventSlotDetailDto detailDto = mapper.toEventSlotDetailDto(eventSlot);
-        final List<EventInvite> invites = eventInviteDao.findByEventSlotIdFilterByAttendantNameOrderByAttendantFirstNameAsc(slotId, filter);
+        final List<EventInvite> invites = eventInviteDao.findByEventSlotIdOrderByAttendantFirstNameAsc(slotId);
         detailDto.setResponses(invites.stream().map(invite -> {
             final EventSlotDetailDto.Rsvp dao = new EventSlotDetailDto.Rsvp();
             dao.setResponse(invite.getResponse());

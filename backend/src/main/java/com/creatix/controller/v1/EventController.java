@@ -81,9 +81,8 @@ public class EventController {
     @JsonView(Views.Public.class)
     @GetMapping(path = {"/api/properties/{propertyId}/events/{eventSlotId}", "/api/v1/events/{eventSlotId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<EventSlotDetailDto> getEventDetailWithFilteredAttendants(
-            @PathVariable Long eventSlotId, @RequestParam(required = false) String filter) {
-        return new DataResponse<>(slotService.getEventDetailWithFilteredAttendants(eventSlotId, filter));
+    public DataResponse<EventSlotDetailDto> getEventDetailWithFilteredAttendants(@PathVariable Long eventSlotId) {
+        return new DataResponse<>(slotService.getEventDetail(eventSlotId));
     }
 
     @ApiOperation(value = "Respond to event invitation")
@@ -95,9 +94,9 @@ public class EventController {
     @JsonView(Views.Public.class)
     @PutMapping(path = "/api/v1/events/{eventSlotId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<Void> respondToEventInvite(@PathVariable Long eventSlotId, @RequestParam EventInviteResponse response) {
+    public DataResponse<EventSlotDetailDto> respondToEventInvite(@PathVariable Long eventSlotId, @RequestParam EventInviteResponse response) {
         slotService.respondToEventInvite(eventSlotId, response);
-        return new DataResponse<>();
+        return new DataResponse<>(slotService.getEventDetail(eventSlotId));
     }
 
     @ApiOperation(value = "Delete event slot")

@@ -2,8 +2,6 @@ package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.EventInvite;
 import com.creatix.domain.entity.store.account.Account;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
@@ -16,17 +14,9 @@ import static com.creatix.domain.entity.store.QEventInvite.eventInvite;
 @Repository
 @Transactional
 public class EventInviteDao extends DaoBase<EventInvite, Long> {
-	public List<EventInvite> findByEventSlotIdFilterByAttendantNameOrderByAttendantFirstNameAsc(Long slotId, String nameFilter) {
-		BooleanExpression predicate = eventInvite.event.id.eq(slotId);
-
-		if ( !StringUtils.isEmpty(nameFilter) ) {
-			predicate = predicate.andAnyOf(
-			        eventInvite.attendant.firstName.containsIgnoreCase(nameFilter),
-                    eventInvite.attendant.lastName.containsIgnoreCase(nameFilter));
-		}
-
+	public List<EventInvite> findByEventSlotIdOrderByAttendantFirstNameAsc(Long slotId) {
 		return queryFactory.selectFrom(eventInvite)
-				.where(predicate)
+				.where(eventInvite.event.id.eq(slotId))
 				.orderBy(eventInvite.attendant.firstName.asc())
 				.fetch();
 	}
