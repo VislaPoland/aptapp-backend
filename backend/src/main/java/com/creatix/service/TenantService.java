@@ -6,13 +6,14 @@ import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
-import com.creatix.domain.entity.store.Apartment;
-import com.creatix.domain.entity.store.ParkingStall;
-import com.creatix.domain.entity.store.Vehicle;
+import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.TenantBase;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.AudienceType;
+import com.creatix.domain.enums.EventInviteResponse;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.template.email.SubTenantActivationMessageTemplate;
 import com.creatix.message.template.email.TenantActivationMessageTemplate;
@@ -28,6 +29,7 @@ import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -41,11 +43,7 @@ public class TenantService {
     @Autowired
     private TenantDao tenantDao;
     @Autowired
-    private VehicleDao vehicleDao;
-    @Autowired
     private ApartmentDao apartmentDao;
-    @Autowired
-    private ParkingStallDao parkingStallDao;
     @Autowired
     private SubTenantDao subTenantDao;
     @Autowired
@@ -58,10 +56,14 @@ public class TenantService {
     private EmailMessageService emailMessageService;
     @Autowired
     private ApplicationProperties applicationProperties;
+    @Autowired
+    private EventSlotDao eventSlotDao;
+    @Autowired
+    private EventInviteDao eventInviteDao;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
-        if ( item == null ) {
+        if (item == null) {
             throw ex;
         }
         return item;
@@ -75,24 +77,22 @@ public class TenantService {
                 new EntityNotFoundException(String.format("Apartment with id %d not found", request.getApartmentId())));
         authorizationManager.checkManager(apartment.getProperty());
 
-        if ( apartment.getTenant() != null ) {
+        if (apartment.getTenant() != null) {
             throw new IllegalArgumentException(String.format("Apartment id=%d has already tenant id=%d assigned.", apartment.getId(), apartment.getTenant().getId()));
         }
 
         Tenant tenant = null;
         final Account account = accountDao.findByEmail(request.getPrimaryEmail());
-        if ( account instanceof Tenant ) {
+        if (account instanceof Tenant) {
             tenant = (Tenant) account;
-        }
-        else if ( account != null ) {
+        } else if (account != null) {
             throw new IllegalArgumentException(String.format("Account with email=%s already exists", request.getPrimaryEmail()));
         }
 
-        if ( tenant == null ) {
+        if (tenant == null) {
             tenant = mapper.toTenant(request);
-        }
-        else {
-            if ( tenant.getActive() == Boolean.TRUE ) {
+        } else {
+            if (tenant.getActive() == Boolean.TRUE) {
                 throw new IllegalArgumentException(String.format("Tenant with email=%s already exists", request.getPrimaryEmail()));
             }
             mapper.fillTenant(request, tenant);
@@ -111,7 +111,20 @@ public class TenantService {
 
         emailMessageService.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
 
+        addEventSlots(tenant, tenant.getApartment().getProperty());
+
         return tenant;
+    }
+
+    private void addEventSlots(TenantBase tenant, Property property) {
+        eventSlotDao.findActiveEventsForTenant(property.getId())
+                .forEach(s -> {
+                    final EventInvite invite = new EventInvite();
+                    invite.setAttendant(tenant);
+                    invite.setEvent(s);
+                    invite.setResponse(EventInviteResponse.Invited);
+                    eventInviteDao.persist(invite);
+                });
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
@@ -124,13 +137,13 @@ public class TenantService {
 
         final Tenant tenant = getTenant(tenantId);
 
-        if ( (apartment.getTenant() != null) && !(Objects.equals(apartment.getTenant(), tenant)) ) {
+        if ((apartment.getTenant() != null) && !(Objects.equals(apartment.getTenant(), tenant))) {
             throw new IllegalArgumentException(String.format("Apartment id=%d has already tenant id=%d assigned.", apartment.getId(), apartment.getTenant().getId()));
         }
 
         mapper.fillTenant(request, tenant);
 
-        if ( (tenant.getApartment() != null) && !(Objects.equals(apartment, tenant.getApartment())) ) {
+        if ((tenant.getApartment() != null) && !(Objects.equals(apartment, tenant.getApartment()))) {
             // apartment changed, un-assign tenant from previous apartment
             final Apartment apartmentPrev = tenant.getApartment();
             apartmentPrev.setTenant(null);
@@ -179,7 +192,7 @@ public class TenantService {
         preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
+        if (authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager)) {
             final SubTenant subTenant = mapper.toSubTenant(request);
             subTenant.setCompanyName(request.getCompanyName());
             subTenant.setRole(AccountRole.SubTenant);
@@ -189,6 +202,8 @@ public class TenantService {
             subTenantDao.persist(subTenant);
 
             emailMessageService.send(new SubTenantActivationMessageTemplate(subTenant, applicationProperties));
+
+            this.addEventSlots(subTenant, subTenant.getApartment().getProperty());
 
             return subTenant;
         }
@@ -211,10 +226,10 @@ public class TenantService {
         Objects.requireNonNull(request);
 
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
+        if (authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager)) {
             final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
 
-            if ( tenant.getSubTenants().contains(subTenant) ) {
+            if (tenant.getSubTenants().contains(subTenant)) {
                 mapper.fillSubTenant(request, subTenant);
                 subTenantDao.persist(subTenant);
                 return subTenant;
@@ -232,17 +247,15 @@ public class TenantService {
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public void deleteSubTenant(Long tenantId, Long subTenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
+        if (authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager)) {
             final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
 
-            if ( tenant.getSubTenants().contains(subTenant) ) {
+            if (tenant.getSubTenants().contains(subTenant)) {
                 subTenantDao.delete(subTenant);
-            }
-            else {
+            } else {
                 throw new SecurityException(String.format("You are not eligible to edit sub-tenant=%d profile", subTenantId));
             }
-        }
-        else {
+        } else {
             throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
         }
     }
@@ -257,7 +270,7 @@ public class TenantService {
         Objects.requireNonNull(tenant);
         authorizationManager.checkWrite(tenant);
 
-        if ( tenant.getApartment() != null ) {
+        if (tenant.getApartment() != null) {
             final Apartment apartment = tenant.getApartment();
             apartment.setTenant(null);
             apartmentDao.persist(apartment);
@@ -273,12 +286,12 @@ public class TenantService {
     }
 
     private void preventAccountDuplicity(String email, String emailExisting) {
-        if ( Objects.equals(email, emailExisting) ) {
+        if (Objects.equals(email, emailExisting)) {
             // email will not change, assume account is not a duplicate
             return;
         }
 
-        if ( accountDao.findByEmail(email) != null ) {
+        if (accountDao.findByEmail(email) != null) {
             throw new IllegalArgumentException(String.format("Account %s already exists.", email));
         }
     }

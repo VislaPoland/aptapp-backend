@@ -58,7 +58,20 @@ public class SlotService {
     @Autowired
     private EventInviteDao eventInviteDao;
 
-    public ScheduledSlotsResponse getSlotsByFilter(@NotNull Long propertyId, LocalDate beginDate, LocalDate endDate, Long startId, Integer pageSize) {
+    /**
+     * You can request list either by providing (beginDate AND endDate) or (pageSize and/or startId (Nullable))
+     *
+     * @param propertyId Not null
+     * @param beginDate
+     * @param endDate
+     * @param startId
+     * @param pageSize Required throws exception if missing
+     * @return List {@link List<SlotDto>} of scheduled slots wrapped inside {@link ScheduledSlotsResponse} for paging
+     *
+     * @throws IllegalArgumentException if pageSize is null
+     * @throws EntityNotFoundException if slot is not fund by id
+     */
+    public ScheduledSlotsResponse getSlotsByFilter(@NotNull Long propertyId, LocalDate beginDate, LocalDate endDate, Long startId, @NotNull Integer pageSize) {
         Objects.requireNonNull(propertyId, "Property id is required");
 
         final Property property = propertyService.getProperty(propertyId);
