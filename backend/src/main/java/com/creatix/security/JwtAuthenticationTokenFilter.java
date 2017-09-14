@@ -40,7 +40,7 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
     @Autowired
     private AuthenticatedUserDetailsService userDetailsService;
 
-    private final AntPathRequestMatcher MATCH_LOGIN = new AntPathRequestMatcher("/api/**", HttpMethod.POST.name());
+    private final AntPathRequestMatcher MATCH_LOGIN = new AntPathRequestMatcher("/api/auth/attempt", HttpMethod.POST.name());
 
     public JwtAuthenticationTokenFilter() {
         super(new AntPathRequestMatcher("/api/**"));
