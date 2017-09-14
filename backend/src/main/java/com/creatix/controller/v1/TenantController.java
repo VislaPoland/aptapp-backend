@@ -184,7 +184,7 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/*/subs/{subTenantId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = {"/*/subs/{subTenantId}", "/subs/{subTenantId}"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<SubTenantDto> getSubTenant(@PathVariable Long subTenantId) {
         return new DataResponse<>(mapper.toSubTenantDto(tenantService.getSubTenant(subTenantId)));
@@ -199,23 +199,8 @@ public class TenantController {
             @ApiResponse(code = 422, message = "Unprocessable")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = {"/*/subs/{subTenantId}", "/subs/{subTenantId}"}, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public DataResponse<SubTenantDto> updateSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId, @Valid @RequestBody UpdateSubTenantRequest request) {
-        return new DataResponse<>(mapper.toSubTenantDto(tenantService.updateSubTenant(tenantId, subTenantId, request)));
-    }
-
-    @ApiOperation(value = "Update sub-tenant account")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 422, message = "Unprocessable")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(value = "/me/subs/{subTenantId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant})
     public DataResponse<SubTenantDto> updateSubTenant(@PathVariable Long subTenantId, @Valid @RequestBody UpdateSubTenantRequest request) {
         return new DataResponse<>(mapper.toSubTenantDto(tenantService.updateSubTenant(subTenantId, request)));
     }
@@ -228,25 +213,10 @@ public class TenantController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/{tenantId}/subs/{subTenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = {"/*/subs/{subTenantId}", "/subs/{subTenantId}"}, method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public DataResponse<Void> deleteSubTenant(@PathVariable Long tenantId, @PathVariable Long subTenantId) {
-        tenantService.deleteSubTenant(tenantId, subTenantId);
-        return new DataResponse<>();
-    }
-
-    @ApiOperation(value = "Delete sub-tenant account")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(value = "/me/subs/{subTenantId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant})
     public DataResponse<Void> deleteSubTenant(@PathVariable Long subTenantId) {
         tenantService.deleteSubTenant(subTenantId);
         return new DataResponse<>();
     }
-}
+ }

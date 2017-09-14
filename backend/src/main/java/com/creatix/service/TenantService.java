@@ -28,10 +28,10 @@ import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -152,19 +152,19 @@ public class TenantService {
     @RoleSecured
     public List<Vehicle> getTenantVehicles(Long tenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        return tenant.getVehicles().stream().collect(Collectors.toList());
+        return new ArrayList<>(tenant.getVehicles());
     }
 
     @RoleSecured
     public List<ParkingStall> getTenantParkingStalls(Long tenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        return tenant.getParkingStalls().stream().collect(Collectors.toList());
+        return new ArrayList<>(tenant.getParkingStalls());
     }
 
     @RoleSecured
     public List<SubTenant> getSubTenants(Long tenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        return tenant.getSubTenants().stream().collect(Collectors.toList());
+        return new ArrayList<>(tenant.getSubTenants());
     }
 
     @RoleSecured({AccountRole.Tenant})
@@ -201,49 +201,29 @@ public class TenantService {
         return getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
     }
 
-    @RoleSecured({AccountRole.Tenant})
-    public SubTenant updateSubTenant(Long subTenantId, @NotNull UpdateSubTenantRequest request) {
-        return updateSubTenant(authorizationManager.getCurrentAccount().getId(), subTenantId, request);
-    }
-
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public SubTenant updateSubTenant(Long tenantId, Long subTenantId, @NotNull UpdateSubTenantRequest request) {
+    public SubTenant updateSubTenant(Long subTenantId, @NotNull UpdateSubTenantRequest request) {
         Objects.requireNonNull(request);
 
-        final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
-            final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
-
-            if ( tenant.getSubTenants().contains(subTenant) ) {
-                mapper.fillSubTenant(request, subTenant);
-                subTenantDao.persist(subTenant);
-                return subTenant;
-            }
-            throw new SecurityException(String.format("You are not eligible to edit sub-tenant=%d profile", subTenantId));
+        final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
+        if ( authorizationManager.isSelf(subTenant.getParentTenant()) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
+            mapper.fillSubTenant(request, subTenant);
+            subTenantDao.persist(subTenant);
+            return subTenant;
         }
-        throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
-    }
-
-    @RoleSecured({AccountRole.Tenant})
-    public void deleteSubTenant(Long subTenantId) {
-        deleteSubTenant(authorizationManager.getCurrentAccount().getId(), subTenantId);
+        else {
+            throw new SecurityException(String.format("You are not eligible to update subtenant=%d profile", subTenantId));
+        }
     }
 
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public void deleteSubTenant(Long tenantId, Long subTenantId) {
-        final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
-        if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
-            final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
-
-            if ( tenant.getSubTenants().contains(subTenant) ) {
-                subTenantDao.delete(subTenant);
-            }
-            else {
-                throw new SecurityException(String.format("You are not eligible to edit sub-tenant=%d profile", subTenantId));
-            }
+    public void deleteSubTenant(Long subTenantId) {
+        final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
+        if ( authorizationManager.isSelf(subTenant.getParentTenant()) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
+            subTenantDao.delete(subTenant);
         }
         else {
-            throw new SecurityException(String.format("You are not eligible to edit user=%d profile", tenantId));
+            throw new SecurityException(String.format("You are not eligible to delete subtenant=%d profile", subTenantId));
         }
     }
 
