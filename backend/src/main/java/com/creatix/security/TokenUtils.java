@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,7 @@ public class TokenUtils {
 
     public String getUsernameFromToken(String token) {
 
-        if (StringUtils.isBlank(token)) {
+        if ( StringUtils.isBlank(token) ) {
             return null;
         }
 
@@ -43,7 +44,8 @@ public class TokenUtils {
         try {
             final Claims claims = this.getClaimsFromToken(token);
             username = claims.getSubject();
-        } catch (Exception e) {
+        }
+        catch ( Exception e ) {
             username = null;
         }
         return username;
@@ -54,7 +56,8 @@ public class TokenUtils {
         try {
             final Claims claims = this.getClaimsFromToken(token);
             created = new Date((Long) claims.get("created"));
-        } catch (Exception e) {
+        }
+        catch ( Exception e ) {
             created = null;
         }
         return created;
@@ -65,7 +68,8 @@ public class TokenUtils {
         try {
             final Claims claims = this.getClaimsFromToken(token);
             expiration = claims.getExpiration();
-        } catch (Exception e) {
+        }
+        catch ( Exception e ) {
             expiration = null;
         }
         return expiration;
@@ -78,7 +82,8 @@ public class TokenUtils {
                     .setSigningKey(this.secret)
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (Exception e) {
+        }
+        catch ( Exception e ) {
             claims = null;
         }
         return claims;
@@ -105,7 +110,7 @@ public class TokenUtils {
         final Claims claims = new DefaultClaims();
         claims.setSubject(userDetails.getUsername());
         claims.setIssuedAt(this.generateCurrentDate());
-        if (userDetails instanceof AuthenticatedUserDetails) {
+        if ( userDetails instanceof AuthenticatedUserDetails ) {
             final AuthenticatedUserDetails auth = (AuthenticatedUserDetails) userDetails;
             final Account account = auth.getAccount();
             claims.setId(Long.toString(account.getId()));
@@ -132,18 +137,25 @@ public class TokenUtils {
             final Claims claims = this.getClaimsFromToken(token);
             claims.put("created", this.generateCurrentDate());
             refreshedToken = this.generateToken(claims);
-        } catch (Exception e) {
+        }
+        catch ( Exception e ) {
             refreshedToken = null;
         }
         return refreshedToken;
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        if (userDetails instanceof AuthenticatedUserDetails) {
+    public boolean validateToken(String token, UserDetails userDetails) throws CredentialsExpiredException {
+        if ( userDetails instanceof AuthenticatedUserDetails ) {
             final Account user = ((AuthenticatedUserDetails) userDetails).getAccount();
             final String username = this.getUsernameFromToken(token);
-            return (username.equals(user.getPrimaryEmail()) && !(this.isTokenExpired(token)));
-        } else {
+            if ( this.isTokenExpired(token) ) {
+                throw new CredentialsExpiredException("Token is expired");
+            }
+            else {
+                return username.equals(user.getPrimaryEmail());
+            }
+        }
+        else {
             throw new IllegalArgumentException("Expected object of type Account as user details.");
         }
     }
