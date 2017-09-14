@@ -15,7 +15,7 @@ import com.creatix.message.template.email.*;
 import com.creatix.security.*;
 import com.creatix.service.message.EmailMessageService;
 import freemarker.template.TemplateException;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.text.RandomStringGenerator;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -93,7 +93,10 @@ public class AccountService {
     public void setActionToken(@NotNull Account account) {
         Objects.requireNonNull(account);
 
-        account.setActionToken(RandomStringUtils.randomNumeric(12));
+        final RandomStringGenerator generator = new RandomStringGenerator.Builder()
+                .withinRange('0', '9').build();
+
+        account.setActionToken(generator.generate(6));
         account.setActionTokenValidUntil(DateTime.now().plusDays(7).toDate());
 
         accountDao.persist(account);
