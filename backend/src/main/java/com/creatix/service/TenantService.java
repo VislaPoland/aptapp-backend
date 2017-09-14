@@ -220,7 +220,10 @@ public class TenantService {
     public void deleteSubTenant(Long subTenantId) {
         final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
         if ( authorizationManager.isSelf(subTenant.getParentTenant()) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
-            subTenantDao.delete(subTenant);
+            subTenant.setDeletedAt(new Date());
+            subTenant.setActive(Boolean.FALSE);
+            subTenant.setParentTenant(null);
+            subTenantDao.persist(subTenant);
         }
         else {
             throw new SecurityException(String.format("You are not eligible to delete subtenant=%d profile", subTenantId));
@@ -246,8 +249,15 @@ public class TenantService {
         tenant.setDeletedAt(new Date());
         tenant.setActive(Boolean.FALSE);
         tenant.setApartment(null);
-
         tenantDao.persist(tenant);
+
+        // delete subtenants
+        for ( SubTenant subTenant : tenant.getSubTenants() ) {
+            subTenant.setDeletedAt(new Date());
+            subTenant.setActive(Boolean.FALSE);
+            subTenant.setParentTenant(null);
+            subTenantDao.persist(subTenant);
+        }
 
         return tenant;
     }

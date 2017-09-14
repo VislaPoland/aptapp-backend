@@ -39,7 +39,7 @@ public class SubTenantDto {
     @ApiModelProperty(value = "Tenant type", required = true)
     private TenantType type;
 
-    @ApiModelProperty(value = "Parent tenant ID", required = true)
+    @ApiModelProperty(value = "Parent tenant ID")
     private Long parentTenantId;
 
     @ApiModelProperty(value = "Address", required = true)
