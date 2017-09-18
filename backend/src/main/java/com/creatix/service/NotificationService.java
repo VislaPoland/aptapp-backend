@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -146,7 +145,7 @@ public class NotificationService {
         return notification;
     }
 
-    public MaintenanceNotification saveMaintenanceNotification(@Deprecated String targetUnitNumber, @NotNull MaintenanceNotification notification, @NotNull Long slotUnitId) throws IOException, TemplateException {
+    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @NotNull MaintenanceNotification notification, @NotNull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(slotUnitId, "slot unit id is null");
 

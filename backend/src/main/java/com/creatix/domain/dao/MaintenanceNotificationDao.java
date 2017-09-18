@@ -10,8 +10,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -27,12 +26,20 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
                 .fetch();
     }
 
-    private Predicate filtersPredicate(@NotNull QMaintenanceNotification maintenanceNotification, @Nullable NotificationStatus status,
-                                       @NotNull NotificationRequestType type, @NotNull Account a) {
+    private Predicate filtersPredicate(@Nonnull QMaintenanceNotification maintenanceNotification, NotificationStatus status,
+                                       @Nonnull NotificationRequestType type, @Nonnull Account a) {
         final BooleanExpression predicate = (status != null ? maintenanceNotification.status.eq(status) : maintenanceNotification.status.isNotNull());
         switch (type) {
             case Sent:
-                return predicate.and(maintenanceNotification.author.eq(a));
+                switch ( a.getRole() ) {
+                    case SubTenant:
+                        SubTenant subTenant = (SubTenant) a;
+                        return predicate.and(
+                                maintenanceNotification.author.eq(a)
+                                .or(maintenanceNotification.targetApartment.tenant.subTenants.any().eq(subTenant)));
+                    default:
+                        return predicate.and(maintenanceNotification.author.eq(a));
+                }
             case Received:
                 switch (a.getRole()) {
                     case PropertyManager:
@@ -52,7 +59,7 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
         }
     }
 
-    public long countByStatusAndType(@Nullable NotificationStatus status, @NotNull NotificationRequestType type, @NotNull Account account) {
+    public long countByStatusAndType(NotificationStatus status, @Nonnull NotificationRequestType type, @Nonnull Account account) {
         Objects.requireNonNull(type);
         Objects.requireNonNull(account);
 
@@ -67,8 +74,8 @@ public class MaintenanceNotificationDao extends AbstractNotificationDao<Maintena
                 .fetchCount();
     }
 
-    public List<MaintenanceNotification> findPageByStatusAndType(@Nullable NotificationStatus status, @NotNull NotificationRequestType type,
-                                                                 @NotNull Account account, long pageNumber, long pageSize) {
+    public List<MaintenanceNotification> findPageByStatusAndType(NotificationStatus status, @Nonnull NotificationRequestType type,
+                                                                 @Nonnull Account account, long pageNumber, long pageSize) {
         final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;
 
         Predicate predicate = filtersPredicate(maintenanceNotification, status, type, account);

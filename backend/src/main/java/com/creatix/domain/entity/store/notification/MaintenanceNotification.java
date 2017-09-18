@@ -7,7 +7,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +22,17 @@ import java.util.Objects;
 @EqualsAndHashCode(callSuper = true)
 public class MaintenanceNotification extends Notification {
 
-    /**
-     * @deprecated Should not rely on this field, can and will be null for most of the time
-     */
     @QueryInit("tenant")
     @ManyToOne
-    @Deprecated
     private Apartment targetApartment;
 
     @Column
     private Boolean accessIfNotAtHome;
 
+    /**
+     * More reservations for one notification are needed to enable us
+     * to track reschedules and to see history of reservations.
+     */
     @OneToMany(mappedBy = "notification")
     private List<MaintenanceReservation> reservations;
 
