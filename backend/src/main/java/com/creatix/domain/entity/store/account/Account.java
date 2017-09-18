@@ -43,7 +43,7 @@ public class Account {
     @Column
     private String primaryPhone;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     @NotNull
     @Email
     private String primaryEmail;
