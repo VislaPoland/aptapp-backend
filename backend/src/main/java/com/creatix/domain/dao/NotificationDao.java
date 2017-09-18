@@ -1,9 +1,6 @@
 package com.creatix.domain.dao;
 
-import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.MaintenanceEmployee;
-import com.creatix.domain.entity.store.account.SecurityEmployee;
-import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.NotificationRequestType;
 import com.creatix.domain.enums.NotificationStatus;
@@ -12,7 +9,6 @@ import com.creatix.security.AuthorizationManager;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +17,6 @@ import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BinaryOperator;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @Repository
 @Transactional
@@ -55,27 +48,60 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
 
         final QPersonalMessageGroup qPersonalMessageGroup = QPersonalMessageGroup.personalMessageGroup;
         final QPersonalMessage qPersonalMessage = QPersonalMessage.personalMessage;
+        final QSubTenant qSubTenantAuthor = QSubTenant.subTenant;
+        final QTenant qParentTenant = QTenant.tenant;
 
 
         BooleanExpression predicate = qNotification.updatedAt.after(startDt).not();
 
 
         if ( requestType == NotificationRequestType.Sent ) {
-            predicate = predicate.and(qNotification.author.eq(account));
+            switch ( account.getRole() ) {
+                case Tenant:
+                    final Tenant tenant = (Tenant) account;
+                    predicate = predicate.andAnyOf(
+                            qNotification.author.eq(account),
+                            qParentTenant.subTenants.any().parentTenant.eq(tenant)
+                    );
+                    break;
+                case SubTenant:
+                    final SubTenant subTenant = (SubTenant) account;
+                    predicate = predicate.andAnyOf(
+                            qNotification.author.eq(account),
+                            qParentTenant.subTenants.any().eq(subTenant)
+                    );
+                    break;
+                default:
+                    predicate = predicate.and(qNotification.author.eq(account));
+                    break;
+            }
         }
         else if ( requestType == NotificationRequestType.Received ) {
 
             switch (account.getRole()) {
                 case Tenant:
-                case SubTenant:
+                    final Tenant tenant = (Tenant) account;
                     predicate = predicate.andAnyOf(
                             Expressions.allOf(
                                     qNotification.instanceOfAny(BusinessProfileNotification.class, DiscountCouponNotification.class),
                                     qNotification.property.eq(authorizationManager.getCurrentProperty(account))
                             ),
                             qNotification.recipient.eq(account),
+                            qParentTenant.subTenants.any().parentTenant.eq(tenant),
                             qPersonalMessage.toAccount.eq(account)
                     );
+                    break;
+                case SubTenant:
+                    final SubTenant subTenant = (SubTenant) account;
+                    predicate = predicate.andAnyOf(
+                            Expressions.allOf(
+                                    qNotification.instanceOfAny(BusinessProfileNotification.class, DiscountCouponNotification.class),
+                                    qNotification.property.eq(authorizationManager.getCurrentProperty(account))
+                            ),
+                            qNotification.recipient.eq(account),
+                            qPersonalMessage.toAccount.eq(account),
+                            qParentTenant.subTenants.any().eq(subTenant)
+                            );
                     break;
                 case PropertyManager:
                 case AssistantPropertyManager:
@@ -158,6 +184,8 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                 .distinct()
                 .leftJoin(qNotification.as(QPersonalMessageNotification.class).personalMessageGroup, qPersonalMessageGroup)
                 .leftJoin(qPersonalMessageGroup.messages, qPersonalMessage)
+                .leftJoin(qNotification.author.as(QSubTenant.class), qSubTenantAuthor)
+                .leftJoin(qSubTenantAuthor.parentTenant, qParentTenant)
                 .where(predicate)
                 .orderBy(qNotification.updatedAt.desc())
                 .limit(pageSize)
