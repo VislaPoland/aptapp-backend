@@ -1,7 +1,9 @@
 package com.creatix.service;
 
 import com.creatix.domain.SlotUtils;
-import com.creatix.domain.dao.*;
+import com.creatix.domain.dao.MaintenanceNotificationDao;
+import com.creatix.domain.dao.ReservationDao;
+import com.creatix.domain.dao.SlotUnitDao;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;
 import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.MaintenanceSlot;
@@ -11,18 +13,19 @@ import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.ReservationStatus;
-import com.creatix.service.message.PushNotificationService;
 import com.creatix.message.template.push.MaintenanceConfirmTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleConfirmTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleRejectTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.message.PushNotificationService;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nonnull;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -104,6 +107,7 @@ public class MaintenanceReservationService {
         }
 
         releaseReservedCapacity(reservation);
+        resolveNotification(reservation);
 
         reservationDao.delete(reservation);
         return reservation;
@@ -163,20 +167,22 @@ public class MaintenanceReservationService {
         final MaintenanceNotificationResponseRequest.ResponseType responseType = response.getResponse();
         if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Confirm ) {
             reservation.setStatus(ReservationStatus.Confirmed);
+            reservationDao.persist(reservation);
+            resolveNotification(reservation);
+
             pushNotificationService.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation), reservation.getEmployee());
         }
         else if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
             releaseReservedCapacity(reservation);
+            reservationDao.persist(reservation);
+            resolveNotification(reservation);
+
             pushNotificationService.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation), reservation.getEmployee());
         }
         else {
             throw new IllegalArgumentException("Unsupported response type: " + responseType);
         }
-        reservationDao.persist(reservation);
-
-        notification.setStatus(NotificationStatus.Resolved);
-        maintenanceNotificationDao.persist(notification);
 
         return notification;
     }
@@ -199,10 +205,8 @@ public class MaintenanceReservationService {
         reservation.setNote(note);
         reservationDao.persist(reservation);
 
-        final MaintenanceNotification notification = reservation.getNotification();
-        notification.setStatus(NotificationStatus.Resolved);
-        maintenanceNotificationDao.persist(notification);
-        pushNotificationService.sendNotification(new MaintenanceConfirmTemplate(reservation), notification.getAuthor());
+        resolveNotification(reservation);
+        pushNotificationService.sendNotification(new MaintenanceConfirmTemplate(reservation), reservation.getNotification().getAuthor());
 
         return reservation;
     }
@@ -260,6 +264,17 @@ public class MaintenanceReservationService {
         pushNotificationService.sendNotification(new MaintenanceRescheduleTemplate(reservationOld, reservationNew), notification.getAuthor());
 
         return reservationNew;
+    }
+
+    private void resolveNotification(@Nonnull MaintenanceReservation maintenanceReservation) {
+        Objects.requireNonNull(maintenanceReservation);
+
+
+        final MaintenanceNotification notification = maintenanceReservation.getNotification();
+        Objects.requireNonNull(notification, "Maintenance is missing notification");
+
+        notification.setStatus(NotificationStatus.Resolved);
+        maintenanceNotificationDao.persist(notification);
     }
 
     private void reserveCapacity(MaintenanceReservation reservation) {
