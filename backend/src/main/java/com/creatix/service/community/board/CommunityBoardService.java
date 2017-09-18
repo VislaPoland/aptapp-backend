@@ -156,14 +156,17 @@ public class CommunityBoardService {
                 communityBoardItem.getProperty(),
                 authorizationManager.getCurrentAccount()
         );
-        communityBoardItem.setCommunityBoardStatus(CommunityBoardStatusType.DELETED);
-        communityBoardItemDao.persist(communityBoardItem);
 
         dispatchSubscriberNotification(
                 communityBoardItem,
                 null,
                 new CommunityItemUpdatedSubscriberTemplate(communityBoardItem, CommunityItemUpdatedSubscriberTemplate.EventType.DELETED)
         );
+
+        communityBoardItem.setCommunityBoardStatus(CommunityBoardStatusType.DELETED);
+        communityBoardItemDao.persist(communityBoardItem);
+
+
 
         return communityBoardItem;
     }
