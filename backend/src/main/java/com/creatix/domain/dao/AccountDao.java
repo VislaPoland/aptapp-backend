@@ -109,13 +109,13 @@ public class AccountDao extends DaoBase<Account, Long> {
      */
     public Account findByEmail(String email) {
         return queryFactory.selectFrom(account)
-                .where(account.primaryEmail.eq(email))
+                .where(account.primaryEmail.eq(email).and(account.deletedAt.isNull()))
                 .fetchOne();
     }
 
     public Account findByActionToken(String actionToken) {
         return queryFactory.selectFrom(account)
-                .where(account.actionToken.eq(actionToken))
+                .where(account.actionToken.eq(actionToken).and(account.deletedAt.isNull()))
                 .fetchOne();
     }
 

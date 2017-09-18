@@ -29,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nonnull;
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpSession;
@@ -307,6 +308,7 @@ public class AccountService {
     @RoleSecured(AccountRole.Administrator)
     public Account createAdministrator(@NotNull PersistAdministratorRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail());
 
         final Account account = this.getEntityInstance(request.getPrimaryEmail(), Account.class);
         account.setRole(AccountRole.Administrator);
@@ -340,6 +342,7 @@ public class AccountService {
     @RoleSecured(AccountRole.Administrator)
     public Account createPropertyOwner(@NotNull PersistPropertyOwnerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail());
 
         final PropertyOwner account = this.getEntityInstance(request.getPrimaryEmail(), PropertyOwner.class);
         account.setRole(AccountRole.PropertyOwner);
@@ -373,6 +376,7 @@ public class AccountService {
     @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public PropertyManager createPropertyManager(@NotNull PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail());
 
         Property managedProperty;
         if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
@@ -432,6 +436,7 @@ public class AccountService {
     @RoleSecured({AccountRole.PropertyManager})
     public SecurityEmployee createSecurityGuy(@NotNull PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail());
 
         final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
 
@@ -468,6 +473,7 @@ public class AccountService {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public MaintenanceEmployee createMaintenanceGuy(@NotNull PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail());
 
         final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
 
@@ -504,6 +510,7 @@ public class AccountService {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public AssistantPropertyManager createAssistantPropertyManager(@NotNull PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail());
 
         final Account currentAccount = authorizationManager.getCurrentAccount();
         final PropertyManager manager;
@@ -593,7 +600,11 @@ public class AccountService {
         return account;
     }
 
-    private void preventAccountDuplicity(String email, String emailExisting) {
+    private void preventAccountDuplicity(@Nonnull String email) {
+        preventAccountDuplicity(email, null);
+    }
+
+    private void preventAccountDuplicity(@Nonnull String email, String emailExisting) {
         if ( Objects.equals(email, emailExisting) ) {
             // email will not change, assume account is not a duplicate
             return;
