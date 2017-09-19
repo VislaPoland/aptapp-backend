@@ -422,12 +422,13 @@ public class SlotService {
         invite.setResponse(EventInviteResponse.Invited);
         eventInviteDao.persist(invite);
 
-        createEventNotification(invite, authorizationManager.getCurrentAccount());
+        final EventInviteNotification notification = createEventNotification(invite, authorizationManager.getCurrentAccount());
+        invite.setNotification(notification);
 
         return invite;
     }
 
-    private void createEventNotification(@Nonnull EventInvite eventInvite, @Nonnull Account eventCreator) {
+    private @Nonnull EventInviteNotification createEventNotification(@Nonnull EventInvite eventInvite, @Nonnull Account eventCreator) {
         final EventInviteNotification notification = new EventInviteNotification();
         notification.setEventInvite(eventInvite);
         notification.setAuthor(eventCreator);
@@ -437,6 +438,7 @@ public class SlotService {
         notification.setRecipient(eventInvite.getAttendant());
         notification.setStatus(NotificationStatus.Pending);
         notificationDao.persist(notification);
+        return notification;
     }
 
 }

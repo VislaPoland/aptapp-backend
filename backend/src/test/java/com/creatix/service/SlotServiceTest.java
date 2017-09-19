@@ -100,6 +100,11 @@ public class SlotServiceTest {
         assertEquals(1, slot.getUnits().size());
         assertEquals(AudienceType.Tenants, slot.getAudience());
         assertEquals(request.getDurationMinutes().intValue(), slot.getUnitDurationMinutes());
+
+        for ( EventInvite invite : slot.getInvites() ) {
+            assertNotNull(invite.getNotification());
+            assertNotNull(invite.getNotification().getId());
+        }
     }
 
     @Test

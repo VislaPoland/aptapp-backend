@@ -27,13 +27,13 @@ import java.util.Set;
 public class Tenant extends TenantBase {
 
     @OneToMany(mappedBy = "usingTenant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ParkingStall> parkingStalls;
+    private Set<ParkingStall> parkingStalls = new HashSet<>();
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Vehicle> vehicles;
+    private Set<Vehicle> vehicles = new HashSet<>();
 
     @OneToMany(mappedBy = "parentTenant", orphanRemoval = true)
-    private Set<SubTenant> subTenants;
+    private Set<SubTenant> subTenants = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
