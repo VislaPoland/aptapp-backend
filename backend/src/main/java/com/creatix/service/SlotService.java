@@ -6,10 +6,8 @@ import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.enums.AccountRole;
-import com.creatix.domain.enums.AudienceType;
-import com.creatix.domain.enums.EventInviteResponse;
-import com.creatix.domain.enums.ReservationStatus;
+import com.creatix.domain.entity.store.notification.EventInviteNotification;
+import com.creatix.domain.enums.*;
 import com.creatix.message.template.push.EventNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
@@ -21,6 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nonnull;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -57,6 +56,8 @@ public class SlotService {
     private PushNotificationService pushNotificationService;
     @Autowired
     private EventInviteDao eventInviteDao;
+    @Autowired
+    private NotificationDao notificationDao;
 
     public ScheduledSlotsResponse getSlotsByFilter(@NotNull Long propertyId, LocalDate beginDate, LocalDate endDate, Long startId, Integer pageSize) {
         Objects.requireNonNull(propertyId, "Property id is required");
@@ -140,31 +141,26 @@ public class SlotService {
 
         eventSlotDao.persist(slot);
 
-        final List<Account> recipients;
+        final List<Account> attendants;
         if ( slot.getAudience() == AudienceType.Employees ) {
-            recipients = accountService.getAccounts(new AccountRole[]{AccountRole.Maintenance, AccountRole.Security, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, propertyId);
+            attendants = accountService.getAccounts(new AccountRole[]{AccountRole.Maintenance, AccountRole.Security, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, propertyId);
         }
         else if ( slot.getAudience() == AudienceType.Tenants ) {
-            recipients = accountService.getAccounts(new AccountRole[]{AccountRole.Tenant, AccountRole.SubTenant}, propertyId);
+            attendants = accountService.getAccounts(new AccountRole[]{AccountRole.Tenant, AccountRole.SubTenant}, propertyId);
         }
         else if ( slot.getAudience() == AudienceType.Everyone ) {
-            recipients = accountService.getAccounts(AccountRole.values(), propertyId);
+            attendants = accountService.getAccounts(AccountRole.values(), propertyId);
         }
         else {
-            recipients = Collections.emptyList();
+            attendants = Collections.emptyList();
         }
 
-        Set<EventInvite> invites = new HashSet<>();
-        for ( Account recipient : recipients ) {
-            pushNotificationService.sendNotification(new EventNotificationTemplate(slot), recipient);
-            final EventInvite invite = new EventInvite();
-            invite.setAttendant(recipient);
-            invite.setEvent(slot);
-            invite.setResponse(EventInviteResponse.Invited);
-            invites.add(invite);
-            eventInviteDao.persist(invite);
+        for ( final Account attendant : attendants ) {
+            // notify attendant by push notification
+            pushNotificationService.sendNotification(new EventNotificationTemplate(slot), attendant);
+            // invite attendant to event
+            slot.addEventInvite(createEventInvite(slot, attendant));
         }
-        slot.setInvites(invites);
 
         return slot;
     }
@@ -417,6 +413,30 @@ public class SlotService {
                 }
             }
         }
+    }
+
+    private @Nonnull EventInvite createEventInvite(@Nonnull EventSlot slot, @Nonnull Account recipient) {
+        final EventInvite invite = new EventInvite();
+        invite.setAttendant(recipient);
+        invite.setEvent(slot);
+        invite.setResponse(EventInviteResponse.Invited);
+        eventInviteDao.persist(invite);
+
+        createEventNotification(invite, authorizationManager.getCurrentAccount());
+
+        return invite;
+    }
+
+    private void createEventNotification(@Nonnull EventInvite eventInvite, @Nonnull Account eventCreator) {
+        final EventInviteNotification notification = new EventInviteNotification();
+        notification.setEventInvite(eventInvite);
+        notification.setAuthor(eventCreator);
+        notification.setTitle("New event invite!");
+        notification.setDescription("Hey, there is a new event invite waiting for you!");
+        notification.setProperty(eventInvite.getEvent().getProperty());
+        notification.setRecipient(eventInvite.getAttendant());
+        notification.setStatus(NotificationStatus.Pending);
+        notificationDao.persist(notification);
     }
 
 }

@@ -8,12 +8,9 @@ import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.OneToMany;
+import javax.annotation.Nonnull;
+import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -37,5 +34,10 @@ public class EventSlot extends Slot {
     private AudienceType audience;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<EventInvite> invites;
+    private Set<EventInvite> invites = new HashSet<>();
+
+    public void addEventInvite(@Nonnull EventInvite eventInvite) {
+        eventInvite.setEvent(this);
+        invites.add(eventInvite);
+    }
 }

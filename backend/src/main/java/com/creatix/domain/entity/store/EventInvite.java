@@ -1,25 +1,14 @@
 package com.creatix.domain.entity.store;
 
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.notification.EventInviteNotification;
 import com.creatix.domain.enums.EventInviteResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -47,4 +36,7 @@ public class EventInvite {
 	@Column(nullable = false)
 	@NotNull
 	private EventInviteResponse response;
+
+	@OneToOne(mappedBy = "eventInvite", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private EventInviteNotification notification;
 }
