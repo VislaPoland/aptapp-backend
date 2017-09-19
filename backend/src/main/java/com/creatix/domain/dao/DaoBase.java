@@ -41,4 +41,8 @@ public abstract class DaoBase<T, ID> {
     public void delete(T entity) {
         em.remove(entity);
     }
+
+    public void flush() {
+        em.flush();
+    }
 }

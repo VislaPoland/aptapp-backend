@@ -33,8 +33,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -262,7 +264,13 @@ public class DiscountCouponService {
         final DiscountCoupon discountCoupon = findCouponById(couponId);
 
         if (discountCoupon.getDiscountCouponPhoto() != null) {
-            attachmentService.deleteAttachmentFiles(Collections.singletonList(discountCoupon.getDiscountCouponPhoto()));
+            final DiscountCouponPhoto discountCouponPhoto = discountCoupon.getDiscountCouponPhoto();
+            discountCoupon.setDiscountCouponPhoto(null);
+            discountCouponDao.persist(discountCoupon);
+            attachmentService.deleteAttachment(discountCouponPhoto);
+            // We need to flush delete command before new entry is inserted into database because of 1:1 relationship
+            // between discount coupon and attachment.
+            discountCouponDao.flush();
         }
 
         List<DiscountCouponPhoto> photoStoreList;

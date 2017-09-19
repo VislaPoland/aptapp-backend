@@ -2,6 +2,7 @@ package com.creatix.domain.entity.store.attachment;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @EqualsAndHashCode(of = "id")
+@ToString(of = { "id", "filePath" })
 @Data
 public class Attachment {
 

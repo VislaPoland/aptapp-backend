@@ -42,7 +42,7 @@ public class DiscountCoupon implements AttachmentId {
     @Column
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private DiscountCouponPhoto discountCouponPhoto;
 
     @OneToMany(mappedBy = "id.discountCoupon",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)

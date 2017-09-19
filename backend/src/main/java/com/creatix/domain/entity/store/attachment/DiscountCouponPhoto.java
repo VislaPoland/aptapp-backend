@@ -3,6 +3,7 @@ package com.creatix.domain.entity.store.attachment;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
@@ -13,6 +14,7 @@ import javax.persistence.OneToOne;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
+@ToString(callSuper = true)
 public class DiscountCouponPhoto extends Attachment {
 
     @OneToOne
