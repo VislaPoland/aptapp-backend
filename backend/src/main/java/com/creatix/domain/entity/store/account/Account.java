@@ -1,7 +1,6 @@
 package com.creatix.domain.entity.store.account;
 
 import com.creatix.domain.entity.store.account.device.Device;
-import com.creatix.domain.entity.store.notification.Notification;
 import com.creatix.domain.enums.AccountRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -88,12 +87,6 @@ public class Account {
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
     private Set<Device> devices;
-
-    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
-    private Set<Notification> notificationsSent;
-
-    @OneToMany(mappedBy = "recipient", cascade = CascadeType.REMOVE)
-    private Set<Notification> notificationsReceived;
 
     @Transient
     public boolean isDeleted() {
