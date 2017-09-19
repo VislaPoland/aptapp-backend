@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nonnull;
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
@@ -41,11 +42,7 @@ public class TenantService {
     @Autowired
     private TenantDao tenantDao;
     @Autowired
-    private VehicleDao vehicleDao;
-    @Autowired
     private ApartmentDao apartmentDao;
-    @Autowired
-    private ParkingStallDao parkingStallDao;
     @Autowired
     private SubTenantDao subTenantDao;
     @Autowired
@@ -59,7 +56,7 @@ public class TenantService {
     @Autowired
     private ApplicationProperties applicationProperties;
 
-    private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
+    private @Nonnull <T, ID> T getOrElseThrow(@Nonnull ID id, @Nonnull DaoBase<T, ID> dao, @Nonnull EntityNotFoundException ex) {
         final T item = dao.findById(id);
         if ( item == null ) {
             throw ex;
@@ -68,8 +65,9 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public Tenant createTenantFromRequest(@NotNull PersistTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+    public @Nonnull Tenant createTenantFromRequest(@Nonnull PersistTenantRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
+        preventAccountDuplicity(request.getPrimaryEmail(), null);
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
                 new EntityNotFoundException(String.format("Apartment with id %d not found", request.getApartmentId())));
@@ -115,7 +113,7 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public Tenant updateTenantFromRequest(long tenantId, @NotNull PersistTenantRequest request) {
+    public @Nonnull Tenant updateTenantFromRequest(long tenantId, @Nonnull PersistTenantRequest request) {
         Objects.requireNonNull(request);
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
@@ -123,6 +121,7 @@ public class TenantService {
         authorizationManager.checkManager(apartment.getProperty());
 
         final Tenant tenant = getTenant(tenantId);
+        preventAccountDuplicity(request.getPrimaryEmail(), tenant.getPrimaryEmail());
 
         if ( (apartment.getTenant() != null) && !(Objects.equals(apartment.getTenant(), tenant)) ) {
             throw new IllegalArgumentException(String.format("Apartment id=%d has already tenant id=%d assigned.", apartment.getId(), apartment.getTenant().getId()));
@@ -145,35 +144,35 @@ public class TenantService {
     }
 
     @RoleSecured
-    public Tenant getTenant(Long tenantId) {
+    public @Nonnull Tenant getTenant(@Nonnull Long tenantId) {
         return getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
     }
 
     @RoleSecured
-    public List<Vehicle> getTenantVehicles(Long tenantId) {
+    public @Nonnull List<Vehicle> getTenantVehicles(@Nonnull Long tenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         return new ArrayList<>(tenant.getVehicles());
     }
 
     @RoleSecured
-    public List<ParkingStall> getTenantParkingStalls(Long tenantId) {
+    public @Nonnull List<ParkingStall> getTenantParkingStalls(@Nonnull Long tenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         return new ArrayList<>(tenant.getParkingStalls());
     }
 
     @RoleSecured
-    public List<SubTenant> getSubTenants(Long tenantId) {
+    public @Nonnull List<SubTenant> getSubTenants(@Nonnull Long tenantId) {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         return new ArrayList<>(tenant.getSubTenants());
     }
 
     @RoleSecured({AccountRole.Tenant})
-    public SubTenant createSubTenant(@NotNull CreateSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+    public @Nonnull SubTenant createSubTenant(@Nonnull CreateSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return createSubTenant(authorizationManager.getCurrentAccount().getId(), request);
     }
 
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public SubTenant createSubTenant(Long tenantId, @NotNull CreateSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+    public @Nonnull SubTenant createSubTenant(@Nonnull Long tenantId, @Nonnull CreateSubTenantRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Objects.requireNonNull(request);
 
         preventAccountDuplicity(request.getPrimaryEmail(), null);
@@ -197,12 +196,12 @@ public class TenantService {
     }
 
     @RoleSecured
-    public SubTenant getSubTenant(Long subTenantId) {
+    public SubTenant getSubTenant(@Nonnull Long subTenantId) {
         return getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
     }
 
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public SubTenant updateSubTenant(Long subTenantId, @NotNull UpdateSubTenantRequest request) {
+    public @Nonnull SubTenant updateSubTenant(@Nonnull Long subTenantId, @NotNull UpdateSubTenantRequest request) {
         Objects.requireNonNull(request);
 
         final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
@@ -217,7 +216,7 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
-    public void deleteSubTenant(Long subTenantId) {
+    public void deleteSubTenant(@Nonnull Long subTenantId) {
         final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
         if ( authorizationManager.isSelf(subTenant.getParentTenant()) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
             subTenant.setDeletedAt(new Date());
@@ -231,12 +230,12 @@ public class TenantService {
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
-    public Tenant deleteTenant(@NotNull Long tenantId) {
+    public @Nonnull Tenant deleteTenant(@Nonnull Long tenantId) {
         return deleteTenant(getTenant(tenantId));
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
-    public Tenant deleteTenant(@NotNull Tenant tenant) {
+    private @Nonnull Tenant deleteTenant(@Nonnull Tenant tenant) {
         Objects.requireNonNull(tenant);
         authorizationManager.checkWrite(tenant);
 
@@ -262,7 +261,7 @@ public class TenantService {
         return tenant;
     }
 
-    private void preventAccountDuplicity(String email, String emailExisting) {
+    private void preventAccountDuplicity(@Nonnull String email, String emailExisting) {
         if ( Objects.equals(email, emailExisting) ) {
             // email will not change, assume account is not a duplicate
             return;
