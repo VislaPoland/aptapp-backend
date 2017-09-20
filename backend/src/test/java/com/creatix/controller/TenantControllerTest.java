@@ -9,6 +9,7 @@ import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
 import com.creatix.domain.dto.tenant.VehicleDto;
 import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.enums.TenantType;
 import com.creatix.mock.WithMockCustomUser;
 import com.creatix.service.TenantService;
 import org.junit.Test;
@@ -45,6 +46,7 @@ public class TenantControllerTest {
     @WithMockCustomUser("mark.building@apartments.com")
     public void createUpdateTenant() throws Exception {
         PersistTenantRequest request = new PersistTenantRequest();
+        request.setType(TenantType.Owner);
         request.setApartmentId(23L);
         request.setFirstName("Michael");
         request.setLastName("Johnson");
@@ -116,6 +118,7 @@ public class TenantControllerTest {
     @WithMockCustomUser("apt2@test.com")
     public void denyCreateTenantForSubtenantRoleTest() throws Exception {
         PersistTenantRequest request = new PersistTenantRequest();
+        request.setType(TenantType.Owner);
         request.setApartmentId(23L);
         request.setFirstName("Michael");
         request.setLastName("Johnson");

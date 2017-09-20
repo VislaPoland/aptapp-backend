@@ -1,6 +1,7 @@
 package com.creatix.domain.dto.tenant;
 
 import com.creatix.domain.dto.account.PersistAccountRequest;
+import com.creatix.domain.enums.TenantType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -13,6 +14,10 @@ import java.util.List;
 @Getter
 @ApiModel
 public class PersistTenantRequest extends PersistAccountRequest {
+
+    @NotNull
+    @ApiModelProperty(required = true, value = "Tenant type")
+    private TenantType type;
 
     @NotNull
     @ApiModelProperty(required = true, value = "Apartment ID")
