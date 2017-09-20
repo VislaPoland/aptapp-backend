@@ -49,7 +49,9 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         final QPersonalMessageGroup qPersonalMessageGroup = QPersonalMessageGroup.personalMessageGroup;
         final QPersonalMessage qPersonalMessage = QPersonalMessage.personalMessage;
         final QSubTenant qSubTenantAuthor = QSubTenant.subTenant;
-        final QTenant qParentTenantOfSubTenant = QTenant.tenant;
+        final QTenant qParentTenantOfSubTenantAuthor = QTenant.tenant;
+        final QSubTenant qSubTenantRecipient = QSubTenant.subTenant;
+        final QTenant qParentTenantOfSubTenantRecipient = QTenant.tenant;
 
 
         BooleanExpression predicate = qNotification.updatedAt.after(startDt).not();
@@ -61,15 +63,15 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                     final Tenant tenant = (Tenant) account;
                     predicate = predicate.andAnyOf(
                             qNotification.author.eq(account),
-                            qParentTenantOfSubTenant.subTenants.any().parentTenant.eq(tenant)
+                            qParentTenantOfSubTenantAuthor.subTenants.any().parentTenant.eq(tenant)
                     );
                     break;
                 case SubTenant:
                     final SubTenant subTenant = (SubTenant) account;
                     predicate = predicate.andAnyOf(
-                            qNotification.author.eq(account),                           // sender is user itself
-                            qParentTenantOfSubTenant.subTenants.any().eq(subTenant),    // sender is one the subtenants
-                            qNotification.author.eq(subTenant.getParentTenant())        // sender is parent of the subtenant
+                            qNotification.author.eq(account),                                   // sender is user itself
+                            qParentTenantOfSubTenantAuthor.subTenants.any().eq(subTenant),      // sender is one the subtenants
+                            qNotification.author.eq(subTenant.getParentTenant())                // sender is parent of the subtenant
                     );
                     break;
                 default:
@@ -88,7 +90,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                                     qNotification.property.eq(authorizationManager.getCurrentProperty(account))
                             ),
                             qNotification.recipient.eq(account),
-                            qParentTenantOfSubTenant.subTenants.any().parentTenant.eq(tenant),
+                            qParentTenantOfSubTenantRecipient.subTenants.any().parentTenant.eq(tenant),
                             qPersonalMessage.toAccount.eq(account)
                     );
                     break;
@@ -101,7 +103,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                             ),
                             qNotification.recipient.eq(account),
                             qPersonalMessage.toAccount.eq(account),
-                            qParentTenantOfSubTenant.subTenants.any().eq(subTenant),
+                            qParentTenantOfSubTenantRecipient.subTenants.any().eq(subTenant),
                             qNotification.recipient.eq(subTenant.getParentTenant())
                     );
                     break;
@@ -187,7 +189,9 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                 .leftJoin(qNotification.as(QPersonalMessageNotification.class).personalMessageGroup, qPersonalMessageGroup)
                 .leftJoin(qPersonalMessageGroup.messages, qPersonalMessage)
                 .leftJoin(qNotification.author.as(QSubTenant.class), qSubTenantAuthor)
-                .leftJoin(qSubTenantAuthor.parentTenant, qParentTenantOfSubTenant)
+                .leftJoin(qSubTenantAuthor.parentTenant, qParentTenantOfSubTenantAuthor)
+                .leftJoin(qNotification.recipient.as(QSubTenant.class), qSubTenantRecipient)
+                .leftJoin(qSubTenantRecipient.parentTenant, qParentTenantOfSubTenantRecipient)
                 .where(predicate)
                 .orderBy(qNotification.updatedAt.desc())
                 .limit(pageSize)
