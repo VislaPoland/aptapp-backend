@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -59,7 +60,8 @@ public class SlotService {
     @Autowired
     private NotificationDao notificationDao;
 
-    public ScheduledSlotsResponse getSlotsByFilter(@NotNull Long propertyId, LocalDate beginDate, LocalDate endDate, Long startId, Integer pageSize) {
+    @Nonnull
+    public ScheduledSlotsResponse getSlotsByFilter(@Nonnull Long propertyId, @Nullable LocalDate beginDate, @Nullable LocalDate endDate, @Nullable Long startId, @Nullable Integer pageSize) {
         Objects.requireNonNull(propertyId, "Property id is required");
 
         final Property property = propertyService.getProperty(propertyId);

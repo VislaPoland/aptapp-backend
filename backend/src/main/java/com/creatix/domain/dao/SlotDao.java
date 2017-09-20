@@ -10,7 +10,7 @@ import com.querydsl.jpa.JPQLQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -25,7 +25,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
         return queryFactory.selectFrom(QSlot.slot).fetch();
     }
 
-    public List<Slot> findByPropertyAndAccountAndDateRange(@NotNull Property property, @NotNull Account account, @NotNull OffsetDateTime from, @NotNull OffsetDateTime to) {
+    public List<Slot> findByPropertyAndAccountAndDateRange(@Nonnull Property property, @Nonnull Account account, @Nonnull OffsetDateTime from, @Nonnull OffsetDateTime to) {
         Objects.requireNonNull(property, "Property is null");
         Objects.requireNonNull(from, "From date is null");
         Objects.requireNonNull(to, "To date is null");
@@ -38,7 +38,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
                 .fetch();
     }
 
-    public List<Slot> findByPropertyAndAccountAndSlotIdGreaterOrEqual(@NotNull Property property, @NotNull Account account, @NotNull Long slotId, @NotNull Integer pageSize) {
+    public List<Slot> findByPropertyAndAccountAndSlotIdGreaterOrEqual(@Nonnull Property property, @Nonnull Account account, @Nonnull Long slotId, @Nonnull Integer pageSize) {
         Objects.requireNonNull(property, "Property is null");
         Objects.requireNonNull(slotId, "Slot id is null");
         Objects.requireNonNull(pageSize, "Page size is null");
@@ -52,7 +52,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
                 .fetch();
     }
 
-    public List<Slot> findByPropertyAndAccountAndBeginTime(@NotNull Property property, @NotNull Account account, @NotNull OffsetDateTime beginTime, @NotNull Integer pageSize) {
+    public List<Slot> findByPropertyAndAccountAndBeginTime(@Nonnull Property property, @Nonnull Account account, @Nonnull OffsetDateTime beginTime, @Nonnull Integer pageSize) {
         Objects.requireNonNull(property, "Property is null");
         Objects.requireNonNull(beginTime, "Begin time is null");
         Objects.requireNonNull(pageSize, "Page size is null");
@@ -67,7 +67,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
                 .fetch();
     }
 
-    private Environment createEnvironment(@NotNull Property property, @NotNull Account account) {
+    private Environment createEnvironment(@Nonnull Property property, @Nonnull Account account) {
         final Environment env = new Environment();
         env.slot = QSlot.slot;
         env.reservations = QMaintenanceReservation.maintenanceReservation;

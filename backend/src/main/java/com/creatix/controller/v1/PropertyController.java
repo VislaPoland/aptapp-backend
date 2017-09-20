@@ -4,11 +4,8 @@ import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.ApplicationFeatureDto;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.*;
-import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
-import com.creatix.domain.dto.property.slot.SlotDto;
 import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
@@ -17,12 +14,10 @@ import com.creatix.service.SlotService;
 import com.creatix.service.property.PropertyService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -35,7 +30,6 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -172,26 +166,6 @@ public class PropertyController {
         }
 
         throw new EntityNotFoundException("Unable to locate photo file");
-    }
-
-    @ApiOperation(value = "Get scheduled events", notes = "Get all scheduled events for single property")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
-    @JsonView(Views.SlotsWithReservations.class)
-    @RequestMapping(path = "/{propertyId}/schedule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
-    public PageableDataResponse<List<SlotDto>> getEvents(
-            @PathVariable Long propertyId,
-            @ApiParam(example = "2016-07-07") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDt,
-            @ApiParam(example = "2016-07-07") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDt,
-            @ApiParam @RequestParam(required = false) Long startId,
-            @ApiParam @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-
-        ScheduledSlotsResponse slotsByFilter = slotService.getSlotsByFilter(propertyId, beginDt, endDt, startId, pageSize);
-        return new PageableDataResponse<>(slotsByFilter.getSlots(), pageSize.longValue(), slotsByFilter.getNextId());
     }
 
 
