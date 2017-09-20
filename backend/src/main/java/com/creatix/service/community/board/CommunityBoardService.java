@@ -299,7 +299,7 @@ public class CommunityBoardService {
                     CommunityBoardItemUpdatedSubscriberNotification  storedNotification = new CommunityBoardItemUpdatedSubscriberNotification();
                     storedNotification.setCommunityBoardItem(communityBoardItem);
                     storedNotification.setCommunityBoardComment(communityBoardComment);
-                    storedNotification.setAuthor(communityBoardItem.getAccount());
+                    storedNotification.setAuthor(authorizationManager.getCurrentAccount());
                     storedNotification.setProperty(communityBoardItem.getProperty());
                     storedNotification.setRecipient(account);
                     storedNotification.setDescription(pushNotification.getMessage());
