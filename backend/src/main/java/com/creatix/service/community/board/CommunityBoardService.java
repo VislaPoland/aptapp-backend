@@ -26,6 +26,7 @@ import com.creatix.message.template.push.community.board.CommunityItemUpdatedSub
 import com.creatix.message.template.push.community.board.NewCommunityItemCommentReplyTemplate;
 import com.creatix.message.template.push.community.board.NewCommunityItemCommentTemplate;
 import com.creatix.security.AuthorizationManager;
+import com.creatix.security.RoleSecured;
 import com.creatix.service.AttachmentService;
 import com.creatix.service.message.PushNotificationService;
 import freemarker.template.TemplateException;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Nonnull;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
@@ -77,6 +79,7 @@ public class CommunityBoardService {
         return communityBoardItemDao.listByPropertyAndStatus(property, ownerId, statusTypes, startId, pageSize);
     }
 
+    @Nonnull
     public List<CommunityBoardItem> listBoardItemsForPropertyAndCategory(long propertyId, Long ownerId, List<CommunityBoardStatusType> statusTypes, List<Long> categoryIdList, Long startId, long pageSize) {
         Property property = getProperty(propertyId);
 
@@ -89,6 +92,7 @@ public class CommunityBoardService {
         return communityBoardItemDao.listByPropertyAnCategories(property, ownerId, statusTypes, categoryList, startId, pageSize);
     }
 
+    @Nonnull
     public List<CommunityBoardItem> searchBoardItemsForProperty(long propertyId, List<CommunityBoardStatusType> statusTypes, long pageSize, SearchRequest searchRequest) {
         Objects.requireNonNull(searchRequest, "Search request can not be null");
 
@@ -100,6 +104,7 @@ public class CommunityBoardService {
         return communityBoardItemDao.searchFromRequest(property, statusTypes, pageSize, searchRequest, communityBoardCategory);
     }
 
+    @Nonnull
     public CommunityBoardItem createNewBoardItemFromRequest(long propertyId, CommunityBoardItemEditRequest request) {
         if (null != request.getId()) {
             throw new IllegalArgumentException(String.format("Request ID must be null, got %d instead", request.getId()));
@@ -116,6 +121,7 @@ public class CommunityBoardService {
         return boardItem;
     }
 
+    @Nonnull
     public CommunityBoardItem updateBoardItemFromRequest(CommunityBoardItemEditRequest request) {
         Objects.requireNonNull(request.getId(), "ID must not be null");
 
@@ -171,7 +177,7 @@ public class CommunityBoardService {
         return communityBoardItem;
     }
 
-    @NotNull
+    @Nonnull
     private Property getProperty(long propertyId) throws SecurityException {
         Property property = propertyDao.findById(propertyId);
         if (null == property) {
@@ -213,7 +219,8 @@ public class CommunityBoardService {
         return communityBoardItem;
     }
 
-    @NotNull
+    @RoleSecured
+    @Nonnull
     public CommunityBoardComment createNewCommentFromRequest(long boardId, @NotNull CommunityBoardCommentEditRequest request) {
         Objects.requireNonNull(request, "Request must not be null");
 
@@ -366,6 +373,7 @@ public class CommunityBoardService {
 
     }
 
+    @RoleSecured
     public CommunityBoardComment updateCommentFromRequest(CommunityBoardCommentEditRequest request) {
         Objects.requireNonNull(request, "Request object must not be null");
         Objects.requireNonNull(request.getId(), "ID of object for edditing must not be null");
@@ -396,6 +404,7 @@ public class CommunityBoardService {
         return comment;
     }
 
+    @RoleSecured
     public CommunityBoardComment deleteCommentById(long commentId) {
         CommunityBoardComment commentById = getCommentById(commentId);
 
@@ -412,6 +421,7 @@ public class CommunityBoardService {
         return commentById;
     }
 
+    @RoleSecured
     public List<CommunityBoardComment> listCommentsForBoardItem(long boardItemId) {
         CommunityBoardItem boardItem = getBoardItemById(boardItemId);
         return communityBoardCommentDao.listParentComments(boardItem);

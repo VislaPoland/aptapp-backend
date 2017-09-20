@@ -38,7 +38,7 @@ public class CommunityBoardCommentController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @RequestMapping(path = "", method = RequestMethod.GET)
-    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
+    @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD)
     public DataResponse<List<CommunityBoardCommentDto>> listAllComments(@PathVariable("boardItemId") Long boardItemId) {
         return new DataResponse<>(
                 communityBoardService.listCommentsForBoardItem(boardItemId).stream().map(

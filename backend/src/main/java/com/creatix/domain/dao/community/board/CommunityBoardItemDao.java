@@ -10,9 +10,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.transaction.Transactional;
-import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.List;
 
 import static com.creatix.domain.entity.store.community.board.QCommunityBoardItem.communityBoardItem;
@@ -24,8 +24,8 @@ import static com.creatix.domain.entity.store.community.board.QCommunityBoardIte
 @Transactional
 public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
 
-
-    public List<CommunityBoardItem> listByPropertyAndStatus(Property property, Long ownerId, List<CommunityBoardStatusType> statusTypes, Long startId, long limit) {
+    @Nonnull
+    public List<CommunityBoardItem> listByPropertyAndStatus(@Nonnull Property property, @Nullable Long ownerId, List<CommunityBoardStatusType> statusTypes, Long startId, long limit) {
 
 
         BooleanExpression wherePredicate = communityBoardItem.property.eq(property);
@@ -46,7 +46,8 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
                 .fetch();
     }
 
-    public List<CommunityBoardItem> searchFromRequest(Property property, List<CommunityBoardStatusType> statusTypes, long pageSize, SearchRequest searchRequest, CommunityBoardCategory category) {
+    @Nonnull
+    public List<CommunityBoardItem> searchFromRequest(@Nonnull Property property, @Nonnull List<CommunityBoardStatusType> statusTypes, long pageSize, @Nonnull SearchRequest searchRequest, @Nullable CommunityBoardCategory category) {
 
         //Select from
         JPQLQuery<CommunityBoardItem> query = queryFactory.selectFrom(communityBoardItem);
@@ -104,7 +105,8 @@ public class CommunityBoardItemDao extends DaoBase<CommunityBoardItem, Long> {
         return query.fetch();
     }
 
-    public List<CommunityBoardItem> listByPropertyAnCategories(Property property, Long ownerId, List<CommunityBoardStatusType> statusTypes, List<CommunityBoardCategory> categoryList, Long startId, long pageSize) {
+    @Nonnull
+    public List<CommunityBoardItem> listByPropertyAnCategories(@Nonnull Property property, @Nullable Long ownerId, @Nonnull List<CommunityBoardStatusType> statusTypes, @Nonnull List<CommunityBoardCategory> categoryList, @Nullable Long startId, long pageSize) {
         BooleanExpression wherePredicate = communityBoardItem.property.eq(property);
         wherePredicate = wherePredicate.and(communityBoardItem.category.in(categoryList));
         wherePredicate = wherePredicate.and(communityBoardItem.communityBoardStatus.in(statusTypes));
