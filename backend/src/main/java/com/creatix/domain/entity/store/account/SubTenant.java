@@ -25,16 +25,16 @@ public class SubTenant extends TenantBase {
 
     @Transient
     public Apartment getApartment() {
-        return parentTenant.getApartment();
+        return parentTenant != null ? parentTenant.getApartment() : null;
     }
 
     @Transient
     public Property getProperty() {
-        return parentTenant.getApartment().getProperty();
+        return parentTenant != null ? parentTenant.getApartment().getProperty() : null;
     }
 
     @Transient
     public Address getAddress() {
-        return parentTenant.getAddress();
+        return parentTenant != null ? parentTenant.getAddress() : null;
     }
 }
