@@ -15,8 +15,7 @@ import java.util.List;
 @ApiModel
 public class PersistTenantRequest extends PersistAccountRequest {
 
-    @NotNull
-    @ApiModelProperty(required = true, value = "Tenant type")
+    @ApiModelProperty(value = "Tenant type")
     private TenantType type;
 
     @NotNull
