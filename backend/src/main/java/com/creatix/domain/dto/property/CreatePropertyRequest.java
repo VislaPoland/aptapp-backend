@@ -22,8 +22,7 @@ public class CreatePropertyRequest {
     @ApiModelProperty(value = "Property address", required = true)
     private AddressDto address;
 
-    @NotNull
-    @ApiModelProperty(value = "ID of the property owner", required = true)
+    @ApiModelProperty(value = "ID of the property owner")
     private Long propertyOwnerId;
 
     @NotNull

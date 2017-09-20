@@ -67,6 +67,7 @@ public class PropertyService {
     @RoleSecured(AccountRole.Administrator)
     public Property createFromRequest(@NotNull CreatePropertyRequest request) {
         Objects.requireNonNull(request);
+        Objects.requireNonNull(request.getPropertyOwnerId(), "Property owner ID is null");
 
         final Property property = mapper.toProperty(request);
         final PropertyOwner propertyOwner = getOrElseThrow(request.getPropertyOwnerId(), propertyOwnerDao,
