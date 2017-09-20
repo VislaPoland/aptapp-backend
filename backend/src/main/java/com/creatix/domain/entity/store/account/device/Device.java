@@ -12,9 +12,9 @@ import java.util.Date;
 
 @Entity
 @Table(indexes = {
-        @Index(columnList = "account_id")
+        @Index(columnList = "account_id"),
+        @Index(columnList = "udid,platform", unique = true)
 })
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(of = "id")

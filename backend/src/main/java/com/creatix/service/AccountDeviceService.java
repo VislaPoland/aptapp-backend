@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nonnull;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Service
@@ -33,20 +33,23 @@ public class AccountDeviceService {
     @Autowired
     private HttpSession httpSession;
 
-    @NotNull
-    public Device retrieveDevice(@NotNull String deviceUDID, @NotNull PlatformType platformType) {
+    @Nonnull
+    public Device retrieveDevice(@Nonnull String deviceUDID, @Nonnull PlatformType platformType) {
         Objects.requireNonNull(deviceUDID, "Device UDID is null");
         Objects.requireNonNull(platformType, "Platform type is null");
 
-        Device device = deviceDao.findByUDID(deviceUDID);
-        if (device == null) {
-            device = new Device();
-            device.setUdid(deviceUDID);
-            device.setPlatform(platformType);
+        Device device;
+        synchronized ( deviceDao ) {
+            device = deviceDao.findByUDIDAndPlatformType(deviceUDID, platformType);
+            if ( device == null ) {
+                device = new Device();
+                device.setUdid(deviceUDID);
+                device.setPlatform(platformType);
+            }
+            // clear delete date
+            device.setDeletedAt(null);
+            deviceDao.persist(device);
         }
-        // clear delete date
-        device.setDeletedAt(null);
-        deviceDao.persist(device);
 
         if ( this.authorizationManager.hasCurrentAccount() ) {
             final Account account = this.getAccount(this.authorizationManager.getCurrentAccount().getId());
@@ -60,7 +63,8 @@ public class AccountDeviceService {
     }
 
     @RoleSecured
-    public Device register(@NotNull Long accountId, @NotNull Long deviceId, @NotNull AccountDeviceDto request) {
+    @Nonnull
+    public Device register(@Nonnull Long accountId, @Nonnull Long deviceId, @Nonnull AccountDeviceDto request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(deviceId);
         Objects.requireNonNull(request);
@@ -78,7 +82,8 @@ public class AccountDeviceService {
     }
 
     @RoleSecured
-    public Device assignDeviceToAccount(@NotNull Account account) {
+    @Nonnull
+    public Device assignDeviceToAccount(@Nonnull Account account) {
         Objects.requireNonNull(account);
 
         PlatformType platformType = (PlatformType) httpSession.getAttribute(deviceProperties.getSessionKeyPlatform());
@@ -98,8 +103,8 @@ public class AccountDeviceService {
         return device;
     }
 
-
-    private Device getDevice(@NotNull Long deviceId) {
+    @Nonnull
+    private Device getDevice(@Nonnull Long deviceId) {
         Objects.requireNonNull(deviceId);
         final Device device = this.deviceDao.findById(deviceId);
         if ( device == null ) {
@@ -108,7 +113,8 @@ public class AccountDeviceService {
         return device;
     }
 
-    private Account getAccount(@NotNull Long accountId) {
+    @Nonnull
+    private Account getAccount(@Nonnull Long accountId) {
         Objects.requireNonNull(accountId);
         final Account account = this.accountDao.findById(accountId);
         if ( account == null ) {

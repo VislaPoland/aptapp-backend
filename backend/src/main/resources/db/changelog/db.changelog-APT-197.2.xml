@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Tomas Sedlak" id="changelog-APT-197.2-1">
+        <comment>Add missing primary key to device table.</comment>
+        <addPrimaryKey tableName="device" columnNames="id"/>
+    </changeSet>
+
+    <changeSet author="Tomas Sedlak" id="changelog-APT-197.2-2">
+        <comment>Delete invalid rows from device table.</comment>
+        <sql>DELETE FROM device d1 WHERE (SELECT COUNT(*) FROM device d2 WHERE d1.udid = d2.udid) > 1</sql>
+        <sql>DELETE FROM device d WHERE (SELECT COUNT(*) FROM account a WHERE d.account_id = a.id) = 0</sql>
+    </changeSet>
+
+    <changeSet author="Tomas Sedlak" id="changelog-APT-197.2-3">
+        <comment>Add foreign keys to device table to ensure reference integrity.</comment>
+        <addForeignKeyConstraint baseTableName="device" baseColumnNames="account_id" constraintName="fk_device_account_id_account_id"
+                                 referencedTableName="account"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet author="Tomas Sedlak" id="changelog-APT-197.2-4">
+        <comment>Add unique constraint on device udid column.</comment>
+        <addUniqueConstraint tableName="device" columnNames="udid, platform" constraintName="uniq_device_udid_platform"/>
+    </changeSet>
+
+</databaseChangeLog>
