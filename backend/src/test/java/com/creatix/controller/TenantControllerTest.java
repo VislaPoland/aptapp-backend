@@ -9,11 +9,8 @@ import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.dto.tenant.TenantDto;
 import com.creatix.domain.dto.tenant.VehicleDto;
 import com.creatix.domain.entity.store.account.Tenant;
-import com.creatix.domain.enums.TenantType;
-import com.creatix.message.MessageDeliveryException;
 import com.creatix.mock.WithMockCustomUser;
 import com.creatix.service.TenantService;
-import freemarker.template.TemplateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +22,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -49,7 +45,6 @@ public class TenantControllerTest {
     @WithMockCustomUser("mark.building@apartments.com")
     public void createUpdateTenant() throws Exception {
         PersistTenantRequest request = new PersistTenantRequest();
-        request.setType(TenantType.Owner);
         request.setApartmentId(23L);
         request.setFirstName("Michael");
         request.setLastName("Johnson");
@@ -121,7 +116,6 @@ public class TenantControllerTest {
     @WithMockCustomUser("apt2@test.com")
     public void denyCreateTenantForSubtenantRoleTest() throws Exception {
         PersistTenantRequest request = new PersistTenantRequest();
-        request.setType(TenantType.Owner);
         request.setApartmentId(23L);
         request.setFirstName("Michael");
         request.setLastName("Johnson");
