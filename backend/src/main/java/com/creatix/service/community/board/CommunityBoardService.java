@@ -145,7 +145,7 @@ public class CommunityBoardService {
         return existingItem;
     }
 
-    @NotNull
+    @Nonnull
     public CommunityBoardItem getBoardItemById(long itemId) throws SecurityException {
         CommunityBoardItem existingItem = getCommunityBoardItem(itemId);
 
@@ -193,7 +193,7 @@ public class CommunityBoardService {
     private CommunityBoardItem getCommunityBoardItem(long itemId) {
         CommunityBoardItem existingItem = communityBoardItemDao.findById(itemId);
 
-        if (null == existingItem || existingItem.getCommunityBoardStatus() == CommunityBoardStatusType.DELETED) {
+        if (null == existingItem) {
             throw new EntityNotFoundException(String.format("Entity %d not found", itemId));
         }
         //TODO: check security regarding the status of item
