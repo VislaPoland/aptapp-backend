@@ -73,16 +73,16 @@ public class SlotDao extends DaoBase<Slot, Long> {
         final QMaintenanceReservation maintenanceReservations = QMaintenanceReservation.maintenanceReservation;
         final QManagedEmployee maintenanceEmployee = QManagedEmployee.managedEmployee;
         final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;;
-        final QSubTenant maintenanceSubTenantRecipient = QSubTenant.subTenant;
-        final QTenant maintenanceParentTenantOfSubTenantRecipient = QTenant.tenant;
+        final QSubTenant maintenanceSubTenantAuthor = QSubTenant.subTenant;
+        final QTenant maintenanceParentTenantOfSubTenantAuthor = QTenant.tenant;
 
         env.query = queryFactory.selectFrom(slot)
                 .distinct()
                 .leftJoin(slot.as(QMaintenanceSlot.class).reservations, maintenanceReservations)
                 .leftJoin(maintenanceReservations.employee, maintenanceEmployee)
                 .leftJoin(maintenanceReservations.notification, maintenanceNotification)
-                .leftJoin(maintenanceNotification.recipient.as(QSubTenant.class), maintenanceSubTenantRecipient)
-                .leftJoin(maintenanceSubTenantRecipient.parentTenant, maintenanceParentTenantOfSubTenantRecipient);
+                .leftJoin(maintenanceNotification.author.as(QSubTenant.class), maintenanceSubTenantAuthor)
+                .leftJoin(maintenanceSubTenantAuthor.parentTenant, maintenanceParentTenantOfSubTenantAuthor);
 
         env.predicate = slot.property.eq(property);
 
@@ -99,8 +99,8 @@ public class SlotDao extends DaoBase<Slot, Long> {
             final Tenant tenant = (Tenant) account;
             env.predicate = env.predicate.andAnyOf(
                     slot.instanceOf(EventSlot.class),
-                    maintenanceNotification.recipient.eq(account),
-                    maintenanceParentTenantOfSubTenantRecipient.subTenants.any().parentTenant.eq(tenant)
+                    maintenanceNotification.author.eq(tenant),
+                    maintenanceParentTenantOfSubTenantAuthor.subTenants.any().parentTenant.eq(tenant)
             );
         }
         else if ( account instanceof SubTenant ) {
@@ -108,9 +108,9 @@ public class SlotDao extends DaoBase<Slot, Long> {
             final SubTenant subTenant = (SubTenant) account;
             env.predicate = env.predicate.andAnyOf(
                     slot.instanceOf(EventSlot.class),
-                    maintenanceNotification.recipient.eq(account),
-                    maintenanceNotification.recipient.eq(subTenant.getParentTenant()),
-                    maintenanceParentTenantOfSubTenantRecipient.subTenants.any().eq(subTenant)
+                    maintenanceNotification.author.eq(account),
+                    maintenanceNotification.author.eq(subTenant.getParentTenant()),
+                    maintenanceParentTenantOfSubTenantAuthor.subTenants.any().eq(subTenant)
             );
         }
         else {
