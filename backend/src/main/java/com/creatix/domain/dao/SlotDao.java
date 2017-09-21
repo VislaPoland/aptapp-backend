@@ -69,47 +69,65 @@ public class SlotDao extends DaoBase<Slot, Long> {
 
     private Environment createEnvironment(@Nonnull Property property, @Nonnull Account account) {
         final Environment env = new Environment();
-        env.slot = QSlot.slot;
-        env.reservations = QMaintenanceReservation.maintenanceReservation;
-        env.tenant = QTenant.tenant;
-        env.employee = QManagedEmployee.managedEmployee;
-        env.maintenanceNotification = QMaintenanceNotification.maintenanceNotification;;
-        env.query = queryFactory.selectFrom(env.slot)
-                .distinct()
-                .leftJoin(env.slot.as(QMaintenanceSlot.class).reservations, env.reservations)
-                .leftJoin(env.reservations.employee, env.employee)
-                .leftJoin(env.reservations.notification, env.maintenanceNotification)
-                .leftJoin(env.maintenanceNotification.targetApartment.tenant, env.tenant);
+        final QSlot slot = QSlot.slot;
+        final QMaintenanceReservation maintenanceReservations = QMaintenanceReservation.maintenanceReservation;
+        final QManagedEmployee maintenanceEmployee = QManagedEmployee.managedEmployee;
+        final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;;
+        final QSubTenant maintenanceSubTenantRecipient = QSubTenant.subTenant;
+        final QTenant maintenanceParentTenantOfSubTenantRecipient = QTenant.tenant;
 
-        env.predicate = env.slot.property.eq(property);
+        env.query = queryFactory.selectFrom(slot)
+                .distinct()
+                .leftJoin(slot.as(QMaintenanceSlot.class).reservations, maintenanceReservations)
+                .leftJoin(maintenanceReservations.employee, maintenanceEmployee)
+                .leftJoin(maintenanceReservations.notification, maintenanceNotification)
+                .leftJoin(maintenanceNotification.recipient.as(QSubTenant.class), maintenanceSubTenantRecipient)
+                .leftJoin(maintenanceSubTenantRecipient.parentTenant, maintenanceParentTenantOfSubTenantRecipient);
+
+        env.predicate = slot.property.eq(property);
 
         if ( (account instanceof MaintenanceEmployee) || (account instanceof PropertyManager) || (account instanceof AssistantPropertyManager) ) {
             // all reservations in state pending or state confirmed or events
-            env.predicate = env.predicate.and(env.reservations.status.in(ReservationStatus.Pending, ReservationStatus.Confirmed).or(env.slot.instanceOf(EventSlot.class)));
+            env.predicate = env.predicate.and(maintenanceReservations.status.in(ReservationStatus.Pending, ReservationStatus.Confirmed).or(slot.instanceOf(EventSlot.class)));
         }
         else if ( account instanceof SecurityEmployee ) {
             // filter: self created maintenance notification or events
-            env.predicate = env.predicate.and(env.maintenanceNotification.author.id.eq(account.getId()).or(env.slot.instanceOf(EventSlot.class)));
+            env.predicate = env.predicate.and(maintenanceNotification.author.id.eq(account.getId()).or(slot.instanceOf(EventSlot.class)));
         }
         else if ( account instanceof Tenant ) {
             // filter: tenant's maintenance or events
-            env.predicate = env.predicate.and(env.tenant.id.eq(account.getId()).or(env.slot.instanceOf(EventSlot.class)));
+            final Tenant tenant = (Tenant) account;
+            env.predicate = env.predicate.andAnyOf(
+                    slot.instanceOf(EventSlot.class),
+                    maintenanceNotification.recipient.eq(account),
+                    maintenanceParentTenantOfSubTenantRecipient.subTenants.any().parentTenant.eq(tenant)
+            );
+        }
+        else if ( account instanceof SubTenant ) {
+            // filter: tenant's maintenance or events
+            final SubTenant subTenant = (SubTenant) account;
+            env.predicate = env.predicate.andAnyOf(
+                    slot.instanceOf(EventSlot.class),
+                    maintenanceNotification.recipient.eq(account),
+                    maintenanceNotification.recipient.eq(subTenant.getParentTenant()),
+                    maintenanceParentTenantOfSubTenantRecipient.subTenants.any().eq(subTenant)
+            );
         }
         else {
-            env.predicate = env.predicate.and(env.slot.instanceOf(EventSlot.class));
+            env.predicate = env.predicate.and(slot.instanceOf(EventSlot.class));
         }
 
 
         // allow to see only appropriate events (filter by audience)
         if ( account instanceof ManagedEmployee ) {
-            env.predicate = env.predicate.and(env.slot.instanceOf(MaintenanceSlot.class)
-                    .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
-                    .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Employees)));
+            env.predicate = env.predicate.and(slot.instanceOf(MaintenanceSlot.class)
+                    .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
+                    .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Employees)));
         }
         else if ( account instanceof TenantBase ) {
-            env.predicate = env.predicate.and(env.slot.instanceOf(MaintenanceSlot.class)
-                    .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
-                    .or(env.slot.as(QEventSlot.class).audience.eq(AudienceType.Tenants)));
+            env.predicate = env.predicate.and(slot.instanceOf(MaintenanceSlot.class)
+                    .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
+                    .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Tenants)));
         }
 
         return env;
@@ -117,12 +135,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
 
     private static final class Environment {
         JPQLQuery<Slot> query;
-        QMaintenanceReservation reservations;
-        QTenant tenant;
-        QManagedEmployee employee;
         BooleanExpression predicate;
-        QSlot slot;
-        QMaintenanceNotification maintenanceNotification;
     }
 
 }
