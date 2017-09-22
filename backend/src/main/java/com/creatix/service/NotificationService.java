@@ -221,6 +221,7 @@ public class NotificationService {
         throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
     }
 
+    @RoleSecured(value = {AccountRole.Security})
     public SecurityNotification respondToSecurityNotification(long notificationId, @NotNull SecurityNotificationResponseRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(request, "Notification response request is null");
 
