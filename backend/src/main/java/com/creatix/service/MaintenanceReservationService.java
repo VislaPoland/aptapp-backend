@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
 import javax.persistence.EntityNotFoundException;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -54,7 +53,7 @@ public class MaintenanceReservationService {
     private MaintenanceNotificationDao maintenanceNotificationDao;
 
     @RoleSecured(value = {AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
-    MaintenanceReservation createMaintenanceReservation(@NotNull MaintenanceNotification maintenanceNotification, @NotNull Long slotUnitId) throws IOException, TemplateException {
+    MaintenanceReservation createMaintenanceReservation(@Nonnull MaintenanceNotification maintenanceNotification, @Nonnull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(maintenanceNotification, "Maintenance notification is null");
         Objects.requireNonNull(slotUnitId, "Slot unit id is null");
 
@@ -114,7 +113,7 @@ public class MaintenanceReservationService {
     }
 
     @RoleSecured(AccountRole.Maintenance)
-    public MaintenanceNotification employeeRespondToMaintenanceNotification(@NotNull MaintenanceNotification notification, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
+    public MaintenanceNotification employeeRespondToMaintenanceNotification(@Nonnull MaintenanceNotification notification, @Nonnull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(response, "Notification response dto is null");
 
@@ -143,7 +142,8 @@ public class MaintenanceReservationService {
     }
 
     @RoleSecured({AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public MaintenanceNotification tenantRespondToMaintenanceReschedule(@NotNull MaintenanceNotification notification, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
+    @Nonnull
+    public MaintenanceNotification tenantRespondToMaintenanceReschedule(@Nonnull MaintenanceNotification notification, @Nonnull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(response, "Notification response dto is null");
 
@@ -159,7 +159,7 @@ public class MaintenanceReservationService {
 
         final MaintenanceReservation reservation = reservations.get(0);
 
-        if ( !(Objects.equals(authorizationManager.getCurrentAccount(), notification.getAuthor()) )) {
+        if ( !(authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.AssistantPropertyManager)) && !(Objects.equals(authorizationManager.getCurrentAccount(), notification.getAuthor()))) {
             throw new SecurityException(String.format("You are not allowed to modify maintenance reservation id=%d", reservation.getId()));
         }
 
@@ -188,8 +188,8 @@ public class MaintenanceReservationService {
     }
 
     @RoleSecured(AccountRole.Maintenance)
-    @NotNull
-    MaintenanceReservation employeeConfirmReservation(@NotNull MaintenanceReservation reservation, String note) throws IOException, TemplateException {
+    @Nonnull
+    MaintenanceReservation employeeConfirmReservation(@Nonnull MaintenanceReservation reservation, String note) throws IOException, TemplateException {
         Objects.requireNonNull(reservation, "Reservation is null");
 
         if ( reservation.getEmployee() == null ) {
@@ -212,8 +212,8 @@ public class MaintenanceReservationService {
     }
 
     @RoleSecured(AccountRole.Maintenance)
-    @NotNull
-    MaintenanceReservation employeeRescheduleReservation(@NotNull MaintenanceReservation reservationOld, @NotNull Long slotUnitId, String note) throws IOException, TemplateException {
+    @Nonnull
+    MaintenanceReservation employeeRescheduleReservation(@Nonnull MaintenanceReservation reservationOld, @Nonnull Long slotUnitId, String note) throws IOException, TemplateException {
         Objects.requireNonNull(reservationOld, "Reservation old is null");
         Objects.requireNonNull(slotUnitId, "Slot unit ID is null");
 
