@@ -204,12 +204,12 @@ public class SlotService {
         final EventSlot eventSlot = getOrElseThrow(slotId, eventSlotDao, new EntityNotFoundException(String.format("Slot id=%d not found", slotId)));
 
         final Account account = authorizationManager.getCurrentAccount();
-        if ( !AccountRole.PropertyManager.equals(account.getRole())
-                && !AccountRole.AssistantPropertyManager.equals(account.getRole())
-                && !eventInviteDao.isUserInvitedToEvent(slotId, account) ) {
-            throw new SecurityException("Not allowed to read event detail without invitation");
+        if ( !(authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.AssistantPropertyManager)) ) {
+            if ( !(eventInviteDao.isUserInvitedToEvent(slotId, account)) ) {
+                // invite uninvited users to event
+                createEventInvite(eventSlot, account);
+            }
         }
-
 
         final EventSlotDetailDto detailDto = mapper.toEventSlotDetailDto(eventSlot);
         final List<EventInvite> invites = eventInviteDao.findByEventSlotIdOrderByAttendantFirstNameAsc(slotId);
@@ -420,7 +420,7 @@ public class SlotService {
     private @Nonnull EventInvite createEventInvite(@Nonnull EventSlot slot, @Nonnull Account recipient) {
         final EventInvite invite = new EventInvite();
         invite.setAttendant(recipient);
-        invite.setEvent(slot);
+        slot.addEventInvite(invite);
         invite.setResponse(EventInviteResponse.Invited);
         eventInviteDao.persist(invite);
 
