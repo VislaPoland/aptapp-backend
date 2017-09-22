@@ -7,7 +7,6 @@ import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,10 +47,11 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
 
         final QPersonalMessageGroup qPersonalMessageGroup = QPersonalMessageGroup.personalMessageGroup;
         final QPersonalMessage qPersonalMessage = QPersonalMessage.personalMessage;
-        final QSubTenant qSubTenantAuthor = QSubTenant.subTenant;
-        final QTenant qParentTenantOfSubTenantAuthor = QTenant.tenant;
-        final QSubTenant qSubTenantRecipient = QSubTenant.subTenant;
-        final QTenant qParentTenantOfSubTenantRecipient = QTenant.tenant;
+
+        final QSubTenant qSubTenantAuthor = new QSubTenant("qSubTenantAuthor");
+        final QTenant qParentTenantOfSubTenantAuthor = new QTenant("qParentTenantOfSubTenantAuthor");
+        final QSubTenant qSubTenantRecipient = new QSubTenant("qSubTenantRecipient");
+        final QTenant qParentTenantOfSubTenantRecipient = new QTenant("qParentTenantOfSubTenantRecipient");
 
 
         BooleanExpression predicate = qNotification.updatedAt.after(startDt).not();
@@ -85,10 +85,8 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                 case Tenant:
                     final Tenant tenant = (Tenant) account;
                     predicate = predicate.andAnyOf(
-                            Expressions.allOf(
-                                    qNotification.instanceOfAny(BusinessProfileNotification.class, DiscountCouponNotification.class),
-                                    qNotification.property.eq(authorizationManager.getCurrentProperty(account))
-                            ),
+                            qNotification.instanceOfAny(BusinessProfileNotification.class, DiscountCouponNotification.class)
+                                    .and(qNotification.property.eq(authorizationManager.getCurrentProperty(account))),
                             qNotification.recipient.eq(account),
                             qParentTenantOfSubTenantRecipient.subTenants.any().parentTenant.eq(tenant),
                             qPersonalMessage.toAccount.eq(account)
@@ -97,10 +95,8 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                 case SubTenant:
                     final SubTenant subTenant = (SubTenant) account;
                     predicate = predicate.andAnyOf(
-                            Expressions.allOf(
-                                    qNotification.instanceOfAny(BusinessProfileNotification.class, DiscountCouponNotification.class),
-                                    qNotification.property.eq(authorizationManager.getCurrentProperty(account))
-                            ),
+                            qNotification.instanceOfAny(BusinessProfileNotification.class, DiscountCouponNotification.class)
+                                    .and(qNotification.property.eq(authorizationManager.getCurrentProperty(account))),
                             qNotification.recipient.eq(account),
                             qPersonalMessage.toAccount.eq(account),
                             qParentTenantOfSubTenantRecipient.subTenants.any().eq(subTenant),
@@ -181,7 +177,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             }
         }
 
-        predicate = predicate.not().and(qNotification.instanceOf(EventInviteNotification.class));
+        predicate = predicate.and(qNotification.instanceOf(EventInviteNotification.class).not());
 
 
         return queryFactory.selectFrom(qNotification)
