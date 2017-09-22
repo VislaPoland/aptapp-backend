@@ -13,4 +13,5 @@
     <include file="classpath:db/changelog/db.changelog-APT-197.1.xml"/>
     <include file="classpath:db/changelog/db.changelog-APT-198.xml"/>
     <include file="classpath:db/changelog/db.changelog-APT-197.2.xml"/>
+    <include file="classpath:db/changelog/db.changelog-APT-200.xml"/>
 </databaseChangeLog>

@@ -1,7 +1,6 @@
 package com.creatix.domain.dto.tenant;
 
 import com.creatix.domain.dto.account.AccountDto;
-import com.creatix.domain.enums.TenantType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,9 +16,6 @@ public class TenantDto extends AccountDto {
 
     @ApiModelProperty(value = "Indicate that sms message notifications are enabled/disabled")
     private Boolean enableSms;
-
-    @ApiModelProperty(value = "Tenant type", required = true)
-    private TenantType type;
 
     @ApiModelProperty(value = "Assigned parking stalls")
     private List<ParkingStallDto> parkingStalls;
@@ -56,8 +52,5 @@ public class TenantDto extends AccountDto {
 
         @ApiModelProperty(value = "Company name")
         private String companyName;
-
-        @ApiModelProperty(value = "Tenant type", required = true)
-        private TenantType type;
     }
 }

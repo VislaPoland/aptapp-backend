@@ -4,7 +4,6 @@ import com.creatix.domain.entity.store.Address;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ParkingStall;
 import com.creatix.domain.entity.store.Vehicle;
-import com.creatix.domain.enums.TenantType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -42,11 +41,6 @@ public class Tenant extends TenantBase {
     @NotNull
     @Column
     private Boolean enableSms;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column
-    private TenantType type;
 
     @Transient
     public Address getAddress() {

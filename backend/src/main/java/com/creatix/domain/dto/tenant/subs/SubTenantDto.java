@@ -3,7 +3,6 @@ package com.creatix.domain.dto.tenant.subs;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.property.PropertyDto;
-import com.creatix.domain.enums.TenantType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -35,9 +34,6 @@ public class SubTenantDto {
 
     @ApiModelProperty(value = "Company name")
     private String companyName;
-
-    @ApiModelProperty(value = "Tenant type", required = true)
-    private TenantType type;
 
     @ApiModelProperty(value = "Parent tenant ID")
     private Long parentTenantId;

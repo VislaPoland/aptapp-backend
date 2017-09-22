@@ -4,7 +4,6 @@ import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
 import com.creatix.domain.entity.store.account.Tenant;
-import com.creatix.domain.enums.TenantType;
 import com.creatix.mock.WithMockCustomUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +37,6 @@ public class TenantServiceTest {
         request.setFirstName("Missing");
         request.setLastName("Test");
         request.setPrimaryPhone("0000000000000");
-        request.setType(TenantType.Owner);
 
         final Tenant tenant = tenantService.createTenantFromRequest(request);
         assertNotNull(tenant);
