@@ -74,4 +74,7 @@ public abstract class Notification {
 
     @ManyToOne(optional = true)
     private Property property;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    public NotificationGroup notificationGroup;
 }

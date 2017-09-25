@@ -7,6 +7,7 @@ import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.AuthorizationManager;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -177,20 +178,25 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             }
         }
 
-        predicate = predicate.and(qNotification.instanceOf(EventInviteNotification.class).not());
-
+//        predicate = predicate.and(qNotification.instanceOf(EventInviteNotification.class).not());
 
         return queryFactory.selectFrom(qNotification)
-                .distinct()
-                .leftJoin(qNotification.as(QPersonalMessageNotification.class).personalMessageGroup, qPersonalMessageGroup)
-                .leftJoin(qPersonalMessageGroup.messages, qPersonalMessage)
-                .leftJoin(qNotification.author.as(QSubTenant.class), qSubTenantAuthor)
-                .leftJoin(qSubTenantAuthor.parentTenant, qParentTenantOfSubTenantAuthor)
-                .leftJoin(qNotification.recipient.as(QSubTenant.class), qSubTenantRecipient)
-                .leftJoin(qSubTenantRecipient.parentTenant, qParentTenantOfSubTenantRecipient)
-                .where(predicate)
-                .orderBy(qNotification.updatedAt.desc())
-                .limit(pageSize)
+                .where(
+                        qNotification.id.in(
+                                JPAExpressions.select(qNotification.id.min())
+                                .from(qNotification)
+                                .leftJoin(qNotification.as(QPersonalMessageNotification.class).personalMessageGroup, qPersonalMessageGroup)
+                                .leftJoin(qPersonalMessageGroup.messages, qPersonalMessage)
+                                .leftJoin(qNotification.author.as(QSubTenant.class), qSubTenantAuthor)
+                                .leftJoin(qSubTenantAuthor.parentTenant, qParentTenantOfSubTenantAuthor)
+                                .leftJoin(qNotification.recipient.as(QSubTenant.class), qSubTenantRecipient)
+                                .leftJoin(qSubTenantRecipient.parentTenant, qParentTenantOfSubTenantRecipient)
+                                .where(predicate)
+                                .groupBy(qNotification.notificationGroup)
+                                .orderBy(qNotification.updatedAt.min().desc())
+                                .limit(pageSize)
+                        )
+                )
                 .fetch();
     }
 }

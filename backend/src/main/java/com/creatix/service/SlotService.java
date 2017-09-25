@@ -7,6 +7,7 @@ import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.notification.EventInviteNotification;
+import com.creatix.domain.entity.store.notification.NotificationGroup;
 import com.creatix.domain.enums.*;
 import com.creatix.message.template.push.EventNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
@@ -59,6 +60,8 @@ public class SlotService {
     private EventInviteDao eventInviteDao;
     @Autowired
     private NotificationDao notificationDao;
+    @Autowired
+    private NotificationGroupDao notificationGroupDao;
 
     @Nonnull
     public ScheduledSlotsResponse getSlotsByFilter(@Nonnull Long propertyId, @Nullable LocalDate beginDate, @Nullable LocalDate endDate, @Nullable Long startId, @Nullable Integer pageSize) {
@@ -157,11 +160,14 @@ public class SlotService {
             attendants = Collections.emptyList();
         }
 
+        final NotificationGroup notificationGroup = new NotificationGroup();
+        notificationGroupDao.persist(notificationGroup);
+
         for ( final Account attendant : attendants ) {
             // notify attendant by push notification
             pushNotificationService.sendNotification(new EventNotificationTemplate(slot), attendant);
             // invite attendant to event
-            slot.addEventInvite(createEventInvite(slot, attendant));
+            slot.addEventInvite(createEventInvite(slot, attendant, notificationGroup));
         }
 
         return slot;
@@ -207,7 +213,9 @@ public class SlotService {
         if ( !(authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.AssistantPropertyManager)) ) {
             if ( !(eventInviteDao.isUserInvitedToEvent(slotId, account)) ) {
                 // invite uninvited users to event
-                createEventInvite(eventSlot, account);
+                final NotificationGroup notificationGroup = new NotificationGroup();
+                notificationGroupDao.persist(notificationGroup);
+                createEventInvite(eventSlot, account, notificationGroup);
             }
         }
 
@@ -417,21 +425,22 @@ public class SlotService {
         }
     }
 
-    private @Nonnull EventInvite createEventInvite(@Nonnull EventSlot slot, @Nonnull Account recipient) {
+    private @Nonnull EventInvite createEventInvite(@Nonnull EventSlot slot, @Nonnull Account recipient, @Nonnull NotificationGroup group) {
         final EventInvite invite = new EventInvite();
         invite.setAttendant(recipient);
         slot.addEventInvite(invite);
         invite.setResponse(EventInviteResponse.Invited);
         eventInviteDao.persist(invite);
 
-        final EventInviteNotification notification = createEventNotification(invite, authorizationManager.getCurrentAccount());
+        final EventInviteNotification notification = createEventNotification(invite, authorizationManager.getCurrentAccount(), group);
         invite.setNotification(notification);
 
         return invite;
     }
 
-    private @Nonnull EventInviteNotification createEventNotification(@Nonnull EventInvite eventInvite, @Nonnull Account eventCreator) {
+    private @Nonnull EventInviteNotification createEventNotification(@Nonnull EventInvite eventInvite, @Nonnull Account eventCreator, @Nonnull NotificationGroup group) {
         final EventInviteNotification notification = new EventInviteNotification();
+        group.addNotification(notification);
         notification.setEventInvite(eventInvite);
         notification.setAuthor(eventCreator);
         notification.setTitle("New event invite!");
