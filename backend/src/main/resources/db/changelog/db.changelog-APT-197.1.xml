@@ -22,6 +22,11 @@
     </changeSet>
 
     <changeSet author="Tomas Sedlak" id="changelog-APT-197.1-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="maintenance_reservation" primaryKeyName="maintenance_reservation_pkey"/>
+            </not>
+        </preConditions>
         <comment>Add primary key to maintenance_reservation table.</comment>
         <addPrimaryKey tableName="maintenance_reservation" columnNames="id"/>
     </changeSet>
