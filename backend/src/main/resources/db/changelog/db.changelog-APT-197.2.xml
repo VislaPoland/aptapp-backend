@@ -6,6 +6,11 @@
                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <changeSet author="Tomas Sedlak" id="changelog-APT-197.2-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="device" primaryKeyName="device_pkey"/>
+            </not>
+        </preConditions>
         <comment>Add missing primary key to device table.</comment>
         <addPrimaryKey tableName="device" columnNames="id"/>
     </changeSet>
