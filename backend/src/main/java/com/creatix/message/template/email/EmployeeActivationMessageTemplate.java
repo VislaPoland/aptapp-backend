@@ -10,6 +10,11 @@ public class EmployeeActivationMessageTemplate extends ActivationMessageTemplate
     }
 
     @Override
+    public String getSubject() {
+        return "Welcome to Apt. App!";
+    }
+
+    @Override
     public String getTemplateName() {
         return "activation-employee";
     }
