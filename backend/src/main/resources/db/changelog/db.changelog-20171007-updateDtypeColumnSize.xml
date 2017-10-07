@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Tomas Sedlak" id="db.changelog-20171007-1">
+        <comment>Increase notification dtype column size to 64.</comment>
+        <modifyDataType columnName="dtype"
+                        newDataType="varchar(64)"
+                        tableName="notification"/>
+    </changeSet>
+
+    <changeSet author="Tomas Sedlak" id="db.changelog-20171007-2">
+        <comment>Fix truncated values</comment>
+        <update tableName="notification">
+            <column name="dtype" value="CommunityBoardItemUpdatedSubscriberNotification"/>
+            <where>dtype='CommunityBoardItemUpdatedSubscr'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>
