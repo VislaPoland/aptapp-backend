@@ -22,6 +22,8 @@ import java.util.Objects;
 @Transactional
 public class AccountDeviceService {
 
+    private static final Object syncLock = new Object();
+
     @Autowired
     private DeviceProperties deviceProperties;
     @Autowired
@@ -39,7 +41,7 @@ public class AccountDeviceService {
         Objects.requireNonNull(platformType, "Platform type is null");
 
         Device device;
-        synchronized ( deviceDao ) {
+        synchronized ( syncLock ) {
             device = deviceDao.findByUDIDAndPlatformType(deviceUDID, platformType);
             if ( device == null ) {
                 device = new Device();

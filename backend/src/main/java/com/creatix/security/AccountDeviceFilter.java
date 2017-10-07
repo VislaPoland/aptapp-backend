@@ -36,9 +36,6 @@ public class AccountDeviceFilter extends GenericFilterBean {
             platformString = PlatformType.Web.toString();
         }
         PlatformType platformType = PlatformType.valueOf(platformString);
-        if ( platformType == null ) {
-            throw new SecurityException("Platform type is required in valid format for all requests.");
-        }
         httpSession.setAttribute(this.deviceProperties.getSessionKeyPlatform(), platformType);
 
         if ( platformType != PlatformType.Web ) {
