@@ -105,6 +105,7 @@ public class PushNotificationService {
         if ( this.pushNotificationProperties.getGoogleCloudMessagingKey() == null ) {
             throw new IllegalStateException("Google GCM key property is null");
         }
+        logger.info("Initializing GCM with API key={}", this.pushNotificationProperties.getGoogleCloudMessagingKey());
         this.gcmSender = new Sender(this.pushNotificationProperties.getGoogleCloudMessagingKey());
     }
 
@@ -185,13 +186,13 @@ public class PushNotificationService {
             messageBuilder.addData("message", notification.getMessage());
         }
         if ( notification.getAttributes() != null ) {
-            notification.getAttributes().entrySet().forEach(a -> messageBuilder.addData(a.getKey(), a.getValue()));
+            notification.getAttributes().forEach(messageBuilder::addData);
         }
 
         final Message message = messageBuilder.build();
         Result result = this.gcmSender.send(message, device.getPushToken(), 1);
         if (result.getErrorCodeName() != null || (result.getFailure() != null && result.getFailure() > 0)) {
-            logger.error(result.toString());
+            logger.error("Failed to send push notification. device_id={}, result={}", device.getId(), result.toString());
         }
     }
 
