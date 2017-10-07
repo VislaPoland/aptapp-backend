@@ -164,7 +164,9 @@ public class PushNotificationService {
             payloadBuilder.customFields(attributesAsMap(notification.getAttributes()));
         }
 
-        return this.apnsService.push(device.getPushToken(), payloadBuilder.build());
+        final ApnsNotification push = this.apnsService.push(device.getPushToken(), payloadBuilder.build());
+        logger.info("Apple push notification sent successfully. device_id={}", device.getId());
+        return push;
     }
 
     private void sendGCM(@NotNull GenericPushNotification notification, @NotNull Device device) throws IOException {
@@ -193,6 +195,9 @@ public class PushNotificationService {
         Result result = this.gcmSender.send(message, device.getPushToken(), 1);
         if (result.getErrorCodeName() != null || (result.getFailure() != null && result.getFailure() > 0)) {
             logger.error("Failed to send push notification. device_id={}, result={}", device.getId(), result.toString());
+        }
+        else {
+            logger.info("Android push notification sent successfully. device_id={}", device.getId());
         }
     }
 
