@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLHandshakeException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -122,7 +123,12 @@ public class PushNotificationService {
                 if ( !(toDevice.isDeleted()) && StringUtils.isNotBlank(toDevice.getPushToken()) ) {
                     switch ( toDevice.getPlatform() ) {
                         case iOS: {
-                            this.sendAPNS(notification, toDevice);
+                            try {
+                                this.sendAPNS(notification, toDevice);
+                            }
+                            catch ( SSLHandshakeException e ) {
+                                logger.warn("Push notification SSL handshare error. Check apple push notification service certificate if it's still valid.", e);
+                            }
                             break;
                         }
                         case Android: {
@@ -135,7 +141,7 @@ public class PushNotificationService {
         }
     }
 
-    private ApnsNotification sendAPNS(@NotNull GenericPushNotification notification, @NotNull Device device) {
+    private ApnsNotification sendAPNS(@NotNull GenericPushNotification notification, @NotNull Device device) throws SSLHandshakeException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(device, "Device is null");
 
