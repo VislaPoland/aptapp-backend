@@ -197,6 +197,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                                 .limit(pageSize)
                         )
                 )
+                .orderBy(qNotification.updatedAt.desc())
                 .fetch();
     }
 }
