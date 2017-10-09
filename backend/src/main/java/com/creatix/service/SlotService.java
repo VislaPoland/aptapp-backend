@@ -17,6 +17,8 @@ import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PushNotificationService;
 import com.creatix.service.property.PropertyService;
 import freemarker.template.TemplateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class SlotService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SlotService.class);
 
     @Autowired
     private AuthorizationManager authorizationManager;
@@ -421,28 +425,33 @@ public class SlotService {
         Objects.requireNonNull(slot, "Slot is null");
 
         if ( slot.getUnits() != null ) {
-            final ArrayList<SlotUnit> slotUnits = new ArrayList<>(slot.getUnits());
-            slotUnits.forEach(u -> {
-                if ( (u.getReservations() == null) || u.getReservations().isEmpty() ) {
-                    slot.removeUnit(u);
-                    slotUnitDao.delete(u);
+            try {
+                final ArrayList<SlotUnit> slotUnits = new ArrayList<>(slot.getUnits());
+                slotUnits.forEach(u -> {
+                    if ( (u.getReservations() == null) || u.getReservations().isEmpty() ) {
+                        slot.removeUnit(u);
+                        slotUnitDao.delete(u);
+                    }
+                });
+                if ( slot.getUnits().isEmpty() ) {
+                    // remove empty slot
+                    final MaintenanceSlotSchedule schedule = slot.getSchedule();
+                    if ( schedule != null ) {
+                        schedule.removeSlot(slot);
+                    }
+                    slotDao.delete(slot);
                 }
-            });
-            if ( slot.getUnits().isEmpty() ) {
-                // remove empty slot
-                final MaintenanceSlotSchedule schedule = slot.getSchedule();
-                if ( schedule != null ) {
-                    schedule.removeSlot(slot);
+                else {
+                    // dissociate slot with schedule
+                    final MaintenanceSlotSchedule schedule = slot.getSchedule();
+                    if ( schedule != null ) {
+                        schedule.removeSlot(slot);
+                        slotDao.persist(slot);
+                    }
                 }
-                slotDao.delete(slot);
             }
-            else {
-                // dissociate slot with schedule
-                final MaintenanceSlotSchedule schedule = slot.getSchedule();
-                if ( schedule != null ) {
-                    schedule.removeSlot(slot);
-                    slotDao.persist(slot);
-                }
+            catch ( Exception e ) {
+                logger.warn("Failed to release maintenance slot. slot_id={}", slot.getId(), e);
             }
         }
     }
