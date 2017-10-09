@@ -230,6 +230,7 @@ public class NotificationService {
 
         if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ) {
             notification.setResponse(request.getResponse());
+            notification.setRespondedAt(OffsetDateTime.now());
             notification.setStatus(NotificationStatus.Resolved);
             securityNotificationDao.persist(notification);
 

@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.time.OffsetDateTime;
 
 @Data
 @Entity
@@ -19,5 +20,8 @@ public class SecurityNotification extends Notification {
     @Column
     @Enumerated(EnumType.STRING)
     private SecurityNotificationResponseType response;
+
+    @Column
+    private OffsetDateTime respondedAt;
 
 }
