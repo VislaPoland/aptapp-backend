@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class MailProperties {
 
     private String from;
+    private String admin;
 
     public String getFrom() {
         return from;
@@ -13,5 +14,13 @@ public class MailProperties {
 
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    public String getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(String admin) {
+        this.admin = admin;
     }
 }

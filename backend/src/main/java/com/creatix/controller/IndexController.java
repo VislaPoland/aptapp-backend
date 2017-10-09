@@ -1,5 +1,9 @@
 package com.creatix.controller;
 
+import com.creatix.configuration.ApplicationProperties;
+import com.creatix.configuration.MailProperties;
+import com.creatix.message.template.email.ExceptionNotificationMessageTemplate;
+import com.creatix.service.message.EmailMessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -34,22 +38,15 @@ import org.springframework.web.servlet.view.RedirectView;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -61,6 +58,12 @@ class IndexController {
 
     private final Logger logger = LoggerFactory.getLogger(IndexController.class);
 
+    @Autowired
+    private MailProperties mailProperties;
+    @Autowired
+    private ApplicationProperties applicationProperties;
+    @Autowired
+    private EmailMessageService emailMessageService;
     @Autowired
     private HttpServletRequest httpServletRequest;
     @Autowired
@@ -170,13 +173,37 @@ class IndexController {
     }
 
     private void handleException(Exception ex, HttpStatus status, HttpServletResponse resp) throws IOException {
-        logger.error("Error processing request", ex);
+        switch ( status ) {
+            case UNAUTHORIZED:
+            case FORBIDDEN:
+                logger.info("Unauthorized access", ex);
+                break;
+            default:
+                logger.error("Error processing request", ex);
+                notifyAdminAboutException(ex);
+                break;
+        }
+
         resp.setStatus(status.value());
         resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         final ErrorMessage errorMessage = new ErrorMessage();
         fillErrorMessage(ex, status, errorMessage);
         resp.getOutputStream().print(jsonMapper.writeValueAsString(errorMessage));
+    }
+
+    private void notifyAdminAboutException(Exception e) {
+        if ( StringUtils.isBlank(mailProperties.getAdmin()) ) {
+            logger.warn("Cannot send exception notification because administrator email address is not configured");
+        }
+        else {
+            try {
+                emailMessageService.send(new ExceptionNotificationMessageTemplate(e, mailProperties.getAdmin(), applicationProperties));
+            }
+            catch ( Throwable t ) {
+                logger.warn("Failed to send notification email to administrator", t);
+            }
+        }
     }
 
     private ErrorMessage fillErrorMessage(Exception ex, HttpStatus status, ErrorMessage errorMessage) {
