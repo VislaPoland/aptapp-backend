@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Tomas Sedlak" id="db.changelog-20171009-1">
+        <comment>Drop unused column default_photo_id from table business_profile.</comment>
+        <dropColumn columnName="default_photo_id"
+                    tableName="business_profile"/>
+    </changeSet>
+
+
+</databaseChangeLog>

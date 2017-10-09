@@ -5,7 +5,6 @@ import com.creatix.domain.entity.store.attachment.AttachmentId;
 import com.creatix.domain.entity.store.attachment.BusinessProfilePhoto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.validator.constraints.Email;
 
 import javax.persistence.*;
 import java.util.List;
@@ -39,9 +38,6 @@ public class BusinessProfile implements AttachmentId {
 
     @OneToMany(mappedBy = "businessProfile", cascade = {CascadeType.REMOVE})
     private List<BusinessProfilePhoto> businessProfilePhotoList;
-
-    @Column
-    private Long defaultPhotoId;
 
     @OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private BusinessContact contact;

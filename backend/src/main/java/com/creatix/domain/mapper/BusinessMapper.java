@@ -48,7 +48,7 @@ public class BusinessMapper extends ConfigurableMapper {
                 .customize(new CustomMapper<BusinessProfile, BusinessProfileDto>() {
                     @Override
                     public void mapAtoB(BusinessProfile businessProfile, BusinessProfileDto businessProfileDto, MappingContext context) {
-                        businessProfileDto.setImageUploaded(businessProfile.getDefaultPhotoId() != null);
+                        businessProfileDto.setImageUploaded((businessProfile.getBusinessProfilePhotoList() != null) && !(businessProfile.getBusinessProfilePhotoList().isEmpty()));
                         if (null != businessProfileDto.getContact() && null != businessProfile.getContact()) {
                             businessProfileDto.getContact().setId(businessProfile.getContact().getId());
                         }
