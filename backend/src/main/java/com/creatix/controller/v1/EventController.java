@@ -8,6 +8,7 @@ import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.slot.EventSlotDetailDto;
 import com.creatix.domain.dto.property.slot.EventSlotDto;
 import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
+import com.creatix.domain.dto.property.slot.UpdateEventSlotRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.EventInviteResponse;
 import com.creatix.security.RoleSecured;
@@ -92,11 +93,24 @@ public class EventController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @PutMapping(path = "/api/v1/events/{eventSlotId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/api/v1/events/{eventSlotId}/response", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
     public DataResponse<EventSlotDetailDto> respondToEventInvite(@PathVariable Long eventSlotId, @RequestParam EventInviteResponse response) {
         slotService.respondToEventInvite(eventSlotId, response);
         return new DataResponse<>(slotService.getEventDetail(eventSlotId));
+    }
+
+    @ApiOperation(value = "Respond to event invitation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.Public.class)
+    @PutMapping(path = "/api/v1/events/{eventSlotId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<EventSlotDto> updateEvent(@PathVariable Long eventSlotId, @Valid @RequestBody UpdateEventSlotRequest data) throws IOException, TemplateException {
+        return new DataResponse<>(mapper.toEventSlotDto(slotService.updateEventSlot(eventSlotId, data)));
     }
 
     @ApiOperation(value = "Delete event slot")
@@ -108,7 +122,7 @@ public class EventController {
     @JsonView(Views.Public.class)
     @DeleteMapping(path = {"/api/properties/{propertyId}/events/{eventSlotId}", "/api/v1/events/{eventSlotId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public DataResponse<EventSlotDto> deleteEventSlot(@PathVariable Long eventSlotId) {
+    public DataResponse<EventSlotDto> deleteEventSlot(@PathVariable Long eventSlotId) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toEventSlotDto(slotService.deleteEventSlotById(eventSlotId)));
     }
 

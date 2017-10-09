@@ -9,6 +9,8 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.notification.EventInviteNotification;
 import com.creatix.domain.entity.store.notification.NotificationGroup;
 import com.creatix.domain.enums.*;
+import com.creatix.message.template.push.EventNotificationAdjustTemplate;
+import com.creatix.message.template.push.EventNotificationCancelTemplate;
 import com.creatix.message.template.push.EventNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
@@ -23,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.*;
 import java.util.*;
@@ -128,7 +129,31 @@ public class SlotService {
         };
     }
 
-    public EventSlot createEventSlot(@NotNull Long propertyId, @NotNull PersistEventSlotRequest request) throws IOException, TemplateException {
+    public EventSlot updateEventSlot(@Nonnull Long eventSlotId, @Nonnull UpdateEventSlotRequest data) throws IOException, TemplateException {
+        Objects.requireNonNull(eventSlotId);
+        Objects.requireNonNull(data);
+
+        final EventSlot eventSlot = getOrElseThrow(eventSlotId, eventSlotDao, new EntityNotFoundException(String.format("Event slot not found, slot_id=%d", eventSlotId)));
+        eventSlot.setAudience(data.getAudience());
+        eventSlot.setDescription(data.getDescription());
+        eventSlot.setTitle(data.getTitle());
+        eventSlot.setLocation(data.getLocation());
+
+        eventSlotDao.persist(eventSlot);
+
+
+        final NotificationGroup notificationGroup = new NotificationGroup();
+        notificationGroupDao.persist(notificationGroup);
+
+        for ( final Account attendant : getEventAttendants(eventSlot) ) {
+            // notify attendant by push notification
+            pushNotificationService.sendNotification(new EventNotificationAdjustTemplate(eventSlot), attendant);
+        }
+
+        return eventSlot;
+    }
+    
+    public EventSlot createEventSlot(@Nonnull Long propertyId, @Nonnull PersistEventSlotRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(request);
 
@@ -146,24 +171,10 @@ public class SlotService {
 
         eventSlotDao.persist(slot);
 
-        final List<Account> attendants;
-        if ( slot.getAudience() == AudienceType.Employees ) {
-            attendants = accountService.getAccounts(new AccountRole[]{AccountRole.Maintenance, AccountRole.Security, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, propertyId);
-        }
-        else if ( slot.getAudience() == AudienceType.Tenants ) {
-            attendants = accountService.getAccounts(new AccountRole[]{AccountRole.Tenant, AccountRole.SubTenant}, propertyId);
-        }
-        else if ( slot.getAudience() == AudienceType.Everyone ) {
-            attendants = accountService.getAccounts(AccountRole.values(), propertyId);
-        }
-        else {
-            attendants = Collections.emptyList();
-        }
-
         final NotificationGroup notificationGroup = new NotificationGroup();
         notificationGroupDao.persist(notificationGroup);
 
-        for ( final Account attendant : attendants ) {
+        for ( final Account attendant : getEventAttendants(slot) ) {
             // notify attendant by push notification
             pushNotificationService.sendNotification(new EventNotificationTemplate(slot), attendant);
             // invite attendant to event
@@ -181,17 +192,28 @@ public class SlotService {
         return item;
     }
 
-    public EventSlot deleteEventSlotById(@NotNull Long slotId) {
+    public EventSlot deleteEventSlotById(@Nonnull Long slotId) throws IOException, TemplateException {
         Objects.requireNonNull(slotId);
 
         final EventSlot slot = getOrElseThrow(slotId, eventSlotDao, new EntityNotFoundException(String.format("Slot id=%d not found", slotId)));
 
         eventSlotDao.delete(slot);
 
+
+        final NotificationGroup notificationGroup = new NotificationGroup();
+        notificationGroupDao.persist(notificationGroup);
+
+        for ( final Account attendant : getEventAttendants(slot) ) {
+            // notify attendant by push notification
+            pushNotificationService.sendNotification(new EventNotificationCancelTemplate(slot), attendant);
+            // invite attendant to event
+            slot.addEventInvite(createEventInvite(slot, attendant, notificationGroup));
+        }
+
         return slot;
     }
 
-    public List<EventSlot> getEventSlotsByPropertyIdAndTimeRange(@NotNull Long propertyId, @NotNull LocalDate beginDate, @NotNull LocalDate endDate) {
+    public List<EventSlot> getEventSlotsByPropertyIdAndTimeRange(@Nonnull Long propertyId, @Nonnull LocalDate beginDate, @Nonnull LocalDate endDate) {
         Objects.requireNonNull(propertyId);
         Objects.requireNonNull(beginDate);
         Objects.requireNonNull(endDate);
@@ -204,7 +226,7 @@ public class SlotService {
         return eventSlotDao.findByPropertyIdAndAccountAndStartBetween(propertyId, authorizationManager.getCurrentAccount(), beginDt, endDt);
     }
 
-    public EventSlotDetailDto getEventDetail(@NotNull Long slotId) {
+    public EventSlotDetailDto getEventDetail(@Nonnull Long slotId) {
         Objects.requireNonNull(slotId);
 
         final EventSlot eventSlot = getOrElseThrow(slotId, eventSlotDao, new EntityNotFoundException(String.format("Slot id=%d not found", slotId)));
@@ -231,7 +253,7 @@ public class SlotService {
         return detailDto;
     }
 
-    public void respondToEventInvite(@NotNull Long slotId, @NotNull EventInviteResponse response) {
+    public void respondToEventInvite(@Nonnull Long slotId, @Nonnull EventInviteResponse response) {
         Objects.requireNonNull(slotId);
         Objects.requireNonNull(response);
 
@@ -247,7 +269,7 @@ public class SlotService {
         eventInviteDao.persist(invite);
     }
 
-    private Slot createMaintenanceSlotFromSchedule(@NotNull LocalDate date, @NotNull MaintenanceSlotSchedule schedule) {
+    private Slot createMaintenanceSlotFromSchedule(@Nonnull LocalDate date, @Nonnull MaintenanceSlotSchedule schedule) {
         Objects.requireNonNull(date, "Date is null");
         Objects.requireNonNull(schedule, "Schedule is null");
 
@@ -395,7 +417,7 @@ public class SlotService {
         oldSlots.forEach(this::releaseSlot);
     }
 
-    private void releaseSlot(@NotNull MaintenanceSlot slot) {
+    private void releaseSlot(@Nonnull MaintenanceSlot slot) {
         Objects.requireNonNull(slot, "Slot is null");
 
         if ( slot.getUnits() != null ) {
@@ -450,6 +472,23 @@ public class SlotService {
         notification.setStatus(NotificationStatus.Pending);
         notificationDao.persist(notification);
         return notification;
+    }
+
+    private List<Account> getEventAttendants(@Nonnull EventSlot slot) {
+        final List<Account> attendants;
+        if ( slot.getAudience() == AudienceType.Employees ) {
+            attendants = accountService.getAccounts(new AccountRole[]{AccountRole.Maintenance, AccountRole.Security, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, slot.getProperty().getId());
+        }
+        else if ( slot.getAudience() == AudienceType.Tenants ) {
+            attendants = accountService.getAccounts(new AccountRole[]{AccountRole.Tenant, AccountRole.SubTenant}, slot.getProperty().getId());
+        }
+        else if ( slot.getAudience() == AudienceType.Everyone ) {
+            attendants = accountService.getAccounts(AccountRole.values(), slot.getProperty().getId());
+        }
+        else {
+            attendants = Collections.emptyList();
+        }
+        return attendants;
     }
 
 }
