@@ -178,8 +178,6 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             }
         }
 
-        predicate = predicate.and(qNotification.instanceOf(EventInviteNotification.class).not());
-
         return queryFactory.selectFrom(qNotification)
                 .where(
                         qNotification.id.in(
