@@ -12,6 +12,7 @@ import com.creatix.domain.dto.apartment.BasicApartmentDto;
 import com.creatix.domain.dto.apartment.PersistApartmentRequest;
 import com.creatix.domain.dto.community.board.CommunityBoardItemDto;
 import com.creatix.domain.dto.notification.*;
+import com.creatix.domain.dto.notification.event.EventInviteNotificationDto;
 import com.creatix.domain.dto.notification.maintenance.CreateMaintenanceNotificationRequest;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
 import com.creatix.domain.dto.notification.message.PersonalMessageAccountDto;
@@ -266,6 +267,10 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(SecurityNotification.class, SecurityNotificationDto.class)
                 .byDefault()
+                .register();
+        mapperFactory.classMap(EventInviteNotification.class, EventInviteNotificationDto.class)
+                .byDefault()
+                .field("eventInvite.event", "event")
                 .register();
         mapperFactory.classMap(MaintenanceNotification.class, MaintenanceNotificationDto.class)
                 .byDefault()
