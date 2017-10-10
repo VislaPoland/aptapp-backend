@@ -166,7 +166,10 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                                 return PersonalMessageNotification.class;
                             case Security:
                                 return SecurityNotification.class;
+                            case EventInvite:
+                                return EventInviteNotification.class;
                             default:
+                                logger.info("Unsupported notification type filter. type={}", nt.name());
                                 return null;
                         }
                     }
