@@ -164,7 +164,7 @@ public class SlotService {
         final Property property = propertyService.getProperty(propertyId);
         final EventSlot slot = new EventSlot();
         mapper.fillEventSlot(request, slot);
-        slot.setEndTime(slot.getBeginTime().plusMinutes(request.getDurationMinutes()));
+        slot.setEndTime(slot.getBeginTime().plusMinutes(request.getUnitDurationMinutes()));
         slot.setProperty(property);
 
         final SlotUnit unit = new SlotUnit();

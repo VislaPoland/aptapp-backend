@@ -84,7 +84,7 @@ public class SlotServiceTest {
         final PersistEventSlotRequest request = new PersistEventSlotRequest();
         request.setBeginTime(beginTime);
         request.setDescription("This is description");
-        request.setDurationMinutes(30);
+        request.setUnitDurationMinutes(30);
         request.setInitialCapacity(1);
         request.setLocation("Lobby");
         request.setTitle("Meeting");
@@ -99,7 +99,7 @@ public class SlotServiceTest {
         assertEquals(beginTime.plusMinutes(30), slot.getEndTime());
         assertEquals(1, slot.getUnits().size());
         assertEquals(AudienceType.Tenants, slot.getAudience());
-        assertEquals(request.getDurationMinutes().intValue(), slot.getUnitDurationMinutes());
+        assertEquals(request.getUnitDurationMinutes().intValue(), slot.getUnitDurationMinutes());
 
         for ( EventInvite invite : slot.getInvites() ) {
             assertNotNull(invite.getNotification());

@@ -17,7 +17,7 @@ public class PersistEventSlotRequest {
     private OffsetDateTime beginTime;
     @NotNull
     @ApiModelProperty(value = "Slot duration in minutes", required = true)
-    private Integer durationMinutes;
+    private Integer unitDurationMinutes;
     @NotNull
     @ApiModelProperty(value = "Initial slot unit capacity (1 = 1 person capacity)", required = true)
     private Integer initialCapacity;

@@ -525,7 +525,6 @@ public class Mapper {
                 .register();
 
         mapperFactory.classMap(PersistEventSlotRequest.class, EventSlot.class)
-                .field("durationMinutes", "unitDurationMinutes")
                 .byDefault()
                 .register();
         mapperFactory.classMap(MaintenanceSlot.class, MaintenanceSlotDto.class)
