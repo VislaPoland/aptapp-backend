@@ -201,23 +201,10 @@ public class SlotService {
 
         final EventSlot slot = getOrElseThrow(slotId, eventSlotDao, new EntityNotFoundException(String.format("Slot id=%d not found", slotId)));
 
-        final NotificationGroup notificationGroup = new NotificationGroup();
-        notificationGroupDao.persist(notificationGroup);
-
         for ( final Account attendant : getEventAttendants(slot) ) {
             // notify attendant by push notification
             pushNotificationService.sendNotification(new EventNotificationCancelTemplate(slot), attendant);
         }
-
-        final Set<NotificationGroup> notificationGroups = slot.getInvites().stream()
-                .map(invite -> invite.getNotification().getNotificationGroup())
-                .distinct()
-                .collect(Collectors.toSet());
-        slot.getInvites().forEach(invite -> {
-            final EventInviteNotification notification = invite.getNotification();
-            notificationDao.delete(notification);
-        });
-        notificationGroups.forEach(group -> notificationGroupDao.delete(group));
 
         eventSlotDao.delete(slot);
 
