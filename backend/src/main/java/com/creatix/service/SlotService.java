@@ -209,6 +209,16 @@ public class SlotService {
             pushNotificationService.sendNotification(new EventNotificationCancelTemplate(slot), attendant);
         }
 
+        final Set<NotificationGroup> notificationGroups = slot.getInvites().stream()
+                .map(invite -> invite.getNotification().getNotificationGroup())
+                .distinct()
+                .collect(Collectors.toSet());
+        slot.getInvites().forEach(invite -> {
+            final EventInviteNotification notification = invite.getNotification();
+            notificationDao.delete(notification);
+        });
+        notificationGroups.forEach(group -> notificationGroupDao.delete(group));
+
         eventSlotDao.delete(slot);
 
         return slot;
