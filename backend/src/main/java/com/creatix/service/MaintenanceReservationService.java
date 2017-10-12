@@ -117,6 +117,9 @@ public class MaintenanceReservationService {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(response, "Notification response dto is null");
 
+        notification.setRespondedAt(OffsetDateTime.now());
+        maintenanceNotificationDao.persist(notification);
+
         final List<MaintenanceReservation> reservations = notification.getReservations().stream()
                 .filter(r -> r.getStatus() == ReservationStatus.Pending).collect(Collectors.toList());
         final long pendingCount = reservations.size();

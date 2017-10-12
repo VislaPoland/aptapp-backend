@@ -11,8 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @ApiModel
@@ -27,6 +26,9 @@ public class MaintenanceNotificationDto extends NotificationDto {
 
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home")
     private Boolean accessIfNotAtHome;
+
+    @ApiModelProperty(value = "Timestamp of response", dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
+    private OffsetDateTime respondedAt;
 
     @JsonView(Views.NotificationsWithReservation.class)
     @ApiModelProperty(value = "Maintenance reservations")

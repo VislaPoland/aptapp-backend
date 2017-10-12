@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +29,9 @@ public class MaintenanceNotification extends Notification {
 
     @Column
     private Boolean accessIfNotAtHome;
+
+    @Column
+    private OffsetDateTime respondedAt;
 
     /**
      * More reservations for one notification are needed to enable us
