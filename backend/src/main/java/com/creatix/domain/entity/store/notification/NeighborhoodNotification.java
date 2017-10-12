@@ -9,7 +9,7 @@ import org.hibernate.annotations.BatchSize;
 
 import javax.annotation.Nullable;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(indexes = {
@@ -23,6 +23,9 @@ public class NeighborhoodNotification extends Notification {
     @ManyToOne
     @JoinColumn
     private Apartment targetApartment;
+
+    @Column
+    private OffsetDateTime respondedAt;
 
     @Column
     @Enumerated(EnumType.STRING)

@@ -17,6 +17,10 @@ import java.time.OffsetDateTime;
 public class SecurityNotificationDto extends NotificationDto {
     @ApiModelProperty(value = "Security notification response message")
     private SecurityNotificationResponseType response;
+
     @ApiModelProperty(value = "Timestamp of response", dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
     private OffsetDateTime respondedAt;
+
+    @ApiModelProperty(value = "Timestamp when notification was closed either as resolved or failed", dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
+    private OffsetDateTime closedAt;
 }

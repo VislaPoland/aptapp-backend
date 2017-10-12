@@ -28,9 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -73,7 +73,7 @@ public class NotificationService {
 
 
     public PageableDataResponse<List<Notification>> filterNotifications(
-            @NotNull NotificationRequestType requestType,
+            @Nonnull NotificationRequestType requestType,
             @Nullable NotificationStatus notificationStatus,
             @Nullable List<NotificationType> notificationType,
             @Nullable Long startId,
@@ -103,34 +103,34 @@ public class NotificationService {
         return new PageableDataResponse<>(notifications, (long) pageSize, nextId);
     }
 
-    public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@NotNull OffsetDateTime beginDate, @NotNull OffsetDateTime endDate) {
+    public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@Nonnull OffsetDateTime beginDate, @Nonnull OffsetDateTime endDate) {
         Objects.requireNonNull(beginDate, "Begin date is null");
         Objects.requireNonNull(endDate, "End date is null");
         return maintenanceNotificationDao.findAllInDateRange(beginDate, endDate);
     }
 
-    public SecurityNotification getSecurityNotification(@NotNull Long notificationId) {
+    public SecurityNotification getSecurityNotification(@Nonnull Long notificationId) {
         Objects.requireNonNull(notificationId, "Notification id is null");
 
         return getOrElseThrow(notificationId, securityNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
     }
 
-    public MaintenanceNotification getMaintenanceNotification(@NotNull Long notificationId) {
+    public MaintenanceNotification getMaintenanceNotification(@Nonnull Long notificationId) {
         Objects.requireNonNull(notificationId, "Notification id is null");
 
         return getOrElseThrow(notificationId, maintenanceNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
     }
 
-    public NeighborhoodNotification getNeighborhoodNotification(@NotNull Long notificationId) {
+    public NeighborhoodNotification getNeighborhoodNotification(@Nonnull Long notificationId) {
         Objects.requireNonNull(notificationId, "Notification id is null");
 
         return getOrElseThrow(notificationId, neighborhoodNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
     }
 
-    public SecurityNotification saveSecurityNotification(@NotNull SecurityNotification notification) throws IOException, TemplateException {
+    public SecurityNotification saveSecurityNotification(@Nonnull SecurityNotification notification) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         notification.setType(NotificationType.Security);
         notification.setAuthor(authorizationManager.getCurrentAccount());
@@ -145,7 +145,7 @@ public class NotificationService {
         return notification;
     }
 
-    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @NotNull MaintenanceNotification notification, @NotNull Long slotUnitId) throws IOException, TemplateException {
+    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Nonnull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(slotUnitId, "slot unit id is null");
 
@@ -167,7 +167,7 @@ public class NotificationService {
         return notification;
     }
 
-    public NeighborhoodNotification saveNeighborhoodNotification(@NotNull String targetUnitNumber, @NotNull NeighborhoodNotification notification) throws MessageDeliveryException, TemplateException, IOException {
+    public NeighborhoodNotification saveNeighborhoodNotification(@Nonnull String targetUnitNumber, @Nonnull NeighborhoodNotification notification) throws MessageDeliveryException, TemplateException, IOException {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
         Objects.requireNonNull(notification, "Notification is null");
 
@@ -195,7 +195,7 @@ public class NotificationService {
         return notification;
     }
 
-    public NeighborhoodNotification respondToNeighborhoodNotification(long notificationId, @NotNull NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
+    public NeighborhoodNotification respondToNeighborhoodNotification(long notificationId, @Nonnull NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(request, "Notification response request is null");
 
         final NeighborhoodNotification notification = getOrElseThrow(notificationId, neighborhoodNotificationDao,
@@ -206,6 +206,7 @@ public class NotificationService {
             if ( authorizationManager.isSelf(tenant) ) {
                 notification.setStatus(NotificationStatus.Resolved);
                 notification.setResponse(request.getResponse());
+                notification.setRespondedAt(OffsetDateTime.now());
                 neighborhoodNotificationDao.persist(notification);
 
                 if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
@@ -222,7 +223,7 @@ public class NotificationService {
     }
 
     @RoleSecured(value = {AccountRole.Security})
-    public SecurityNotification respondToSecurityNotification(long notificationId, @NotNull SecurityNotificationResponseRequest request) throws IOException, TemplateException {
+    public SecurityNotification respondToSecurityNotification(long notificationId, @Nonnull SecurityNotificationResponseRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(request, "Notification response request is null");
 
         final SecurityNotification notification = getOrElseThrow(notificationId, securityNotificationDao,
@@ -231,6 +232,7 @@ public class NotificationService {
         if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ) {
             notification.setResponse(request.getResponse());
             notification.setRespondedAt(OffsetDateTime.now());
+            notification.setClosedAt(OffsetDateTime.now());
             notification.setStatus(NotificationStatus.Resolved);
             securityNotificationDao.persist(notification);
 
@@ -262,7 +264,7 @@ public class NotificationService {
     }
 
     @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public MaintenanceNotification respondToMaintenanceNotification(@NotNull Long notificationId, @NotNull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
+    public MaintenanceNotification respondToMaintenanceNotification(@Nonnull Long notificationId, @Nonnull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
 
         if ( authorizationManager.hasAnyOfRoles(AccountRole.Maintenance) ) {
@@ -276,7 +278,19 @@ public class NotificationService {
         }
     }
 
-    private Apartment getApartmentByUnitNumber(@NotNull String targetUnitNumber) {
+    @RoleSecured(AccountRole.Maintenance)
+    public MaintenanceNotification closeMaintenanceNotification(@Nonnull Long notificationId) throws IOException, TemplateException {
+
+        final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
+        notification.setClosedAt(OffsetDateTime.now());
+        notification.setStatus(NotificationStatus.Resolved);
+
+        maintenanceNotificationDao.persist(notification);
+
+        return notification;
+    }
+
+    private Apartment getApartmentByUnitNumber(@Nonnull String targetUnitNumber) {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
 
         final Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty());

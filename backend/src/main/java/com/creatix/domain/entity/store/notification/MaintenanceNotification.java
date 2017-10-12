@@ -33,6 +33,9 @@ public class MaintenanceNotification extends Notification {
     @Column
     private OffsetDateTime respondedAt;
 
+    @Column
+    private OffsetDateTime closedAt;
+
     /**
      * More reservations for one notification are needed to enable us
      * to track reschedules and to see history of reservations.

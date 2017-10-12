@@ -205,6 +205,19 @@ public class NotificationController {
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.respondToMaintenanceNotification(notificationId, request)));
     }
 
+    @ApiOperation(value = "Close maintenance notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.NotificationsWithReservation.class)
+    @PostMapping(path = "/maintenance/{notificationId}/close", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(value = AccountRole.Maintenance, feature = ApplicationFeatureType.MAINTENANCE)
+    public DataResponse<MaintenanceNotificationDto> closeMaintenanceNotification(@PathVariable Long notificationId) throws IOException, TemplateException {
+        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.closeMaintenanceNotification(notificationId)));
+    }
+
     @ApiOperation(value = "Get single neighborhood notification")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),

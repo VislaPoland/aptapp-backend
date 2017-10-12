@@ -30,6 +30,9 @@ public class MaintenanceNotificationDto extends NotificationDto {
     @ApiModelProperty(value = "Timestamp of response", dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
     private OffsetDateTime respondedAt;
 
+    @ApiModelProperty(value = "Timestamp when notification was closed either as resolved or failed", dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
+    private OffsetDateTime closedAt;
+
     @JsonView(Views.NotificationsWithReservation.class)
     @ApiModelProperty(value = "Maintenance reservations")
     private List<MaintenanceReservationDto> reservations;

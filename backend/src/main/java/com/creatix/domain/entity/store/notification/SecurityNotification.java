@@ -24,4 +24,7 @@ public class SecurityNotification extends Notification {
     @Column
     private OffsetDateTime respondedAt;
 
+    @Column
+    private OffsetDateTime closedAt;
+
 }

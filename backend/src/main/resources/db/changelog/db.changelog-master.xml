@@ -18,4 +18,5 @@
     <include file="classpath:db/changelog/db.changelog-20171007-updateDtypeColumnSize.xml"/>
     <include file="classpath:db/changelog/db.changelog-20171009-removeUnusedDefaultPhotoId.xml"/>
     <include file="classpath:db/changelog/db.changelog-20171009-addResponseTimeToSecurityNotification.xml"/>
+    <include file="classpath:db/changelog/db.changelog-20171012-addClosedTimeToMaintenanceNotification.xml"/>
 </databaseChangeLog>
