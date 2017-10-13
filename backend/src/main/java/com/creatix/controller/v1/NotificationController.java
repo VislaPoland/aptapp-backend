@@ -88,7 +88,7 @@ public class NotificationController {
             @RequestParam NotificationRequestType requestType,
             @RequestParam int pageSize,
             @RequestParam(required = false) Long startId,
-            @RequestParam(required = false) NotificationStatus notificationStatus,
+            @RequestParam(required = false) NotificationStatus[] notificationStatus,
             @RequestParam(required = false) String notificationType) {
 
         List<NotificationType> notificationTypeList = null;

@@ -28,7 +28,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
 
     public List<Notification> findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
             @NotNull NotificationRequestType requestType,
-            @Nullable NotificationStatus notificationStatus,
+            @Nullable NotificationStatus notificationStatus[],
             @Nullable List<NotificationType> notificationTypeList,
             @Nullable Long startId,
             @NotNull Account account,
@@ -140,7 +140,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
 
 
         if ( notificationStatus != null ) {
-            predicate = predicate.and(qNotification.status.eq(notificationStatus));
+            predicate = predicate.and(qNotification.status.in(notificationStatus));
         }
 
 

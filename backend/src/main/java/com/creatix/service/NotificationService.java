@@ -74,7 +74,7 @@ public class NotificationService {
 
     public PageableDataResponse<List<Notification>> filterNotifications(
             @Nonnull NotificationRequestType requestType,
-            @Nullable NotificationStatus notificationStatus,
+            @Nullable NotificationStatus[] notificationStatus,
             @Nullable List<NotificationType> notificationType,
             @Nullable Long startId,
             int pageSize) {
