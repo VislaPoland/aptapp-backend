@@ -232,7 +232,6 @@ public class NotificationService {
         if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ) {
             notification.setResponse(request.getResponse());
             notification.setRespondedAt(OffsetDateTime.now());
-            notification.setClosedAt(OffsetDateTime.now());
             notification.setStatus(NotificationStatus.Resolved);
             securityNotificationDao.persist(notification);
 
@@ -283,7 +282,7 @@ public class NotificationService {
 
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
         notification.setClosedAt(OffsetDateTime.now());
-        notification.setStatus(NotificationStatus.Resolved);
+        notification.setStatus(NotificationStatus.Closed);
 
         maintenanceNotificationDao.persist(notification);
 
