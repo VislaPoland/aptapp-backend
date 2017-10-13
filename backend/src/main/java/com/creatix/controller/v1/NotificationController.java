@@ -44,9 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -89,21 +87,9 @@ public class NotificationController {
             @RequestParam int pageSize,
             @RequestParam(required = false) Long startId,
             @RequestParam(required = false) NotificationStatus[] notificationStatus,
-            @RequestParam(required = false) String notificationType) {
+            @RequestParam(required = false) NotificationType[] notificationType) {
 
-        List<NotificationType> notificationTypeList = null;
-        if (null != notificationType) {
-            notificationTypeList = Arrays.stream(notificationType.split(",")).map(
-                    e -> {
-                        try {
-                            return NotificationType.valueOf(e);
-                        } catch (IllegalArgumentException exception) {
-                            return null;
-                        }
-                    }
-            ).filter(Objects::nonNull).collect(Collectors.toList());
-        }
-        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationTypeList, startId, pageSize),
+        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, pageSize),
                 n -> mapper.toNotificationDto(n, this.getMappingClass(n.getClass())));
     }
 

@@ -17,6 +17,7 @@ import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Repository
 @Transactional
@@ -28,8 +29,8 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
 
     public List<Notification> findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
             @NotNull NotificationRequestType requestType,
-            @Nullable NotificationStatus notificationStatus[],
-            @Nullable List<NotificationType> notificationTypeList,
+            @Nullable NotificationStatus[] notificationStatus,
+            @Nullable NotificationType[] notificationTypes,
             @Nullable Long startId,
             @NotNull Account account,
             int pageSize) {
@@ -144,9 +145,8 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         }
 
 
-        if (null != notificationTypeList) {
-            Optional<BooleanExpression> reduce = notificationTypeList
-                .stream()
+        if (null != notificationTypes) {
+            Optional<BooleanExpression> reduce = Stream.of(notificationTypes)
                 .map(
                     nt -> {
                         switch (nt) {
