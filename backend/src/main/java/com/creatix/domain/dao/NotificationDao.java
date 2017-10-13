@@ -140,7 +140,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         }
 
 
-        if ( notificationStatus != null ) {
+        if ( (notificationStatus != null) && (notificationStatus.length > 0) ) {
             predicate = predicate.and(qNotification.status.in(notificationStatus));
         }
 
