@@ -138,10 +138,26 @@ public class SlotService {
         Objects.requireNonNull(data);
 
         final EventSlot eventSlot = getOrElseThrow(eventSlotId, eventSlotDao, new EntityNotFoundException(String.format("Event slot not found, slot_id=%d", eventSlotId)));
-        eventSlot.setAudience(data.getAudience());
-        eventSlot.setDescription(data.getDescription());
-        eventSlot.setTitle(data.getTitle());
-        eventSlot.setLocation(data.getLocation());
+        if ( data.getAudience() != null ) {
+            eventSlot.setAudience(data.getAudience());
+        }
+        if ( data.getDescription() != null ) {
+            eventSlot.setDescription(data.getDescription());
+        }
+        if ( data.getTitle() != null ) {
+            eventSlot.setTitle(data.getTitle());
+        }
+        if ( data.getLocation() != null ) {
+            eventSlot.setLocation(data.getLocation());
+        }
+        if ( data.getBeginTime() != null ) {
+            eventSlot.setBeginTime(data.getBeginTime());
+        }
+        if ( data.getUnitDurationMinutes() != null ) {
+            eventSlot.setUnitDurationMinutes(data.getUnitDurationMinutes());
+        }
+        // update end time just in case that begin_time or unit_duration_minutes was changed
+        eventSlot.setEndTime(eventSlot.getBeginTime().plusMinutes(eventSlot.getUnitDurationMinutes()));
 
         eventSlotDao.persist(eventSlot);
 

@@ -7,18 +7,25 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.time.OffsetDateTime;
+
 @ApiModel
 @Getter
 @Setter
 public class UpdateEventSlotRequest {
 
     @NotEmpty
-    @ApiModelProperty(value = "Title", required = true)
+    @ApiModelProperty(value = "Title")
     private String title;
     @ApiModelProperty(value = "Description")
     private String description;
     @ApiModelProperty(value = "Location")
     private String location;
-    @ApiModelProperty(value = "Audience", required = true)
+    @ApiModelProperty(value = "Audience")
     private AudienceType audience;
+
+    @ApiModelProperty(value = "Time when slot starts", example = "2016-07-07T10:37:47.960Z")
+    private OffsetDateTime beginTime;
+    @ApiModelProperty(value = "Slot duration in minutes")
+    private Integer unitDurationMinutes;
 }

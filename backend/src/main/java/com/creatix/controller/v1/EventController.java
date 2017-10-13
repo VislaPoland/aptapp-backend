@@ -100,7 +100,7 @@ public class EventController {
         return new DataResponse<>(slotService.getEventDetail(eventSlotId));
     }
 
-    @ApiOperation(value = "Respond to event invitation")
+    @ApiOperation(value = "Update event")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
