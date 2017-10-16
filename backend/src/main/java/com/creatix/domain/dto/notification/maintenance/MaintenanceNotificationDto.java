@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -37,4 +38,10 @@ public class MaintenanceNotificationDto extends NotificationDto {
     @ApiModelProperty(value = "Maintenance reservations")
     private List<MaintenanceReservationDto> reservations;
 
+    @ApiModelProperty(value = "Indicate if there is a pet present in apartment")
+    private Boolean hasPet;
+
+    @Size(max = 2048)
+    @ApiModelProperty(value = "Pet instructions")
+    private String petInstructions;
 }

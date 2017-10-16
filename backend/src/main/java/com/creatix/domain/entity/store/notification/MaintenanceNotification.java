@@ -6,6 +6,7 @@ import com.querydsl.core.annotations.QueryInit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,6 +36,13 @@ public class MaintenanceNotification extends Notification {
 
     @Column
     private OffsetDateTime closedAt;
+
+    @Column
+    private Boolean hasPet;
+
+    @Length(max = 2048)
+    @Column(length = 2048)
+    private String petInstructions;
 
     /**
      * More reservations for one notification are needed to enable us

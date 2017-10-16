@@ -6,7 +6,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
 
 @ApiModel
 @Data
@@ -28,4 +27,11 @@ public class CreateMaintenanceNotificationRequest {
 
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home")
     private Boolean accessIfNotAtHome;
+
+    @ApiModelProperty(value = "Indicate if there is a pet present in apartment")
+    private Boolean hasPet;
+
+    @Size(max = 2048)
+    @ApiModelProperty(value = "Pet instructions")
+    private String petInstructions;
 }
