@@ -145,6 +145,7 @@ public class NotificationService {
         return notification;
     }
 
+    @RoleSecured
     public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Nonnull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(slotUnitId, "slot unit id is null");
@@ -164,7 +165,16 @@ public class NotificationService {
             pushNotificationService.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
         }
 
-        return notification;
+        if ( authorizationManager.hasAnyOfRoles(AccountRole.Maintenance) ) {
+            // automatically confirm maintenance reservation when created by maintenance employee
+            final MaintenanceNotificationResponseRequest response = new MaintenanceNotificationResponseRequest();
+            response.setResponse(MaintenanceNotificationResponseRequest.ResponseType.Confirm);
+            response.setNote("Created by maintenance employee");
+            return maintenanceReservationService.employeeRespondToMaintenanceNotification(notification, response);
+        }
+        else {
+            return notification;
+        }
     }
 
     public NeighborhoodNotification saveNeighborhoodNotification(@Nonnull String targetUnitNumber, @Nonnull NeighborhoodNotification notification) throws MessageDeliveryException, TemplateException, IOException {
