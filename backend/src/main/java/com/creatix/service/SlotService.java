@@ -402,7 +402,7 @@ public class SlotService {
             boolean wasReminded = false;
 
             try {
-                pushNotificationSender.sendNotification(new com.creatix.message.template.push.RsvpReminderMessageTemplate(), invite.getAttendant());
+                pushNotificationSender.sendNotification(new com.creatix.message.template.push.RsvpReminderMessageTemplate(invite), invite.getAttendant());
                 wasReminded = true;
             }
             catch ( IOException | TemplateException e ) {
@@ -410,7 +410,7 @@ public class SlotService {
             }
 
             try {
-                smsMessageSender.send(new com.creatix.message.template.sms.RsvpReminderMessageTemplate(invite.getAttendant()));
+                smsMessageSender.send(new com.creatix.message.template.sms.RsvpReminderMessageTemplate(invite));
                 wasReminded = true;
             }
             catch ( IOException | TemplateException | MessageDeliveryException e ) {

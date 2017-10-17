@@ -1,22 +1,29 @@
 package com.creatix.message.template.sms;
 
-import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.EventInvite;
+
+import javax.annotation.Nonnull;
 
 public class RsvpReminderMessageTemplate implements SmsMessageTemplate {
 
-    private final Account recipient;
+    private final EventInvite invite;
 
-    public RsvpReminderMessageTemplate(Account recipient) {
-        this.recipient = recipient;
+    public RsvpReminderMessageTemplate(@Nonnull EventInvite invite) {
+        this.invite = invite;
     }
 
     @Override
     public String getRecipient() {
-        return recipient.getPrimaryPhone();
+        return invite.getAttendant().getPrimaryPhone();
     }
 
     @Override
     public String getTemplateName() {
         return "rsvp-reminder";
+    }
+
+    @Nonnull
+    public String getEventTitle() {
+        return invite.getEvent().getTitle();
     }
 }
