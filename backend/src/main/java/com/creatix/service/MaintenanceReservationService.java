@@ -52,7 +52,7 @@ public class MaintenanceReservationService {
     @Autowired
     private MaintenanceNotificationDao maintenanceNotificationDao;
 
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security})
+    @RoleSecured
     MaintenanceReservation createMaintenanceReservation(@Nonnull MaintenanceNotification maintenanceNotification, @Nonnull Long slotUnitId) throws IOException, TemplateException {
         Objects.requireNonNull(maintenanceNotification, "Maintenance notification is null");
         Objects.requireNonNull(slotUnitId, "Slot unit id is null");
