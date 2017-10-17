@@ -10,6 +10,7 @@ import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
 
 @Entity
 @Data
@@ -31,6 +32,9 @@ public class EventInvite {
 	@JoinColumn(nullable = false)
 	@NotNull
 	private Account attendant;
+
+	@Column
+	private OffsetDateTime remindedAt;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)

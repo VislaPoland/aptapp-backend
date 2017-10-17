@@ -21,7 +21,7 @@ import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.message.PushNotificationService;
+import com.creatix.service.message.PushNotificationSender;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class NotificationService {
     @Autowired
     private SmsMessageSender smsMessageSender;
     @Autowired
-    private PushNotificationService pushNotificationService;
+    private PushNotificationSender pushNotificationSender;
     @Autowired
     private SecurityEmployeeDao securityEmployeeDao;
     @Autowired
@@ -139,7 +139,7 @@ public class NotificationService {
         securityNotificationDao.persist(notification);
 
         for ( SecurityEmployee secEmp : securityEmployeeDao.findByProperty(notification.getProperty()) ) {
-            pushNotificationService.sendNotification(new SecurityNotificationTemplate(notification), secEmp);
+            pushNotificationSender.sendNotification(new SecurityNotificationTemplate(notification), secEmp);
         }
 
         return notification;
@@ -162,7 +162,7 @@ public class NotificationService {
         maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
 
         for ( MaintenanceEmployee employee : maintenanceEmployeeDao.findByProperty(notification.getProperty()) ) {
-            pushNotificationService.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
+            pushNotificationSender.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
         }
 
         if ( authorizationManager.hasAnyOfRoles(AccountRole.Maintenance) ) {
@@ -199,7 +199,7 @@ public class NotificationService {
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
             }
-            pushNotificationService.sendNotification(new NeighborNotificationTemplate(notification), tenant);
+            pushNotificationSender.sendNotification(new NeighborNotificationTemplate(notification), tenant);
         }
 
         return notification;
@@ -220,10 +220,10 @@ public class NotificationService {
                 neighborhoodNotificationDao.persist(notification);
 
                 if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
-                    pushNotificationService.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
+                    pushNotificationSender.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
                 }
                 else if ( request.getResponse() == NeighborhoodNotificationResponse.SorryNotMe ) {
-                    pushNotificationService.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
+                    pushNotificationSender.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
                 }
 
                 return notification;
@@ -249,20 +249,20 @@ public class NotificationService {
                 final Account account = notification.getAuthor();
 
                 if ( account.getRole() == AccountRole.Tenant || account.getRole() == AccountRole.SubTenant ) {
-                    pushNotificationService.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), account);
+                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborNoIssueTemplate(notification), account);
                 }
                 else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
-                    pushNotificationService.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), account);
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerNoIssueTemplate(notification), account);
                 }
             }
             else if ( request.getResponse() == SecurityNotificationResponseType.Resolved ) {
                 final Account account = notification.getAuthor();
 
                 if ( account.getRole() == AccountRole.Tenant || account.getRole() == AccountRole.SubTenant ) {
-                    pushNotificationService.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), account);
+                    pushNotificationSender.sendNotification(new SecurityNotificationNeighborResolvedTemplate(notification), account);
                 }
                 else if ( account.getRole() == AccountRole.PropertyManager || account.getRole() == AccountRole.AssistantPropertyManager ) {
-                    pushNotificationService.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), account);
+                    pushNotificationSender.sendNotification(new SecurityNotificationManagerResolvedTemplate(notification), account);
                 }
             }
 

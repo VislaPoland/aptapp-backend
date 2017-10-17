@@ -56,7 +56,7 @@ public class PersonalMessageControllerTest {
         assertEquals(2, createMsgRes.getData().size());
 
 
-        final PageableDataResponse<List<NotificationDto>> notifications = notificationController.getNotifications(NotificationRequestType.Sent, 1, null, null, NotificationType.PersonalMessage.name());
+        final PageableDataResponse<List<NotificationDto>> notifications = notificationController.getNotifications(NotificationRequestType.Sent, 1, null, null, new NotificationType[] { NotificationType.PersonalMessage });
         assertNotNull(notifications);
         assertNotNull(notifications.getData());
         assertEquals(1, notifications.getData().size());

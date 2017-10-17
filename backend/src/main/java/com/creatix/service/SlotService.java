@@ -9,12 +9,14 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.notification.EventInviteNotification;
 import com.creatix.domain.entity.store.notification.NotificationGroup;
 import com.creatix.domain.enums.*;
+import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.EventNotificationAdjustTemplate;
 import com.creatix.message.template.push.EventNotificationCancelTemplate;
 import com.creatix.message.template.push.EventNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.message.PushNotificationService;
+import com.creatix.service.message.PushNotificationSender;
 import com.creatix.service.property.PropertyService;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
@@ -60,7 +62,9 @@ public class SlotService {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private PushNotificationService pushNotificationService;
+    private PushNotificationSender pushNotificationSender;
+    @Autowired
+    private SmsMessageSender smsMessageSender;
     @Autowired
     private EventInviteDao eventInviteDao;
     @Autowired
@@ -167,7 +171,7 @@ public class SlotService {
 
         for ( final Account attendant : getEventAttendants(eventSlot) ) {
             // notify attendant by push notification
-            pushNotificationService.sendNotification(new EventNotificationAdjustTemplate(eventSlot), attendant);
+            pushNotificationSender.sendNotification(new EventNotificationAdjustTemplate(eventSlot), attendant);
         }
 
         return eventSlot;
@@ -196,7 +200,7 @@ public class SlotService {
 
         for ( final Account attendant : getEventAttendants(slot) ) {
             // notify attendant by push notification
-            pushNotificationService.sendNotification(new EventNotificationTemplate(slot), attendant);
+            pushNotificationSender.sendNotification(new EventNotificationTemplate(slot), attendant);
             // invite attendant to event
             slot.addEventInvite(createEventInvite(slot, attendant, notificationGroup));
         }
@@ -219,7 +223,7 @@ public class SlotService {
 
         for ( final Account attendant : getEventAttendants(slot) ) {
             // notify attendant by push notification
-            pushNotificationService.sendNotification(new EventNotificationCancelTemplate(slot), attendant);
+            pushNotificationSender.sendNotification(new EventNotificationCancelTemplate(slot), attendant);
         }
 
         eventSlotDao.delete(slot);
@@ -384,6 +388,43 @@ public class SlotService {
         }
         maintenanceSlotScheduleDao.delete(schedule);
         return schedule;
+    }
+
+    @Scheduled(cron = "0 0 */3 * * *") // run every third hour
+    public void sendEventRsvpReminder() {
+
+        final List<EventInvite> invitesToNotify = eventInviteDao.findBySlotDateAndInviteResponseAndRemindedAtNull(
+                OffsetDateTime.now().plusDays(1), new EventInviteResponse[]{EventInviteResponse.Going, EventInviteResponse.Maybe});
+
+
+        for ( EventInvite invite : invitesToNotify ) {
+
+            boolean wasReminded = false;
+
+            try {
+                pushNotificationSender.sendNotification(new com.creatix.message.template.push.RsvpReminderMessageTemplate(), invite.getAttendant());
+                wasReminded = true;
+            }
+            catch ( IOException | TemplateException e ) {
+                logger.info(String.format("Failed to push notify %s about upcoming event", invite.getAttendant().getPrimaryEmail()), e);
+            }
+
+            try {
+                smsMessageSender.send(new com.creatix.message.template.sms.RsvpReminderMessageTemplate(invite.getAttendant()));
+                wasReminded = true;
+            }
+            catch ( IOException | TemplateException | MessageDeliveryException e ) {
+                logger.info(String.format("Failed to sms notify %s about upcoming event", invite.getAttendant().getPrimaryEmail()), e);
+            }
+
+            if ( wasReminded ) {
+                invite.setRemindedAt(OffsetDateTime.now());
+                eventInviteDao.persist(invite);
+            }
+            else {
+                logger.warn(String.format("Failed to notify %s about upcoming event", invite.getAttendant().getPrimaryEmail()));
+            }
+        }
     }
 
     @Scheduled(cron = "0 0 * * * *") // the top of every hour of every day

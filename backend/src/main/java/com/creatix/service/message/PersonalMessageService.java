@@ -54,7 +54,7 @@ public class PersonalMessageService {
     @Autowired
     private AccountDao accountDao;
     @Autowired
-    private PushNotificationService pushNotificationService;
+    private PushNotificationSender pushNotificationSender;
     @Autowired
     private PushNotificationTemplateProcessor templateProcessor;
     @Autowired
@@ -179,7 +179,7 @@ public class PersonalMessageService {
 
 
 
-        pushNotificationService.sendNotification(notification, personalMessage.getToAccount());
+        pushNotificationSender.sendNotification(notification, personalMessage.getToAccount());
 
         personalMessage.setMessageStatus(PersonalMessageStatusType.DELIVERED);
         personalMessageDao.persist(personalMessage);

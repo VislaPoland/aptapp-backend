@@ -28,7 +28,7 @@ import com.creatix.message.template.push.community.board.NewCommunityItemComment
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.AttachmentService;
-import com.creatix.service.message.PushNotificationService;
+import com.creatix.service.message.PushNotificationSender;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,7 +71,7 @@ public class CommunityBoardService {
     @Autowired
     private NotificationDao notificationDao;
     @Autowired
-    private PushNotificationService pushNotificationService;
+    private PushNotificationSender pushNotificationSender;
 
     public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, Long ownerId, List<CommunityBoardStatusType> statusTypes, Long startId, long pageSize) {
         Property property = getProperty(propertyId);
@@ -308,7 +308,7 @@ public class CommunityBoardService {
                     notificationDao.persist(storedNotification);
 
                     try {
-                        pushNotificationService.sendNotification(pushNotification, account);
+                        pushNotificationSender.sendNotification(pushNotification, account);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -332,7 +332,7 @@ public class CommunityBoardService {
         storedNotification.setTitle(pushNotification.getTitle());
         notificationDao.persist(storedNotification);
 
-        pushNotificationService.sendNotification(pushNotification, comment.getCommunityBoardItem().getAccount());
+        pushNotificationSender.sendNotification(pushNotification, comment.getCommunityBoardItem().getAccount());
     }
 
     private void dispatchNotificationOfCommentReply(@NotNull CommunityBoardComment comment) throws IOException, TemplateException {
@@ -350,7 +350,7 @@ public class CommunityBoardService {
         storedNotification.setTitle(pushNotification.getTitle());
         notificationDao.persist(storedNotification);
 
-        pushNotificationService.sendNotification(pushNotification, comment.getCommunityBoardItem().getAccount());
+        pushNotificationSender.sendNotification(pushNotification, comment.getCommunityBoardItem().getAccount());
     }
 
     private void dispatchNotifications(@NotNull CommunityBoardComment comment) throws IOException, TemplateException {

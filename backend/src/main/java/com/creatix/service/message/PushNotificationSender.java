@@ -35,9 +35,9 @@ import java.util.stream.Collectors;
 
 @Component
 @Transactional
-public class PushNotificationService {
+public class PushNotificationSender {
 
-    private final Logger logger = LoggerFactory.getLogger(PushNotificationService.class);
+    private final Logger logger = LoggerFactory.getLogger(PushNotificationSender.class);
 
     @Autowired
     private PushNotificationProperties pushNotificationProperties;

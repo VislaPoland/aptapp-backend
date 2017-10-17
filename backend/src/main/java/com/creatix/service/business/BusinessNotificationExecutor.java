@@ -2,9 +2,7 @@ package com.creatix.service.business;
 
 import com.creatix.domain.dao.ApartmentDao;
 import com.creatix.domain.dao.NotificationDao;
-import com.creatix.domain.dao.PropertyDao;
 import com.creatix.domain.dao.TenantDao;
-import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.business.BusinessProfile;
 import com.creatix.domain.entity.store.business.DiscountCoupon;
@@ -17,9 +15,8 @@ import com.creatix.message.push.DiscountCouponCreatedPush;
 import com.creatix.message.template.push.businessProfile.BusinessProfileCreatedTemplate;
 import com.creatix.message.template.push.businessProfile.DiscountCouponCreatedTemplate;
 import com.creatix.service.apartment.ApartmentService;
-import com.creatix.service.message.PushNotificationService;
+import com.creatix.service.message.PushNotificationSender;
 import freemarker.template.TemplateException;
-import lombok.experimental.Accessors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +41,7 @@ public class BusinessNotificationExecutor {
     @Autowired
     private TenantDao tenantDao;
     @Autowired
-    private PushNotificationService pushNotificationService;
+    private PushNotificationSender pushNotificationSender;
     @Autowired
     private PushNotificationTemplateProcessor templateProcessor;
     @Autowired
@@ -107,7 +104,7 @@ public class BusinessNotificationExecutor {
                 .parallel()
                 .forEach(tenant -> {
                     try {
-                        pushNotificationService.sendNotification(notification, tenant);
+                        pushNotificationSender.sendNotification(notification, tenant);
                     } catch (IOException exception) {
                         logger.error(
                                 String.format(
@@ -143,7 +140,7 @@ public class BusinessNotificationExecutor {
                 .parallel()
                 .forEach(tenant -> {
                     try {
-                        pushNotificationService.sendNotification(notification, tenant);
+                        pushNotificationSender.sendNotification(notification, tenant);
                     } catch (IOException exception) {
                         logger.error(
                                 String.format(

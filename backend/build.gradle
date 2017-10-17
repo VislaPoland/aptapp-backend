@@ -97,6 +97,7 @@ dependencies {
 	compile('org.hibernate:hibernate-core:5.2.1.Final')
 	compile('com.querydsl:querydsl-jpa:4.1.4')
 	compile('com.querydsl:querydsl-apt:4.1.4:jpa')
+	compile('com.querydsl:querydsl-sql:4.1.4')
 	//validation
 	compile('org.hibernate:hibernate-validator:5.2.4.Final')
 

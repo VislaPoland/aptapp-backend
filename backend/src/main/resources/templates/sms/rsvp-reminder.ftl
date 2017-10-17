@@ -1,0 +1,1 @@
+You have an upcoming event tomorrow. Have a look at Schedule for more details.

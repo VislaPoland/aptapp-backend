@@ -19,7 +19,7 @@ import com.creatix.message.template.push.MaintenanceRescheduleRejectTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.message.PushNotificationService;
+import com.creatix.service.message.PushNotificationSender;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class MaintenanceReservationService {
     @Autowired
     private SlotUnitDao slotUnitDao;
     @Autowired
-    private PushNotificationService pushNotificationService;
+    private PushNotificationSender pushNotificationSender;
     @Autowired
     private MaintenanceNotificationDao maintenanceNotificationDao;
 
@@ -173,7 +173,7 @@ public class MaintenanceReservationService {
             reservationDao.persist(reservation);
             resolveNotification(reservation);
 
-            pushNotificationService.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation), reservation.getEmployee());
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation), reservation.getEmployee());
         }
         else if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
@@ -181,7 +181,7 @@ public class MaintenanceReservationService {
             reservationDao.persist(reservation);
             resolveNotification(reservation);
 
-            pushNotificationService.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation), reservation.getEmployee());
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation), reservation.getEmployee());
         }
         else {
             throw new IllegalArgumentException("Unsupported response type: " + responseType);
@@ -209,7 +209,7 @@ public class MaintenanceReservationService {
         reservationDao.persist(reservation);
 
         resolveNotification(reservation);
-        pushNotificationService.sendNotification(new MaintenanceConfirmTemplate(reservation), reservation.getNotification().getAuthor());
+        pushNotificationSender.sendNotification(new MaintenanceConfirmTemplate(reservation), reservation.getNotification().getAuthor());
 
         return reservation;
     }
@@ -264,7 +264,7 @@ public class MaintenanceReservationService {
 
         notification.getReservations().add(reservationNew);
 
-        pushNotificationService.sendNotification(new MaintenanceRescheduleTemplate(reservationOld, reservationNew), notification.getAuthor());
+        pushNotificationSender.sendNotification(new MaintenanceRescheduleTemplate(reservationOld, reservationNew), notification.getAuthor());
 
         return reservationNew;
     }
