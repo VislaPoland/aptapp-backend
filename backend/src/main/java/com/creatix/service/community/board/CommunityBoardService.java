@@ -35,14 +35,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -73,14 +71,14 @@ public class CommunityBoardService {
     @Autowired
     private PushNotificationSender pushNotificationSender;
 
-    public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, Long ownerId, List<CommunityBoardStatusType> statusTypes, Long startId, long pageSize) {
+    public List<CommunityBoardItem> listBoardItemsForProperty(long propertyId, @Nullable Long ownerId, @Nonnull Collection<CommunityBoardStatusType> statusTypes, @Nullable Long startId, long pageSize) {
         Property property = getProperty(propertyId);
 
         return communityBoardItemDao.listByPropertyAndStatus(property, ownerId, statusTypes, startId, pageSize);
     }
 
     @Nonnull
-    public List<CommunityBoardItem> listBoardItemsForPropertyAndCategory(long propertyId, Long ownerId, List<CommunityBoardStatusType> statusTypes, List<Long> categoryIdList, Long startId, long pageSize) {
+    public List<CommunityBoardItem> listBoardItemsForPropertyAndCategory(long propertyId, @Nullable Long ownerId, @Nonnull Collection<CommunityBoardStatusType> statusTypes, @Nonnull List<Long> categoryIdList, @Nullable Long startId, long pageSize) {
         Property property = getProperty(propertyId);
 
         List<CommunityBoardCategory> categoryList = categoryIdList

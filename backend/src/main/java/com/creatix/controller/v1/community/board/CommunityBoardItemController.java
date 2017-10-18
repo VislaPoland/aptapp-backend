@@ -12,7 +12,6 @@ import com.creatix.domain.enums.community.board.CommunityBoardStatusType;
 import com.creatix.domain.mapper.CommunityBoardMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.community.board.CommunityBoardService;
-import com.creatix.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -24,8 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +46,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "", method = RequestMethod.POST)
+    @PostMapping(path = "")
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemDto> createNew(@PathVariable("propertyId") Long propertyId, @Valid @RequestBody CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
@@ -64,7 +62,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "/{itemId}", method = RequestMethod.PUT)
+    @PutMapping(path = "/{itemId}")
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemDto> updateItem(@Valid @RequestBody CommunityBoardItemEditRequest request) {
         return new DataResponse<>(
@@ -80,7 +78,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "/{itemId}", method = RequestMethod.GET)
+    @GetMapping(path = "/{itemId}")
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD)
     public DataResponse<CommunityBoardItemDto> getItem(@PathVariable("itemId") Long itemId) {
         return new DataResponse<>(
@@ -96,7 +94,7 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "/{itemId}", method = RequestMethod.DELETE)
+    @DeleteMapping(path = "/{itemId}")
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Tenant, AccountRole.SubTenant})
     public DataResponse<CommunityBoardItemDto> deleteItem(@PathVariable("itemId") Long itemId) {
         return new DataResponse<>(
@@ -113,24 +111,27 @@ public class CommunityBoardItemController {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
-    @RequestMapping(path = "", method = RequestMethod.GET)
+    @GetMapping(path = "")
     @RoleSecured(feature = ApplicationFeatureType.COMMUNITY_BOARD)
     public PageableDataResponse<List<CommunityBoardItemDto>> listVisibleItems(@PathVariable("propertyId") Long propertyId,
                                                                                            @RequestParam(value = "startId", required = false) Long startId,
                                                                                            @RequestParam(value = "pageSize", required = true) Long pageSize,
                                                                                            @RequestParam(value = "owner", required = false) Long ownerId,
-                                                                                           @RequestParam(value = "categoryList", required = false) String categoryList) {
-        List<CommunityBoardItem> boardItems;
-        if (null == categoryList || "".equals(categoryList)) {
-            boardItems = communityBoardService.listBoardItemsForProperty(propertyId, ownerId, Collections.singletonList(CommunityBoardStatusType.OPEN), startId, pageSize + 1);
-        } else {
-            List<Long> categoryIdList = StringUtils.splitToLong(categoryList, ",");
-            boardItems = communityBoardService.listBoardItemsForPropertyAndCategory(propertyId, ownerId, Collections.singletonList(CommunityBoardStatusType.OPEN), categoryIdList, startId, pageSize + 1);
+                                                                                           @RequestParam(value = "categoryList", required = false) Long[] categoryList) {
+
+        final Collection<CommunityBoardStatusType> statusTypes = (ownerId == null ? EnumSet.of(CommunityBoardStatusType.OPEN) : EnumSet.of(CommunityBoardStatusType.OPEN, CommunityBoardStatusType.CLOSED));
+        final List<CommunityBoardItem> boardItems;
+
+        if (null == categoryList || (categoryList.length == 0)) {
+            boardItems = communityBoardService.listBoardItemsForProperty(propertyId, ownerId, statusTypes, startId, pageSize + 1);
+        }
+        else {
+            boardItems = communityBoardService.listBoardItemsForPropertyAndCategory(propertyId, ownerId, statusTypes, Arrays.asList(categoryList), startId, pageSize + 1);
         }
         return new PageableDataResponse<>(boardItems
                 .stream()
                 .limit(pageSize)
-                .map(e-> communityBoardMapper.toCommunityBoardItem(e))
+                .map(communityBoardMapper::toCommunityBoardItem)
                 .collect(Collectors.toList()),
                 pageSize, boardItems.size() > pageSize ? boardItems.get(pageSize.intValue()).getId() : null
         );
