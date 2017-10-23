@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.validator.constraints.Length;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -70,6 +71,34 @@ public class Property {
     @Column(nullable = false)
     @NotNull
     private Boolean enableSms;
+
+    @Nullable
+    @Column
+    private Integer lockoutHours;
+
+    @Nullable
+    @Column
+    private Integer disruptiveComplaintHours;
+
+    @Nullable
+    @Column
+    private Integer disruptiveComplaintThreshold;
+
+    @Nullable
+    @Column
+    private Integer throttleFastMinutes;
+
+    @Nullable
+    @Column
+    private Integer throttleSlowHours;
+
+    @Nullable
+    @Column
+    private Integer throttleFastLimit;
+
+    @Nullable
+    @Column
+    private Integer throttleSlowLimit;
 
     @OneToMany(mappedBy = "managedProperty")
     @OrderBy("firstName asc, lastName asc")
