@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Tomas Sedlak" id="db.changelog-201710241443-1">
+        <comment>Update notification status from Closed to Resolved.</comment>
+        <update tableName="notification">
+            <column name="status" value="Resolved"/>
+            <where>status = 'Closed'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

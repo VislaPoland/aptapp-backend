@@ -11,10 +11,7 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.MaintenanceEmployee;
 import com.creatix.domain.entity.store.account.SecurityEmployee;
 import com.creatix.domain.entity.store.account.Tenant;
-import com.creatix.domain.entity.store.notification.MaintenanceNotification;
-import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
-import com.creatix.domain.entity.store.notification.Notification;
-import com.creatix.domain.entity.store.notification.SecurityNotification;
+import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.SmsMessageSender;
@@ -44,6 +41,8 @@ public class NotificationService {
     private NotificationDao notificationDao;
     @Autowired
     private MaintenanceNotificationDao maintenanceNotificationDao;
+    @Autowired
+    private EscalatedNeighborhoodNotificationDao escalatedNeighborhoodNotificationDao;
     @Autowired
     private NeighborhoodNotificationDao neighborhoodNotificationDao;
     @Autowired
@@ -205,6 +204,7 @@ public class NotificationService {
         return notification;
     }
 
+    @RoleSecured(value = AccountRole.Tenant)
     public NeighborhoodNotification respondToNeighborhoodNotification(long notificationId, @Nonnull NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(request, "Notification response request is null");
 
@@ -228,6 +228,32 @@ public class NotificationService {
 
                 return notification;
             }
+        }
+        throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
+    }
+
+    @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public NeighborhoodNotification respondToEscalatedNeighborhoodNotification(long notificationId, @Nonnull NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
+        Objects.requireNonNull(request, "Notification response request is null");
+
+        final EscalatedNeighborhoodNotification notification = getOrElseThrow(notificationId, escalatedNeighborhoodNotificationDao,
+                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
+
+        if ( authorizationManager.isManager(notification.getProperty()) ) {
+            notification.setStatus(NotificationStatus.Resolved);
+            notification.setResponse(request.getResponse());
+            notification.setRespondedAt(OffsetDateTime.now());
+            notification.setClosedAt(OffsetDateTime.now());
+            escalatedNeighborhoodNotificationDao.persist(notification);
+
+            if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
+                pushNotificationSender.sendNotification(new EscalatedNeighborNotificationResolvedTemplate(notification), notification.getAuthor());
+            }
+            else if ( request.getResponse() == NeighborhoodNotificationResponse.NoIssueFound ) {
+                pushNotificationSender.sendNotification(new EscalatedNeighborNotificationNoIssueFoundTemplate(notification), notification.getAuthor());
+            }
+
+            return notification;
         }
         throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
     }
@@ -292,7 +318,7 @@ public class NotificationService {
 
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
         notification.setClosedAt(OffsetDateTime.now());
-        notification.setStatus(NotificationStatus.Closed);
+        notification.setStatus(NotificationStatus.Resolved);
 
         maintenanceNotificationDao.persist(notification);
 

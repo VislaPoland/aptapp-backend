@@ -23,4 +23,5 @@
     <include file="classpath:db/changelog/db.changelog-20171016-addPetToNotification.xml"/>
     <include file="classpath:db/changelog/db.changelog-20171017-addRemindedAtToEventInvite.xml"/>
     <include file="classpath:db/changelog/db.changelog-20171023-addPropertyConfiguration.xml"/>
+    <include file="classpath:db/changelog/db.changelog-20171024-updateNotificationStatus.xml"/>
 </databaseChangeLog>
