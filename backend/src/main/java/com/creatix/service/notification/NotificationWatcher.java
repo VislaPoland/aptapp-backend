@@ -23,7 +23,7 @@ public class NotificationWatcher {
         this.notificationDao = notificationDao;
     }
 
-    public void processNotification(@Nonnull NeighborhoodNotification notification) {
+    public void process(@Nonnull NeighborhoodNotification notification) {
         final Long propertyId = notification.getProperty().getId();
         synchronized ( watcherMap ) {
             PropertyNotificationWatcher watcher = watcherMap.get(propertyId);

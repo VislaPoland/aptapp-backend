@@ -12,7 +12,6 @@ import org.springframework.security.access.AccessDeniedException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 /**
@@ -50,7 +49,7 @@ class PropertyNotificationWatcher {
 
     void processNotification(@Nonnull NeighborhoodNotification notification) {
 
-        if ( notification.getTargetApartment() == null ) {
+        if ( (notification.getTargetApartment() == null) || (notification.getTargetApartment().getTenant() == null) ) {
             // do nothing
             return;
         }
@@ -71,7 +70,7 @@ class PropertyNotificationWatcher {
         }
         else {
             final Neighbor offender = new Neighbor(notification.getTargetApartment().getTenant());
-            final NeighborComplaint complaint = new NeighborComplaint(notification);
+            final NeighborComplaint complaint = new NeighborComplaint();
 
             complaintThrottleFast.put(relation, complaint);
             complaintThrottleSlow.put(relation, complaint);
@@ -80,8 +79,8 @@ class PropertyNotificationWatcher {
 
             final boolean shouldEscalate = (complaintThrottleSlow.size(relation) >= getThrottleSlowLimit());
             if ( shouldEscalate ) {
-                final EscalatedNeighborhoodNotification escalationNotification = sendEscalationNotification(notification);
-                lockoutLatch.put(relation, new Escalation(escalationNotification));
+                sendEscalationNotification(notification);
+                lockoutLatch.put(relation, new Escalation());
             }
 
             final boolean shouldReportNeighbor = (disruptiveNeighborComplaints.size(offender) >= getDisruptiveComplaintThreshold());
@@ -98,18 +97,17 @@ class PropertyNotificationWatcher {
             disruptiveComplaintThreshold = Optional.ofNullable(property.getDisruptiveComplaintThreshold()).orElse(disruptiveComplaintThreshold);
         }
 
-        complaintThrottleFast.setProtectedPeriod(Duration.ofMinutes(Optional.ofNullable(property.getThrottleFastMinutes()).orElse((int) complaintThrottleFast.getProtectedPeriod().get(ChronoUnit.MINUTES))));
-        complaintThrottleSlow.setProtectedPeriod(Duration.ofHours(Optional.ofNullable(property.getThrottleSlowHours()).orElse((int) complaintThrottleSlow.getProtectedPeriod().get(ChronoUnit.HOURS))));
-        disruptiveNeighborComplaints.setProtectedPeriod(Duration.ofHours(Optional.ofNullable(property.getDisruptiveComplaintHours()).orElse((int) disruptiveNeighborComplaints.getProtectedPeriod().get(ChronoUnit.HOURS))));
-        lockoutLatch.setProtectedPeriod(Duration.ofHours(Optional.ofNullable(property.getLockoutHours()).orElse((int) lockoutLatch.getProtectedPeriod().get(ChronoUnit.HOURS))));
+        complaintThrottleFast.setProtectedPeriod(Optional.ofNullable(property.getThrottleFastMinutes()).map(Duration::ofMinutes).orElse(complaintThrottleFast.getProtectedPeriod()));
+        complaintThrottleSlow.setProtectedPeriod(Optional.ofNullable(property.getThrottleSlowHours()).map(Duration::ofHours).orElse(complaintThrottleSlow.getProtectedPeriod()));
+        disruptiveNeighborComplaints.setProtectedPeriod(Optional.ofNullable(property.getDisruptiveComplaintHours()).map(Duration::ofHours).orElse(disruptiveNeighborComplaints.getProtectedPeriod()));
+        lockoutLatch.setProtectedPeriod(Optional.ofNullable(property.getLockoutHours()).map(Duration::ofHours).orElse(lockoutLatch.getProtectedPeriod()));
     }
 
     private void sendDisruptiveNeighborNotification() {
 
     }
 
-    @Nonnull
-    private EscalatedNeighborhoodNotification sendEscalationNotification(@Nonnull NeighborhoodNotification notificationSrc) {
+    private void sendEscalationNotification(@Nonnull NeighborhoodNotification notificationSrc) {
         final EscalatedNeighborhoodNotification notificationDst = new EscalatedNeighborhoodNotification();
         notificationDst.setAuthor(notificationSrc.getAuthor());
         notificationDst.setProperty(notificationSrc.getProperty());
@@ -120,23 +118,21 @@ class PropertyNotificationWatcher {
         notificationDao.persist(notificationDst);
 
         // TODO: notify
-
-        return notificationDst;
     }
 
     @Nonnull
     private Blocking testIfShouldBlock(@Nonnull NeighborRelation relation) {
         if ( lockoutLatch.size(relation) > 0 ) {
-            return Blocking.shouldBlock(String.format("Please try again in %d hours.", lockoutLatch.getProtectedPeriod().get(ChronoUnit.HOURS)));
+            return Blocking.shouldBlock(String.format("Please try again in %d hours.", lockoutLatch.getProtectedPeriod().getSeconds() / 3600));
         }
         if ( complaintThrottleFast.size(relation) >= getThrottleFastLimit() ) {
-            return Blocking.shouldBlock(String.format("Please try again in %d minutes.", complaintThrottleFast.getProtectedPeriod().get(ChronoUnit.MINUTES)));
+            return Blocking.shouldBlock(String.format("Please try again in %d minutes.", complaintThrottleFast.getProtectedPeriod().getSeconds() / 60));
         }
         if ( complaintThrottleSlow.size(relation) >= getThrottleSlowLimit() ) {
             LOGGER.warn("Slow throttle was hit. This should not happen! Please check settings. property_id={}, lockout_count={}, lockout_period={}, tslow_count={}, tslow_period={}",
                     propertyId, lockoutLatch.size(relation), lockoutLatch.getProtectedPeriod(), complaintThrottleSlow.size(relation), complaintThrottleSlow.getProtectedPeriod());
 
-            return Blocking.shouldBlock(String.format("Please try again in %d hours.", complaintThrottleSlow.getProtectedPeriod().get(ChronoUnit.HOURS)));
+            return Blocking.shouldBlock(String.format("Please try again in %d hours.", complaintThrottleSlow.getProtectedPeriod().getSeconds() / 3600));
         }
 
         return Blocking.shouldNotBlock();

@@ -19,6 +19,7 @@ import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PushNotificationSender;
+import com.creatix.service.notification.NotificationWatcher;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,8 @@ public class NotificationService {
     private MaintenanceEmployeeDao maintenanceEmployeeDao;
     @Autowired
     private MaintenanceReservationService maintenanceReservationService;
+    @Autowired
+    private NotificationWatcher notificationWatcher;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -193,6 +196,7 @@ public class NotificationService {
             notification.setStatus(NotificationStatus.Pending);
             notification.setRecipient(targetApartment.getTenant());
             notification.setTargetApartment(targetApartment);
+            notificationWatcher.process(notification);
             neighborhoodNotificationDao.persist(notification);
 
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {

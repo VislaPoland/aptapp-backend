@@ -1,5 +1,7 @@
 package com.creatix.service.notification;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import javax.annotation.Nonnull;
 import java.time.Instant;
 
@@ -26,5 +28,13 @@ class WrappedValue<T> {
     @Nonnull
     public T getValue() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("evictAfter", evictAfter)
+                .append("value", value)
+                .toString();
     }
 }
