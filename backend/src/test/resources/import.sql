@@ -31,27 +31,9 @@ INSERT INTO public.contact (id, communication_type, type, value) VALUES (1, 'Ema
 INSERT INTO public.contact (id, communication_type, type, value) VALUES (2, 'Phone', 'OtherUseful', '(785) 123-9653');
 
 -- properties contacts
-INSERT INTO
-  public.contact(id, type, communication_type, value)
-VALUES
-  (3, 'Police', 'Phone', '1-541-754-3010'),
-  (4, 'Police', 'Email', 'police@gmail.com'),
-  (5, 'MedicalEmergency', 'Phone', '1-541-754-3010'),
-  (6, 'MedicalEmergency', 'Email', 'medical@gmail.com'),
-  (7, 'FireService', 'Phone', '1-541-754-3010'),
-  (8, 'FireService', 'Email', 'fire@gmail.com')
-;
+INSERT INTO public.contact(id, type, communication_type, value) VALUES (3, 'Police', 'Phone', '1-541-754-3010'),(4, 'Police', 'Email', 'police@gmail.com'),(5, 'MedicalEmergency', 'Phone', '1-541-754-3010'),(6, 'MedicalEmergency', 'Email', 'medical@gmail.com'),(7, 'FireService', 'Phone', '1-541-754-3010'),(8, 'FireService', 'Email', 'fire@gmail.com');
 
-INSERT INTO
-  public.property_contacts(property_id, contacts_id)
-VALUES
-  (1, 3),
-  (1, 4),
-  (1, 5),
-  (1, 6),
-  (1, 7),
-  (1, 8)
-;
+INSERT INTO public.property_contacts(property_id, contacts_id) VALUES (1, 3),(1, 4),(1, 5),(1, 6),(1, 7),(1, 8);
 
 -- property contacts connections
 INSERT INTO public.property_contacts (property_id, contacts_id) VALUES (1, 1);
@@ -127,13 +109,15 @@ UPDATE public.apartment SET left_id = 12 WHERE id = 22;
 
 
 -- tenant
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 3, true, 'South Water Apartments', 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt@test.com', '(905) 545-0256', 'Tenant', 'Owner', 22, '123456', '2017-06-16 15:36:38', '2016-06-16 15:36:38', false);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 451, true, 'South Water Apartments', 'Tomas', 'Sedlak', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'tomas.sedlak@thinkcreatix.com', '+421948519283', 'Tenant', 'Owner', 21, null, null, '2016-06-16 15:36:38', true);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 434, false, 'South Water Apartments', 'Peter', 'Pan', null, 'inactive.tenant@test.com', '', 'Tenant', 'Owner', 33, null, null, '2016-06-16 15:36:38', true);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, type, apartment_id, action_token, action_token_valid_until, created_at, enable_sms, parent_tenant_id) VALUES ('SubTenant', 133245, true, 'South Water Apartments', 'Alan', 'SubTenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt2@test.com', '(901) 222-3213', 'SubTenant', null, 22, null, null, '2016-06-16 15:36:38', true, 3);
+INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 3, true, 'South Water Apartments', 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt@test.com', '(905) 545-0256', 'Tenant', 22, '123456', '2017-06-16 15:36:38', '2016-06-16 15:36:38', false);
+INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 451, true, 'South Water Apartments', 'Tomas', 'Sedlak', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'tomas.sedlak@thinkcreatix.com', '+421948519283', 'Tenant', 21, null, null, '2016-06-16 15:36:38', true);
+INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 434, false, 'South Water Apartments', 'Peter', 'Pan', null, 'inactive.tenant@test.com', '', 'Tenant', 33, null, null, '2016-06-16 15:36:38', true);
+INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms, parent_tenant_id) VALUES ('SubTenant', 133245, true, 'South Water Apartments', 'Alan', 'SubTenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt2@test.com', '(901) 222-3213', 'SubTenant', 22, null, null, '2016-06-16 15:36:38', true, 3);
+
+INSERT INTO public.notification_group (id, created_at) VALUES (1, '2016-02-01 18:30:00');
 
 -- notification
-INSERT INTO public.notification (dtype, id, created_at, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id) VALUES ('MaintenanceNotification', 1, '2016-07-07 16:00:00', null, null, null, 'Pending', 'Maint. test 1', 'Maintenance', '2016-07-07 16:00:00', false, 3, 1, 22);
+INSERT INTO public.notification (dtype, id, created_at, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id, notification_group_id) VALUES ('MaintenanceNotification', 1, '2016-07-07 16:00:00', null, null, null, 'Pending', 'Maint. test 1', 'Maintenance', '2016-07-07 16:00:00', false, 3, 1, 22, 1);
 
 -- slots
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title, audience) VALUES ('EventSlot', 100, '2016-02-01 18:30:00', '2016-02-01 19:00:00', 30, 1, null, 'Event slot 1', 'Event 1', 'Everyone');
@@ -163,9 +147,9 @@ INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes,
 INSERT INTO public.slot (dtype, id, begin_time, end_time, unit_duration_minutes, property_id, schedule_id, description, title) VALUES ('MaintenanceSlot', 574, '2016-08-29 15:00:00.000000', '2016-08-29 23:00:00.000000', 30, 1, null, null, null);
 
 -- reservations
-INSERT INTO public.notification (dtype, id, created_at, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id) VALUES ('MaintenanceNotification', 254, '2016-02-01 07:26:04', null, 'Somebody broke my window', '', 'Pending', 'Broken window', 'Maintenance', '2016-02-01 07:26:04', false, 451, 1, 21);
+INSERT INTO public.notification (dtype, id, created_at, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id, notification_group_id) VALUES ('MaintenanceNotification', 254, '2016-02-01 07:26:04', null, 'Somebody broke my window', '', 'Pending', 'Broken window', 'Maintenance', '2016-02-01 07:26:04', false, 451, 1, 21, 1);
 INSERT INTO public.maintenance_reservation (id, begin_time, capacity, duration_minutes, end_time, note, version, employee_id, notification_id, slot_id, status) VALUES (1, '2016-02-01 19:00:00', 1, 30, '2016-02-01 19:30:00', 'Broken window', 1, 45, 254, 201, 'Confirmed');
-INSERT INTO public.notification (dtype, id, created_at, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id) VALUES ('MaintenanceNotification', 203, '2016-02-01 07:26:04', null, 'There is a gas leaking in my kitchen', '', 'Pending', 'Leaking gas', 'Maintenance', '2016-02-01 04:16:44', true, 3, 1, 22);
+INSERT INTO public.notification (dtype, id, created_at, deleted_at, description, response, status, title, type, updated_at, access_if_not_at_home, author_id, property_id, target_apartment_id, notification_group_id) VALUES ('MaintenanceNotification', 203, '2016-02-01 07:26:04', null, 'There is a gas leaking in my kitchen', '', 'Pending', 'Leaking gas', 'Maintenance', '2016-02-01 04:16:44', true, 3, 1, 22, 1);
 INSERT INTO public.maintenance_reservation (id, begin_time, capacity, duration_minutes, end_time, note, version, employee_id, notification_id, slot_id, status) VALUES (2, '2016-02-01 19:00:00', 1, 30, '2016-02-01 19:30:00', 'Urgent', 1, 45, 203, 201, 'Pending');
 
 
@@ -298,6 +282,11 @@ INSERT INTO public.slot_unit (id, capacity, initial_capacity, "offset", version,
 INSERT INTO public.slot_unit (id, capacity, initial_capacity, "offset", version, slot_id) VALUES (577, 1, 1, 2, 0, 574);
 INSERT INTO public.slot_unit (id, capacity, initial_capacity, "offset", version, slot_id) VALUES (576, 1, 1, 1, 0, 574);
 INSERT INTO public.slot_unit (id, capacity, initial_capacity, "offset", version, slot_id) VALUES (575, 1, 1, 0, 0, 574);
+
+-- assign tenant to apartment
+UPDATE public.account SET apartment_id = 14 WHERE id = 451;
+UPDATE public.account SET apartment_id = 13 WHERE id = 434;
+
 -------------------
 -- /DEMO DATA
 -------------------
