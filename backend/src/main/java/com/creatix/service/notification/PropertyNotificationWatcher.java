@@ -2,16 +2,24 @@ package com.creatix.service.notification;
 
 import com.creatix.domain.dao.NotificationDao;
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.EscalatedNeighborhoodNotification;
 import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
 import com.creatix.domain.enums.NotificationStatus;
+import com.creatix.message.template.push.EscalatedManagerNotificationTemplate;
+import com.creatix.message.template.push.EscalatedNeighborNotificationTemplate;
+import com.creatix.service.message.PushNotificationSender;
+import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -26,6 +34,8 @@ class PropertyNotificationWatcher {
     private final NotificationDao notificationDao;
     @Nonnull
     private final Long propertyId;
+    @Nonnull
+    private final PushNotificationSender pushNotificationSender;
 
     @Nonnull
     private final ExpiringChannel<Neighbor, NeighborComplaint> disruptiveNeighborComplaints = new ExpiringChannel<>(Duration.ofHours(24));
@@ -42,12 +52,13 @@ class PropertyNotificationWatcher {
     private int throttleSlowLimit = 3;
 
 
-    PropertyNotificationWatcher(@Nonnull NotificationDao notificationDao, @Nonnull Property property) {
+    PropertyNotificationWatcher(@Nonnull Property property, @Nonnull NotificationDao notificationDao, @Nonnull PushNotificationSender pushNotificationSender) {
         this.notificationDao = notificationDao;
         this.propertyId = property.getId();
+        this.pushNotificationSender = pushNotificationSender;
     }
 
-    void processNotification(@Nonnull NeighborhoodNotification notification) {
+    void processNotification(@Nonnull NeighborhoodNotification notification) throws IOException, TemplateException {
 
         if ( (notification.getTargetApartment() == null) || (notification.getTargetApartment().getTenant() == null) ) {
             // do nothing
@@ -55,37 +66,42 @@ class PropertyNotificationWatcher {
         }
         if ( notification.getProperty() == null ) {
             // do nothing
+            LOGGER.warn("Notification without property detected");
             return;
         }
         else {
             refreshConfiguration(notification.getProperty());
         }
 
+        final Tenant accountOffender = notification.getTargetApartment().getTenant();
+        final Account accountComplainer = notification.getAuthor();
 
-        final NeighborRelation relation = new NeighborRelation(notification.getAuthor(), notification.getTargetApartment().getTenant());
+        final NeighborRelation relation = new NeighborRelation(accountComplainer, accountOffender);
 
         final Blocking blocking = testIfShouldBlock(relation);
         if ( blocking.shouldBlock() ) {
             throw new AccessDeniedException(blocking.getBlockingMessage());
         }
         else {
-            final Neighbor offender = new Neighbor(notification.getTargetApartment().getTenant());
-            final NeighborComplaint complaint = new NeighborComplaint();
+            final Neighbor offender = new Neighbor(accountOffender);
+            final NeighborComplaint complaint = new NeighborComplaint(accountComplainer);
 
             complaintThrottleFast.put(relation, complaint);
             complaintThrottleSlow.put(relation, complaint);
-            disruptiveNeighborComplaints.put(offender, complaint);
+            if ( disruptiveNeighborComplaints.get(offender).stream().noneMatch(c -> Objects.equals(c.getComplainerAccountId(), accountComplainer.getId())) ) {
+                disruptiveNeighborComplaints.put(offender, complaint);
+            }
 
 
             final boolean shouldEscalate = (complaintThrottleSlow.size(relation) >= getThrottleSlowLimit());
             if ( shouldEscalate ) {
-                sendEscalationNotification(notification);
+                sendEscalationNotification(accountOffender, notification);
                 lockoutLatch.put(relation, new Escalation());
             }
 
             final boolean shouldReportNeighbor = (disruptiveNeighborComplaints.size(offender) >= getDisruptiveComplaintThreshold());
             if ( shouldReportNeighbor ) {
-                sendDisruptiveNeighborNotification();
+                sendDisruptiveNeighborNotification(accountOffender, accountComplainer);
             }
         }
     }
@@ -103,11 +119,11 @@ class PropertyNotificationWatcher {
         lockoutLatch.setProtectedPeriod(Optional.ofNullable(property.getLockoutHours()).map(Duration::ofHours).orElse(lockoutLatch.getProtectedPeriod()));
     }
 
-    private void sendDisruptiveNeighborNotification() {
-
+    private void sendDisruptiveNeighborNotification(@Nonnull Tenant offender, @Nonnull Account complainer) throws IOException, TemplateException {
+        // TODO: notify admin and offender
     }
 
-    private void sendEscalationNotification(@Nonnull NeighborhoodNotification notificationSrc) {
+    private void sendEscalationNotification(@Nonnull Tenant offender, @Nonnull NeighborhoodNotification notificationSrc) throws IOException, TemplateException {
         final EscalatedNeighborhoodNotification notificationDst = new EscalatedNeighborhoodNotification();
         notificationDst.setAuthor(notificationSrc.getAuthor());
         notificationDst.setProperty(notificationSrc.getProperty());
@@ -117,7 +133,8 @@ class PropertyNotificationWatcher {
         notificationDst.setStatus(NotificationStatus.Pending);
         notificationDao.persist(notificationDst);
 
-        // TODO: notify
+        pushNotificationSender.sendNotification(new EscalatedNeighborNotificationTemplate(throttleSlowLimit, complaintThrottleSlow.getProtectedPeriod()), offender);
+        pushNotificationSender.sendNotification(new EscalatedManagerNotificationTemplate(offender, notificationSrc.getAuthor(), throttleSlowLimit, complaintThrottleSlow.getProtectedPeriod()), offender);
     }
 
     @Nonnull
