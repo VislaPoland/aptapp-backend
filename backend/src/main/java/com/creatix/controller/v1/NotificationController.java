@@ -24,6 +24,8 @@ import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.AttachmentService;
 import com.creatix.service.NotificationService;
+import com.creatix.service.notification.NotificationsStatistics;
+import com.creatix.service.notification.NotificationsStatisticsCreator;
 import com.fasterxml.jackson.annotation.JsonView;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
@@ -55,6 +57,8 @@ public class NotificationController {
 
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private NotificationsStatisticsCreator notificationsStatisticsCreator;
     @Autowired
     private Mapper mapper;
     @Autowired
@@ -230,6 +234,19 @@ public class NotificationController {
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(dto.getUnitNumber(), mapper.fromNeighborhoodNotificationRequest(dto))));
     }
 
+    @ApiOperation(value = "Get neighborhood notification statistics")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.Public.class)
+    @GetMapping(path = "/neighborhood/stats", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.NEIGHBORHOOD)
+    public DataResponse<NotificationsStatistics> getNeighborhoodNotificationStats(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
+                                                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws IOException, TemplateException {
+        return new DataResponse<>(notificationsStatisticsCreator.createForTimeRange(from, till));
+    }
 
     @ApiOperation(value = "Respond to escalated neighborhood notification")
     @ApiResponses(value = {
