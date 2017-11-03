@@ -9,7 +9,6 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.notification.EventInviteNotification;
 import com.creatix.domain.entity.store.notification.NotificationGroup;
 import com.creatix.domain.enums.*;
-import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.EventNotificationAdjustTemplate;
 import com.creatix.message.template.push.EventNotificationTemplate;
@@ -412,7 +411,7 @@ public class SlotService {
                 smsMessageSender.send(new com.creatix.message.template.sms.RsvpReminderMessageTemplate(invite));
                 wasReminded = true;
             }
-            catch ( IOException | TemplateException | MessageDeliveryException e ) {
+            catch ( Exception e ) {
                 logger.info(String.format("Failed to sms notify %s about upcoming event", invite.getAttendant().getPrimaryEmail()), e);
             }
 

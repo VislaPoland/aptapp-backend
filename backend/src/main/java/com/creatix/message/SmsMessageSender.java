@@ -3,9 +3,9 @@ package com.creatix.message;
 import com.creatix.configuration.TwilioProperties;
 import com.creatix.message.template.sms.SmsMessageTemplate;
 import com.twilio.sdk.Twilio;
-import com.twilio.sdk.type.PhoneNumber;
-import com.twilio.sdk.resource.api.v2010.account.Message;
 import com.twilio.sdk.creator.api.v2010.account.MessageCreator;
+import com.twilio.sdk.resource.api.v2010.account.Message;
+import com.twilio.sdk.type.PhoneNumber;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class SmsMessageSender {
             throw new IllegalStateException("Missing auth token configuration");
         }
         if ( StringUtils.isBlank(twilioProperties.getFrom()) ) {
-            throw new IllegalStateException("Missing from number configuration");
+            throw new IllegalArgumentException("Missing from number configuration");
         }
 
         if ( !(isInitialized) ) {

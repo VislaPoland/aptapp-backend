@@ -22,6 +22,8 @@ import com.creatix.service.message.PushNotificationSender;
 import com.creatix.service.notification.NotificationWatcher;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +39,9 @@ import java.util.Objects;
 @Service
 @Transactional
 public class NotificationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+
 
     @Autowired
     private NotificationDao notificationDao;
@@ -200,7 +205,12 @@ public class NotificationService {
             neighborhoodNotificationDao.persist(notification);
 
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
-                smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
+                try {
+                    smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
+                }
+                catch ( Exception e ) {
+                    logger.info(String.format("Failed to sms notify %s", tenant.getPrimaryEmail()), e);
+                }
             }
             pushNotificationSender.sendNotification(new NeighborNotificationTemplate(notification), tenant);
         }

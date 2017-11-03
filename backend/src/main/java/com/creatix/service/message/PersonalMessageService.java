@@ -10,7 +10,6 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.message.PersonalMessageDeleteStatus;
 import com.creatix.domain.enums.message.PersonalMessageStatusType;
-import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.PushNotificationTemplateProcessor;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.push.GenericPushNotification;
@@ -148,7 +147,7 @@ public class PersonalMessageService {
                     try {
                         smsMessageSender.send(new TenantPersonalMessageTemplate(recipientAccount.getPrimaryPhone(), personalMessage));
                     }
-                    catch ( IOException | TemplateException | MessageDeliveryException e ) {
+                    catch ( Exception e ) {
                         logger.error(String.format("Failed to send sms for account %d to phone number %s", recipientAccount.getId(), recipientAccount.getPrimaryPhone()), e);
                     }
                 }
