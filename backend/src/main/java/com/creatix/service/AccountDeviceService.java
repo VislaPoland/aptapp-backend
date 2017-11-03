@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpSession;
 import java.util.Objects;
@@ -84,7 +85,7 @@ public class AccountDeviceService {
     }
 
     @RoleSecured
-    @Nonnull
+    @Nullable
     public Device assignDeviceToAccount(@Nonnull Account account) {
         Objects.requireNonNull(account);
 

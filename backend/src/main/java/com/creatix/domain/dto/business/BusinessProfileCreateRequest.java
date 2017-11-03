@@ -19,6 +19,8 @@ public class BusinessProfileCreateRequest {
     @Size(max = 255)
     @NotBlank
     private String name;
+    @ApiModelProperty("Business profile website")
+    private String website;
     @ApiModelProperty("Latitude")
     private Double lat;
     @ApiModelProperty("Longitude")

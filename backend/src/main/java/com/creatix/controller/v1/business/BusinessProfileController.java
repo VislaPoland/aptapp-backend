@@ -21,9 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -143,7 +141,7 @@ public class BusinessProfileController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(path = "/{businessProfileId}", method = {RequestMethod.PUT}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{businessProfileId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileDto> updateBusinessProfile(@Valid @RequestBody BusinessProfileDto request,
                                                                   @PathVariable("businessProfileId") Long businessProfileId) {
