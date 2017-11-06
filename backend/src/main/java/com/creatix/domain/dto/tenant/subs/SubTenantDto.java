@@ -32,9 +32,6 @@ public class SubTenantDto {
     @NotEmpty
     private String primaryEmail;
 
-    @ApiModelProperty(value = "Company name")
-    private String companyName;
-
     @ApiModelProperty(value = "Parent tenant ID")
     private Long parentTenantId;
 

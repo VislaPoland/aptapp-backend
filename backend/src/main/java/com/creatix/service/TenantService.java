@@ -180,7 +180,6 @@ public class TenantService {
         final Tenant tenant = getOrElseThrow(tenantId, tenantDao, new EntityNotFoundException(String.format("Tenant id=%d not found", tenantId)));
         if ( authorizationManager.isSelf(tenant) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
             final SubTenant subTenant = mapper.toSubTenant(request);
-            subTenant.setCompanyName(request.getCompanyName());
             subTenant.setRole(AccountRole.SubTenant);
             subTenant.setActive(false);
             accountService.setActionToken(subTenant);

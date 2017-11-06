@@ -23,8 +23,6 @@ public class BasicAccountDto {
     private String primaryEmail;
     @ApiModelProperty(value = "Phone number")
     private String primaryPhone;
-    @ApiModelProperty
-    private String companyName;
 
     @Deprecated
     @ApiModelProperty(required = true, notes = "*Deprecated*, use first and last name fields instead!")

@@ -37,9 +37,6 @@ public class Account {
     private String lastName;
 
     @Column
-    private String companyName;
-
-    @Column
     private String primaryPhone;
 
     @Column(nullable = false)

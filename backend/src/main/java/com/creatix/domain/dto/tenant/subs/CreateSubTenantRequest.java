@@ -30,7 +30,4 @@ public class CreateSubTenantRequest {
     @Email
     @UniqueEntityIdentifier
     private String primaryEmail;
-
-    @ApiModelProperty(value = "Company name")
-    private String companyName;
 }

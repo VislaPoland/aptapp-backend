@@ -32,9 +32,6 @@ public class PersistAccountRequest {
     @ApiModelProperty(value = "Phone number")
     private String primaryPhone;
 
-    @ApiModelProperty(value = "Company name")
-    private String companyName;
-
     @Email
     @ApiModelProperty(value = "Secondary email address")
     private String secondaryEmail;

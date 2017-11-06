@@ -8,8 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 /**
  * Account data transfer object
  */
@@ -47,9 +45,6 @@ public class AccountDto {
 
     @ApiModelProperty(value = "Secondary phone number", required = true)
     private String secondaryPhone;
-
-    @ApiModelProperty(value = "Company name")
-    private String companyName;
 
     @ApiModelProperty(value = "Associated property details", notes = "This is required for tenant and property manager")
     private PropertyDto property;

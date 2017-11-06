@@ -17,8 +17,6 @@ public class PersonalMessageAccountDto {
     private String firstName;
     @ApiModelProperty("User's last name")
     private String lastName;
-    @ApiModelProperty("Company's name")
-    private String companyName;
     @ApiModelProperty("User's primary phone")
     private String primaryPhone;
     @ApiModelProperty("User's primary email")

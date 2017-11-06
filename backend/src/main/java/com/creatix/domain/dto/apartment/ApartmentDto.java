@@ -71,8 +71,6 @@ public class ApartmentDto extends BasicApartmentDto {
         @ApiModelProperty(required = true)
         private String phone;
         @ApiModelProperty
-        private String companyName;
-        @ApiModelProperty
         private Boolean deleted;
     }
 

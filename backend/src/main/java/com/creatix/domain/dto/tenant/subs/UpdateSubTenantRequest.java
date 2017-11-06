@@ -21,7 +21,4 @@ public class UpdateSubTenantRequest {
     @ApiModelProperty(value = "Phone number", required = true)
     @NotNull
     private String primaryPhone;
-
-    @ApiModelProperty(value = "Company name")
-    private String companyName;
 }

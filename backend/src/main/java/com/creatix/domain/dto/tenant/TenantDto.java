@@ -49,8 +49,5 @@ public class TenantDto extends AccountDto {
 
         @ApiModelProperty(value = "Email address", required = true)
         private String primaryEmail;
-
-        @ApiModelProperty(value = "Company name")
-        private String companyName;
     }
 }
