@@ -19,7 +19,4 @@ public class DiscountCouponCreatedTemplate extends PushMessageTemplate {
         return "discount-coupon-created";
     }
 
-    public String getBusinessName() {
-        return this.discountCoupon.getBusinessProfile().getName();
-    }
 }

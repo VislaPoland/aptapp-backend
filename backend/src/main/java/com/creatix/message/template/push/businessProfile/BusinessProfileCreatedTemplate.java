@@ -19,9 +19,4 @@ public class BusinessProfileCreatedTemplate extends PushMessageTemplate {
     public String getTemplateName() {
         return "business-profile-created";
     }
-
-    public String getBusinessName() {
-        return businessProfile.getName();
-    }
-
 }
