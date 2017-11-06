@@ -111,7 +111,7 @@ dependencies {
 	compile('commons-io:commons-io:2.5')
 	compile('ma.glasnost.orika:orika-core:1.5.1')
 	compile('org.freemarker:freemarker:2.3.23')
-	compile('com.twilio.sdk:twilio-java-sdk:7.0.0-rc-10')
+	compile('com.twilio.sdk:twilio:7.15.5')
 	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0')
     compile('com.googlecode.json-simple:json-simple:1.1.1')
 	compile('com.google.zxing:core:3.3.0')

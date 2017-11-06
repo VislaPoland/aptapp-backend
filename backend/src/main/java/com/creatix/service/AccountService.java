@@ -11,10 +11,12 @@ import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.email.*;
 import com.creatix.security.*;
 import com.creatix.service.message.EmailMessageService;
 import freemarker.template.TemplateException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.RandomStringGenerator;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,7 @@ import javax.annotation.Nonnull;
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpSession;
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,6 +85,8 @@ public class AccountService {
     private HttpSession httpSession;
     @Autowired
     private DeviceProperties deviceProperties;
+    @Autowired
+    private SmsMessageSender smsMessageSender;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -241,6 +246,7 @@ public class AccountService {
         }
 
         mapper.fillAccount(request, account);
+        checkPhoneNumber(account);
         accountDao.persist(account);
 
         return account;
@@ -315,6 +321,7 @@ public class AccountService {
         mapper.fillAccount(request, account);
         account.setActive(true);
         account.setCreatedAt(new Date());
+        checkPhoneNumber(account);
         accountDao.persist(account);
         setActionToken(account);
 
@@ -334,6 +341,7 @@ public class AccountService {
             throw new SecurityException("Account role change is not allowed.");
         }
         mapper.fillAccount(request, account);
+        checkPhoneNumber(account);
         accountDao.persist(account);
 
         return account;
@@ -349,6 +357,7 @@ public class AccountService {
         mapper.fillAccount(request, account);
         account.setActive(false);
         account.setCreatedAt(new Date());
+        checkPhoneNumber(account);
         accountDao.persist(account);
         setActionToken(account);
 
@@ -368,6 +377,7 @@ public class AccountService {
             throw new SecurityException("Account role change is not allowed.");
         }
         mapper.fillAccount(request, account);
+        checkPhoneNumber(account);
         propertyOwnerDao.persist(account);
 
         return account;
@@ -395,6 +405,7 @@ public class AccountService {
         account.setActive(false);
         account.setCreatedAt(new Date());
         account.setManagedProperty(managedProperty);
+        checkPhoneNumber(account);
         accountDao.persist(account);
         setActionToken(account);
 
@@ -428,6 +439,7 @@ public class AccountService {
         }
         mapper.fillAccount(request, account);
         account.setManagedProperty(managedProperty);
+        checkPhoneNumber(account);
         propertyManagerDao.persist(account);
 
         return account;
@@ -446,6 +458,7 @@ public class AccountService {
         account.setActive(false);
         account.setCreatedAt(new Date());
         account.setManager(manager);
+        checkPhoneNumber(account);
         securityEmployeeDao.persist(account);
         setActionToken(account);
 
@@ -465,6 +478,7 @@ public class AccountService {
             throw new SecurityException("Account role change is not allowed.");
         }
         mapper.fillAccount(request, account);
+        checkPhoneNumber(account);
         securityEmployeeDao.persist(account);
 
         return account;
@@ -483,6 +497,7 @@ public class AccountService {
         account.setActive(false);
         account.setCreatedAt(new Date());
         account.setManager(manager);
+        checkPhoneNumber(account);
         maintenanceEmployeeDao.persist(account);
         setActionToken(account);
 
@@ -502,6 +517,7 @@ public class AccountService {
             throw new SecurityException("Account role change is not allowed.");
         }
         mapper.fillAccount(request, account);
+        checkPhoneNumber(account);
         maintenanceEmployeeDao.persist(account);
 
         return account;
@@ -535,6 +551,7 @@ public class AccountService {
         account.setActive(false);
         account.setCreatedAt(new Date());
         account.setManager(manager);
+        checkPhoneNumber(account);
         assistantPropertyManagerDao.persist(account);
         setActionToken(account);
 
@@ -554,6 +571,7 @@ public class AccountService {
             throw new SecurityException("Account role change is not allowed.");
         }
         mapper.fillAccount(request, account);
+        checkPhoneNumber(account);
         assistantPropertyManagerDao.persist(account);
 
         return account;
@@ -615,6 +633,14 @@ public class AccountService {
         }
     }
 
+    private void checkPhoneNumber(@Nonnull Account account) {
+        if ( StringUtils.isNotBlank(account.getPrimaryPhone()) && !(smsMessageSender.validPhoneNumber(account.getPrimaryPhone())) ) {
+            throw new ValidationException(String.format("Primary phone number %s is not valid.", account.getPrimaryPhone()));
+        }
+        if ( StringUtils.isNotBlank(account.getSecondaryPhone()) && !(smsMessageSender.validPhoneNumber(account.getSecondaryPhone())) ) {
+            throw new ValidationException(String.format("Secondary phone number %s is not valid.", account.getSecondaryPhone()));
+        }
+    }
 
     @SuppressWarnings("unchecked")
     private <T extends Account> T getEntityInstance(String email, Class<T> clazz) {
