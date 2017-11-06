@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -20,8 +19,9 @@ public class BusinessProfileDto {
 
     @ApiModelProperty(value = "Id", required = true, readOnly = true)
     private Long id;
+
     @ApiModelProperty(value = "Business profile name", required = true)
-    @Size(max = 255)
+    @Size(max = 120)
     @NotEmpty
     private String name;
 
