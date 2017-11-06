@@ -41,8 +41,10 @@ public class SmsMessageSender {
         }
     }
 
-    public void send(@Nonnull SmsMessageTemplate template) throws IOException, TemplateException, MessageDeliveryException {
-        send(templateProcessor.processTemplate(template), template.getRecipient());
+    public void send(SmsMessageTemplate template) throws IOException, TemplateException, MessageDeliveryException {
+        if ( StringUtils.isNotBlank(template.getRecipient()) ) {
+            send(templateProcessor.processTemplate(template), template.getRecipient());
+        }
     }
 
     /**
