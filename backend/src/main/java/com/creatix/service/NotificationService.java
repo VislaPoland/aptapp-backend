@@ -332,7 +332,7 @@ public class NotificationService {
 
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
         notification.setClosedAt(OffsetDateTime.now());
-        notification.setStatus(NotificationStatus.Resolved);
+        notification.setStatus(NotificationStatus.Closed);
 
         maintenanceNotificationDao.persist(notification);
 
