@@ -6,6 +6,7 @@ import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.EventInviteNotification;
 import com.creatix.domain.entity.store.notification.NotificationGroup;
 import com.creatix.domain.enums.*;
@@ -392,7 +393,7 @@ public class SlotService {
     public void sendEventRsvpReminder() {
 
         final List<EventInvite> invitesToNotify = eventInviteDao.findBySlotDateAndInviteResponseAndRemindedAtNull(
-                OffsetDateTime.now().plusDays(1), new EventInviteResponse[]{EventInviteResponse.Going, EventInviteResponse.Maybe});
+                OffsetDateTime.now(), OffsetDateTime.now().plusDays(1), new EventInviteResponse[]{EventInviteResponse.Going, EventInviteResponse.Maybe});
 
 
         for ( EventInvite invite : invitesToNotify ) {
@@ -408,18 +409,24 @@ public class SlotService {
             }
 
             try {
-                smsMessageSender.send(new com.creatix.message.template.sms.RsvpReminderMessageTemplate(invite));
-                wasReminded = true;
+                boolean smsEnabled = true;
+                if ( invite.getAttendant() instanceof Tenant ) {
+                    smsEnabled = ((Tenant) invite.getAttendant()).getEnableSms() == Boolean.TRUE;
+                }
+
+                if ( smsEnabled ) {
+                    smsMessageSender.send(new com.creatix.message.template.sms.RsvpReminderMessageTemplate(invite));
+                    wasReminded = true;
+                }
             }
             catch ( Exception e ) {
                 logger.info(String.format("Failed to sms notify %s about upcoming event", invite.getAttendant().getPrimaryEmail()), e);
             }
 
-            if ( wasReminded ) {
-                invite.setRemindedAt(OffsetDateTime.now());
-                eventInviteDao.persist(invite);
-            }
-            else {
+            invite.setRemindedAt(OffsetDateTime.now());
+            eventInviteDao.persist(invite);
+
+            if ( !(wasReminded) ) {
                 logger.warn(String.format("Failed to notify %s about upcoming event", invite.getAttendant().getPrimaryEmail()));
             }
         }

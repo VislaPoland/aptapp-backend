@@ -3,7 +3,6 @@ package com.creatix.domain.dao;
 import com.creatix.domain.entity.store.EventInvite;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.EventInviteResponse;
-import com.querydsl.sql.SQLExpressions;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nonnull;
@@ -36,10 +35,10 @@ public class EventInviteDao extends DaoBase<EventInvite, Long> {
     }
 
     @Nonnull
-    public List<EventInvite> findBySlotDateAndInviteResponseAndRemindedAtNull(@Nonnull OffsetDateTime beginDate, @Nonnull EventInviteResponse[] responses) {
+    public List<EventInvite> findBySlotDateAndInviteResponseAndRemindedAtNull(@Nonnull OffsetDateTime beginDate, @Nonnull OffsetDateTime endDate, @Nonnull EventInviteResponse[] responses) {
 		return queryFactory.selectFrom(eventInvite)
 				.where(
-				    SQLExpressions.date(eventInvite.event.beginTime).eq(beginDate)
+				    eventInvite.event.beginTime.between(beginDate, endDate)
                     .and(eventInvite.response.in(responses))
                     .and(eventInvite.remindedAt.isNull()))
                 .fetch();
