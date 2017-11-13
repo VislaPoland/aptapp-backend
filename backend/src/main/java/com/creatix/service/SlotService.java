@@ -389,7 +389,7 @@ public class SlotService {
         return schedule;
     }
 
-    @Scheduled(cron = "0 0 */3 * * *") // run every third hour
+    @Scheduled(cron = "0 */10 * * * *") // run every 10th minute (eg. 09:00, 09:10, 09:20, ...)
     public void sendEventRsvpReminder() {
 
         final List<EventInvite> invitesToNotify = eventInviteDao.findBySlotDateAndInviteResponseAndRemindedAtNull(
