@@ -63,7 +63,7 @@
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Hello ${name},</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Welcome to Apt. App – a mobile app made FOR residents BY residents. All features have been carefully designed to facilitate in exceptional communication and communities. Now you are empowered to communicate with your neighbors in a safe, completely anonymous way about noise complaints and community concerns. While also having the tools at your fingertips to explore your community within your property and surrounding neighborhood. Your enhanced living experience starts…. Now!</p>
 
-                                        <ol style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">
+                                        <ol style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: left; color: #031821;">
                                             <li>Download Apt. App from your Google Play or Apple App store</li>
                                             <li>Use the code or link below to activate your account and follow prompts</li>
                                             <li>Start enjoying Apt. App</li>

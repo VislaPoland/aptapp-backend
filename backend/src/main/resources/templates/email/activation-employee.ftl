@@ -62,7 +62,7 @@
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Hello ${name},</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Hooray! Your property has teamed up with Apt. App offering YOU the technology to quickly prioritize your day, explore the neighborhood, and keep updated on community events. It’s a snap to use and we have a great feeling you are going to LOVE it!</p>
-                                        <ol style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">
+                                        <ol style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: left; color: #031821;">
                                             <li>Download Apt. App from your Google Play or Apple App store</li>
                                             <li>Use the code or link below to activate your account and follow prompts</li>
                                             <li>Start enjoying Apt. App</li>
