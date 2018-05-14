@@ -374,6 +374,8 @@ public class AuthorizationManager {
         switch (sessionAccount.getRole()) {
             case Tenant:
             case SubTenant:
+            case Maintenance:
+            case Security:
                 if (!authorAccountId.equals(sessionAccount.getId())) {
                     throw new SecurityException("You can not modify this item");
                 }
@@ -385,9 +387,6 @@ public class AuthorizationManager {
                     throw new SecurityException("You can not modify this item");
                 }
                 break;
-            case Maintenance:
-            case Security:
-                throw new SecurityException("You can not modify this item");
             case Administrator:
                 // he can do anything
                 break;
