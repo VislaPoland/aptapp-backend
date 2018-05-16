@@ -1,9 +1,11 @@
 package com.creatix.service.notification;
 
+import com.creatix.configuration.PushNotificationProperties;
 import com.creatix.domain.dao.NotificationDao;
 import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
 import com.creatix.service.message.PushNotificationSender;
 import freemarker.template.TemplateException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
@@ -16,6 +18,9 @@ import java.util.Map;
  */
 @Component
 public class NotificationWatcher {
+
+    @Autowired
+    private PushNotificationProperties pushNotificationProperties;
 
     @Nonnull
     private final NotificationDao notificationDao;
@@ -34,7 +39,7 @@ public class NotificationWatcher {
         synchronized ( watcherMap ) {
             PropertyNotificationWatcher watcher = watcherMap.get(propertyId);
             if ( watcher == null ) {
-                watcher = new PropertyNotificationWatcher(notification.getProperty(), notificationDao, pushNotificationSender);
+                watcher = new PropertyNotificationWatcher(pushNotificationProperties.isThrottlingEnabled(), notification.getProperty(), notificationDao, pushNotificationSender);
                 watcherMap.put(propertyId, watcher);
             }
             watcher.processNotification(notification);

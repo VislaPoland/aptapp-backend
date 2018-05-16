@@ -35,6 +35,8 @@ class PropertyNotificationWatcher {
     @Nonnull
     private final Long propertyId;
     @Nonnull
+    private final boolean isThrottlingEnabled;
+    @Nonnull
     private final PushNotificationSender pushNotificationSender;
 
     @Nonnull
@@ -52,7 +54,8 @@ class PropertyNotificationWatcher {
     private int throttleSlowLimit = 3;
 
 
-    PropertyNotificationWatcher(@Nonnull Property property, @Nonnull NotificationDao notificationDao, @Nonnull PushNotificationSender pushNotificationSender) {
+    PropertyNotificationWatcher(@Nonnull boolean isThrottlingEnabled, @Nonnull Property property, @Nonnull NotificationDao notificationDao, @Nonnull PushNotificationSender pushNotificationSender) {
+        this.isThrottlingEnabled = isThrottlingEnabled;
         this.notificationDao = notificationDao;
         this.propertyId = property.getId();
         this.pushNotificationSender = pushNotificationSender;
@@ -79,7 +82,7 @@ class PropertyNotificationWatcher {
         final NeighborRelation relation = new NeighborRelation(accountComplainer, accountOffender);
 
         final Blocking blocking = testIfShouldBlock(relation);
-        if ( blocking.shouldBlock() ) {
+        if ( blocking.shouldBlock() && this.isThrottlingEnabled ) {
             throw new AccessDeniedException(blocking.getBlockingMessage());
         }
         else {
