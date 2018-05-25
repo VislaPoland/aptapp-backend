@@ -7,10 +7,7 @@ import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotification
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.MaintenanceEmployee;
-import com.creatix.domain.entity.store.account.SecurityEmployee;
-import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
@@ -157,12 +154,29 @@ public class NotificationService {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(slotUnitId, "slot unit id is null");
 
+        Account currentAccount = authorizationManager.getCurrentAccount();
+
         notification.setType(NotificationType.Maintenance);
-        notification.setAuthor(authorizationManager.getCurrentAccount());
+        notification.setAuthor(currentAccount);
         notification.setProperty(authorizationManager.getCurrentProperty());
         notification.setStatus(NotificationStatus.Pending);
-        if (null != targetUnitNumber) {
-            notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
+        switch (currentAccount.getRole()) {
+            case Tenant:
+                notification.setTargetApartment(((Tenant) currentAccount).getApartment());
+                break;
+            case SubTenant:
+                notification.setTargetApartment(((SubTenant) currentAccount).getApartment());
+                break;
+            case Administrator:
+            case Maintenance:
+            case PropertyManager:
+            case AssistantPropertyManager:
+                if (null != targetUnitNumber) {
+                    notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
+                }
+                break;
+            default:
+                break;
         }
         maintenanceNotificationDao.persist(notification);
 
