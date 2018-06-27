@@ -110,18 +110,19 @@ public class DiscountCouponService {
         Objects.requireNonNull(request.getId(), "Coupon id can not be null for update");
 
         DiscountCoupon storedCoupon = findCouponById(request.getId());
-        //todo: Annotation on {@link DiscountCoupon} should handle this problem, but for some odd reason is not. Although cascade is not set changes from request are nevertheless propagated.
-        request.setBusinessProfile(businessMapper.toBusinessProfile(storedCoupon.getBusinessProfile()));
 
-        if (authorizationManager.canWrite(storedCoupon.getBusinessProfile().getProperty())) {
+        BusinessProfile businessProfile = storedCoupon.getBusinessProfile();
+        if (authorizationManager.canWrite(businessProfile.getProperty())) {
             businessMapper.map(request, storedCoupon);
+            //todo: Annotation on {@link DiscountCoupon} should handle this problem, but for some odd reason is not. Although cascade is not set changes from request are nevertheless propagated.
+            storedCoupon.setBusinessProfile(businessProfile);
             discountCouponDao.persist(storedCoupon);
             return storedCoupon;
         }
 
         throw new SecurityException(
                 String.format("You are not eligible to create or modify discount coupons for property %d",
-                        storedCoupon.getBusinessProfile().getProperty().getId())
+                        businessProfile.getProperty().getId())
         );
     }
 
