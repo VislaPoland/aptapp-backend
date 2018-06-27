@@ -21,4 +21,13 @@ public class BusinessCategory {
     @Column(nullable = false)
     private String name;
 
+    @Override
+    public int hashCode() {
+        return this.id.intValue();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof BusinessCategory) && (((BusinessCategory) obj).getId()).equals(this.getId());
+    }
 }

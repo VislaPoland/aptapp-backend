@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Tomas Michalek on 12/04/2017.
@@ -34,7 +35,7 @@ public class BusinessProfile implements AttachmentId {
     private Double lng;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<BusinessCategory> businessCategoryList;
+    private Set<BusinessCategory> businessCategoryList;
 
     @OneToMany(mappedBy = "businessProfile", cascade = {CascadeType.REMOVE})
     private List<BusinessProfilePhoto> businessProfilePhotoList;
