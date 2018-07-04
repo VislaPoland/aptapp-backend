@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
-import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 @Component
@@ -25,26 +24,21 @@ public class NotificationJob{
     @Autowired
     private AccountService accountService;
 
-    @Scheduled(cron = "0 40 10 * * ?")
+    @Scheduled(cron = "0 19 12 * * ?")
     public void resendCodes() throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         log.info("ResendCodes job started");
 
         for(Account account:  accountService.getInactiveAccounts()){
-            if(account == null) continue;
             Date created = account.getCreatedAt();
             LocalDate dateCreated = created.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
             Date today = new Date();
             LocalDate dateToday = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
             long daysBetween = DAYS.between(dateCreated, dateToday);
 
             if( daysBetween == 7 || daysBetween == 14){
                 log.info("Resending activation code for accountId: "+account.getId());
                 accountService.resendActivationCode(account.getId());
             }
-
-
         }
     }
 }
