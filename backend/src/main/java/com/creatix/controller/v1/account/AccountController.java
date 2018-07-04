@@ -70,6 +70,21 @@ public class AccountController {
         return new DataResponse<>(mapper.toAccountDto(account));
     }
 
+
+    @ApiOperation(value = "Resend token")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/resendCode/{accountId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<String> resendCode(@PathVariable Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        Account account = authorizationManager.getCurrentAccount();
+        return new DataResponse<>(accountService.resendActivationCode(accountId));
+    }
+
     @ApiOperation(value = "Get user profile information")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),

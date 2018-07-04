@@ -136,6 +136,27 @@ public class AccountService {
         return account.getActionToken();
     }
 
+
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public String resendActivationCode(@NotNull Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        Objects.requireNonNull(accountId, "Account ID is null");
+
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        authorizationManager.checkResetActivationCode(account);
+
+        if ( account.getActive() == Boolean.TRUE ) {
+            throw new IllegalArgumentException(String.format("Account id=%d is already activated", accountId));
+        }
+
+        if(new Date().after(account.getActionTokenValidUntil())){
+            System.out.println("Regenerating token");
+            setActionToken(account);
+            emailMessageService.send(new ResetActivationMessageTemplate(account, applicationProperties));
+        }
+
+        return account.getActionToken();
+    }
+
     public LoginResponse createLoginResponse(String email) {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         final String token = tokenUtils.generateToken(userDetails);
