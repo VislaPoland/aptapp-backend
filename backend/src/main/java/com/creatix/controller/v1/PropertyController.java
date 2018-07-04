@@ -7,8 +7,10 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.*;
 import com.creatix.domain.entity.store.PropertyPhoto;
+import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.AccountService;
 import com.creatix.service.ApplicationFeatureService;
 import com.creatix.service.SlotService;
 import com.creatix.service.property.PropertyService;
@@ -17,20 +19,21 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,6 +45,9 @@ public class PropertyController {
     private Mapper mapper;
     @Autowired
     private PropertyService propertyService;
+
+    @Autowired
+    private AccountService accountService;
     @Autowired
     private SlotService slotService;
     @Autowired
@@ -72,6 +78,23 @@ public class PropertyController {
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
     public DataResponse<PropertyDto> getPropertyDetails(@PathVariable long propertyId) {
         return new DataResponse<>(mapper.toPropertyDto(propertyService.getProperty(propertyId)));
+    }
+
+    @ApiOperation(value = "Get property accounts to csv")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{propertyId}/csv", method = RequestMethod.GET, produces = "text/csv")
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
+    public ResponseEntity<String> getPropertyAccounts(final HttpServletResponse response, @PathVariable long propertyId) {
+        response.setHeader("Content-Disposition", "attachment; filename=property_"+propertyId+"_accounts.csv");
+        response.setContentType("text/csv");
+        String csvResponse = propertyService.generateCsvResponse(propertyId);
+        return new ResponseEntity<>(csvResponse, HttpStatus.OK);
+
     }
 
     @ApiOperation(value = "Create new property")

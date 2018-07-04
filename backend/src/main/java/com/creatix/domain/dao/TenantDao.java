@@ -19,4 +19,10 @@ public class TenantDao extends AbstractAccountDao<Tenant> {
                 .fetch();
     }
 
+    public List<Tenant> findByProperty(Long propertyId){
+        return queryFactory.selectFrom(tenant)
+                .where(tenant.apartment.property.id.eq(propertyId))
+                .fetch();
+    }
+
 }
