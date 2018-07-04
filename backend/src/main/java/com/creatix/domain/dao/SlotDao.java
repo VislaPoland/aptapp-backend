@@ -37,7 +37,6 @@ public class SlotDao extends DaoBase<Slot, Long> {
                 .orderBy(slot.id.asc())
                 .fetch();
     }
-
     public List<Slot> findByPropertyAndAccountAndSlotIdGreaterOrEqual(@Nonnull Property property, @Nonnull Account account, @Nonnull Long slotId, @Nonnull Integer pageSize) {
         Objects.requireNonNull(property, "Property is null");
         Objects.requireNonNull(slotId, "Slot id is null");
