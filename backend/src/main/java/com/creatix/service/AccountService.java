@@ -104,7 +104,6 @@ public class AccountService {
 
         account.setActionToken(generator.generate(6));
         account.setActionTokenValidUntil(DateTime.now().plusDays(30).toDate());
-
         accountDao.persist(account);
     }
 
@@ -200,6 +199,10 @@ public class AccountService {
             throw new EntityNotFoundException(String.format("Account email=%s not found", email));
         }
         return account;
+    }
+
+    public List<Account> getInactiveAccounts(){
+        return accountDao.findInactive();
     }
 
     public Account getAccount(Long accountId) {
@@ -641,6 +644,23 @@ public class AccountService {
             throw new ValidationException(String.format("Secondary phone number %s is not valid.", account.getSecondaryPhone()));
         }
     }
+
+    public String resendActivationCode(@NotNull Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        Objects.requireNonNull(accountId, "Account ID is null");
+
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        if ( account.getActive() == Boolean.TRUE ) {
+            throw new IllegalArgumentException(String.format("Account id=%d is already activated", accountId));
+        }
+
+        if(new Date().after(account.getActionTokenValidUntil())){
+            setActionToken(account);
+            emailMessageService.send(new ResetActivationMessageTemplate(account, applicationProperties));
+        }
+
+        return account.getActionToken();
+    }
+
 
     @SuppressWarnings("unchecked")
     private <T extends Account> T getEntityInstance(String email, Class<T> clazz) {
