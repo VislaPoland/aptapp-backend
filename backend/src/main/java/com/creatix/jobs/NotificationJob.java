@@ -24,10 +24,9 @@ public class NotificationJob{
     @Autowired
     private AccountService accountService;
 
-    @Scheduled(cron = "0 19 12 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void resendCodes() throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         log.info("ResendCodes job started");
-
         for(Account account:  accountService.getInactiveAccounts()){
             Date created = account.getCreatedAt();
             LocalDate dateCreated = created.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
