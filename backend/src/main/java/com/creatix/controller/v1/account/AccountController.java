@@ -71,18 +71,18 @@ public class AccountController {
     }
 
 
-    @ApiOperation(value = "Resend token")
+    @ApiOperation(value = "Resend code")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/resendCode/{accountId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/code/resend/{accountId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<String> resendCode(@PathVariable Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+    public DataResponse<String> resendActivationCode(@PathVariable Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Account account = authorizationManager.getCurrentAccount();
-        return new DataResponse<>(accountService.resendActivationCode(accountId));
+        return new DataResponse<>(accountService.resendActivationCodeRequest(accountId));
     }
 
     @ApiOperation(value = "Get user profile information")
