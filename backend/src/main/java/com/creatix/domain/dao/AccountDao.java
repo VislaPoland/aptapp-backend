@@ -113,6 +113,13 @@ public class AccountDao extends DaoBase<Account, Long> {
                 .fetchOne();
     }
 
+    public List<Account> findInactiveTenantsAndSubTenants() {
+        return queryFactory.selectFrom(account)
+                .where(account.active.eq(false)
+                .and(account.role.in(AccountRole.Tenant, AccountRole.SubTenant))
+                ).fetch();
+    }
+
     public Account findByActionToken(String actionToken) {
         return queryFactory.selectFrom(account)
                 .where(account.actionToken.eq(actionToken).and(account.deletedAt.isNull()))

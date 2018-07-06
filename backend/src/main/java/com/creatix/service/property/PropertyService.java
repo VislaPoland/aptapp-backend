@@ -8,7 +8,7 @@ import com.creatix.domain.dto.property.PropertyStatsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.PropertyPhoto;
-import com.creatix.domain.entity.store.account.PropertyOwner;
+import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.PropertyStatus;
 import com.creatix.security.AuthorizationManager;
@@ -38,6 +38,8 @@ public class PropertyService {
     private PropertyOwnerDao propertyOwnerDao;
     @Autowired
     private AccountDao accountDao;
+  @Autowired
+    private TenantDao tenantDao;
 
     @Autowired
     private Mapper mapper;
@@ -126,6 +128,34 @@ public class PropertyService {
         return property;
     }
 
+    private List<Tenant> getTenants(Long propertyId){
+        return tenantDao.findByProperty(propertyId);
+    }
+
+    private String returnCsvRow(TenantBase tenant){
+        StringJoiner joiner = new StringJoiner(",");
+        joiner.add(tenant.getFirstName())
+                .add(tenant.getLastName())
+                .add(tenant.getPrimaryPhone())
+                .add(tenant.getPrimaryEmail())
+                .add(tenant.getCreatedAt().toString());
+        if(tenant.getActionTokenValidUntil() != null ) joiner.add(tenant.getActionTokenValidUntil().toString());
+        else joiner.add("");
+        return joiner.toString();
+    }
+
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public String generateCsvResponse(Long propertyId){
+        String csvResponse = "firstName,lastName,primryPhone,primaryEmail,createdAt,actionTokenValidUntil";
+        for(Tenant tenant: getTenants(propertyId)){
+            csvResponse+="\n"+returnCsvRow(tenant);
+            Set<SubTenant> subTenants = tenant.getSubTenants();
+            for(SubTenant subTenant:subTenants){
+               csvResponse+="\n"+returnCsvRow(subTenant);
+            }
+        }
+        return csvResponse;
+    }
 
     @RoleSecured
     public Property storePropertyPhotos(MultipartFile[] files, long propertyId) throws IOException {

@@ -7,6 +7,7 @@ import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.attachment.EventPhoto;
 import com.creatix.domain.entity.store.notification.EventInviteNotification;
 import com.creatix.domain.entity.store.notification.NotificationGroup;
 import com.creatix.domain.enums.*;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -70,6 +72,8 @@ public class SlotService {
     private NotificationDao notificationDao;
     @Autowired
     private NotificationGroupDao notificationGroupDao;
+    @Autowired
+    private AttachmentService attachmentService;
 
     @Nonnull
     public ScheduledSlotsResponse getSlotsByFilter(@Nonnull Long propertyId, @Nullable LocalDate beginDate, @Nullable LocalDate endDate, @Nullable Long startId, @Nullable Integer pageSize) {
@@ -554,6 +558,25 @@ public class SlotService {
             attendants = Collections.emptyList();
         }
         return attendants;
+    }
+
+    public EventSlot storeEventSlotPhotos(MultipartFile[] files, long eventSlotId) {
+        final EventSlot eventSlot = eventSlotDao.findById(eventSlotId);
+        List<EventPhoto> photoStoreList;
+        try {
+            photoStoreList = attachmentService.storeAttachments(files, foreignKeyObject -> {
+                EventPhoto eventPhoto = new EventPhoto();
+                eventPhoto.setEventSlot(eventSlot);
+                return eventPhoto;
+            }, eventSlot, EventPhoto.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Unable to store photo for event slot", e);
+        }
+
+        eventSlot.getEventPhotos().addAll(photoStoreList);
+        eventSlotDao.persist(eventSlot);
+
+        return eventSlot;
     }
 
 }

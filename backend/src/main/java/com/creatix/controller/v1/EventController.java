@@ -11,6 +11,7 @@ import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
 import com.creatix.domain.dto.property.slot.UpdateEventSlotRequest;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.EventInviteResponse;
+import com.creatix.domain.mapper.EventSlotMapper;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.SlotService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -24,6 +25,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -40,6 +42,8 @@ public class EventController {
     private SlotService slotService;
     @Autowired
     private Mapper mapper;
+  @Autowired
+    private EventSlotMapper eventSlotMapper;
 
 
     @ApiOperation(value = "Get events", notes = "Get all events for single property where event begin time falls within desired time span.")
@@ -126,4 +130,17 @@ public class EventController {
         return new DataResponse<>(mapper.toEventSlotDto(slotService.deleteEventSlotById(eventSlotId)));
     }
 
+    @ApiOperation(value = "Upload event slot photos")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/api/v1/events/{eventSlotId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<EventSlotDto> storeEventPhotos(@RequestParam MultipartFile[] files, @PathVariable long eventSlotId) {
+        return new DataResponse<>(
+                eventSlotMapper.toEventSlotDto(slotService.storeEventSlotPhotos(files, eventSlotId))
+        );
+    }
 }
