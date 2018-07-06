@@ -32,7 +32,7 @@ public class EventSlotMapper extends ConfigurableMapper {
                     @Override
                     public void mapAtoB(EventPhoto eventPhoto, EventPhotoDto eventPhotoDto, MappingContext context) {
                         try {
-                            eventPhotoDto.setFileUrl(getCartPhotoUrl(eventPhoto));
+                            eventPhotoDto.setFileUrl(getPhotoUrl(eventPhoto));
                         } catch (MalformedURLException e) {
                             throw new IllegalStateException("Failed to create download URL", e);
                         }
@@ -42,7 +42,7 @@ public class EventSlotMapper extends ConfigurableMapper {
     }
 
     @NotNull
-    private String getCartPhotoUrl(@NotNull EventPhoto eventPhoto) throws MalformedURLException {
+    private String getPhotoUrl(@NotNull EventPhoto eventPhoto) throws MalformedURLException {
         return applicationProperties.buildBackendUrl(
                 String.format(
                         "api/attachments/%d/%s",
