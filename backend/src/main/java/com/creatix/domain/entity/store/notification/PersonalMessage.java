@@ -1,6 +1,7 @@
 package com.creatix.domain.entity.store.notification;
 
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.attachment.AttachmentId;
 import com.creatix.domain.enums.message.PersonalMessageDeleteStatus;
 import com.creatix.domain.enums.message.PersonalMessageStatusType;
 import lombok.Data;
@@ -8,13 +9,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Created by Tomas Michalek on 26/05/2017.
  */
 @Entity
 @Data
-public class PersonalMessage {
+public class PersonalMessage implements AttachmentId {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -44,6 +46,9 @@ public class PersonalMessage {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     public PersonalMessageGroup personalMessageGroup;
+
+    @OneToMany(mappedBy = "personalMessage", cascade = {CascadeType.REMOVE})
+    private List<PersonalMessagePhoto> personalMessagePhotos;
 
     @PrePersist
     @PreUpdate
