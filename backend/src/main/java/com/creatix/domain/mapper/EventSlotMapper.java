@@ -53,7 +53,7 @@ public class EventSlotMapper extends ConfigurableMapper {
     }
 
     public EventSlotDto toEventSlotDto(@NotNull EventSlot eventSlot) {
-        Objects.requireNonNull(eventSlot, "Business profile must not be null");
+        Objects.requireNonNull(eventSlot, "Event slot must not be null");
         return this.map(eventSlot, EventSlotDto.class);
     }
 
