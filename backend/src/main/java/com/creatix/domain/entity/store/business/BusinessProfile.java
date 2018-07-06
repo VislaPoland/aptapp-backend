@@ -1,4 +1,4 @@
-        package com.creatix.domain.entity.store.business;
+package com.creatix.domain.entity.store.business;
 
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.attachment.AttachmentId;
