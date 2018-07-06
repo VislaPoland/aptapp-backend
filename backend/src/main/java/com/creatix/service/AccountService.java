@@ -103,8 +103,7 @@ public class AccountService {
                 .withinRange('0', '9').build();
 
         account.setActionToken(generator.generate(6));
-        account.setActionTokenValidUntil(DateTime.now().plusDays(7).toDate());
-
+        account.setActionTokenValidUntil(DateTime.now().plusDays(30).toDate());
         accountDao.persist(account);
     }
 
@@ -136,6 +135,33 @@ public class AccountService {
         return account.getActionToken();
     }
 
+
+    public List<Account> getInactiveTenantsAndSubTenants(){
+        return accountDao.findInactiveTenantsAndSubTenants();
+    }
+
+
+    public String resendActivationCode(@NotNull Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        Objects.requireNonNull(accountId, "Account is null");
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+
+        if ( account.getActive() == Boolean.TRUE ) {
+            throw new IllegalArgumentException(String.format("Account id=%d is already activated", account.getId()));
+        }
+        if(new Date().after(account.getActionTokenValidUntil())){
+            setActionToken(account);
+        }
+        emailMessageService.send(new ResetActivationMessageTemplate(account, applicationProperties));
+        return account.getActionToken();
+    }
+
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public String resendActivationCodeRequest(@NotNull Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        authorizationManager.checkResetActivationCode(account);
+        return resendActivationCode(accountId);
+    }
+    
     public LoginResponse createLoginResponse(String email) {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         final String token = tokenUtils.generateToken(userDetails);
