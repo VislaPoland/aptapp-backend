@@ -145,8 +145,8 @@ public class AccountService {
         }
         if(new Date().after(account.getActionTokenValidUntil())){
             setActionToken(account);
-            emailMessageService.send(new ResetActivationMessageTemplate(account, applicationProperties));
         }
+        emailMessageService.send(new ResetActivationMessageTemplate(account, applicationProperties));
         return account.getActionToken();
     }
 
