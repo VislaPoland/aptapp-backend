@@ -27,7 +27,7 @@ public class NotificationJob{
     @Scheduled(cron = "0 0 0 * * ?")
     public void resendCodes() throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         log.info("ResendCodes job started");
-        for(Account account:  accountService.getInactiveAccounts()){
+        for(Account account:  accountService.getInactiveTenantsAndSubTenants()){
             Date created = account.getCreatedAt();
             LocalDate dateCreated = created.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             Date today = new Date();
