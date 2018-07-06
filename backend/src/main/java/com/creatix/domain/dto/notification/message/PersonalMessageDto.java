@@ -44,4 +44,6 @@ public class PersonalMessageDto {
     @ApiModelProperty
     private PersonalMessageDeleteStatus deleteStatus;
 
+    @ApiModelProperty("List of photos for personal message")
+    private List<PersonalMessagePhotoDto> personalMessagePhotos;
 }
