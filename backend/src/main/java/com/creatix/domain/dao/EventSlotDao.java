@@ -9,8 +9,10 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nonnull;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,14 @@ public class EventSlotDao extends DaoBase<EventSlot, Long> {
                 .where(predicate)
                 .fetch();
     }
+
+    public EventSlot findById(@Nonnull Long slotId) {
+        Objects.requireNonNull(slotId, "SlotId is null");
+        return queryFactory.selectFrom(eventSlot)
+                .where(eventSlot.id.eq(slotId))
+                .fetchOne();
+    }
+
 
     @Override
     public void delete(EventSlot entity) {

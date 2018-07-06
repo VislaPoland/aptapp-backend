@@ -25,4 +25,5 @@
     <include file="classpath:db/changelog/db.changelog-20171023-addPropertyConfiguration.xml"/>
     <include file="classpath:db/changelog/db.changelog-20171024-updateNotificationStatus.xml"/>
     <include file="classpath:db/changelog/db.changelog-20171106-removeCompanyNameFromAccount.xml"/>
+    <include file="classpath:db/changelog/db.changelog-20180706-addColumnsToAttachment.xml"/>
 </databaseChangeLog>

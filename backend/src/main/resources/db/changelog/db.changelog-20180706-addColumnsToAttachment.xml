@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Lubos Zlatolavek" id="db.changelog-201807061317">
+        <comment>Add event_slot_id and personal_message_id  column to attachment.</comment>
+        <addColumn tableName="attachment">
+            <column name="event_slot_id" type="bigint"/>
+            <column name="personal_message_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
