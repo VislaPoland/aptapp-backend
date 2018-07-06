@@ -26,7 +26,7 @@ public class EventSlotDto extends SlotDto {
     @ApiModelProperty(value = "Audience", required = true)
     private AudienceType audience;
     @ApiModelProperty(value = "Photos", required = true)
-    private List<EventPhoto> eventPhotos;
+    private List<EventPhotoDto> eventPhotos;
     @Override
     public SlotType getType() {
         return SlotType.Event;
