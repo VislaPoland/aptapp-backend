@@ -135,6 +135,7 @@ public class AccountService {
         return account.getActionToken();
     }
 
+
     public List<Account> getInactiveTenantsAndSubTenants(){
         return accountDao.findInactiveTenantsAndSubTenants();
     }
@@ -150,11 +151,17 @@ public class AccountService {
         if(new Date().after(account.getActionTokenValidUntil())){
             setActionToken(account);
         }
-
         emailMessageService.send(new ResetActivationMessageTemplate(account, applicationProperties));
         return account.getActionToken();
     }
 
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public String resendActivationCodeRequest(@NotNull Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        authorizationManager.checkResetActivationCode(account);
+        return resendActivationCode(accountId);
+    }
+    
     public LoginResponse createLoginResponse(String email) {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         final String token = tokenUtils.generateToken(userDetails);
