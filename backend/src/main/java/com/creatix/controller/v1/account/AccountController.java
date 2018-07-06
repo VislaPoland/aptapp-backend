@@ -17,7 +17,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,9 +81,10 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/code/resend/{accountId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured
-    public DataResponse<String> resendActivationCode(@PathVariable Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+    public ResponseEntity resendActivationCode(@PathVariable Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         Account account = authorizationManager.getCurrentAccount();
-        return new DataResponse<>(accountService.resendActivationCodeRequest(accountId));
+        accountService.resendActivationCodeRequest(accountId);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get user profile information")
