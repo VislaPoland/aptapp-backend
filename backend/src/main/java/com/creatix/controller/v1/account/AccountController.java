@@ -71,22 +71,6 @@ public class AccountController {
         return new DataResponse<>(mapper.toAccountDto(account));
     }
 
-
-    @ApiOperation(value = "Resend code")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Not found")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(value = "/code/resend/{accountId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured
-    public ResponseEntity resendActivationCode(@PathVariable Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
-        Account account = authorizationManager.getCurrentAccount();
-        accountService.resendActivationCodeRequest(accountId);
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
     @ApiOperation(value = "Get user profile information")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -331,5 +315,20 @@ public class AccountController {
     @RequestMapping(value = "/{accountId}/reset/code", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<String> resetCode(@PathVariable Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return new DataResponse<>(accountService.resetActivationCode(accountId));
+    }
+
+    @ApiOperation(value = "Resend activation (re-generate if expired) code")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "{accountId}/resend/code", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public ResponseEntity resendActivationCode(@PathVariable Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        Account account = authorizationManager.getCurrentAccount();
+        accountService.resendActivationCodeRequest(accountId);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }
