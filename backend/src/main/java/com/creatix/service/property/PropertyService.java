@@ -8,12 +8,17 @@ import com.creatix.domain.dto.property.PropertyStatsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.PropertyPhoto;
-import com.creatix.domain.entity.store.account.*;
+import com.creatix.domain.entity.store.account.PropertyOwner;
+import com.creatix.domain.entity.store.account.SubTenant;
+import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.TenantBase;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.PropertyStatus;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +54,8 @@ public class PropertyService {
     private FileUploadProperties uploadProperties;
     @Autowired
     private PropertyPhotoDao propertyPhotoDao;
+
+    private static String[] columns = { "First Name", "Last Name", "Primary phone", "Primary email", "Created date", "Token valid until" };
 
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
@@ -144,6 +151,21 @@ public class PropertyService {
         return joiner.toString();
     }
 
+    private Row addRowToSheet(Sheet sheet, int rowPosition,TenantBase tenant){
+        Row row = sheet.createRow(rowPosition);
+        row.createCell(0).setCellValue(tenant.getFirstName());
+        row.createCell(1).setCellValue(tenant.getLastName());
+        row.createCell(2).setCellValue(tenant.getPrimaryPhone());
+        row.createCell(3).setCellValue(tenant.getPrimaryEmail());
+        row.createCell(4).setCellValue(tenant.getCreatedAt().toString());
+
+        if(tenant.getActionTokenValidUntil() != null )
+            row.createCell(5).setCellValue(tenant.getActionTokenValidUntil().toString());
+        else row.createCell(5).setCellValue("");
+
+        return row;
+    }
+
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public String generateCsvResponse(Long propertyId){
         String csvResponse = "firstName,lastName,primryPhone,primaryEmail,createdAt,actionTokenValidUntil";
@@ -155,6 +177,39 @@ public class PropertyService {
             }
         }
         return csvResponse;
+    }
+
+    public Workbook generateXlsxResponse(Long propertyId){
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Report");
+
+        // create header
+        Font headerFont = workbook.createFont();
+        headerFont.setBoldweight((short)700);
+        CellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setFont(headerFont);
+        Row headerRow = sheet.createRow(0);
+
+        for (int i = 0; i < columns.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columns[i]);
+            cell.setCellStyle(headerCellStyle);
+        }
+        //content
+        int rowPosition = 1;
+        for(Tenant tenant: getTenants(propertyId)){
+            addRowToSheet(sheet,rowPosition++, tenant );
+            Set<SubTenant> subTenants = tenant.getSubTenants();
+            for(SubTenant subTenant:subTenants){
+                addRowToSheet(sheet, rowPosition++, subTenant );
+            }
+        }
+
+        // Resize all columns to fit the content size
+        for (int i = 0; i < columns.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        return workbook;
     }
 
     @RoleSecured

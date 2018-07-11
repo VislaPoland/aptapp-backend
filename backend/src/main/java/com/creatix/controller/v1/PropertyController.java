@@ -7,7 +7,6 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.*;
 import com.creatix.domain.entity.store.PropertyPhoto;
-import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.AccountService;
@@ -19,7 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 @RestController
@@ -95,6 +93,20 @@ public class PropertyController {
         String csvResponse = propertyService.generateCsvResponse(propertyId);
         return new ResponseEntity<>(csvResponse, HttpStatus.OK);
 
+    }
+
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{propertyId}/xlsx", method = RequestMethod.GET, produces = "text/xlsx")
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
+    public void getPropertyAccountsXlsx(final HttpServletResponse response, @PathVariable long propertyId) {
+        response.setHeader("Content-Disposition", "attachment; filename=property_"+propertyId+"_accounts.xlsx");
+        response.setContentType("text/xlsx");
+        Workbook wb = propertyService.generateXlsxResponse(propertyId);
+        try {
+            wb.write(response.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @ApiOperation(value = "Create new property")
