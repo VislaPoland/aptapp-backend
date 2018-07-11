@@ -55,6 +55,8 @@ public class PropertyService {
     @Autowired
     private PropertyPhotoDao propertyPhotoDao;
 
+    private static String[] columns = { "First Name", "Last Name", "Primary phone", "Primary email", "Created date", "Token valid until" };
+
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -149,14 +151,17 @@ public class PropertyService {
         return joiner.toString();
     }
 
-    private Row returnXlsRow(TenantBase tenant, Row row){
+    private Row createXlsxRow(TenantBase tenant, Row row){
         row.createCell(0).setCellValue(tenant.getFirstName());
         row.createCell(1).setCellValue(tenant.getLastName());
         row.createCell(2).setCellValue(tenant.getPrimaryPhone());
         row.createCell(3).setCellValue(tenant.getPrimaryEmail());
         row.createCell(4).setCellValue(tenant.getCreatedAt().toString());
-        if(tenant.getActionTokenValidUntil() != null ) row.createCell(5).setCellValue(tenant.getActionTokenValidUntil().toString());
+
+        if(tenant.getActionTokenValidUntil() != null )
+            row.createCell(5).setCellValue(tenant.getActionTokenValidUntil().toString());
         else row.createCell(5).setCellValue("");
+
         return row;
     }
 
@@ -173,12 +178,11 @@ public class PropertyService {
         return csvResponse;
     }
 
-    public Workbook generateXlsResponse(Long propertyId){
+    public Workbook generateXlsxResponse(Long propertyId){
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Report");
 
         // create header
-        String[] columns = { "First Name", "Last Name", "Primary phone", "Primary email", "Created date", "Token valid until" };
         Font headerFont = workbook.createFont();
         headerFont.setBoldweight((short)700);
         CellStyle headerCellStyle = workbook.createCellStyle();
@@ -194,11 +198,11 @@ public class PropertyService {
         int rowNum = 1;
         for(Tenant tenant: getTenants(propertyId)){
             Row row = sheet.createRow(rowNum++);
-            returnXlsRow(tenant, row);
+            createXlsxRow(tenant, row);
             Set<SubTenant> subTenants = tenant.getSubTenants();
             for(SubTenant subTenant:subTenants){
                 Row subTenantRow = sheet.createRow(rowNum++);
-                returnXlsRow(subTenant, subTenantRow);
+                createXlsxRow(subTenant, subTenantRow);
             }
         }
         // Resize all columns to fit the content size

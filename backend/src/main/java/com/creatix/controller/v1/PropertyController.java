@@ -101,7 +101,7 @@ public class PropertyController {
     public void getPropertyAccountsXlsx(final HttpServletResponse response, @PathVariable long propertyId) {
         response.setHeader("Content-Disposition", "attachment; filename=property_"+propertyId+"_accounts.xlsx");
         response.setContentType("text/xlsx");
-        Workbook wb = propertyService.generateXlsResponse(propertyId);
+        Workbook wb = propertyService.generateXlsxResponse(propertyId);
         try {
             wb.write(response.getOutputStream());
         } catch (IOException e) {
