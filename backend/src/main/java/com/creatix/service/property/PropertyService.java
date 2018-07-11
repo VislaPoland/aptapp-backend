@@ -151,7 +151,8 @@ public class PropertyService {
         return joiner.toString();
     }
 
-    private Row createXlsxRow(TenantBase tenant, Row row){
+    private Row addRowToSheet(Sheet sheet, int rowPosition,TenantBase tenant){
+        Row row = sheet.createRow(rowPosition);
         row.createCell(0).setCellValue(tenant.getFirstName());
         row.createCell(1).setCellValue(tenant.getLastName());
         row.createCell(2).setCellValue(tenant.getPrimaryPhone());
@@ -195,16 +196,15 @@ public class PropertyService {
             cell.setCellStyle(headerCellStyle);
         }
         //content
-        int rowNum = 1;
+        int rowPosition = 1;
         for(Tenant tenant: getTenants(propertyId)){
-            Row row = sheet.createRow(rowNum++);
-            createXlsxRow(tenant, row);
+            addRowToSheet(sheet,rowPosition++, tenant );
             Set<SubTenant> subTenants = tenant.getSubTenants();
             for(SubTenant subTenant:subTenants){
-                Row subTenantRow = sheet.createRow(rowNum++);
-                createXlsxRow(subTenant, subTenantRow);
+                addRowToSheet(sheet, rowPosition++, subTenant );
             }
         }
+
         // Resize all columns to fit the content size
         for (int i = 0; i < columns.length; i++) {
             sheet.autoSizeColumn(i);
