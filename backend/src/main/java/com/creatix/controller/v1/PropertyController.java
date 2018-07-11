@@ -98,7 +98,7 @@ public class PropertyController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}/xlsx", method = RequestMethod.GET, produces = "text/xlsx")
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
-    public void getPropertyAccountsXls(final HttpServletResponse response, @PathVariable long propertyId) {
+    public void getPropertyAccountsXlsx(final HttpServletResponse response, @PathVariable long propertyId) {
         response.setHeader("Content-Disposition", "attachment; filename=property_"+propertyId+"_accounts.xlsx");
         response.setContentType("text/xlsx");
         Workbook wb = propertyService.generateXlsResponse(propertyId);
