@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -95,6 +97,20 @@ public class PropertyController {
         String csvResponse = propertyService.generateCsvResponse(propertyId);
         return new ResponseEntity<>(csvResponse, HttpStatus.OK);
 
+    }
+
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{propertyId}/xls", method = RequestMethod.GET, produces = "text/xlsx")
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
+    public void getPropertyAccountsXls(final HttpServletResponse response, @PathVariable long propertyId) {
+        response.setHeader("Content-Disposition", "attachment; filename=property_"+propertyId+"_accounts.xlsx");
+        response.setContentType("text/xlsx");
+        Workbook wb = propertyService.generateXlsResponse(propertyId);
+        try {
+            wb.write(response.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @ApiOperation(value = "Create new property")

@@ -14,6 +14,8 @@ import com.creatix.domain.enums.PropertyStatus;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -144,6 +148,17 @@ public class PropertyService {
         return joiner.toString();
     }
 
+    private Row returnXlsRow(TenantBase tenant, Row row){
+        row.createCell(0).setCellValue(tenant.getFirstName());
+        row.createCell(1).setCellValue(tenant.getLastName());
+        row.createCell(2).setCellValue(tenant.getPrimaryPhone());
+        row.createCell(3).setCellValue(tenant.getPrimaryEmail());
+        row.createCell(4).setCellValue(tenant.getCreatedAt().toString());
+        if(tenant.getActionTokenValidUntil() != null ) row.createCell(5).setCellValue(tenant.getActionTokenValidUntil().toString());
+        else row.createCell(5).setCellValue("");
+        return row;
+    }
+
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public String generateCsvResponse(Long propertyId){
         String csvResponse = "firstName,lastName,primryPhone,primaryEmail,createdAt,actionTokenValidUntil";
@@ -155,6 +170,41 @@ public class PropertyService {
             }
         }
         return csvResponse;
+    }
+
+    public Workbook generateXlsResponse(Long propertyId){
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Report");
+
+        // create header
+        String[] columns = { "First Name", "Last Name", "Primary phone", "Primary email", "Created date", "Token valid until" };
+        Font headerFont = workbook.createFont();
+        headerFont.setBoldweight((short)700);
+        CellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setFont(headerFont);
+        Row headerRow = sheet.createRow(0);
+
+        for (int i = 0; i < columns.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columns[i]);
+            cell.setCellStyle(headerCellStyle);
+        }
+        //content
+        int rowNum = 1;
+        for(Tenant tenant: getTenants(propertyId)){
+            Row row = sheet.createRow(rowNum++);
+            returnXlsRow(tenant, row);
+            Set<SubTenant> subTenants = tenant.getSubTenants();
+            for(SubTenant subTenant:subTenants){
+                Row subTenantRow = sheet.createRow(rowNum++);
+                returnXlsRow(subTenant, subTenantRow);
+            }
+        }
+        // Resize all columns to fit the content size
+        for (int i = 0; i < columns.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        return workbook;
     }
 
     @RoleSecured
