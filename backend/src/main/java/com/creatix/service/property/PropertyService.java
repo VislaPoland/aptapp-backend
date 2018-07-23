@@ -185,7 +185,7 @@ public class PropertyService {
 
         // create header
         Font headerFont = workbook.createFont();
-        headerFont.setBoldweight((short)700);
+        headerFont.setBold(true);
         CellStyle headerCellStyle = workbook.createCellStyle();
         headerCellStyle.setFont(headerFont);
         Row headerRow = sheet.createRow(0);
