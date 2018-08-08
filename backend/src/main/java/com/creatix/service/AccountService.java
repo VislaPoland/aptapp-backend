@@ -409,7 +409,7 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public PropertyManager createPropertyManager(@NotNull PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
@@ -440,7 +440,7 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public PropertyManager updatePropertyManager(@NotNull Long accountId, @NotNull PersistPropertyManagerRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
@@ -471,7 +471,7 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager})
     public SecurityEmployee createSecurityGuy(@NotNull PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
@@ -493,7 +493,7 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.Security})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.Security})
     public SecurityEmployee updateSecurityGuy(@NotNull Long accountId, @NotNull PersistSecurityGuyRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
@@ -510,7 +510,7 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public MaintenanceEmployee createMaintenanceGuy(@NotNull PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
@@ -532,7 +532,7 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.Maintenance})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.Maintenance})
     public MaintenanceEmployee updateMaintenanceGuy(@NotNull Long accountId, @NotNull PersistMaintenanceGuyRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
@@ -549,7 +549,7 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public AssistantPropertyManager createAssistantPropertyManager(@NotNull PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
@@ -586,7 +586,7 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner})
     public AssistantPropertyManager updateAssistantPropertyManager(@NotNull Long accountId, @NotNull PersistAssistantPropertyManagerRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);

@@ -85,7 +85,7 @@ public class NotificationController {
     })
     @JsonView(Views.NotificationsWithReservation.class)
     @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security})
     public PageableDataResponse<List<NotificationDto>> getNotifications(
             @RequestParam NotificationRequestType requestType,
             @RequestParam int pageSize,
@@ -105,7 +105,7 @@ public class NotificationController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance/{notificationId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE)
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceNotificationDto> getMaintenanceNotificationDetail(@PathVariable Long notificationId) {
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.getMaintenanceNotification(notificationId)));
     }
@@ -132,7 +132,7 @@ public class NotificationController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance/calendar", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE)
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<List<MaintenanceNotificationDto>> getMaintenanceNotificationsInDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) {
@@ -150,7 +150,7 @@ public class NotificationController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/security/{notificationId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security}, feature = ApplicationFeatureType.SECURITY)
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security}, feature = ApplicationFeatureType.SECURITY)
     public DataResponse<SecurityNotificationDto> getSecurityNotificationDetail(@PathVariable Long notificationId) {
         return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.getSecurityNotification(notificationId)));
     }
@@ -163,7 +163,7 @@ public class NotificationController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/security", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.SECURITY)
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.SECURITY)
     public DataResponse<SecurityNotificationDto> saveSecurityNotification(@Valid @RequestBody CreateSecurityNotificationRequest dto) throws IOException, TemplateException {
         SecurityNotification n = mapper.fromSecurityNotificationRequest(dto);
         return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.saveSecurityNotification(n)));
@@ -190,7 +190,7 @@ public class NotificationController {
     })
     @JsonView(Views.NotificationsWithReservation.class)
     @RequestMapping(path = "/maintenance/{notificationId}/respond", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Maintenance, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.MAINTENANCE)
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Maintenance, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceNotificationDto> respondToMaintenanceNotification(@PathVariable Long notificationId, @Valid @RequestBody MaintenanceNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.respondToMaintenanceNotification(notificationId, request)));
     }
@@ -216,7 +216,7 @@ public class NotificationController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood/{notificationId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security}, feature = ApplicationFeatureType.NEIGHBORHOOD)
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance, AccountRole.Security}, feature = ApplicationFeatureType.NEIGHBORHOOD)
     public DataResponse<NeighborhoodNotificationDto> getNeighborhoodNotificationDetail(@PathVariable Long notificationId) {
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.getNeighborhoodNotification(notificationId)));
     }
@@ -242,7 +242,7 @@ public class NotificationController {
     })
     @JsonView(Views.Public.class)
     @GetMapping(path = "/neighborhood/stats", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.NEIGHBORHOOD)
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.NEIGHBORHOOD)
     public DataResponse<NotificationsStatistics> getNeighborhoodNotificationStats(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
                                                                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws IOException, TemplateException {
         return new DataResponse<>(notificationsStatisticsCreator.createForTimeRange(from, till));
@@ -256,7 +256,7 @@ public class NotificationController {
     })
     @JsonView(Views.Public.class)
     @PostMapping(path = "/neighborhood/escalated/{notificationId}/respond", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.NEIGHBORHOOD)
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.NEIGHBORHOOD)
     public DataResponse<NeighborhoodNotificationDto> respondToEscalatedNeighborhoodNotification(@PathVariable long notificationId, @Valid @RequestBody NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.respondToNeighborhoodNotification(notificationId, request)));
     }

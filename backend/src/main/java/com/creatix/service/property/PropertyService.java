@@ -90,7 +90,7 @@ public class PropertyService {
         return property;
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public Property updateFromRequest(Long propertyId, @NotNull UpdatePropertyRequest request) {
         Objects.requireNonNull(request);
 
@@ -263,7 +263,7 @@ public class PropertyService {
         return photo;
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public @NotNull PropertyStatsDto getPropertyStats(@NotNull Long propertyId) {
         Objects.requireNonNull(propertyId, "property id");
 

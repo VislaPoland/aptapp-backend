@@ -26,7 +26,7 @@ public class PropertyEmployeeService {
     @Autowired
     private AuthorizationManager authorizationManager;
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public EmployeeBase delete(@NotNull Long propertyId, @NotNull Long employeeId) {
         Objects.requireNonNull(propertyId);
 

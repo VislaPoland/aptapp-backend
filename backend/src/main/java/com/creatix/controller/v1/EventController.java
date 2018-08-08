@@ -72,7 +72,7 @@ public class EventController {
     })
     @JsonView(Views.Public.class)
     @PostMapping(path = {"/api/properties/{propertyId}/events", "/api/v1/properties/{propertyId}/events"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<EventSlotDto> createEventSlot(@PathVariable Long propertyId, @Valid @RequestBody PersistEventSlotRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toEventSlotDto(slotService.createEventSlot(propertyId, request)));
     }
@@ -125,7 +125,7 @@ public class EventController {
     })
     @JsonView(Views.Public.class)
     @DeleteMapping(path = {"/api/properties/{propertyId}/events/{eventSlotId}", "/api/v1/events/{eventSlotId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<EventSlotDto> deleteEventSlot(@PathVariable Long eventSlotId) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toEventSlotDto(slotService.deleteEventSlotById(eventSlotId)));
     }
