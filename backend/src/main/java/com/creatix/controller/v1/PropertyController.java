@@ -130,7 +130,7 @@ public class PropertyController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<PropertyDto> updateProperty(@PathVariable Long propertyId, @Valid @RequestBody UpdatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDto(propertyService.updateFromRequest(propertyId, request)));
     }
@@ -227,7 +227,7 @@ public class PropertyController {
     })
     @JsonView(Views.Public.class)
     @GetMapping(path = "/{propertyId}/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<PropertyStatsDto> getPropertyStats(@PathVariable Long propertyId) {
         return new DataResponse<>(propertyService.getPropertyStats(propertyId));
     }

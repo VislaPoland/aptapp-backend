@@ -43,7 +43,7 @@ public class AccountResetController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.PropertyOwner})
     @RequestMapping(value = "/reset/code", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<String> resetCode(@Valid @RequestBody ResetCodeRequest request) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         return new DataResponse<>(accountService.resetActivationCode(request));

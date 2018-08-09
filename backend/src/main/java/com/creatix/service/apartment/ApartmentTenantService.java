@@ -28,7 +28,7 @@ public class ApartmentTenantService {
     @Autowired
     private AuthorizationManager authorizationManager;
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public TenantBase delete(@NotNull Long apartmentId, @NotNull Long tenantId) {
         Objects.requireNonNull(apartmentId);
 

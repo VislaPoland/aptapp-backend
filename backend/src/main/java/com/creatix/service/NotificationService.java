@@ -260,7 +260,7 @@ public class NotificationService {
         throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
     }
 
-    @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public NeighborhoodNotification respondToEscalatedNeighborhoodNotification(long notificationId, @Nonnull NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(request, "Notification response request is null");
 
@@ -326,14 +326,14 @@ public class NotificationService {
         throw new SecurityException("You are not eligible to respond to security notifications from another property");
     }
 
-    @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.Maintenance, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceNotification respondToMaintenanceNotification(@Nonnull Long notificationId, @Nonnull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
 
         if ( authorizationManager.hasAnyOfRoles(AccountRole.Maintenance) ) {
             return maintenanceReservationService.employeeRespondToMaintenanceNotification(notification, response);
         }
-        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager) ) {
+        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager) ) {
             return maintenanceReservationService.tenantRespondToMaintenanceReschedule(notification, response);
         }
         else {

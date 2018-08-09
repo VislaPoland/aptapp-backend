@@ -69,7 +69,7 @@ public class PropertyContactController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<PropertyDto.ContactDto> createPropertyContact(@PathVariable Long propertyId, @Valid @RequestBody CreatePropertyContactRequest request) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.create(propertyId, request)));
     }
@@ -82,7 +82,7 @@ public class PropertyContactController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{contactId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<PropertyDto.ContactDto> updatePropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId, @Valid @RequestBody UpdatePropertyContactRequest request) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.update(propertyId, contactId, request)));
     }
@@ -95,7 +95,7 @@ public class PropertyContactController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{contactId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<PropertyDto.ContactDto> deletePropertyContact(@PathVariable Long propertyId, @PathVariable Long contactId) {
         return new DataResponse<>(mapper.toPropertyContact(propertyContactService.delete(propertyId, contactId)));
     }

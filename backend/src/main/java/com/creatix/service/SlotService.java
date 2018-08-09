@@ -333,7 +333,7 @@ public class SlotService {
         return maintenanceSlotDao.findByPropertyIdAndStartBetween(propertyId, beginDt, endDt);
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public MaintenanceSlotSchedule createSchedule(long propertyId, PersistMaintenanceSlotScheduleRequest request) throws SecurityException {
         final Property property = propertyDao.findById(propertyId);
         if ( authorizationManager.isManager(property) || authorizationManager.isOwner(property) ) {
@@ -370,7 +370,7 @@ public class SlotService {
         slots.forEach(this::releaseSlot);
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceSlotSchedule deleteScheduleById(long slotScheduleId) {
         final MaintenanceSlotSchedule schedule = maintenanceSlotScheduleDao.findById(slotScheduleId);
         if ( schedule == null ) {
