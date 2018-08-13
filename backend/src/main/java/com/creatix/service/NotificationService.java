@@ -66,6 +66,8 @@ public class NotificationService {
     private MaintenanceReservationService maintenanceReservationService;
     @Autowired
     private NotificationWatcher notificationWatcher;
+    @Autowired
+    private PropertyDao propertyDao;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -81,6 +83,7 @@ public class NotificationService {
             @Nullable NotificationStatus[] notificationStatus,
             @Nullable NotificationType[] notificationType,
             @Nullable Long startId,
+            @Nullable Long propertyId,
             int pageSize) {
         Objects.requireNonNull(requestType, "Request type is null");
 
@@ -92,6 +95,7 @@ public class NotificationService {
                 notificationType,
                 startId,
                 account,
+                findPropertyById(propertyId),
                 pageSize + 1);
 
 
@@ -150,7 +154,7 @@ public class NotificationService {
     }
 
     @RoleSecured
-    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Nonnull Long slotUnitId) throws IOException, TemplateException {
+    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Nonnull Long slotUnitId, @Nullable Long propertyId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(slotUnitId, "slot unit id is null");
 
@@ -158,7 +162,11 @@ public class NotificationService {
 
         notification.setType(NotificationType.Maintenance);
         notification.setAuthor(currentAccount);
-        notification.setProperty(authorizationManager.getCurrentProperty());
+        if (propertyId == null) {
+            notification.setProperty(authorizationManager.getCurrentProperty());
+        } else {
+            notification.setProperty(findPropertyById(propertyId));
+        }
         notification.setStatus(NotificationStatus.Pending);
         switch (currentAccount.getRole()) {
             case Tenant:
@@ -363,4 +371,17 @@ public class NotificationService {
         return apartment;
     }
 
+    @Nullable
+    private Property findPropertyById(@Nullable Long propertyId) {
+        if (propertyId == null) {
+            return null;
+        }
+
+        Property property = propertyDao.findById(propertyId);
+
+        if (null == property) {
+            throw new EntityNotFoundException(String.format("Property %d not found", propertyId));
+        }
+        return property;
+    }
 }

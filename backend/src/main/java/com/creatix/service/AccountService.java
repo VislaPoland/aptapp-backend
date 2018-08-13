@@ -415,14 +415,17 @@ public class AccountService {
         preventAccountDuplicity(request.getPrimaryEmail());
 
         Property managedProperty;
-        if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
-            Objects.requireNonNull(request.getManagedPropertyId(), "Managed property id is null");
+        switch (authorizationManager.getCurrentAccount().getRole()) {
+            case Administrator:
+            case PropertyOwner:
+                Objects.requireNonNull(request.getManagedPropertyId(), "Managed property id is null");
 
-            managedProperty = propertyDao.findById(request.getManagedPropertyId());
-            authorizationManager.checkOwner(managedProperty);
-        }
-        else {
-            managedProperty = authorizationManager.getCurrentProperty();
+                managedProperty = propertyDao.findById(request.getManagedPropertyId());
+                authorizationManager.checkOwner(managedProperty);
+                break;
+            default:
+                managedProperty = authorizationManager.getCurrentProperty();
+                break;
         }
 
         final PropertyManager account = this.getEntityInstance(request.getPrimaryEmail(), PropertyManager.class);
@@ -447,18 +450,21 @@ public class AccountService {
 
         Property managedProperty;
         PropertyManager account;
-        if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
-            Objects.requireNonNull(request.getManagedPropertyId());
 
-            managedProperty = propertyDao.findById(request.getManagedPropertyId());
-            authorizationManager.checkOwner(managedProperty);
-            account = propertyManagerDao.findById(accountId);
+        switch (authorizationManager.getCurrentAccount().getRole()) {
+            case Administrator:
+            case PropertyOwner:
+                Objects.requireNonNull(request.getManagedPropertyId());
+
+                managedProperty = propertyDao.findById(request.getManagedPropertyId());
+                authorizationManager.checkOwner(managedProperty);
+                account = propertyManagerDao.findById(accountId);
+            default:
+                managedProperty = authorizationManager.getCurrentProperty();
+                account = propertyManagerDao.findById(accountId);
+                authorizationManager.isSelf(account);
         }
-        else {
-            managedProperty = authorizationManager.getCurrentProperty();
-            account = propertyManagerDao.findById(accountId);
-            authorizationManager.isSelf(account);
-        }
+
         preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
         if ( account.getRole() != AccountRole.PropertyManager ) {
             throw new SecurityException("Account role change is not allowed.");
@@ -476,7 +482,13 @@ public class AccountService {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
 
-        final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
+        final PropertyManager manager;
+        if (authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyManager) {
+            manager = (PropertyManager) authorizationManager.getCurrentAccount();
+        } else {
+            // TODO not best way how to select manager, this need to be changed in future
+            manager = propertyDao.findById(request.getPropertyId()).getManagers().iterator().next();
+        }
 
         final SecurityEmployee account = this.getEntityInstance(request.getPrimaryEmail(), SecurityEmployee.class);
         account.setRole(AccountRole.Security);
@@ -515,7 +527,19 @@ public class AccountService {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
 
-        final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
+        final PropertyManager manager;
+        switch (authorizationManager.getCurrentAccount().getRole()) {
+            case PropertyManager:
+            case PropertyOwner:
+                manager = (PropertyManager) authorizationManager.getCurrentAccount();
+                break;
+            case Administrator:
+                // TODO not best way how to select manager, this need to be changed in future
+                manager = propertyDao.findById(request.getPropertyId()).getManagers().iterator().next();
+                break;
+            default:
+                throw new SecurityException("Not allowed to perform action");
+        }
 
         final MaintenanceEmployee account = this.getEntityInstance(request.getPrimaryEmail(), MaintenanceEmployee.class);
         account.setRole(AccountRole.Maintenance);
@@ -556,19 +580,25 @@ public class AccountService {
 
         final Account currentAccount = authorizationManager.getCurrentAccount();
         final PropertyManager manager;
-        if ( currentAccount instanceof PropertyManager ) {
-            manager = (PropertyManager) currentAccount;
-        }
-        else if ( currentAccount instanceof PropertyOwner ) {
-            Objects.requireNonNull(request.getManagerId(), "Manager is null");
-            manager = propertyManagerDao.findById(request.getManagerId());
-            if ( manager == null ) {
-                throw new EntityNotFoundException(String.format("Property manager id=%d not found", request.getManagerId()));
-            }
-            authorizationManager.checkOwner(manager.getManagedProperty());
-        }
-        else {
-            throw new SecurityException("Not allowed to perform action");
+
+        switch(authorizationManager.getCurrentAccount().getRole()) {
+            case PropertyManager:
+                manager = (PropertyManager) currentAccount;
+                break;
+            case PropertyOwner:
+                Objects.requireNonNull(request.getManagerId(), "Manager is null");
+                manager = propertyManagerDao.findById(request.getManagerId());
+                if ( manager == null ) {
+                    throw new EntityNotFoundException(String.format("Property manager id=%d not found", request.getManagerId()));
+                }
+                authorizationManager.checkOwner(manager.getManagedProperty());
+                break;
+            case Administrator:
+                // TODO not best way how to select manager, this need to be changed in future
+                manager = propertyDao.findById(request.getPropertyId()).getManagers().iterator().next();
+                break;
+            default:
+                throw new SecurityException("Not allowed to perform action");
         }
 
         final AssistantPropertyManager account = this.getEntityInstance(request.getPrimaryEmail(), AssistantPropertyManager.class);
