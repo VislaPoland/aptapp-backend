@@ -1,5 +1,6 @@
 package com.creatix.domain.dao;
 
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.NotificationRequestType;
@@ -33,6 +34,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
             @Nullable NotificationType[] notificationTypes,
             @Nullable Long startId,
             @NotNull Account account,
+            @Nullable Property property,
             int pageSize) {
 
         final QNotification qNotification = QNotification.notification;
@@ -115,6 +117,17 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                                     qNotification.recipient.eq(authorizationManager.getCurrentAccount())
                             )
                     );
+                    break;
+                case Administrator:
+                    if (property != null) {
+                        predicate = predicate.and(
+                                qNotification.property.eq(
+                                        property
+                                ).or(
+                                        qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                                )
+                        );
+                    }
                     break;
                 case Maintenance:
                     predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class)).and(

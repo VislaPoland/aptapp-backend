@@ -91,9 +91,10 @@ public class NotificationController {
             @RequestParam int pageSize,
             @RequestParam(required = false) Long startId,
             @RequestParam(required = false) NotificationStatus[] notificationStatus,
-            @RequestParam(required = false) NotificationType[] notificationType) {
+            @RequestParam(required = false) NotificationType[] notificationType,
+            @RequestParam(required = false) Long propertyId) {
 
-        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, pageSize),
+        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, propertyId, pageSize),
                 n -> mapper.toNotificationDto(n, this.getMappingClass(n.getClass())));
     }
 
@@ -121,7 +122,7 @@ public class NotificationController {
     @RoleSecured(feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@Valid @RequestBody CreateMaintenanceNotificationRequest dto) throws IOException, TemplateException {
         MaintenanceNotification n = mapper.fromMaintenanceNotificationRequest(dto);
-        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n, dto.getSlotUnitId())));
+        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n, dto.getSlotUnitId(), dto.getPropertyId())));
     }
 
     @ApiOperation(value = "Get all maintenance notifications in date range")
