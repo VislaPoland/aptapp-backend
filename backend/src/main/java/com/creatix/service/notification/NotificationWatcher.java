@@ -39,7 +39,7 @@ public class NotificationWatcher {
         synchronized ( watcherMap ) {
             PropertyNotificationWatcher watcher = watcherMap.get(propertyId);
             if ( watcher == null ) {
-                watcher = new PropertyNotificationWatcher(pushNotificationProperties.isThrottlingEnabled(), notification.getProperty(), notificationDao, pushNotificationSender);
+                watcher = new PropertyNotificationWatcher(pushNotificationProperties.getIsThrottlingEnabled(), notification.getProperty(), notificationDao, pushNotificationSender);
                 watcherMap.put(propertyId, watcher);
             }
             watcher.processNotification(notification);
