@@ -138,11 +138,11 @@ public class NotificationService {
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
     }
 
-    public SecurityNotification saveSecurityNotification(@Nonnull SecurityNotification notification) throws IOException, TemplateException {
+    public SecurityNotification saveSecurityNotification(@Nonnull SecurityNotification notification, @Nullable Long propertyId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         notification.setType(NotificationType.Security);
         notification.setAuthor(authorizationManager.getCurrentAccount());
-        notification.setProperty(authorizationManager.getCurrentProperty());
+        notification.setProperty(propertyId != null ? propertyDao.findById(propertyId) : authorizationManager.getCurrentProperty());
         notification.setStatus(NotificationStatus.Pending);
         securityNotificationDao.persist(notification);
 

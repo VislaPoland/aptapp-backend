@@ -167,7 +167,7 @@ public class NotificationController {
     @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.SECURITY)
     public DataResponse<SecurityNotificationDto> saveSecurityNotification(@Valid @RequestBody CreateSecurityNotificationRequest dto) throws IOException, TemplateException {
         SecurityNotification n = mapper.fromSecurityNotificationRequest(dto);
-        return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.saveSecurityNotification(n)));
+        return new DataResponse<>(mapper.toSecurityNotificationDto(notificationService.saveSecurityNotification(n, dto.getPropertyId())));
     }
 
     @ApiOperation(value = "Respond to security notification")

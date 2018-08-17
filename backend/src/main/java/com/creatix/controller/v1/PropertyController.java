@@ -95,6 +95,22 @@ public class PropertyController {
 
     }
 
+    @ApiOperation(value = "Get users all properties accounts to csv")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/all/csv", method = RequestMethod.GET, produces = "text/csv")
+    @RoleSecured({AccountRole.Administrator})
+    public ResponseEntity<String> getAllPropertyAccounts(final HttpServletResponse response) {
+        response.setHeader("Content-Disposition", "attachment; filename=all_property_accounts.csv");
+        response.setContentType("text/csv");
+        String csvResponse = propertyService.generateAllCsvResponse();
+        return new ResponseEntity<>(csvResponse, HttpStatus.OK);
+    }
+
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}/xlsx", method = RequestMethod.GET, produces = "text/xlsx")
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})

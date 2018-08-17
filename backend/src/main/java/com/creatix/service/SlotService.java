@@ -336,7 +336,7 @@ public class SlotService {
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public MaintenanceSlotSchedule createSchedule(long propertyId, PersistMaintenanceSlotScheduleRequest request) throws SecurityException {
         final Property property = propertyDao.findById(propertyId);
-        if ( authorizationManager.isManager(property) || authorizationManager.isOwner(property) ) {
+        if ( authorizationManager.isManager(property) || authorizationManager.isOwner(property) || AccountRole.Administrator.equals(authorizationManager.getCurrentAccount().getRole())) {
 
             final boolean releasePreviousSchedule = (property.getSchedule() != null);
 
