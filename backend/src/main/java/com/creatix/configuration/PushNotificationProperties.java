@@ -43,11 +43,11 @@ public class PushNotificationProperties {
         this.googleCloudMessagingKey = googleCloudMessagingKey;
     }
 
-    public boolean isThrottlingEnabled() {
+    public boolean getIsThrottlingEnabled() {
         return isThrottlingEnabled;
     }
 
-    public void setThrottlingEnabled(boolean throttlingEnabled) {
+    public void setIsThrottlingEnabled(boolean throttlingEnabled) {
         isThrottlingEnabled = throttlingEnabled;
     }
 }
