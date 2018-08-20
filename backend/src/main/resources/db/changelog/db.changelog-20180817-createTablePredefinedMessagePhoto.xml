@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="martin dupal" id="db.changelog-20180817">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="predefined_message_photo"/>
+            </not>
+        </preConditions>
+        <createTable tableName="predefined_message_photo">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_path" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="predefined_message_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="id" constraintName="predefined_message_photo_pkey" tableName="predefined_message_photo"/>
+
+        <createIndex indexName="ig4QxZvj9dPgnE0f0zeYKRz65T0m" tableName="predefined_message_photo">
+            <column name="predefined_message_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="predefined_message_id" baseTableName="predefined_message_photo" constraintName="FKF4xHRJm9SdfBfuz1jiskbOqoZ" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="predefined_message"/>
+    </changeSet>
+
+</databaseChangeLog>
