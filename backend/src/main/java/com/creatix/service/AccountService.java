@@ -415,11 +415,13 @@ public class AccountService {
         preventAccountDuplicity(request.getPrimaryEmail());
 
         Property managedProperty;
+        Objects.requireNonNull(request.getManagedPropertyId(), "Managed property id is null");
+
         switch (authorizationManager.getCurrentAccount().getRole()) {
             case Administrator:
+                managedProperty = propertyDao.findById(request.getManagedPropertyId());
+                break;
             case PropertyOwner:
-                Objects.requireNonNull(request.getManagedPropertyId(), "Managed property id is null");
-
                 managedProperty = propertyDao.findById(request.getManagedPropertyId());
                 authorizationManager.checkOwner(managedProperty);
                 break;
@@ -451,14 +453,18 @@ public class AccountService {
         Property managedProperty;
         PropertyManager account;
 
+        Objects.requireNonNull(request.getManagedPropertyId());
+
         switch (authorizationManager.getCurrentAccount().getRole()) {
             case Administrator:
+                managedProperty = propertyDao.findById(request.getManagedPropertyId());
+                account = propertyManagerDao.findById(accountId);
+                break;
             case PropertyOwner:
-                Objects.requireNonNull(request.getManagedPropertyId());
-
                 managedProperty = propertyDao.findById(request.getManagedPropertyId());
                 authorizationManager.checkOwner(managedProperty);
                 account = propertyManagerDao.findById(accountId);
+                break;
             default:
                 managedProperty = authorizationManager.getCurrentProperty();
                 account = propertyManagerDao.findById(accountId);

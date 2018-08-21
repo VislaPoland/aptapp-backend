@@ -96,7 +96,8 @@ public class PropertyService {
 
         final Property property = getOrElseThrow(propertyId, propertyDao, new EntityNotFoundException(String.format("Property %d not found", propertyId)));
 
-        if ( authorizationManager.canUpdateProperty(property) ) {
+        // we are not distinguish Administrator vs PO/PM, so update is same as write
+        if ( authorizationManager.canWrite(property) ) {
             if ( request.getPropertyOwnerId() != null ) {
                 final PropertyOwner propertyOwner = propertyOwnerDao.findById(request.getPropertyOwnerId());
                 if ( propertyOwner == null ) {
@@ -168,7 +169,7 @@ public class PropertyService {
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public String generateCsvResponse(Long propertyId){
-        String csvResponse = "firstName,lastName,primryPhone,primaryEmail,createdAt,actionTokenValidUntil";
+        String csvResponse = "First Name,Last Name,Primary Phone,Primary Email,Created At,Action Token Valid Until";
         for(Tenant tenant: getTenants(propertyId)){
             csvResponse+="\n"+returnCsvRow(tenant);
             Set<SubTenant> subTenants = tenant.getSubTenants();
@@ -177,6 +178,11 @@ public class PropertyService {
             }
         }
         return csvResponse;
+    }
+
+    public String generateAllCsvResponse(){
+        Map<String, String> allTenant = propertyDao.findAll().stream().collect(Collectors.toMap(property -> property.getName(), property -> generateCsvResponse(property.getId())));
+        return allTenant.entrySet().stream().map(entry ->  entry.getKey() + "\n" + entry.getValue() + "\n").collect(Collectors.joining("\n"));
     }
 
     public Workbook generateXlsxResponse(Long propertyId){

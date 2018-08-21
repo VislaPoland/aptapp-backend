@@ -246,12 +246,6 @@ public class AuthorizationManager {
         }
     }
 
-    // same as read accessibility except Administrator
-    public boolean canUpdateProperty(Property property) {
-        final Account account = getCurrentAccount();
-        return !account.getRole().equals(AccountRole.Administrator) && canWrite(property);
-    }
-
     public boolean canRead(@NotNull MaintenanceReservation reservation) {
         Objects.requireNonNull(reservation, "Maintenance reservation is null");
 

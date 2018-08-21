@@ -71,7 +71,10 @@ public class TenantService {
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
                 new EntityNotFoundException(String.format("Apartment with id %d not found", request.getApartmentId())));
-        authorizationManager.checkManager(apartment.getProperty());
+
+        if (authorizationManager.getCurrentAccount().getRole() != AccountRole.Administrator) {
+            authorizationManager.checkManager(apartment.getProperty());
+        }
 
         if ( apartment.getTenant() != null ) {
             throw new IllegalArgumentException(String.format("Apartment id=%d has already tenant id=%d assigned.", apartment.getId(), apartment.getTenant().getId()));
