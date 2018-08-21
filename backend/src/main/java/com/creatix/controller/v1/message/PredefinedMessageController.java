@@ -6,6 +6,7 @@ import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.message.CreatePredefinedMessageRequest;
 import com.creatix.domain.dto.property.message.PredefinedMessageDto;
+import com.creatix.domain.entity.store.PredefinedMessagePhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PredefinedMessageService;
@@ -13,14 +14,22 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,5 +99,42 @@ public class PredefinedMessageController {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public HttpEntity<PredefinedMessageDto> deletePredefinedMessage(@NotNull @PathVariable Long messageId) {
         return new HttpEntity<>(mapper.toPredefinedMessageDto(predefinedMessageService.deleteById(messageId)));
+    }
+
+    @ApiOperation(value = "Upload predefined message photo")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/{predefinedMessageId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<PredefinedMessageDto> storePredefinedMessagePhotos(@RequestParam MultipartFile[] files, @PathVariable long predefinedMessageId) throws IOException {
+        return new DataResponse<>(
+                mapper.toPredefinedMessageDto(predefinedMessageService.storePredefinedMessagePhotos(files, predefinedMessageId))
+        );
+    }
+
+    @ApiOperation(value = "Download predefined message photo")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{predefinedMessageId}/photos/{fileName:.+}", method = RequestMethod.GET)
+    @ResponseBody
+    @RoleSecured
+    public HttpEntity<byte[]> downloadPredefinedMessagePhoto(@PathVariable Long predefinedMessageId, @PathVariable String fileName) throws IOException {
+        final PredefinedMessagePhoto photo = predefinedMessageService.getPredefinedMessagePhoto(predefinedMessageId, fileName);
+        final File photoFile = new File(photo.getFilePath());
+        final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf(Files.probeContentType(photoFile.toPath())));
+        headers.setContentLength(photoFileData.length);
+
+        return new HttpEntity<>(photoFileData, headers);
     }
 }

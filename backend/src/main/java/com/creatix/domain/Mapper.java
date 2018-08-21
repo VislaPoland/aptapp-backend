@@ -25,6 +25,7 @@ import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.*;
 import com.creatix.domain.dto.property.message.CreatePredefinedMessageRequest;
 import com.creatix.domain.dto.property.message.PredefinedMessageDto;
+import com.creatix.domain.dto.property.message.PredefinedMessagePhotoDto;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
@@ -84,6 +85,9 @@ public class Mapper {
     }
     private String createPropertyPhotoDownloadUrl(PropertyPhoto photo) throws MalformedURLException, URISyntaxException {
         return applicationProperties.buildBackendUrl(String.format("api/properties/%d/photos/%s", photo.getProperty().getId(), photo.getFileName())).toString();
+    }
+    private String createPredefinedMessagePhotoDownloadUrl(PredefinedMessagePhoto photo) throws MalformedURLException, URISyntaxException {
+        return applicationProperties.buildBackendUrl(String.format("/api/properties/%d/messages/predefined/%d/photos/%s", photo.getPredefinedMessage().getProperty().getId(), photo.getPredefinedMessage().getId(), photo.getFileName())).toString();
     }
 
     private void configure(MapperFactory mapperFactory) {
@@ -323,6 +327,21 @@ public class Mapper {
                     public void mapAtoB(NotificationPhoto a, NotificationPhotoDto b, MappingContext context) {
                         try {
                             b.setFileUrl(createNotificationPhotoDownloadUrl(a));
+                        }
+                        catch ( MalformedURLException | URISyntaxException e ) {
+                            throw new IllegalStateException("Failed to create download URL", e);
+                        }
+                    }
+                })
+                .register();
+
+        mapperFactory.classMap(PredefinedMessagePhoto.class, PredefinedMessagePhotoDto.class)
+                .byDefault()
+                .customize(new CustomMapper<PredefinedMessagePhoto, PredefinedMessagePhotoDto>() {
+                    @Override
+                    public void mapAtoB(PredefinedMessagePhoto a, PredefinedMessagePhotoDto b, MappingContext context) {
+                        try {
+                            b.setFileUrl(createPredefinedMessagePhotoDownloadUrl(a));
                         }
                         catch ( MalformedURLException | URISyntaxException e ) {
                             throw new IllegalStateException("Failed to create download URL", e);

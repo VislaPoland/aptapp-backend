@@ -1,5 +1,8 @@
 package com.creatix.domain.entity.store;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
@@ -23,4 +26,7 @@ public class PredefinedMessage {
 
     @ManyToOne(optional = false)
     private Property property;
+
+    @OneToMany(mappedBy = "predefinedMessage")
+    private List<PredefinedMessagePhoto> photos = new ArrayList<>(1);
 }
