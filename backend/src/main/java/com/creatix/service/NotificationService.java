@@ -155,9 +155,11 @@ public class NotificationService {
     }
 
     @RoleSecured
-    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Nonnull Long slotUnitId, @Nullable Long propertyId) throws IOException, TemplateException {
+    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Deprecated @Nonnull Long slotUnitId, List<Long> slotsUnitId, @Nullable Long propertyId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
-        Objects.requireNonNull(slotUnitId, "slot unit id is null");
+
+// TODO uncomment this after deleting deprecated "slotUnitId"
+//        Objects.requireNonNull(slotsUnitId, "slot unit id is null");
 
         Account currentAccount = authorizationManager.getCurrentAccount();
 
@@ -189,7 +191,14 @@ public class NotificationService {
         }
         maintenanceNotificationDao.persist(notification);
 
-        maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
+        // TODO delete original slotUnitId after FE and APP update and release
+        if (slotsUnitId != null && slotsUnitId.size() > 0) {
+            for (Long slotUnitIdFromList : slotsUnitId) {
+                maintenanceReservationService.createMaintenanceReservation(notification, slotUnitIdFromList);
+            }
+        } else {
+            maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
+        }
 
         for ( MaintenanceEmployee employee : maintenanceEmployeeDao.findByProperty(notification.getProperty()) ) {
             pushNotificationSender.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
@@ -222,7 +231,7 @@ public class NotificationService {
         authorizationManager.checkRead(property);
 
         final Tenant tenant = targetApartment.getTenant();
-        if ( tenant != null ) {
+        if (tenant != null) {
 
             notification.setType(NotificationType.Neighborhood);
             notification.setAuthor(currentAccount);
@@ -239,8 +248,7 @@ public class NotificationService {
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 try {
                     smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
-                }
-                catch ( Exception e ) {
+                } catch (Exception e) {
                     logger.info(String.format("Failed to sms notify %s", tenant.getPrimaryEmail()), e);
                 }
             }

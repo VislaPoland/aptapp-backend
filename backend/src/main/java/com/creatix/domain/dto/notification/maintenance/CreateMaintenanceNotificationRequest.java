@@ -1,5 +1,7 @@
 package com.creatix.domain.dto.notification.maintenance;
 
+import java.util.List;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,9 +20,16 @@ public class CreateMaintenanceNotificationRequest {
     @ApiModelProperty(value = "Longer notification description", notes = "Maximum size of 100 letters")
     @Size(max = 100)
     private String description;
-    @NotNull
+
+// TODO: this is deprecated, we can delete this after some time (and after some mobile app releases).
+    @Deprecated
     @ApiModelProperty(value = "ID of the selected slot unit", required = true)
     private Long slotUnitId;
+
+// TODO uncomment "@NotNull" after deleting "slotUnitId"
+//    @NotNull
+    @ApiModelProperty(value = "List of ID of the selected slot unit", required = true)
+    private List<Long> slotsUnitId;
 
     @ApiModelProperty(value = "unit number making request - optional")
     private String unitNumber;
