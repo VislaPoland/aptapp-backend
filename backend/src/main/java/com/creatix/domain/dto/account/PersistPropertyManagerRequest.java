@@ -16,6 +16,6 @@ import javax.validation.constraints.NotNull;
 public class PersistPropertyManagerRequest extends PersistAccountRequest {
 
     @ApiModelProperty(value = "Managed property id")
-    private Long managedPropertyId;
+    private Long propertyId;
 
 }
