@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -231,8 +232,12 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(feature = ApplicationFeatureType.NEIGHBORHOOD)
-    public DataResponse<NeighborhoodNotificationDto> saveNeighborhoodNotification(@Valid @RequestBody CreateNeighborhoodNotificationRequest dto) throws MessageDeliveryException, TemplateException, IOException {
-        return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(dto.getUnitNumber(), mapper.fromNeighborhoodNotificationRequest(dto))));
+    public DataResponse<List<NeighborhoodNotificationDto>> saveNeighborhoodNotification(@Valid @RequestBody CreateNeighborhoodNotificationRequest dto) throws MessageDeliveryException, TemplateException, IOException {
+        List<NeighborhoodNotificationDto> neighborhoodNotificationDto = new ArrayList<>();
+        for (String unitNumber : dto.getUnitNumbers()) {
+            neighborhoodNotificationDto.add(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(unitNumber, mapper.fromNeighborhoodNotificationRequest(dto))));
+        }
+        return new DataResponse<>(neighborhoodNotificationDto);
     }
 
     @ApiOperation(value = "Get neighborhood notification statistics")
