@@ -235,7 +235,7 @@ public class NotificationController {
     public DataResponse<List<NeighborhoodNotificationDto>> saveNeighborhoodNotification(@Valid @RequestBody CreateNeighborhoodNotificationRequest dto) throws MessageDeliveryException, TemplateException, IOException {
         List<NeighborhoodNotificationDto> neighborhoodNotificationDto = new ArrayList<>();
         for (String unitNumber : dto.getUnitNumbers()) {
-            neighborhoodNotificationDto.add(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(unitNumber, mapper.fromNeighborhoodNotificationRequest(dto))));
+            neighborhoodNotificationDto.add(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(unitNumber, mapper.fromNeighborhoodNotificationRequest(dto), dto.getPropertyId())));
         }
         return new DataResponse<>(neighborhoodNotificationDto);
     }

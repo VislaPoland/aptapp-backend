@@ -20,7 +20,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -62,7 +61,7 @@ public class NotificationServiceTest {
         request.setTitle("Complaint");
         request.setDescription("Your dog is too loud!");
         request.setUnitNumbers(Arrays.asList("21"));
-        final NeighborhoodNotification notification = notificationService.saveNeighborhoodNotification(request.getUnitNumbers().get(0), mapper.fromNeighborhoodNotificationRequest(request));
+        final NeighborhoodNotification notification = notificationService.saveNeighborhoodNotification(request.getUnitNumbers().get(0), mapper.fromNeighborhoodNotificationRequest(request), dto.getPropertyId());
         assertNotNull(notification);
         assertNotNull(notification.getId());
         assertEquals("Complaint", notification.getTitle());

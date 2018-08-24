@@ -95,6 +95,8 @@ public class AuthorizationManager {
                 return ((PropertyManager) account).getManagedProperty();
             case AssistantPropertyManager:
                 return ((AssistantPropertyManager) account).getManager().getManagedProperty();
+            case Administrator:
+                return null;
             default:
                 if ( account instanceof ManagedEmployee ) {
                     return ((ManagedEmployee) account).getManager().getManagedProperty();

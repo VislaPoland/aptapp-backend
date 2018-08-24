@@ -24,4 +24,6 @@ public class CreateNeighborhoodNotificationRequest {
     @ApiModelProperty(value = "Target apartment unit number", required = true)
     @NotNull
     private List<String> unitNumbers;
+    @ApiModelProperty(value = "Property id")
+    private Long propertyId;
 }

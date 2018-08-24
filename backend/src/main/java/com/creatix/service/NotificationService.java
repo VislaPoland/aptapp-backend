@@ -180,7 +180,7 @@ public class NotificationService {
             case PropertyManager:
             case AssistantPropertyManager:
                 if (null != targetUnitNumber) {
-                    notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
+                    notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber, propertyId));
                 }
                 break;
             default:
@@ -206,11 +206,11 @@ public class NotificationService {
         }
     }
 
-    public NeighborhoodNotification saveNeighborhoodNotification(@Nonnull String targetUnitNumber, @Nonnull NeighborhoodNotification notification) throws MessageDeliveryException, TemplateException, IOException {
+    public NeighborhoodNotification saveNeighborhoodNotification(@Nonnull String targetUnitNumber, @Nonnull NeighborhoodNotification notification, Long propertyId) throws MessageDeliveryException, TemplateException, IOException {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
         Objects.requireNonNull(notification, "Notification is null");
 
-        final Apartment targetApartment = getApartmentByUnitNumber(targetUnitNumber);
+        final Apartment targetApartment = getApartmentByUnitNumber(targetUnitNumber, propertyId);
         final Property property = targetApartment.getProperty();
         authorizationManager.checkRead(property);
 
@@ -301,7 +301,8 @@ public class NotificationService {
         final SecurityNotification notification = getOrElseThrow(notificationId, securityNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
 
-        if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ) {
+        if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ||
+                AccountRole.Administrator.equals(authorizationManager.getCurrentAccount().getRole()) ) {
             notification.setResponse(request.getResponse());
             notification.setRespondedAt(OffsetDateTime.now());
             notification.setStatus(NotificationStatus.Resolved);
@@ -361,10 +362,12 @@ public class NotificationService {
         return notification;
     }
 
-    private Apartment getApartmentByUnitNumber(@Nonnull String targetUnitNumber) {
+    private Apartment getApartmentByUnitNumber(@Nonnull String targetUnitNumber, Long propertyId) {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
 
-        final Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty());
+        Property property = (propertyId != null) ? propertyDao.findById(propertyId) : authorizationManager.getCurrentProperty();
+
+        final Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, property);
         if ( apartment == null ) {
             throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
         }
