@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -210,6 +211,12 @@ public class NotificationService {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
         Objects.requireNonNull(notification, "Notification is null");
 
+        Account currentAccount = authorizationManager.getCurrentAccount();
+
+        if (currentAccount.getIsNeighborhoodNotificationEnable() != null && currentAccount.getIsNeighborhoodNotificationEnable() != true) {
+            throw new AccessDeniedException("Current user doesn't have permission to send neighborhood notifications.");
+        }
+
         final Apartment targetApartment = getApartmentByUnitNumber(targetUnitNumber, propertyId);
         final Property property = targetApartment.getProperty();
         authorizationManager.checkRead(property);
@@ -218,12 +225,14 @@ public class NotificationService {
         if ( tenant != null ) {
 
             notification.setType(NotificationType.Neighborhood);
-            notification.setAuthor(authorizationManager.getCurrentAccount());
+            notification.setAuthor(currentAccount);
             notification.setProperty(property);
             notification.setStatus(NotificationStatus.Pending);
             notification.setRecipient(targetApartment.getTenant());
             notification.setTargetApartment(targetApartment);
-            notificationWatcher.process(notification);
+            if ( AccountRole.Tenant.equals(currentAccount.getRole()) || AccountRole.SubTenant.equals(currentAccount.getRole())) {
+                notificationWatcher.process(notification);
+            }
             neighborhoodNotificationDao.persist(notification);
 
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
@@ -275,7 +284,7 @@ public class NotificationService {
         final EscalatedNeighborhoodNotification notification = getOrElseThrow(notificationId, escalatedNeighborhoodNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
 
-        if ( authorizationManager.isManager(notification.getProperty()) ) {
+        if ( authorizationManager.isManager(notification.getProperty()) || AccountRole.Administrator.equals(authorizationManager.getCurrentAccount().getRole())) {
             notification.setStatus(NotificationStatus.Resolved);
             notification.setResponse(request.getResponse());
             notification.setRespondedAt(OffsetDateTime.now());

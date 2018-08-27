@@ -37,4 +37,19 @@ public class CreatePropertyRequest {
     @NotNull
     @ApiModelProperty(value = "Enable/disable sms notifications", required = true, notes = "Indicate that sms message notifications are enabled/disabled")
     private Boolean enableSms;
+
+    @ApiModelProperty(value = "Lock out hours, lockout after repetition msgs in hours, default set to 24h", required = true, notes = "Lockout after repetition msgs in hours")
+    private Integer lockoutHours;
+
+    @ApiModelProperty(value = "Throttle fast, time of locking msg after last one in minutes, default set to 15min", required = true, notes = "Time of locking msg after last one in minutes")
+    private Integer throttleFastMinutes;
+
+    @ApiModelProperty(value = "Throttle fast, time of locking msg after last one in minutes, default set to 15min", required = true, notes = "Time of locking msg after last one in minutes")
+    private Integer throttleSlowLimit;
+
+    @ApiModelProperty(value = "Enable sending of sms in case of several notifications type escalation", required = true)
+    private Boolean enableSmsEscalation;
+
+    @ApiModelProperty(value = "Enable sending of email in case of several notifications type escalation", required = true)
+    private Boolean enableEmailEscalation;
 }

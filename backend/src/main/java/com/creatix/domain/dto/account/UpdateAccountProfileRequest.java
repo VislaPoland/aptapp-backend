@@ -28,4 +28,6 @@ public class UpdateAccountProfileRequest {
     private Boolean isTacAccepted;
     @ApiModelProperty
     private Boolean isPrivacyPolicyAccepted;
+    @ApiModelProperty
+    private Boolean isNeighborhoodNotificationEnable;
 }

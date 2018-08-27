@@ -93,6 +93,22 @@ class ExpiringChannel<K, V> implements AutoCloseable {
         }
     }
 
+    @Nonnull
+    Optional<Instant> nextOpenPeriod(@Nonnull K key) {
+        synchronized ( queueMap ) {
+            final Queue<WrappedValue<V>> queue = queueMap.get(key);
+            if ( queue == null ) {
+                return Optional.empty();
+            }
+            else if ( queue.isEmpty() ) {
+                return Optional.empty();
+            }
+            else {
+                return Optional.of(queue.peek().getEvictAfter());
+            }
+        }
+    }
+
     private void autoEvict() {
         LOGGER.trace("Running auto evict");
 

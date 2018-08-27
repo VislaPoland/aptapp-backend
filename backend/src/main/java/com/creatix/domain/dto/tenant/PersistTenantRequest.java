@@ -24,4 +24,6 @@ public class PersistTenantRequest extends PersistAccountRequest {
     @ApiModelProperty(value = "Vehicles")
     private List<VehicleDto> vehicles;
 
+    @ApiModelProperty(value = "Is neighborhood notification enable?")
+    private Boolean isNeighborhoodNotificationEnable;
 }

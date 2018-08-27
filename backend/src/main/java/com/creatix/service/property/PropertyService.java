@@ -109,6 +109,26 @@ public class PropertyService {
             if ( StringUtils.isBlank(property.getTimeZone()) ) {
                 property.setTimeZone(TimeZone.getDefault().toString());
             }
+
+            if (request.getThrottleFastMinutes() != null) {
+                property.setThrottleFastMinutes(request.getThrottleFastMinutes());
+            }
+            if (request.getLockoutHours() != null ) {
+                property.setLockoutHours(request.getLockoutHours());
+            }
+
+            if (request.getThrottleSlowLimit() != null) {
+                property.setThrottleSlowLimit(request.getThrottleSlowLimit());
+            }
+
+            if (request.getEnableEmailEscalation() != null) {
+                property.setEnableEmailEscalation(request.getEnableEmailEscalation());
+            }
+
+            if (request.getEnableSmsEscalation() != null) {
+                property.setEnableSmsEscalation(request.getEnableSmsEscalation());
+            }
+
             propertyDao.persist(property);
             return property;
         }

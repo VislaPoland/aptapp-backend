@@ -264,7 +264,7 @@ public class NotificationController {
     @PostMapping(path = "/neighborhood/escalated/{notificationId}/respond", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.NEIGHBORHOOD)
     public DataResponse<NeighborhoodNotificationDto> respondToEscalatedNeighborhoodNotification(@PathVariable long notificationId, @Valid @RequestBody NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
-        return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.respondToNeighborhoodNotification(notificationId, request)));
+        return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.respondToEscalatedNeighborhoodNotification(notificationId, request)));
     }
 
     @ApiOperation(value = "Respond to neighborhood notification")
