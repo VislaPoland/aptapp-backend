@@ -1,4 +1,4 @@
-    <!doctype html>
+<!doctype html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width">
@@ -49,7 +49,7 @@
                     <table style="box-sizing: border-box; border-collapse: separate !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                         <tr>
                             <td class="align-center" style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top; text-align: center;" valign="top" align="center">
-                                <a href="${applicationUrl}" style="box-sizing: border-box; color: #348eda; text-decoration: underline;"><img src="${logoUrl}" height="100" alt="AptApp" style="-ms-interpolation-mode: bicubic; max-width: 100%;"></a>
+                                <a href="${applicationUrl}" style="box-sizing: border-box; color: #348eda; text-decoration: underline;"><img src="${logoUrl}" height="80" alt="AptApp" style="-ms-interpolation-mode: bicubic; max-width: 100%; margin-top:20px;"></a>
                             </td>
                         </tr>
                     </table>
@@ -68,8 +68,7 @@
                                 </tr>
                                 <tr>
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
-                                        <p class="bottom" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; color: #031821; margin-bottom: 0; text-align: center; padding-bottom: 5px;"><img src="${iconUrl}" height="40" style="-ms-interpolation-mode: bicubic; max-width: 100%;"></p>
-                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. App a tool you can’t live without. If you see ways we can do better, we would love to hear from you. Please e-mail us at <a href="mailto:hello@aptappmobile.com" style="box-sizing: border-box; text-decoration: underline; color: #999999;">hello@aptappmobile.com</a>.</p>
+                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 20px 0; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. App a tool you can’t live without. If you see ways we can do better, we would love to hear from you. Please e-mail us at <a href="mailto:hello@aptappmobile.com" style="box-sizing: border-box; text-decoration: underline; color: #999999;">hello@aptappmobile.com</a>.</p>
                                     </td>
                                 </tr>
                             </table>
