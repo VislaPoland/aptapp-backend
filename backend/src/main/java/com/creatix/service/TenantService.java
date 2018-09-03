@@ -99,6 +99,10 @@ public class TenantService {
             mapper.fillTenant(request, tenant);
         }
 
+        if (request.getIsNeighborhoodNotificationEnable() != null) {
+            tenant.setIsNeighborhoodNotificationEnable(request.getIsNeighborhoodNotificationEnable());
+        }
+
         tenant.setApartment(apartment);
         tenant.setActive(false);
         tenant.setDeletedAt(null);
@@ -138,6 +142,11 @@ public class TenantService {
             apartmentPrev.setTenant(null);
             apartmentDao.persist(apartmentPrev);
         }
+
+        if (request.getIsNeighborhoodNotificationEnable() != null) {
+            tenant.setIsNeighborhoodNotificationEnable(request.getIsNeighborhoodNotificationEnable());
+        }
+
         tenant.setApartment(apartment);
         tenantDao.persist(tenant);
         apartment.setTenant(tenant);

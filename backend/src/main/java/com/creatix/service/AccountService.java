@@ -264,11 +264,13 @@ public class AccountService {
         Objects.requireNonNull(request, "Request is null");
 
         if ( account instanceof Tenant ) {
+            final Tenant tenant = (Tenant) account;
+
             if ( request.getEnableSms() == null ) {
                 throw new IllegalArgumentException("Enable sms parameter is required");
             }
-            final Tenant tenant = (Tenant) account;
             tenant.setEnableSms(request.getEnableSms());
+            tenant.setIsNeighborhoodNotificationEnable(request.getIsNeighborhoodNotificationEnable());
         }
 
         mapper.fillAccount(request, account);

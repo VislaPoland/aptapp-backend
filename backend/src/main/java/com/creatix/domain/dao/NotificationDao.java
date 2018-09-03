@@ -185,6 +185,8 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                                 return SecurityNotification.class;
                             case EventInvite:
                                 return EventInviteNotification.class;
+                            case Escalation:
+                                return EscalatedNeighborhoodNotification.class;
                             default:
                                 logger.info("Unsupported notification type filter. type={}", nt.name());
                                 return null;

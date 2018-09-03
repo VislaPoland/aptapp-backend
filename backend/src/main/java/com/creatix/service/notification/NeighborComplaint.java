@@ -1,6 +1,7 @@
 package com.creatix.service.notification;
 
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.Tenant;
 
 import javax.annotation.Nonnull;
 
@@ -11,11 +12,26 @@ class NeighborComplaint {
 
     private final long complainerAccountId;
 
-    NeighborComplaint(@Nonnull Account complainer) {
+    private final String complainerAppartmentUnit;
+    private final String complainerMessage;
+
+    NeighborComplaint(@Nonnull Tenant complainer, String complainerMessage) {
         this.complainerAccountId = complainer.getId();
+        this.complainerAppartmentUnit = complainer.getApartment().getUnitNumber();
+        this.complainerMessage = complainerMessage;
     }
 
     public long getComplainerAccountId() {
         return complainerAccountId;
     }
+
+    public String getComplainerMessage() {
+        return complainerMessage;
+    }
+
+    public String getComplainerAppartmentUnit() {
+        return complainerAppartmentUnit;
+    }
+
+
 }

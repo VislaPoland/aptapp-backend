@@ -119,6 +119,12 @@ public class Property {
     @OneToMany(mappedBy = "property")
     private List<PredefinedMessage> predefinedMessages;
 
+    @Column(nullable = false)
+    private Boolean enableSmsEscalation;
+
+    @Column(nullable = false)
+    private Boolean enableEmailEscalation;
+
     @Transient
     public ZoneOffset getZoneOffset(LocalDateTime dt) {
         return getZoneId().getRules().getOffset(dt);

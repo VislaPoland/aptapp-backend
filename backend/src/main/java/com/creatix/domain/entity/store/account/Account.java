@@ -85,6 +85,10 @@ public class Account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
     private Set<Device> devices;
 
+    @Column(nullable = false)
+    @NotNull
+    private Boolean isNeighborhoodNotificationEnable;
+
     @Transient
     public boolean isDeleted() {
         return this.deletedAt != null;
