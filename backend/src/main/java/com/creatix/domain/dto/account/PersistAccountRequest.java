@@ -39,6 +39,9 @@ public class PersistAccountRequest {
     @ApiModelProperty(value = "Secondary phone number")
     private String secondaryPhone;
 
+    @ApiModelProperty(value = "Is neighborhood notification enable?")
+    private Boolean isNeighborhoodNotificationEnable;
+
     public void setPrimaryEmail(String primaryEmail) {
         this.primaryEmail = StringUtils.lowerCase(primaryEmail);
     }
