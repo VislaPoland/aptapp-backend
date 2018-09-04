@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +45,7 @@ public class PropertyService {
     private PropertyOwnerDao propertyOwnerDao;
     @Autowired
     private AccountDao accountDao;
-  @Autowired
+    @Autowired
     private TenantDao tenantDao;
 
     @Autowired
@@ -166,9 +168,7 @@ public class PropertyService {
                 .add(tenant.getLastName())
                 .add(tenant.getPrimaryPhone())
                 .add(tenant.getPrimaryEmail())
-                .add(tenant.getCreatedAt().toString());
-        if(tenant.getActionTokenValidUntil() != null ) joiner.add(tenant.getActionTokenValidUntil().toString());
-        else joiner.add("");
+                .add(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone( ZoneId.systemDefault() ).format(tenant.getCreatedAt().toInstant()));
         return joiner.toString();
     }
 
@@ -189,7 +189,7 @@ public class PropertyService {
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public String generateCsvResponse(Long propertyId){
-        String csvResponse = "First Name,Last Name,Primary Phone,Primary Email,Created At,Action Token Valid Until";
+        String csvResponse = "First Name,Last Name,Primary Phone,Primary Email,Created At";
         for(Tenant tenant: getTenants(propertyId)){
             csvResponse+="\n"+returnCsvRow(tenant);
             Set<SubTenant> subTenants = tenant.getSubTenants();
