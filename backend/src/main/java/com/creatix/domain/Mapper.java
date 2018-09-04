@@ -144,6 +144,7 @@ public class Mapper {
                                 case SubTenant:
                                     accountDto.setIsPrivacyPolicyAccepted(((TenantBase) account).getIsPrivacyPolicyAccepted());
                                     accountDto.setIsTacAccepted(((TenantBase) account).getIsTacAccepted());
+                                    accountDto.setIsNeighborhoodNotificationEnable(((TenantBase) account).getIsNeighborhoodNotificationEnable());
                                     break;
                                 default:
                                     break;
