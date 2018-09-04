@@ -108,7 +108,7 @@ public class AuthorizationManager {
     }
 
     public void checkManager(@NotNull Property property) {
-        if ( !(isManager(property)) || isAdministrator()) {
+        if ( !(isManager(property)) && !isAdministrator()) {
             throw new SecurityException("Not a apartment manager");
         }
     }
