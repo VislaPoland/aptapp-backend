@@ -80,7 +80,9 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                     break;
                 case Administrator:
                     if (property != null) {
-                        predicate = predicate.and(qNotification.property.eq(property));
+                        predicate = predicate.andAnyOf(
+                                qNotification.property.eq(property),
+                                qNotification.author.eq(account));
                     }
                 default:
                     predicate = predicate.and(qNotification.author.eq(account));
