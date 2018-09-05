@@ -207,14 +207,14 @@ public class NotificationService {
         }
     }
 
-    public NeighborhoodNotification saveNeighborhoodNotification(@Nonnull String targetUnitNumber, @Nonnull NeighborhoodNotification notification, Long propertyId) throws MessageDeliveryException, TemplateException, IOException {
+    public NeighborhoodNotification saveNeighborhoodNotification(@Nonnull String targetUnitNumber, @Nonnull NeighborhoodNotification notification, Long propertyId) throws TemplateException, IOException {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
         Objects.requireNonNull(notification, "Notification is null");
 
         Account currentAccount = authorizationManager.getCurrentAccount();
 
         if (currentAccount.getIsNeighborhoodNotificationEnable() != null && currentAccount.getIsNeighborhoodNotificationEnable() != true) {
-            throw new AccessDeniedException("Current user doesn't have permission to send neighborhood notifications.");
+            throw new AccessDeniedException("You have been blocked to send any notification messages to your neighbors. To unblock sending the notifications, contact your property manager.");
         }
 
         final Apartment targetApartment = getApartmentByUnitNumber(targetUnitNumber, propertyId);

@@ -102,12 +102,13 @@ public class PersonalMessageService {
                     catch ( IOException | TemplateException e ) {
                         logger.error(String.format("Failed to dispatch message to account %d", recipientAccount.getId()), e);
                     }
-
+                    
                     return personalMessage;
                 }
         ).collect(Collectors.toList());
 
-        createPersonalMessageNotification(personalMessageGroup);
+        Long notificationId = createPersonalMessageNotification(personalMessageGroup);
+        messages.forEach(personalMessage -> personalMessage.setNotificationId(notificationId));
 
         return messages;
     }
@@ -164,7 +165,8 @@ public class PersonalMessageService {
             }
         }
 
-        createPersonalMessageNotification(personalMessageGroup);
+        Long notificationId = createPersonalMessageNotification(personalMessageGroup);
+        messages.forEach(personalMessage -> personalMessage.setNotificationId(notificationId));
 
         return messages;
     }
@@ -189,7 +191,8 @@ public class PersonalMessageService {
         personalMessageDao.persist(personalMessage);
     }
 
-    private void createPersonalMessageNotification(@NotNull PersonalMessageGroup personalMessageGroup) {
+
+    private Long createPersonalMessageNotification(@NotNull PersonalMessageGroup personalMessageGroup) {
         final PersonalMessage message = personalMessageGroup.getMessages().stream().findFirst().orElseThrow(() -> new IllegalStateException("Message group is empty"));
         final PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
         personalMessageNotification.setPersonalMessageGroup(personalMessageGroup);
@@ -199,6 +202,8 @@ public class PersonalMessageService {
         personalMessageNotification.setStatus(NotificationStatus.Pending);
         personalMessageNotification.setTitle(message.getTitle());
         notificationDao.persist(personalMessageNotification);
+
+        return personalMessageNotification.getId();
     }
 
     @RoleSecured

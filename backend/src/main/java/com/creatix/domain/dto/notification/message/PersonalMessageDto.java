@@ -46,4 +46,7 @@ public class PersonalMessageDto {
 
     @ApiModelProperty("List of photos for personal message")
     private List<PersonalMessagePhotoDto> personalMessagePhotos;
+
+    @ApiModelProperty
+    private Long notificationId;
 }

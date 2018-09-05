@@ -50,6 +50,9 @@ public class PersonalMessage implements AttachmentId {
     @OneToMany(mappedBy = "personalMessage", cascade = {CascadeType.REMOVE})
     private List<PersonalMessagePhoto> personalMessagePhotos;
 
+    @Transient
+    private Long notificationId;
+
     @PrePersist
     @PreUpdate
     private void beforeCreateOrUpdate() {
