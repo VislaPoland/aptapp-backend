@@ -20,7 +20,6 @@ import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
-import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.AttachmentService;
 import com.creatix.service.NotificationService;
@@ -232,7 +231,7 @@ public class NotificationController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(feature = ApplicationFeatureType.NEIGHBORHOOD)
-    public DataResponse<List<NeighborhoodNotificationDto>> saveNeighborhoodNotification(@Valid @RequestBody CreateNeighborhoodNotificationRequest dto) throws MessageDeliveryException, TemplateException, IOException {
+    public DataResponse<List<NeighborhoodNotificationDto>> saveNeighborhoodNotification(@Valid @RequestBody CreateNeighborhoodNotificationRequest dto) throws TemplateException, IOException {
         List<NeighborhoodNotificationDto> neighborhoodNotificationDto = new ArrayList<>();
         for (String unitNumber : dto.getUnitNumbers()) {
             neighborhoodNotificationDto.add(mapper.toNeighborhoodNotificationDto(notificationService.saveNeighborhoodNotification(unitNumber, mapper.fromNeighborhoodNotificationRequest(dto), dto.getPropertyId())));

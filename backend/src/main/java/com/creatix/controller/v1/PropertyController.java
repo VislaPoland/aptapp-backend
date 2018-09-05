@@ -9,9 +9,7 @@ import com.creatix.domain.dto.property.*;
 import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.AccountService;
 import com.creatix.service.ApplicationFeatureService;
-import com.creatix.service.SlotService;
 import com.creatix.service.property.PropertyService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
@@ -43,11 +41,6 @@ public class PropertyController {
     private Mapper mapper;
     @Autowired
     private PropertyService propertyService;
-
-    @Autowired
-    private AccountService accountService;
-    @Autowired
-    private SlotService slotService;
     @Autowired
     private ApplicationFeatureService applicationFeatureService;
 
