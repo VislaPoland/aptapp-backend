@@ -4,17 +4,20 @@ import static java.util.stream.Collectors.toList;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.dao.NotificationDao;
+import com.creatix.domain.dao.NotificationGroupDao;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.PropertyManager;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.EscalatedNeighborhoodNotification;
 import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
+import com.creatix.domain.entity.store.notification.NotificationGroup;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.email.EscalatedManagerMessageForMoreTenantsTemplate;
 import com.creatix.message.template.email.EscalatedManagerMessageTemplate;
 import com.creatix.message.template.push.EscalatedManagerNotificationTemplate;
+import com.creatix.message.template.push.EscalatedNeighborNotificationTemplate;
 import com.creatix.message.template.sms.EscalatedManagerSmsTemplate;
 import com.creatix.message.template.sms.EscalatedManagerSmsTemplateForMoreTenants;
 import com.creatix.service.message.EmailMessageService;
@@ -37,6 +40,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tomas Sedlak on 18.10.2017.
@@ -60,6 +64,8 @@ class PropertyNotificationWatcher {
     private final SmsMessageSender smsMessageSender;
     @Nonnull
     private final ApplicationProperties properties;
+    @Nonnull
+    private final NotificationGroupDao notificationGroupDao;
 
     @Nonnull
     private final ExpiringChannel<Neighbor, NeighborComplaint> disruptiveNeighborComplaints = new ExpiringChannel<>(Duration.ofHours(24));
@@ -76,7 +82,7 @@ class PropertyNotificationWatcher {
     private int throttleSlowLimit = 3;
 
 
-    PropertyNotificationWatcher(@Nonnull boolean isThrottlingEnabled, @Nonnull Property property, @Nonnull NotificationDao notificationDao, @Nonnull PushNotificationSender pushNotificationSender, @Nonnull EmailMessageService emailMessageService, @Nonnull SmsMessageSender smsMessageSender, @Nonnull ApplicationProperties properties) {
+    PropertyNotificationWatcher(@Nonnull boolean isThrottlingEnabled, @Nonnull Property property, @Nonnull NotificationDao notificationDao, @Nonnull PushNotificationSender pushNotificationSender, @Nonnull EmailMessageService emailMessageService, @Nonnull SmsMessageSender smsMessageSender, @Nonnull ApplicationProperties properties, @Nonnull NotificationGroupDao notificationGroupDao) {
         this.isThrottlingEnabled = isThrottlingEnabled;
         this.notificationDao = notificationDao;
         this.propertyId = property.getId();
@@ -84,6 +90,7 @@ class PropertyNotificationWatcher {
         this.emailMessageService = emailMessageService;
         this.smsMessageSender = smsMessageSender;
         this.properties = properties;
+        this.notificationGroupDao = notificationGroupDao;
     }
 
     void processNotification(@Nonnull NeighborhoodNotification notification) {
@@ -124,12 +131,25 @@ class PropertyNotificationWatcher {
             final boolean shouldEscalate = (complaintThrottleSlow.size(relation) >= getThrottleSlowLimit());
             final boolean shouldReportNeighbor = (disruptiveNeighborComplaints.size(offender) >= getDisruptiveComplaintThreshold());
 
+
+            if ( shouldEscalate ) {
+                sendEscalationNotificationToOffender(accountOffender, accountComplainer, notification);
+                sendPushEscalationNotificationToOffender(accountOffender);
+
+                lockoutLatch.put(relation, new Escalation());
+            }
+
+            NotificationGroup notificationGroup = new NotificationGroup();
+            notificationGroupDao.persist(notificationGroup);
+
             property.getManagers().forEach((PropertyManager manager) -> {
 
                 // this will send notification to manager after one person complain to another max time per "day"
                 if ( shouldEscalate ) {
-                    sendEscalationNotification(accountOffender, accountComplainer, notification, manager);
-                    lockoutLatch.put(relation, new Escalation());
+
+                    sendEscalationNotificationToManager(accountOffender.getApartment().getUnitNumber(), accountComplainer, notification, manager, null, notificationGroup);
+                    sendPushEscalationNotificationToManager(accountOffender.getApartment().getUnitNumber(), accountComplainer.getApartment().getUnitNumber(), manager);
+
                     sendEscalationEmail( property,
                                          accountOffender,
                                          (Tenant) notification.getAuthor(),
@@ -140,6 +160,13 @@ class PropertyNotificationWatcher {
 
                 // this will send email to manager when some people (depends on disruptive_complaint_threshold) will send notification to one person
                 if ( shouldReportNeighbor ) {
+                    sendEscalationNotificationToManager( accountOffender.getApartment().getUnitNumber(),
+                                                         null,
+                                                         notification, manager,
+                                                         disruptiveNeighborComplaints.get(offender).stream().map( neighborComplaint -> neighborComplaint.getComplainerAppartmentUnit()).collect(Collectors.joining(", ")), notificationGroup);
+                    sendPushEscalationNotificationToManager(accountOffender.getApartment().getUnitNumber(), null, manager);
+//                    sendPushEscalationNotificationToOffender(accountOffender);
+
                     sendEscalationEmailForMoreTenants( property,
                                                        accountOffender,
                                                        manager,
@@ -157,7 +184,6 @@ class PropertyNotificationWatcher {
             // TODO: fix this when the times is right. for now we will use same value as for max msg per person.
 //            disruptiveComplaintThreshold = Optional.ofNullable(property.getDisruptiveComplaintThreshold()).orElse(disruptiveComplaintThreshold);
             disruptiveComplaintThreshold = Optional.ofNullable(property.getThrottleSlowLimit()).orElse(throttleSlowLimit);
-
         }
 
         complaintThrottleFast.setProtectedPeriod(Optional.ofNullable(property.getThrottleFastMinutes()).map(Duration::ofMinutes).orElse(complaintThrottleFast.getProtectedPeriod()));
@@ -166,19 +192,44 @@ class PropertyNotificationWatcher {
         lockoutLatch.setProtectedPeriod(Optional.ofNullable(property.getLockoutHours()).map(Duration::ofHours).orElse(lockoutLatch.getProtectedPeriod()));
     }
 
-    private void sendEscalationNotification(@Nonnull Tenant offender, Tenant accountComplainer, @Nonnull NeighborhoodNotification notificationSrc, PropertyManager manager) {
-        final EscalatedNeighborhoodNotification notificationDst = new EscalatedNeighborhoodNotification();
-        notificationDst.setAuthor(accountComplainer);
-        notificationDst.setProperty(notificationSrc.getProperty());
-        notificationDst.setRecipient(manager);
-        notificationDst.setDescription("The resident in unit " + offender.getApartment().getUnitNumber() + " has been sending multiple messages to unit " + accountComplainer.getApartment().getUnitNumber() + ".");
-        notificationDst.setTitle("Apt. App Alert");
-        notificationDst.setStatus(NotificationStatus.Pending);
-        notificationDao.persist(notificationDst);
+    private void sendEscalationNotificationToManager(@Nonnull String offenderUnitNuimber, Tenant accountComplainer, @Nonnull NeighborhoodNotification notificationSrc, PropertyManager manager, String units, NotificationGroup notificationGroup) {
+        final EscalatedNeighborhoodNotification notificationManager = new EscalatedNeighborhoodNotification();
+        notificationManager.setAuthor(accountComplainer);
+        notificationManager.setNotificationGroup(notificationGroup);
+        notificationManager.setProperty(notificationSrc.getProperty());
+        notificationManager.setRecipient(manager);
+        String description = (accountComplainer != null)
+                ? "The resident in unit " + accountComplainer.getApartment().getUnitNumber() + " has been sending multiple messages to unit " + offenderUnitNuimber + "."
+                : "The resident in unit " + offenderUnitNuimber + " has received multiple messages from units: " + units + ".";
+        notificationManager.setDescription(description);
+        notificationManager.setTitle("Apt. App Alert");
+        notificationManager.setStatus(NotificationStatus.Pending);
+        notificationDao.persist(notificationManager);
+    }
 
-//        pushNotificationSender.sendNotification(new EscalatedNeighborNotificationTemplate(throttleSlowLimit, complaintThrottleSlow.getProtectedPeriod()), offender);
+    private void sendEscalationNotificationToOffender(@Nonnull Tenant offender, Tenant accountComplainer, @Nonnull NeighborhoodNotification notificationSrc) {
+        final EscalatedNeighborhoodNotification notificationTenant = new EscalatedNeighborhoodNotification();
+        notificationTenant.setAuthor(accountComplainer);
+        notificationTenant.setProperty(notificationSrc.getProperty());
+        notificationTenant.setRecipient(offender);
+        notificationTenant.setTargetApartment(offender.getApartment());
+        notificationTenant.setDescription("A neighbor has attempted to notify you " + throttleSlowLimit + " times in " + lockoutLatch.getProtectedPeriod().toHours() + " hours. The manager has been notified.");
+        notificationTenant.setTitle("Apt. App Alert");
+        notificationTenant.setStatus(NotificationStatus.Pending);
+        notificationDao.persist(notificationTenant);
+    }
+
+    private void sendPushEscalationNotificationToManager(@Nonnull String offenderUnit, String authorUnit, PropertyManager manager) {
         try {
-            pushNotificationSender.sendNotification(new EscalatedManagerNotificationTemplate(offender, notificationSrc.getAuthor(), throttleSlowLimit, complaintThrottleSlow.getProtectedPeriod()), manager);
+            pushNotificationSender.sendNotification(new EscalatedManagerNotificationTemplate(offenderUnit, authorUnit), manager);
+        } catch (TemplateException | IOException e) {
+            LOGGER.error("Unable to send escalation notification.", e);
+        }
+    }
+
+    private void sendPushEscalationNotificationToOffender(@Nonnull Tenant offender) {
+        try {
+            pushNotificationSender.sendNotification(new EscalatedNeighborNotificationTemplate(throttleSlowLimit, lockoutLatch.getProtectedPeriod()), offender);
         } catch (TemplateException | IOException e) {
             LOGGER.error("Unable to send escalation notification.", e);
         }
@@ -245,13 +296,13 @@ class PropertyNotificationWatcher {
     private Blocking testIfShouldBlock(@Nonnull NeighborRelation relation) {
         if ( lockoutLatch.size(relation) > 0 ) {
             Duration remainingTime = Duration.between(Instant.now(), lockoutLatch.nextOpenPeriod(relation).get());
-            return Blocking.shouldBlock("Please try again in " + ( remainingTime.toHours() > 0 ?  remainingTime.toHours() + " hours." :
-                                                                    ( remainingTime.toMinutes() > 0 ?  remainingTime.toMinutes() + " minutes." :
-                                                                        remainingTime.getSeconds() + " seconds." )));
+            return Blocking.shouldBlock("The max number of notifications to your neighbor has been reached. Your manager has been notified and in "
+                                            + ((remainingTime.toMinutes() > 0) ? ( remainingTime.toHours() + " hours and " + (remainingTime.toMinutes() - (remainingTime.toHours()*60)  ) + " minutes" ) : (remainingTime.getSeconds() < 0 ? 1 : remainingTime.getSeconds()) + " seconds" )
+                                            + " you can notify your neighbor again.");
         }
         if ( complaintThrottleFast.size(relation) >= getThrottleFastLimit() ) {
             Duration remainingTime = Duration.between(Instant.now(), complaintThrottleFast.nextOpenPeriod(relation).get());
-            return Blocking.shouldBlock("Please try again in " + ( remainingTime.toMinutes() > 0 ?  remainingTime.toMinutes() + " minutes." : remainingTime.getSeconds() + " seconds." ));
+            return Blocking.shouldBlock("Please allow " + remainingTime.toMinutes() + " minutes and " + (remainingTime.getSeconds() < 0 ? 1 : remainingTime.getSeconds() - (remainingTime.toMinutes()*60)) + " seconds to pass to allow time for your neighbor to respond to your request.");
         }
         if ( complaintThrottleSlow.size(relation) >= getThrottleSlowLimit() ) {
             LOGGER.warn("Slow throttle was hit. This should not happen! Please check settings. property_id={}, lockout_count={}, lockout_period={}, tslow_count={}, tslow_period={}",

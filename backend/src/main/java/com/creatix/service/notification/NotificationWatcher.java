@@ -3,6 +3,7 @@ package com.creatix.service.notification;
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.configuration.PushNotificationProperties;
 import com.creatix.domain.dao.NotificationDao;
+import com.creatix.domain.dao.NotificationGroupDao;
 import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.service.message.EmailMessageService;
@@ -34,6 +35,9 @@ public class NotificationWatcher {
     @Autowired
     private ApplicationProperties properties;
 
+    @Autowired
+    private NotificationGroupDao notificationGroupDao;
+
     @Nonnull
     private final NotificationDao notificationDao;
     @Nonnull
@@ -51,7 +55,7 @@ public class NotificationWatcher {
         synchronized ( watcherMap ) {
             PropertyNotificationWatcher watcher = watcherMap.get(propertyId);
             if ( watcher == null ) {
-                watcher = new PropertyNotificationWatcher(pushNotificationProperties.getIsThrottlingEnabled(), notification.getProperty(), notificationDao, pushNotificationSender, emailMessageService, smsMessageSender, properties);
+                watcher = new PropertyNotificationWatcher(pushNotificationProperties.getIsThrottlingEnabled(), notification.getProperty(), notificationDao, pushNotificationSender, emailMessageService, smsMessageSender, properties, notificationGroupDao);
                 watcherMap.put(propertyId, watcher);
             }
             watcher.processNotification(notification);

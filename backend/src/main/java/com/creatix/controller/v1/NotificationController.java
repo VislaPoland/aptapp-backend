@@ -72,6 +72,8 @@ public class NotificationController {
             return BusinessProfileNotificationDto.class;
         } else if (clazz.equals(CommunityBoardItemUpdatedSubscriberNotification.class)) {
             return CommunityBoardItemUpdatedSubscriberNotificationDto.class;
+        } else if (clazz.equals(EscalatedNeighborhoodNotification.class)) {
+            return NeighborhoodNotificationDto.class;
         } else {
             return NotificationDto.class;
         }
@@ -260,7 +262,7 @@ public class NotificationController {
             @ApiResponse(code = 403, message = "Forbidden")
     })
     @JsonView(Views.Public.class)
-    @PostMapping(path = "/neighborhood/escalated/{notificationId}/respond", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/escalation/{notificationId}/respond", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.NEIGHBORHOOD)
     public DataResponse<NeighborhoodNotificationDto> respondToEscalatedNeighborhoodNotification(@PathVariable long notificationId, @Valid @RequestBody NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toNeighborhoodNotificationDto(notificationService.respondToEscalatedNeighborhoodNotification(notificationId, request)));
