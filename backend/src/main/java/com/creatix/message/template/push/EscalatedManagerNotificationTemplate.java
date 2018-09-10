@@ -7,41 +7,26 @@ import java.time.Duration;
 
 public class EscalatedManagerNotificationTemplate extends PushMessageTemplate {
 
-    private final int threshold;
-    @Nonnull
-    private final Account offender;
-    @Nonnull
-    private final Account complainer;
-    @Nonnull
-    private final Duration duration;
+    private final String offenderUnit;
+    private final String complainerUnit;
 
-    public EscalatedManagerNotificationTemplate(@Nonnull Account offender, @Nonnull Account complainer, int threshold, @Nonnull Duration duration) {
-        this.threshold = threshold;
-        this.duration = duration;
-        this.offender = offender;
-        this.complainer = complainer;
+
+    public EscalatedManagerNotificationTemplate(@Nonnull String offenderUnit, String complainerUnit) {
+        this.offenderUnit = offenderUnit;
+        this.complainerUnit = complainerUnit;
     }
 
     @Override
     public String getTemplateName() {
-        return "escalated-manager-notification";
-    }
-
-    public int getTimes() {
-        return threshold;
-    }
-
-    public int getHours() {
-        return (int) (duration.getSeconds() / 3600);
+        return complainerUnit == null ? "escalated-manager-notification-from-more-tenants" : "escalated-manager-notification";
     }
 
     @Nonnull
-    public String getOffender() {
-        return this.offender.getFullName();
+    public String getOffenderUnit() {
+        return this.offenderUnit;
     }
 
-    @Nonnull
-    public String getComplainer() {
-        return this.complainer.getFullName();
+    public String getComplainerUnit() {
+        return this.complainerUnit;
     }
 }

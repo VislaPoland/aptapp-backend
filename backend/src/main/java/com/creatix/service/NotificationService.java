@@ -281,15 +281,20 @@ public class NotificationService {
     public NeighborhoodNotification respondToEscalatedNeighborhoodNotification(long notificationId, @Nonnull NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(request, "Notification response request is null");
 
-        final EscalatedNeighborhoodNotification notification = getOrElseThrow(notificationId, escalatedNeighborhoodNotificationDao,
-                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
+        final List<EscalatedNeighborhoodNotification> notifications = escalatedNeighborhoodNotificationDao.findByNotificationGroup(notificationId);
 
-        if ( authorizationManager.isManager(notification.getProperty()) || AccountRole.Administrator.equals(authorizationManager.getCurrentAccount().getRole())) {
-            notification.setStatus(NotificationStatus.Resolved);
-            notification.setResponse(request.getResponse());
-            notification.setRespondedAt(OffsetDateTime.now());
-            notification.setClosedAt(OffsetDateTime.now());
-            escalatedNeighborhoodNotificationDao.persist(notification);
+        if ( notifications != null && !notifications.isEmpty() &&
+                (authorizationManager.isManager(notifications.get(0).getProperty()) || AccountRole.Administrator.equals(authorizationManager.getCurrentAccount().getRole()))) {
+
+            notifications.stream().forEach(escalatedNeighborhoodNotification -> {
+                escalatedNeighborhoodNotification.setStatus(NotificationStatus.Resolved);
+                escalatedNeighborhoodNotification.setResponse(request.getResponse());
+                escalatedNeighborhoodNotification.setRespondedAt(OffsetDateTime.now());
+                escalatedNeighborhoodNotification.setClosedAt(OffsetDateTime.now());
+                escalatedNeighborhoodNotificationDao.persist(escalatedNeighborhoodNotification);
+            });
+
+            EscalatedNeighborhoodNotification notification = notifications.stream().filter(escalatedNeighborhoodNotification -> escalatedNeighborhoodNotification.getId().equals(notificationId)).findAny().orElse(null);
 
             if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
                 pushNotificationSender.sendNotification(new EscalatedNeighborNotificationResolvedTemplate(notification), notification.getAuthor());

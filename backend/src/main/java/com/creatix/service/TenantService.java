@@ -101,6 +101,8 @@ public class TenantService {
 
         if (request.getIsNeighborhoodNotificationEnable() != null) {
             tenant.setIsNeighborhoodNotificationEnable(request.getIsNeighborhoodNotificationEnable());
+        } else {
+            tenant.setIsNeighborhoodNotificationEnable(true);
         }
 
         tenant.setApartment(apartment);
