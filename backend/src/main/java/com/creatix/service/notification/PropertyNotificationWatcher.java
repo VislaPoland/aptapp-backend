@@ -146,10 +146,7 @@ class PropertyNotificationWatcher {
 
                 // this will send notification to manager after one person complain to another max time per "day"
                 if ( shouldEscalate ) {
-
-                    sendEscalationNotificationToManager(accountOffender.getApartment().getUnitNumber(), accountComplainer, notification, manager, null, notificationGroup);
                     sendPushEscalationNotificationToManager(accountOffender.getApartment().getUnitNumber(), accountComplainer.getApartment().getUnitNumber(), manager);
-
                     sendEscalationEmail( property,
                                          accountOffender,
                                          (Tenant) notification.getAuthor(),
@@ -162,11 +159,10 @@ class PropertyNotificationWatcher {
                 if ( shouldReportNeighbor ) {
                     sendEscalationNotificationToManager( accountOffender.getApartment().getUnitNumber(),
                                                          null,
-                                                         notification, manager,
+                                                         notification,
+                                                         manager,
                                                          disruptiveNeighborComplaints.get(offender).stream().map( neighborComplaint -> neighborComplaint.getComplainerAppartmentUnit()).collect(Collectors.joining(", ")), notificationGroup);
                     sendPushEscalationNotificationToManager(accountOffender.getApartment().getUnitNumber(), null, manager);
-//                    sendPushEscalationNotificationToOffender(accountOffender);
-
                     sendEscalationEmailForMoreTenants( property,
                                                        accountOffender,
                                                        manager,
@@ -187,19 +183,21 @@ class PropertyNotificationWatcher {
         }
 
         complaintThrottleFast.setProtectedPeriod(Optional.ofNullable(property.getThrottleFastMinutes()).map(Duration::ofMinutes).orElse(complaintThrottleFast.getProtectedPeriod()));
-        complaintThrottleSlow.setProtectedPeriod(Optional.ofNullable(property.getThrottleSlowHours()).map(Duration::ofHours).orElse(complaintThrottleSlow.getProtectedPeriod()));
+//        complaintThrottleSlow.setProtectedPeriod(Optional.ofNullable(property.getThrottleSlowHours()).map(Duration::ofHours).orElse(complaintThrottleSlow.getProtectedPeriod()));
+        complaintThrottleSlow.setProtectedPeriod(Optional.ofNullable(property.getLockoutHours()).map(Duration::ofHours).orElse(complaintThrottleSlow.getProtectedPeriod()));
+
         disruptiveNeighborComplaints.setProtectedPeriod(Optional.ofNullable(property.getDisruptiveComplaintHours()).map(Duration::ofHours).orElse(disruptiveNeighborComplaints.getProtectedPeriod()));
         lockoutLatch.setProtectedPeriod(Optional.ofNullable(property.getLockoutHours()).map(Duration::ofHours).orElse(lockoutLatch.getProtectedPeriod()));
     }
 
     private void sendEscalationNotificationToManager(@Nonnull String offenderUnitNuimber, Tenant accountComplainer, @Nonnull NeighborhoodNotification notificationSrc, PropertyManager manager, String units, NotificationGroup notificationGroup) {
         final EscalatedNeighborhoodNotification notificationManager = new EscalatedNeighborhoodNotification();
-        notificationManager.setAuthor(accountComplainer);
+        notificationManager.setAuthor(accountComplainer == null ? manager : accountComplainer);
         notificationManager.setNotificationGroup(notificationGroup);
         notificationManager.setProperty(notificationSrc.getProperty());
         notificationManager.setRecipient(manager);
         String description = (accountComplainer != null)
-                ? "The resident in unit " + accountComplainer.getApartment().getUnitNumber() + " has been sending multiple messages to unit " + offenderUnitNuimber + "."
+                ? "The resident in unit " + accountComplainer.getApartment().getUnitNumber() + " has been sending multiple messages to unit " + offenderUnitNuimber + ". The manager has been notified."
                 : "The resident in unit " + offenderUnitNuimber + " has received multiple messages from units: " + units + ".";
         notificationManager.setDescription(description);
         notificationManager.setTitle("Apt. App Alert");
@@ -213,7 +211,7 @@ class PropertyNotificationWatcher {
         notificationTenant.setProperty(notificationSrc.getProperty());
         notificationTenant.setRecipient(offender);
         notificationTenant.setTargetApartment(offender.getApartment());
-        notificationTenant.setDescription("A neighbor has attempted to notify you " + throttleSlowLimit + " times in " + lockoutLatch.getProtectedPeriod().toHours() + " hours. The manager has been notified.");
+        notificationTenant.setDescription("A neighbor notification was sent " + throttleSlowLimit + " times in " + lockoutLatch.getProtectedPeriod().toHours() + " hours. The manager has been notified.");
         notificationTenant.setTitle("Apt. App Alert");
         notificationTenant.setStatus(NotificationStatus.Pending);
         notificationDao.persist(notificationTenant);
