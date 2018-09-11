@@ -246,6 +246,13 @@ public class Mapper {
                         if ( !(authorizationManager.hasCurrentAccount()) || authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.SubTenant) ) {
                             // only authenticated non-tenant accounts are allowed to see author of the notification
                             notificationDto.setAuthor(null);
+                        } else {
+                            if (notification.getAuthor() instanceof Tenant) {
+                                Apartment apartment = ((Tenant)notification.getAuthor()).getApartment();
+                                if (apartment != null) {
+                                    notificationDto.getAuthor().setUnitNumber(apartment.getUnitNumber());
+                                }
+                            }
                         }
                     }
                 })
