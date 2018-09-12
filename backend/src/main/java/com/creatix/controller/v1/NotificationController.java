@@ -319,7 +319,7 @@ public class NotificationController {
         // TODO delete after tests
         log.info("File name: {}", fileName);
         if (photo != null) {
-            log.info("File name: {}, Notification Photo id: {}", fileName, photo.getId());
+            log.info("File name: {}, Notification Photo id: {}  ", fileName, photo.getId());
         }
         if (photoFile != null) {
             log.info("Photo file path: {}", photoFile.toPath());
