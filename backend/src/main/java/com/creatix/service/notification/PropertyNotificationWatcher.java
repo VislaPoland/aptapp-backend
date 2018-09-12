@@ -120,16 +120,17 @@ class PropertyNotificationWatcher {
         }
         else {
             final Neighbor offender = new Neighbor(accountOffender);
-            final NeighborComplaint complaint = new NeighborComplaint(accountComplainer, notification.getTitle() + " \t-\t " + notification.getDescription() + " \t-\t [" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")) + "]");
+            final NeighborComplaint complaint = new NeighborComplaint(accountComplainer, notification.getTitle() + " \t-\t [" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + "]");
 
             complaintThrottleFast.put(relation, complaint);
             complaintThrottleSlow.put(relation, complaint);
+            int originalNumberOfNeighborComplaints = disruptiveNeighborComplaints.get(offender).size();
             if ( disruptiveNeighborComplaints.get(offender).stream().noneMatch(c -> Objects.equals(c.getComplainerAccountId(), accountComplainer.getId())) ) {
                 disruptiveNeighborComplaints.put(offender, complaint);
             }
 
             final boolean shouldEscalate = (complaintThrottleSlow.size(relation) >= getThrottleSlowLimit());
-            final boolean shouldReportNeighbor = (disruptiveNeighborComplaints.size(offender) >= getDisruptiveComplaintThreshold());
+            final boolean shouldReportNeighbor = ((disruptiveNeighborComplaints.size(offender) >= getDisruptiveComplaintThreshold()) && disruptiveNeighborComplaints.get(offender).size() != originalNumberOfNeighborComplaints);
 
 
             if ( shouldEscalate ) {
@@ -186,7 +187,7 @@ class PropertyNotificationWatcher {
 //        complaintThrottleSlow.setProtectedPeriod(Optional.ofNullable(property.getThrottleSlowHours()).map(Duration::ofHours).orElse(complaintThrottleSlow.getProtectedPeriod()));
         complaintThrottleSlow.setProtectedPeriod(Optional.ofNullable(property.getLockoutHours()).map(Duration::ofHours).orElse(complaintThrottleSlow.getProtectedPeriod()));
 
-        disruptiveNeighborComplaints.setProtectedPeriod(Optional.ofNullable(property.getDisruptiveComplaintHours()).map(Duration::ofHours).orElse(disruptiveNeighborComplaints.getProtectedPeriod()));
+        disruptiveNeighborComplaints.setProtectedPeriod(Optional.ofNullable(property.getLockoutHours()).map(Duration::ofHours).orElse(complaintThrottleSlow.getProtectedPeriod()));
         lockoutLatch.setProtectedPeriod(Optional.ofNullable(property.getLockoutHours()).map(Duration::ofHours).orElse(lockoutLatch.getProtectedPeriod()));
     }
 
