@@ -30,7 +30,6 @@ import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +53,6 @@ import java.util.stream.Collectors;
 @Transactional
 @RequestMapping(path = {"/api/notifications", "/api/v1/notifications"})
 @ApiVersion(1.0)
-@Slf4j
 public class NotificationController {
 
     @Autowired
@@ -316,17 +313,16 @@ public class NotificationController {
         final File photoFile = new File(photo.getFilePath());
         final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
 
-        // TODO delete after tests
-        log.info("File name: {}", fileName);
-        if (photo != null) {
-            log.info("File name: {}, Notification Photo id: {}  ", fileName, photo.getId());
-        }
-        if (photoFile != null) {
-            log.info("Photo file path: {}", photoFile.toPath());
+        final HttpHeaders headers = new HttpHeaders();
+
+        if (photoFile.toPath().toString().toUpperCase().endsWith(".JPEG")) {
+            headers.setContentType(MediaType.IMAGE_JPEG);
+        } else if (photoFile.toPath().toString().toUpperCase().endsWith(".GIF")) {
+            headers.setContentType(MediaType.IMAGE_GIF);
+        } else {
+            headers.setContentType(MediaType.IMAGE_PNG);
         }
 
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.valueOf(Files.probeContentType(photoFile.toPath())));
         headers.setContentLength(photoFileData.length);
 
         return new HttpEntity<>(photoFileData, headers);

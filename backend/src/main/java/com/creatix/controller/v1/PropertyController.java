@@ -200,7 +200,14 @@ public class PropertyController {
                 final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
 
                 final HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.valueOf(Files.probeContentType(photoFile.toPath())));
+
+                if (photoFile.toPath().toString().toUpperCase().endsWith(".JPEG")) {
+                    headers.setContentType(MediaType.IMAGE_JPEG);
+                } else if (photoFile.toPath().toString().toUpperCase().endsWith(".GIF")) {
+                    headers.setContentType(MediaType.IMAGE_GIF);
+                } else {
+                    headers.setContentType(MediaType.IMAGE_PNG);
+                }
                 headers.setContentLength(photoFileData.length);
 
                 return new HttpEntity<>(photoFileData, headers);

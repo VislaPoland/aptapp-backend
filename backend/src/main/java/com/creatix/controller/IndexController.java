@@ -89,7 +89,13 @@ class IndexController {
         }
 
         final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.valueOf(Files.probeContentType(absolutePath)));
+        if (strAbsolutePath.toUpperCase().endsWith(".JPEG")) {
+            headers.setContentType(MediaType.IMAGE_JPEG);
+        } else if (strAbsolutePath.toString().toUpperCase().endsWith(".GIF")) {
+            headers.setContentType(MediaType.IMAGE_GIF);
+        } else {
+            headers.setContentType(MediaType.IMAGE_PNG);
+        }
         headers.setContentLength(fileData.length);
 
         return new HttpEntity<>(fileData, headers);
