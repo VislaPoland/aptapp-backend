@@ -30,6 +30,8 @@ import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -53,6 +55,7 @@ import java.util.stream.Collectors;
 @Transactional
 @RequestMapping(path = {"/api/notifications", "/api/v1/notifications"})
 @ApiVersion(1.0)
+@Slf4j
 public class NotificationController {
 
     @Autowired
@@ -312,6 +315,15 @@ public class NotificationController {
         final NotificationPhoto photo = attachmentService.getNotificationPhoto(notificationId, fileName);
         final File photoFile = new File(photo.getFilePath());
         final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
+
+        // TODO delete after tests
+        log.info("File name: {}", fileName);
+        if (photo != null) {
+            log.info("File name: {}, Notification Photo id: {}", fileName, photo.getId());
+        }
+        if (photoFile != null) {
+            log.info("Photo file path: {}", photoFile.toPath());
+        }
 
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.valueOf(Files.probeContentType(photoFile.toPath())));
