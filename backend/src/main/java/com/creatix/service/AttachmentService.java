@@ -172,10 +172,14 @@ public class AttachmentService {
 
             if (attachmentFile.exists()) {
                 try {
-                    return new DownloadAttachment(
-                            FileUtils.readFileToByteArray(attachmentFile),
-                            MediaType.valueOf(Files.probeContentType(attachmentFile.toPath()))
-                    );
+                    MediaType type = MediaType.IMAGE_PNG;
+                    if (attachmentFile.toPath().toString().toUpperCase().endsWith(".JPEG")) {
+                        type = MediaType.IMAGE_JPEG;
+                    } else if (attachmentFile.toPath().toString().toUpperCase().endsWith(".GIF")) {
+                        type = MediaType.IMAGE_GIF;
+                    }
+
+                    return new DownloadAttachment(FileUtils.readFileToByteArray(attachmentFile), type);
                 } catch (IOException e) {
                     throw new EntityNotFoundException(String.format("Unable to read attachments file %s", fileName));
                 } catch (InvalidMediaTypeException invalidMediaTypeEx) {
