@@ -103,7 +103,7 @@ public class AccountService {
                 .withinRange('0', '9').build();
 
         account.setActionToken(generator.generate(6));
-        account.setActionTokenValidUntil(DateTime.now().plusDays(30).toDate());
+        account.setActionTokenValidUntil(DateTime.now().plusDays(1).toDate());
         accountDao.persist(account);
     }
 
