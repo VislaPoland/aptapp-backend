@@ -230,10 +230,11 @@ public class NotificationService {
             notification.setStatus(NotificationStatus.Pending);
             notification.setRecipient(targetApartment.getTenant());
             notification.setTargetApartment(targetApartment);
+            neighborhoodNotificationDao.persist(notification);
+
             if ( AccountRole.Tenant.equals(currentAccount.getRole()) || AccountRole.SubTenant.equals(currentAccount.getRole())) {
                 notificationWatcher.process(notification);
             }
-            neighborhoodNotificationDao.persist(notification);
 
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 try {
