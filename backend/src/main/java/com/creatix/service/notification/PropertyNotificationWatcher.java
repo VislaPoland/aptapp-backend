@@ -22,6 +22,8 @@ import com.creatix.message.template.sms.EscalatedManagerSmsTemplate;
 import com.creatix.message.template.sms.EscalatedManagerSmsTemplateForMoreTenants;
 import com.creatix.service.message.EmailMessageService;
 import com.creatix.service.message.PushNotificationSender;
+import com.creatix.util.StringUtils;
+
 import freemarker.template.TemplateException;
 
 import org.slf4j.Logger;
@@ -120,7 +122,7 @@ class PropertyNotificationWatcher {
         }
         else {
             final Neighbor offender = new Neighbor(accountOffender);
-            final NeighborComplaint complaint = new NeighborComplaint(accountComplainer, notification.getTitle() + " \t-\t [" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + "]");
+            final NeighborComplaint complaint = new NeighborComplaint(accountComplainer, StringUtils.translateTileFromEnumString(notification.getTitle()) + " \t-\t [" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + "]");
 
             complaintThrottleFast.put(relation, complaint);
             complaintThrottleSlow.put(relation, complaint);
