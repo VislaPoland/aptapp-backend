@@ -417,7 +417,7 @@ public class AccountService {
         preventAccountDuplicity(request.getPrimaryEmail());
 
         Property managedProperty;
-        Objects.requireNonNull(request.getPropertyId(), "Managed property id is null");
+        Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
 
         switch (authorizationManager.getCurrentAccount().getRole()) {
             case Administrator:
