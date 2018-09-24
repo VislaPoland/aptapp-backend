@@ -4,15 +4,14 @@ import com.creatix.configuration.TwilioProperties;
 import com.creatix.message.template.sms.SmsMessageTemplate;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.rest.lookups.v1.PhoneNumber;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 @Component
 public class SmsMessageSender {
@@ -25,20 +24,7 @@ public class SmsMessageSender {
     private boolean isInitialized = false;
 
     public boolean validPhoneNumber(@Nonnull String phoneNumber) {
-        initializeTwilioIfNeeded();
-
-        try {
-            PhoneNumber.fetcher(new com.twilio.type.PhoneNumber(phoneNumber)).fetch();
-            return true;
-        }
-        catch ( com.twilio.exception.ApiException e ) {
-            if ( e.getStatusCode() == HttpStatus.NOT_FOUND.value() ) {
-                return false;
-            }
-            else {
-                throw e;
-            }
-        }
+        return Pattern.compile("^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$").matcher(phoneNumber).matches();
     }
 
     public void send(SmsMessageTemplate template) throws IOException, TemplateException, MessageDeliveryException {
