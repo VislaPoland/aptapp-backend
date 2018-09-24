@@ -417,13 +417,14 @@ public class AccountService {
         preventAccountDuplicity(request.getPrimaryEmail());
 
         Property managedProperty;
-        Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
 
         switch (authorizationManager.getCurrentAccount().getRole()) {
             case Administrator:
+                Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
                 managedProperty = propertyDao.findById(request.getPropertyId());
                 break;
             case PropertyOwner:
+                Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
                 managedProperty = propertyDao.findById(request.getPropertyId());
                 authorizationManager.checkOwner(managedProperty);
                 break;
@@ -455,14 +456,14 @@ public class AccountService {
         Property managedProperty;
         PropertyManager account;
 
-        Objects.requireNonNull(request.getPropertyId());
-
         switch (authorizationManager.getCurrentAccount().getRole()) {
             case Administrator:
+                Objects.requireNonNull(request.getPropertyId());
                 managedProperty = propertyDao.findById(request.getPropertyId());
                 account = propertyManagerDao.findById(accountId);
                 break;
             case PropertyOwner:
+                Objects.requireNonNull(request.getPropertyId());
                 managedProperty = propertyDao.findById(request.getPropertyId());
                 authorizationManager.checkOwner(managedProperty);
                 account = propertyManagerDao.findById(accountId);
