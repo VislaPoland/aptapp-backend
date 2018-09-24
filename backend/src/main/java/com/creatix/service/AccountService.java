@@ -458,12 +458,12 @@ public class AccountService {
 
         switch (authorizationManager.getCurrentAccount().getRole()) {
             case Administrator:
-                Objects.requireNonNull(request.getPropertyId());
+                Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
                 managedProperty = propertyDao.findById(request.getPropertyId());
                 account = propertyManagerDao.findById(accountId);
                 break;
             case PropertyOwner:
-                Objects.requireNonNull(request.getPropertyId());
+                Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
                 managedProperty = propertyDao.findById(request.getPropertyId());
                 authorizationManager.checkOwner(managedProperty);
                 account = propertyManagerDao.findById(accountId);
