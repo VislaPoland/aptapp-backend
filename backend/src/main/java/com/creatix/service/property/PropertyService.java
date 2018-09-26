@@ -169,7 +169,7 @@ public class PropertyService {
                 .add(tenant.getPrimaryPhone())
                 .add(tenant.getPrimaryEmail())
                 .add(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone( ZoneId.systemDefault() ).format(tenant.getCreatedAt().toInstant()))
-                .add(tenant.getActive().toString());
+                .add(tenant.getActive() ? "Yes" : "No");
         return joiner.toString();
     }
 
@@ -190,7 +190,7 @@ public class PropertyService {
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public String generateCsvResponse(Long propertyId){
-        String csvResponse = "First Name,Last Name,Primary Phone,Primary Email,Created At,Active";
+        String csvResponse = "First Name,Last Name,Primary Phone,Primary Email,Created At,Active users";
         for(Tenant tenant: getTenants(propertyId)){
             csvResponse+="\n"+returnCsvRow(tenant);
             Set<SubTenant> subTenants = tenant.getSubTenants();
