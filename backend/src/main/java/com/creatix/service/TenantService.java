@@ -21,6 +21,7 @@ import com.creatix.security.RoleSecured;
 import com.creatix.service.message.EmailMessageService;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -121,13 +122,20 @@ public class TenantService {
         return tenant;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager, AccountRole.Tenant})
     public @Nonnull Tenant updateTenantFromRequest(long tenantId, @Nonnull PersistTenantRequest request) {
         Objects.requireNonNull(request);
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
                 new EntityNotFoundException(String.format("Apartment id=%d not found", request.getApartmentId())));
-        authorizationManager.checkManager(apartment.getProperty());
+
+        if (!AccountRole.Tenant.equals(authorizationManager.getCurrentAccount().getRole())) {
+            authorizationManager.checkManager(apartment.getProperty());
+        }
+
+        if (AccountRole.Tenant.equals(authorizationManager.getCurrentAccount().getRole()) && authorizationManager.getCurrentAccount().getId() != tenantId) {
+            throw new AccessDeniedException("Tenant can update only himself.");
+        }
 
         final Tenant tenant = getTenant(tenantId);
         preventAccountDuplicity(request.getPrimaryEmail(), tenant.getPrimaryEmail());
