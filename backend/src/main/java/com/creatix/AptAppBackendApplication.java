@@ -35,6 +35,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         TwilioProperties.class,
         DeviceProperties.class,
         PushNotificationProperties.class,
+        BitlyProperties.class,
 })
 public class AptAppBackendApplication extends SpringBootServletInitializer {
 
