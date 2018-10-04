@@ -112,6 +112,7 @@ public class PushNotificationSender {
     public void sendNotification(@NotNull PushMessageTemplate template, @NotNull Account recipient) throws IOException, TemplateException {
         final GenericPushNotification notification = new GenericPushNotification();
         notification.setMessage(templateProcessor.processTemplate(template));
+        notification.setBadgeCount(1);
         sendNotification(notification, recipient);
     }
 
