@@ -27,6 +27,7 @@
     <include file="classpath:db/changelog/db.changelog-20171106-removeCompanyNameFromAccount.xml"/>
     <include file="classpath:db/changelog/db.changelog-20180706-addColumnsToAttachment.xml"/>
     <include file="classpath:db/changelog/db.changelog-20180817-createTablePredefinedMessagePhoto.xml"/> 
-    <include file="classpath:db/changelog/db.changelog-20180827-setDefaultValuesForNotifications.xml"/> 
+    <include file="classpath:db/changelog/db.changelog-20180827-setDefaultValuesForNotifications.xml"/>
+    <include file="classpath:db/changelog/db.changelog-20181008-addColumnsToMaintenanceSlotScheduleDaysOfWeek.xml"/>
 </databaseChangeLog>
 

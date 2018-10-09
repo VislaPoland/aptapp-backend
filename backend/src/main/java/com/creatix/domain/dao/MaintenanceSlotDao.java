@@ -18,7 +18,8 @@ public class MaintenanceSlotDao extends DaoBase<MaintenanceSlot, Long> {
     public List<MaintenanceSlot> findByPropertyIdAndStartBetween(Long propertyId, OffsetDateTime beginDt, OffsetDateTime endDt) {
         return queryFactory.selectFrom(maintenanceSlot)
                 .where(maintenanceSlot.property.id.eq(propertyId)
-                        .and(maintenanceSlot.beginTime.between(beginDt, endDt)))
+                        .and(maintenanceSlot.beginTime.between(beginDt, endDt))
+                        .and(maintenanceSlot.schedule.isNotNull()))
                 .fetch();
     }
 
