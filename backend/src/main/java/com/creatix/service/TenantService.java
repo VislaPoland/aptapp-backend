@@ -14,12 +14,18 @@ import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.email.SubTenantActivationMessageTemplate;
 import com.creatix.message.template.email.TenantActivationMessageTemplate;
+import com.creatix.message.template.sms.ActivationMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.message.BitlyService;
 import com.creatix.service.message.EmailMessageService;
 import freemarker.template.TemplateException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -56,6 +62,12 @@ public class TenantService {
     private EmailMessageService emailMessageService;
     @Autowired
     private ApplicationProperties applicationProperties;
+    @Autowired
+    private SmsMessageSender smsMessageSender;
+    @Autowired
+    private BitlyService bitlyService;
+
+    private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private @Nonnull <T, ID> T getOrElseThrow(@Nonnull ID id, @Nonnull DaoBase<T, ID> dao, @Nonnull EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -118,6 +130,16 @@ public class TenantService {
         accountService.setActionToken(tenant);
 
         emailMessageService.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
+
+        if (apartment.getProperty().getEnableSms()) {
+            String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", account.getActionToken())).toString());
+            logger.debug("Generated short url for sms activation account. Url: " + shortUrl);
+            try {
+                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, account.getPrimaryPhone()));
+            } catch (Exception e) {
+                logger.error("There is problem with smsMessageSender.send in tenantService: " + e);
+            }
+        }
 
         return tenant;
     }
