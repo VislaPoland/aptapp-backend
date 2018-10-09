@@ -1,5 +1,7 @@
 package com.creatix.service;
 
+import static java.util.stream.Collectors.toSet;
+
 import com.creatix.domain.Mapper;
 import com.creatix.domain.SlotUtils;
 import com.creatix.domain.dao.*;
@@ -74,6 +76,8 @@ public class SlotService {
     private NotificationGroupDao notificationGroupDao;
     @Autowired
     private AttachmentService attachmentService;
+    @Autowired
+    private DurationPerDayOfWeekDao durationPerDayOfWeekDao;
 
     @Nonnull
     public ScheduledSlotsResponse getSlotsByFilter(@Nonnull Long propertyId, @Nullable LocalDate beginDate, @Nullable LocalDate endDate, @Nullable Long startId, @Nullable Integer pageSize) {
@@ -290,13 +294,12 @@ public class SlotService {
         eventInviteDao.persist(invite);
     }
 
-    private Slot createMaintenanceSlotFromSchedule(@Nonnull LocalDate date, @Nonnull MaintenanceSlotSchedule schedule) {
+    private Slot createMaintenanceSlotFromSchedule(@Nonnull LocalDate date, @Nonnull MaintenanceSlotSchedule schedule, @Nonnull OffsetDateTime beginDt, @Nonnull OffsetDateTime endDt) {
         Objects.requireNonNull(date, "Date is null");
         Objects.requireNonNull(schedule, "Schedule is null");
+        Objects.requireNonNull(beginDt, "Begin date is null");
+        Objects.requireNonNull(endDt, "End date is null");
 
-
-        final OffsetDateTime beginDt = date.atTime(schedule.getBeginTime()).atOffset(schedule.getZoneOffset(date.atTime(schedule.getBeginTime())));
-        final OffsetDateTime endDt = date.atTime(schedule.getEndTime()).atOffset(schedule.getZoneOffset(date.atTime(schedule.getEndTime())));
 
         // create parent slot
         final MaintenanceSlot slot = new MaintenanceSlot();
@@ -341,15 +344,19 @@ public class SlotService {
             final boolean releasePreviousSchedule = (property.getSchedule() != null);
 
             if ( releasePreviousSchedule ) {
-                releaseScheduleSlots(property.getSchedule());
+                releaseSchedule(property.getSchedule());
             }
-
             final MaintenanceSlotSchedule schedule = releasePreviousSchedule ? property.getSchedule() : new MaintenanceSlotSchedule();
-            schedule.setBeginTime(request.getBeginTime());
-            schedule.setEndTime(request.getEndTime());
-            schedule.setDaysOfWeek(request.getDaysOfWeek());
+
+            Set<DurationPerDayOfWeek> durationPerDayOfWeekSet = request.getDaysOfWeek().stream().map(daysOfWeek -> {
+                DurationPerDayOfWeek duration = new DurationPerDayOfWeek(schedule, daysOfWeek.getBeginTime(), daysOfWeek.getEndTime(), daysOfWeek.getDay(), property.getTimeZone());
+                durationPerDayOfWeekDao.persist(duration);
+                return duration;
+            }).collect(toSet());
+
+            schedule.setDurationPerDayOfWeek(durationPerDayOfWeekSet);
+
             schedule.setProperty(property);
-            schedule.setTimeZone(property.getTimeZone());
             schedule.setInitialCapacity(request.getInitialCapacity());
             schedule.setUnitDurationMinutes(request.getUnitDurationMinutes());
             maintenanceSlotScheduleDao.persist(schedule);
@@ -365,9 +372,11 @@ public class SlotService {
         }
     }
 
-    private void releaseScheduleSlots(MaintenanceSlotSchedule schedule) {
+    private void releaseSchedule(MaintenanceSlotSchedule schedule) {
         final ArrayList<MaintenanceSlot> slots = new ArrayList<>(schedule.getSlots());
         slots.forEach(this::releaseSlot);
+
+        schedule.getDurationPerDayOfWeek().forEach(durationPerDayOfWeekDao::delete);
     }
 
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
@@ -443,7 +452,7 @@ public class SlotService {
     }
 
     private void scheduleSlots(MaintenanceSlotSchedule schedule) {
-        if ( (schedule == null) || (schedule.getDaysOfWeek() == null) || schedule.getDaysOfWeek().isEmpty() ) {
+        if ( (schedule == null) || (schedule.getDurationPerDayOfWeek() == null) || schedule.getDurationPerDayOfWeek().isEmpty() ) {
             return;
         }
 
@@ -451,29 +460,30 @@ public class SlotService {
         final Set<ZonedDateTime> scheduledTimes = scheduledSlots.stream()
                 .map(Slot::getBeginTime)
                 .map(dt -> dt.atZoneSameInstant(ZoneId.systemDefault()))
-                .collect(Collectors.toSet());
+                .collect(toSet());
 
-        for ( DayOfWeek dayOfWeek : schedule.getDaysOfWeek() ) {
-            LocalDate d = LocalDate.now().with(dayOfWeek);
+        schedule.getDurationPerDayOfWeek().stream().forEach(durationPerDayOfWeek -> {
+            LocalDate d = LocalDate.now().with(durationPerDayOfWeek.getDayOfWeek());
 
             for ( LocalDate dStop = d.plusMonths(4); d.isBefore(dStop); d = d.plusWeeks(1) ) {
                 if ( d.isBefore(LocalDate.now()) ) {
                     continue;
                 }
 
-                final OffsetDateTime dt = d
-                        .atTime(schedule.getBeginTime())
-                        .atOffset(schedule.getZoneOffset(d.atTime(schedule.getBeginTime())));
+                final OffsetDateTime dt = d.atTime(durationPerDayOfWeek.getBeginTime())
+                                           .atOffset(durationPerDayOfWeek.getZoneOffset(d.atTime(durationPerDayOfWeek.getBeginTime())));
 
                 if ( scheduledTimes.contains(dt.atZoneSameInstant(ZoneId.systemDefault())) ) {
                     continue;
                 }
 
-                createMaintenanceSlotFromSchedule(dt.toLocalDate(), schedule);
-            }
-        }
-    }
+                final OffsetDateTime beginDt = dt.toLocalDate().atTime(durationPerDayOfWeek.getBeginTime()).atOffset(durationPerDayOfWeek.getZoneOffset(dt.toLocalDate().atTime(durationPerDayOfWeek.getBeginTime())));
+                final OffsetDateTime endDt = dt.toLocalDate().atTime(durationPerDayOfWeek.getEndTime()).atOffset(durationPerDayOfWeek.getZoneOffset(dt.toLocalDate().atTime(durationPerDayOfWeek.getEndTime())));
 
+                createMaintenanceSlotFromSchedule( dt.toLocalDate(), schedule, beginDt, endDt);
+            }
+        });
+    }
 
     @Scheduled(cron = "0 10 */6 * * *") // every 6 hours, 10 minutes past full hour
     public void cleanupOldSlots() {
