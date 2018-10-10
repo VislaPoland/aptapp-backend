@@ -4,7 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Set;
+import java.time.DayOfWeek;
+import java.util.Map;
 
 @ApiModel
 @Data
@@ -14,5 +15,5 @@ public class MaintenanceSlotScheduleDto {
     @ApiModelProperty(value = "Initial slot unit capacity (1 = 1 employee capacity)", required = true)
     private int initialCapacity;
     @ApiModelProperty(value = "Days of week with adjustable work time", required = true)
-    private Set<DurationPerDayOfWeekDto> durationPerDayOfWeek;
+    private Map<DayOfWeek, DurationPerDayOfWeekDto> durationPerDayOfWeek;
 }
