@@ -348,8 +348,10 @@ public class SlotService {
             }
             final MaintenanceSlotSchedule schedule = releasePreviousSchedule ? property.getSchedule() : new MaintenanceSlotSchedule();
 
-            Set<DurationPerDayOfWeek> durationPerDayOfWeekSet = request.getDaysOfWeek().stream().map(daysOfWeek -> {
-                DurationPerDayOfWeek duration = new DurationPerDayOfWeek(schedule, daysOfWeek.getBeginTime(), daysOfWeek.getEndTime(), daysOfWeek.getDay(), property.getTimeZone());
+            Set<DurationPerDayOfWeek> durationPerDayOfWeekSet = request.getDurationPerDayOfWeek().entrySet().stream()
+                    .filter(day -> day.getValue().getEndTime() != null && day.getValue().getBeginTime() != null)
+                    .map(day -> {
+                DurationPerDayOfWeek duration = new DurationPerDayOfWeek(schedule, day.getValue().getBeginTime(), day.getValue().getEndTime(), day.getKey(), property.getTimeZone());
                 durationPerDayOfWeekDao.persist(duration);
                 return duration;
             }).collect(toSet());
@@ -462,7 +464,9 @@ public class SlotService {
                 .map(dt -> dt.atZoneSameInstant(ZoneId.systemDefault()))
                 .collect(toSet());
 
-        schedule.getDurationPerDayOfWeek().stream().forEach(durationPerDayOfWeek -> {
+        schedule.getDurationPerDayOfWeek().stream()
+                .filter(week -> week.getBeginTime() != null && week.getEndTime() != null)
+                .forEach(durationPerDayOfWeek -> {
             LocalDate d = LocalDate.now().with(durationPerDayOfWeek.getDayOfWeek());
 
             for ( LocalDate dStop = d.plusMonths(4); d.isBefore(dStop); d = d.plusWeeks(1) ) {

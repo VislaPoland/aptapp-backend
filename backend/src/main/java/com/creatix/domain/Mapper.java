@@ -52,6 +52,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -596,6 +597,26 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(MaintenanceSlotSchedule.class, MaintenanceSlotScheduleDto.class)
                 .byDefault()
+                .customize(new CustomMapper<MaintenanceSlotSchedule, MaintenanceSlotScheduleDto>() {
+                    public void mapAtoB(MaintenanceSlotSchedule schedule, MaintenanceSlotScheduleDto scheduleDto, MappingContext context) {
+                        scheduleDto.setDurationPerDayOfWeek(new EnumMap<>(DayOfWeek.class));
+
+                        Arrays.stream(DayOfWeek.values())
+                                .forEach(dayOfWeek -> {
+                                    DurationPerDayOfWeek duration = schedule.getDurationPerDayOfWeek()
+                                            .stream()
+                                            .filter(day -> dayOfWeek.equals(day.getDayOfWeek()))
+                                            .findFirst()
+                                            .orElse(null);
+
+                                    if (duration != null) {
+                                        scheduleDto.getDurationPerDayOfWeek().put(dayOfWeek, new DurationPerDayOfWeekDto(duration.getBeginTime(), duration.getEndTime()));
+                                    } else {
+                                        scheduleDto.getDurationPerDayOfWeek().put(dayOfWeek, new DurationPerDayOfWeekDto(null, null));
+                                    }
+                                });
+                    }
+                })
                 .register();
         mapperFactory.classMap(EventSlot.class, EventSlotDto.class)
                 .byDefault()

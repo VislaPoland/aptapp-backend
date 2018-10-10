@@ -1,6 +1,5 @@
 package com.creatix.domain.dto.property.slot;
 
-import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 import javax.validation.constraints.NotNull;
@@ -19,8 +18,4 @@ public class DayDuration {
     @NotNull
     @ApiModelProperty(value = "Time when slot ends", required = true, dataType = "java.lang.String", example = "17:00:00.000")
     private LocalTime endTime;
-    @NotNull
-    @ApiModelProperty(value = "Day", required = true, dataType = "java.lang.String", example = "MONDAY")
-    private DayOfWeek day;
-
 }

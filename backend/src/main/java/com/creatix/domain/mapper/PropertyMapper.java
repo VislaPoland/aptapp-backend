@@ -6,17 +6,25 @@ import com.creatix.domain.dto.property.contact.CreatePropertyContactRequest;
 import com.creatix.domain.dto.property.contact.UpdatePropertyContactRequest;
 import com.creatix.domain.dto.property.facility.CreatePropertyFacilityRequest;
 import com.creatix.domain.dto.property.facility.UpdatePropertyFacilityRequest;
+import com.creatix.domain.dto.property.slot.DurationPerDayOfWeekDto;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.Account;
+
+import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.Objects;
 
 @Component
@@ -68,6 +76,30 @@ public final class PropertyMapper extends ConfigurableMapper {
                 .byDefault()
                 .register();
         mapperFactory.classMap(MaintenanceSlotSchedule.class, MaintenanceSlotScheduleDto.class)
+                .byDefault()
+                .customize(new CustomMapper<MaintenanceSlotSchedule, MaintenanceSlotScheduleDto>() {
+                    public void mapAtoB(MaintenanceSlotSchedule schedule, MaintenanceSlotScheduleDto scheduleDto, MappingContext context) {
+                        scheduleDto.setDurationPerDayOfWeek(new EnumMap<>(DayOfWeek.class));
+
+                        Arrays.stream(DayOfWeek.values())
+                                .forEach(dayOfWeek -> {
+                                    DurationPerDayOfWeek duration = schedule.getDurationPerDayOfWeek()
+                                            .stream()
+                                            .filter(day -> dayOfWeek.equals(day.getDayOfWeek()))
+                                            .findFirst()
+                                            .orElse(null);
+
+                                    if (duration != null) {
+                                        scheduleDto.getDurationPerDayOfWeek().put(dayOfWeek, new DurationPerDayOfWeekDto(duration.getBeginTime(), duration.getEndTime()));
+                                    } else {
+                                        scheduleDto.getDurationPerDayOfWeek().put(dayOfWeek, new DurationPerDayOfWeekDto(null, null));
+                                    }
+                                });
+                    }
+                })
+                .register();
+
+        mapperFactory.classMap(DurationPerDayOfWeek.class, DurationPerDayOfWeekDto.class)
                 .byDefault()
                 .register();
         //endregion

@@ -1,6 +1,5 @@
 package com.creatix.domain.dto.property.slot;
 
-import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 import io.swagger.annotations.ApiModel;
@@ -18,7 +17,9 @@ public class DurationPerDayOfWeekDto {
     private LocalTime beginTime;
     @ApiModelProperty(value = "Time when slot ends", required = true, dataType = "java.lang.String", example = "17:00:00.000")
     private LocalTime endTime;
-    @ApiModelProperty(value = "Days of week", required = true)
-    private DayOfWeek dayOfWeek;
 
+    public DurationPerDayOfWeekDto(LocalTime beginTime, LocalTime endTime) {
+        this.beginTime = beginTime;
+        this.endTime = endTime;
+    }
 }
