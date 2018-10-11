@@ -342,19 +342,23 @@ public class SlotService {
         if ( authorizationManager.isManager(property) || authorizationManager.isOwner(property) || AccountRole.Administrator.equals(authorizationManager.getCurrentAccount().getRole())) {
 
             final boolean releasePreviousSchedule = (property.getSchedule() != null);
-
+            final MaintenanceSlotSchedule schedule;
             if ( releasePreviousSchedule ) {
                 releaseSchedule(property.getSchedule());
+                schedule = property.getSchedule();
+            } else {
+                schedule = new MaintenanceSlotSchedule();
+                maintenanceSlotScheduleDao.persist(schedule);
             }
-            final MaintenanceSlotSchedule schedule = releasePreviousSchedule ? property.getSchedule() : new MaintenanceSlotSchedule();
 
-            Set<DurationPerDayOfWeek> durationPerDayOfWeekSet = request.getDurationPerDayOfWeek().entrySet().stream()
-                    .filter(day -> day.getValue().getEndTime() != null && day.getValue().getBeginTime() != null)
+            Set<DurationPerDayOfWeek> durationPerDayOfWeekSet = request.getDurationPerDayOfWeek().entrySet()
+                    .stream()
+                    .filter(day ->day.getValue().getBeginTime() != null && day.getValue().getEndTime() != null)
                     .map(day -> {
-                DurationPerDayOfWeek duration = new DurationPerDayOfWeek(schedule, day.getValue().getBeginTime(), day.getValue().getEndTime(), day.getKey(), property.getTimeZone());
-                durationPerDayOfWeekDao.persist(duration);
-                return duration;
-            }).collect(toSet());
+                        DurationPerDayOfWeek duration = new DurationPerDayOfWeek(schedule, day.getValue().getBeginTime(), day.getValue().getEndTime(), day.getKey(), property.getTimeZone());
+                        durationPerDayOfWeekDao.persist(duration);
+                        return duration;
+                    }).collect(toSet());
 
             schedule.setDurationPerDayOfWeek(durationPerDayOfWeekSet);
 
@@ -467,25 +471,25 @@ public class SlotService {
         schedule.getDurationPerDayOfWeek().stream()
                 .filter(week -> week.getBeginTime() != null && week.getEndTime() != null)
                 .forEach(durationPerDayOfWeek -> {
-            LocalDate d = LocalDate.now().with(durationPerDayOfWeek.getDayOfWeek());
+                    LocalDate d = LocalDate.now().with(durationPerDayOfWeek.getDayOfWeek());
 
-            for ( LocalDate dStop = d.plusMonths(4); d.isBefore(dStop); d = d.plusWeeks(1) ) {
-                if ( d.isBefore(LocalDate.now()) ) {
-                    continue;
-                }
+                    for ( LocalDate dStop = d.plusMonths(4); d.isBefore(dStop); d = d.plusWeeks(1) ) {
+                        if ( d.isBefore(LocalDate.now()) ) {
+                            continue;
+                        }
 
-                final OffsetDateTime dt = d.atTime(durationPerDayOfWeek.getBeginTime())
-                                           .atOffset(durationPerDayOfWeek.getZoneOffset(d.atTime(durationPerDayOfWeek.getBeginTime())));
+                        final OffsetDateTime dt = d.atTime(durationPerDayOfWeek.getBeginTime())
+                                                   .atOffset(durationPerDayOfWeek.getZoneOffset(d.atTime(durationPerDayOfWeek.getBeginTime())));
 
-                if ( scheduledTimes.contains(dt.atZoneSameInstant(ZoneId.systemDefault())) ) {
-                    continue;
-                }
+                        if ( scheduledTimes.contains(dt.atZoneSameInstant(ZoneId.systemDefault())) ) {
+                            continue;
+                        }
 
-                final OffsetDateTime beginDt = dt.toLocalDate().atTime(durationPerDayOfWeek.getBeginTime()).atOffset(durationPerDayOfWeek.getZoneOffset(dt.toLocalDate().atTime(durationPerDayOfWeek.getBeginTime())));
-                final OffsetDateTime endDt = dt.toLocalDate().atTime(durationPerDayOfWeek.getEndTime()).atOffset(durationPerDayOfWeek.getZoneOffset(dt.toLocalDate().atTime(durationPerDayOfWeek.getEndTime())));
+                        final OffsetDateTime beginDt = dt.toLocalDate().atTime(durationPerDayOfWeek.getBeginTime()).atOffset(durationPerDayOfWeek.getZoneOffset(dt.toLocalDate().atTime(durationPerDayOfWeek.getBeginTime())));
+                        final OffsetDateTime endDt = dt.toLocalDate().atTime(durationPerDayOfWeek.getEndTime()).atOffset(durationPerDayOfWeek.getZoneOffset(dt.toLocalDate().atTime(durationPerDayOfWeek.getEndTime())));
 
-                createMaintenanceSlotFromSchedule( dt.toLocalDate(), schedule, beginDt, endDt);
-            }
+                        createMaintenanceSlotFromSchedule( dt.toLocalDate(), schedule, beginDt, endDt);
+                    }
         });
     }
 
