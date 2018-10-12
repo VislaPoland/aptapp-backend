@@ -1,2 +1,2 @@
-Security has resolved your concern.
+Property Patrol has resolved your concern.
 ${message} ${timestamp}

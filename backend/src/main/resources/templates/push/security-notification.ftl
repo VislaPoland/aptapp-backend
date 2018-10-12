@@ -1,1 +1,1 @@
-${role} ${name} sent security a notification: ${message} ${timestamp}
+${role} ${name} sent Property Patrol a notification: ${message} ${timestamp}
