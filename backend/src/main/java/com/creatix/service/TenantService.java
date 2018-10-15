@@ -137,7 +137,7 @@ public class TenantService {
             try {
                 smsMessageSender.send(new ActivationMessageTemplate(shortUrl, account.getPrimaryPhone()));
             } catch (Exception e) {
-                logger.error("There is problem with smsMessageSender.send in tenantService: " + e);
+                logger.error("There is problem with smsMessageSender.send in tenantService: " + e.getMessage());
             }
         }
 
