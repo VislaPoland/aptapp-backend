@@ -43,6 +43,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -161,20 +162,7 @@ public class AccountService {
             setActionToken(account);
         }
 
-        final boolean enableSms = authorizationManager.getAccountProperties(account).iterator().next().getEnableSms() &&
-                account.getPrimaryPhone() != null &&
-                !account.getPrimaryPhone().isEmpty();
-
-        if ( enableSms || ( enableSms && AccountRole.Tenant.equals(account.getRole()) && ((Tenant) account).getEnableSms())) {
-
-            String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", account.getActionToken())).toString());
-            logger.info("Generated short url for sms activation account. Url: " + shortUrl);
-            try {
-                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, account.getPrimaryPhone()));
-            } catch (Exception e) {
-                logger.error("There is problem with smsMessageSender.send in accountService", e);
-            }
-        }
+        sendActivationSms(account);
 
         emailMessageService.send(new ResetActivationMessageTemplate(account, applicationProperties));
         return account.getActionToken();
@@ -378,6 +366,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new AdministratorActivationMessageTemplate(account, applicationProperties));
 
         return account;
@@ -414,6 +403,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new PropertyOwnerActivationMessageTemplate(account, applicationProperties));
 
         return account;
@@ -468,6 +458,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
@@ -534,6 +525,7 @@ public class AccountService {
         securityEmployeeDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
@@ -585,6 +577,7 @@ public class AccountService {
         maintenanceEmployeeDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
@@ -645,6 +638,7 @@ public class AccountService {
         assistantPropertyManagerDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
@@ -764,5 +758,21 @@ public class AccountService {
         }
     }
 
+    private void sendActivationSms(Account account) throws MessageDeliveryException, MalformedURLException {
+        final boolean enableSms = account.getPrimaryPhone() != null && !account.getPrimaryPhone().isEmpty();
+
+        if ( enableSms ||
+            ( enableSms && AccountRole.Tenant.equals(account.getRole()) && ((Tenant) account).getEnableSms() && authorizationManager.getAccountProperties(account).iterator().next().getEnableSms()) ||
+            ( enableSms && AccountRole.PropertyOwner.equals(account.getRole()) && authorizationManager.getAccountProperties(account).iterator().next().getEnableSms())) {
+
+            String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", account.getActionToken())).toString());
+            logger.info("Generated short url for sms activation account. Url: " + shortUrl);
+            try {
+                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, account.getPrimaryPhone()));
+            } catch (Exception e) {
+                logger.error("There is problem with smsMessageSender.send in accountService", e);
+            }
+        }
+    }
 
 }
