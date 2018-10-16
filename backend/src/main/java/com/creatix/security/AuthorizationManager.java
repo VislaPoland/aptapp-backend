@@ -257,10 +257,11 @@ public class AuthorizationManager {
             if ( reservation.getNotification() != null ) {
                 return Objects.equals(tenant, reservation.getNotification().getAuthor());
             }
-        }
-        else if ( account instanceof EmployeeBase ) {
+        } else if (account instanceof EmployeeBase) {
             final Property property = getCurrentProperty(account);
             return Objects.equals(property, reservation.getSlot().getProperty());
+        } else if (AccountRole.Administrator.equals(account.getRole())) {
+            return true;
         }
 
         return false;
