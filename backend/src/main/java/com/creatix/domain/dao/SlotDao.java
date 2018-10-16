@@ -103,8 +103,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
                 env.predicate = env.predicate.andAnyOf(
                         slot.instanceOf(EventSlot.class),
                         maintenanceNotification.author.eq(tenant),
-                        maintenanceParentTenantOfSubTenantAuthor.subTenants.any().parentTenant.eq(tenant)
-                );
+                        maintenanceParentTenantOfSubTenantAuthor.subTenants.any().parentTenant.eq(tenant));
                 break;
             case SubTenant:
                 // filter: tenant's maintenance or events
