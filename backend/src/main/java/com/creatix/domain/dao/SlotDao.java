@@ -85,37 +85,42 @@ public class SlotDao extends DaoBase<Slot, Long> {
 
         env.predicate = slot.property.eq(property);
 
-        if ( (account instanceof MaintenanceEmployee) || (account instanceof PropertyManager) || (account instanceof AssistantPropertyManager) ) {
-            // all reservations in state pending or state confirmed or events
-            env.predicate = env.predicate.and(maintenanceReservations.status.in(ReservationStatus.Pending, ReservationStatus.Confirmed).or(slot.instanceOf(EventSlot.class)));
+        switch (account.getRole()) {
+            case Maintenance:
+            case PropertyManager:
+            case AssistantPropertyManager:
+            case Administrator:
+                // all reservations in state pending or state confirmed or events
+                env.predicate = env.predicate.and(maintenanceReservations.status.in(ReservationStatus.Pending, ReservationStatus.Confirmed).or(slot.instanceOf(EventSlot.class)));
+                break;
+            case Security:
+                // filter: self created maintenance notification or events
+                env.predicate = env.predicate.and(maintenanceNotification.author.id.eq(account.getId()).or(slot.instanceOf(EventSlot.class)));
+                break;
+            case Tenant:
+                // filter: tenant's maintenance or events
+                final Tenant tenant = (Tenant) account;
+                env.predicate = env.predicate.andAnyOf(
+                        slot.instanceOf(EventSlot.class),
+                        maintenanceNotification.author.eq(tenant),
+                        maintenanceParentTenantOfSubTenantAuthor.subTenants.any().parentTenant.eq(tenant)
+                );
+                break;
+            case SubTenant:
+                // filter: tenant's maintenance or events
+                final SubTenant subTenant = (SubTenant) account;
+                env.predicate = env.predicate.andAnyOf(
+                        slot.instanceOf(EventSlot.class),
+                        maintenanceNotification.author.eq(account),
+                        maintenanceNotification.author.eq(subTenant.getParentTenant()),
+                        maintenanceParentTenantOfSubTenantAuthor.subTenants.any().eq(subTenant)
+                );
+                break;
+            case PropertyOwner:
+            default:
+                env.predicate = env.predicate.and(slot.instanceOf(EventSlot.class));
+                break;
         }
-        else if ( account instanceof SecurityEmployee ) {
-            // filter: self created maintenance notification or events
-            env.predicate = env.predicate.and(maintenanceNotification.author.id.eq(account.getId()).or(slot.instanceOf(EventSlot.class)));
-        }
-        else if ( account instanceof Tenant ) {
-            // filter: tenant's maintenance or events
-            final Tenant tenant = (Tenant) account;
-            env.predicate = env.predicate.andAnyOf(
-                    slot.instanceOf(EventSlot.class),
-                    maintenanceNotification.author.eq(tenant),
-                    maintenanceParentTenantOfSubTenantAuthor.subTenants.any().parentTenant.eq(tenant)
-            );
-        }
-        else if ( account instanceof SubTenant ) {
-            // filter: tenant's maintenance or events
-            final SubTenant subTenant = (SubTenant) account;
-            env.predicate = env.predicate.andAnyOf(
-                    slot.instanceOf(EventSlot.class),
-                    maintenanceNotification.author.eq(account),
-                    maintenanceNotification.author.eq(subTenant.getParentTenant()),
-                    maintenanceParentTenantOfSubTenantAuthor.subTenants.any().eq(subTenant)
-            );
-        }
-        else {
-            env.predicate = env.predicate.and(slot.instanceOf(EventSlot.class));
-        }
-
 
         // allow to see only appropriate events (filter by audience)
         if ( account instanceof ManagedEmployee ) {
