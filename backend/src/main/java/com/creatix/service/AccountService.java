@@ -161,10 +161,14 @@ public class AccountService {
             setActionToken(account);
         }
 
-        if ((authorizationManager.getAccountProperties(account).iterator().next().getEnableSms() && !account.getPrimaryPhone().isEmpty()) ||
-            (AccountRole.Tenant.equals(account.getRole()) && ((Tenant) account).getEnableSms()) ) {
+        final boolean enableSms = authorizationManager.getAccountProperties(account).iterator().next().getEnableSms() &&
+                account.getPrimaryPhone() != null &&
+                !account.getPrimaryPhone().isEmpty();
+
+        if ( enableSms || ( enableSms && AccountRole.Tenant.equals(account.getRole()) && ((Tenant) account).getEnableSms())) {
+
             String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", account.getActionToken())).toString());
-            logger.debug("Generated short url for sms activation account. Url: " + shortUrl);
+            logger.info("Generated short url for sms activation account. Url: " + shortUrl);
             try {
                 smsMessageSender.send(new ActivationMessageTemplate(shortUrl, account.getPrimaryPhone()));
             } catch (Exception e) {
