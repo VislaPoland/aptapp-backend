@@ -168,7 +168,7 @@ public class AccountService {
             try {
                 smsMessageSender.send(new ActivationMessageTemplate(shortUrl, account.getPrimaryPhone()));
             } catch (Exception e) {
-                logger.error("There is problem with smsMessageSender.send in accountService: " + e);
+                logger.error("There is problem with smsMessageSender.send in accountService: " + e.getMessage());
             }
         }
 
