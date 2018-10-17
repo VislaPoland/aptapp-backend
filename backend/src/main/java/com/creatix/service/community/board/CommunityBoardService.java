@@ -284,6 +284,7 @@ public class CommunityBoardService {
 
         final GenericPushNotification pushNotification = new GenericPushNotification();
         pushNotification.setTitle(template.getTitle());
+        pushNotification.setBadgeCount(1);
         try {
             pushNotification.setMessage(templateProcessor.processTemplate(template));
         } catch (IOException | TemplateException e) {
@@ -319,6 +320,7 @@ public class CommunityBoardService {
         final GenericPushNotification pushNotification = new GenericPushNotification();
         pushNotification.setMessage(templateProcessor.processTemplate(new NewCommunityItemCommentTemplate(comment)));
         pushNotification.setTitle("New comment");
+        pushNotification.setBadgeCount(1);
 
         CommentNotification storedNotification = new CommentNotification();
         storedNotification.setCommunityBoardComment(comment);
@@ -337,6 +339,7 @@ public class CommunityBoardService {
         final GenericPushNotification pushNotification = new GenericPushNotification();
         pushNotification.setMessage(templateProcessor.processTemplate(new NewCommunityItemCommentReplyTemplate((comment))));
         pushNotification.setTitle("New comment reply");
+        pushNotification.setBadgeCount(1);
 
         CommentNotification storedNotification = new CommentNotification();
         storedNotification.setCommunityBoardComment(comment);

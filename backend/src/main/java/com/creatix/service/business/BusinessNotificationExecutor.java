@@ -83,6 +83,7 @@ public class BusinessNotificationExecutor {
 
         final BusinessProfileCreatedPush notification = new BusinessProfileCreatedPush(businessProfile.getId());
         notification.setTitle("New Business!");
+        notification.setBadgeCount(1);
         try {
             notification.setMessage(
                     templateProcessor.processTemplate(new BusinessProfileCreatedTemplate(businessProfile))
@@ -123,6 +124,7 @@ public class BusinessNotificationExecutor {
 
         final DiscountCouponCreatedPush notification = new DiscountCouponCreatedPush(discountCoupon.getId());
         notification.setTitle("New Coupon Available!");
+        notification.setBadgeCount(1);
         try {
             notification.setMessage(
                     templateProcessor.processTemplate(new DiscountCouponCreatedTemplate(discountCoupon))

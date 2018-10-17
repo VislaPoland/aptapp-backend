@@ -181,9 +181,8 @@ public class PersonalMessageService {
 
         final GenericPushNotification notification = new GenericPushNotification();
         notification.setMessage(templateProcessor.processTemplate(new NewPersonalMessageTemplate(personalMessage)));
+        notification.setBadgeCount(1);
         notification.setTitle("New personal message");
-
-
 
         pushNotificationSender.sendNotification(notification, personalMessage.getToAccount());
 
