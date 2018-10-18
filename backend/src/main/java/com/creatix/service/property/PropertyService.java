@@ -162,10 +162,11 @@ public class PropertyService {
         return tenantDao.findByProperty(propertyId);
     }
 
-    private String returnCsvRow(TenantBase tenant){
+    private String returnCsvRow(TenantBase tenant, String apartmentNumber){
         StringJoiner joiner = new StringJoiner(",");
         joiner.add(tenant.getFirstName())
                 .add(tenant.getLastName())
+                .add(apartmentNumber)
                 .add(tenant.getPrimaryPhone())
                 .add(tenant.getPrimaryEmail())
                 .add(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone( ZoneId.systemDefault() ).format(tenant.getCreatedAt().toInstant()))
@@ -190,12 +191,12 @@ public class PropertyService {
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public String generateCsvResponse(Long propertyId){
-        String csvResponse = "First Name,Last Name,Primary Phone,Primary Email,Created At,Active users";
+        String csvResponse = "First Name,Last Name,Apartment Number,Primary Phone,Primary Email,Created At,Active users";
         for(Tenant tenant: getTenants(propertyId)){
-            csvResponse+="\n"+returnCsvRow(tenant);
+            csvResponse+="\n"+returnCsvRow(tenant, tenant.getApartment().getUnitNumber());
             Set<SubTenant> subTenants = tenant.getSubTenants();
             for(SubTenant subTenant:subTenants){
-               csvResponse+="\n"+returnCsvRow(subTenant);
+               csvResponse+="\n"+returnCsvRow(subTenant, subTenant.getParentTenant().getApartment().getUnitNumber());
             }
         }
         return csvResponse;
