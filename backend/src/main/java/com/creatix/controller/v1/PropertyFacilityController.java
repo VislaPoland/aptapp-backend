@@ -69,7 +69,7 @@ public class PropertyFacilityController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<PropertyDto.FacilityDto> createPropertyFacility(@PathVariable Long propertyId, @Valid @RequestBody CreatePropertyFacilityRequest request) {
         return new DataResponse<>(mapper.toPropertyFacility(propertyFacilityService.create(propertyId, request)));
     }
@@ -82,7 +82,7 @@ public class PropertyFacilityController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{facilityId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<PropertyDto.FacilityDto> updatePropertyFacility(@PathVariable Long propertyId, @PathVariable Long facilityId, @Valid @RequestBody UpdatePropertyFacilityRequest request) {
         return new DataResponse<>(mapper.toPropertyFacility(propertyFacilityService.update(propertyId, facilityId, request)));
     }
@@ -95,7 +95,7 @@ public class PropertyFacilityController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{facilityId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public DataResponse<PropertyDto.FacilityDto> deletePropertyFacility(@PathVariable Long propertyId, @PathVariable Long facilityId) {
         return new DataResponse<>(mapper.toPropertyFacility(propertyFacilityService.delete(propertyId, facilityId)));
     }

@@ -7,6 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 
 @ApiModel
 @Data
@@ -22,5 +23,7 @@ public class CreateNeighborhoodNotificationRequest {
     private Date date = new Date();
     @ApiModelProperty(value = "Target apartment unit number", required = true)
     @NotNull
-    private String unitNumber;
+    private List<String> unitNumbers;
+    @ApiModelProperty(value = "Property id")
+    private Long propertyId;
 }

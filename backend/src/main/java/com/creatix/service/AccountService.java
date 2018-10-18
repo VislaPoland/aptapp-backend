@@ -13,12 +13,17 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.email.*;
+import com.creatix.message.template.sms.ActivationMessageTemplate;
 import com.creatix.security.*;
+import com.creatix.service.message.BitlyService;
 import com.creatix.service.message.EmailMessageService;
 import freemarker.template.TemplateException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.RandomStringGenerator;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,6 +43,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -87,6 +93,10 @@ public class AccountService {
     private DeviceProperties deviceProperties;
     @Autowired
     private SmsMessageSender smsMessageSender;
+    @Autowired
+    private BitlyService bitlyService;
+
+    private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -103,8 +113,7 @@ public class AccountService {
                 .withinRange('0', '9').build();
 
         account.setActionToken(generator.generate(6));
-        account.setActionTokenValidUntil(DateTime.now().plusDays(7).toDate());
-
+        account.setActionTokenValidUntil(DateTime.now().plusDays(30).toDate());
         accountDao.persist(account);
     }
 
@@ -136,6 +145,36 @@ public class AccountService {
         return account.getActionToken();
     }
 
+
+    public List<Account> getInactiveTenantsAndSubTenants(){
+        return accountDao.findInactiveTenantsAndSubTenants();
+    }
+
+
+    public String resendActivationCode(@NotNull Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        Objects.requireNonNull(accountId, "Account is null");
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+
+        if ( account.getActive() == Boolean.TRUE ) {
+            throw new IllegalArgumentException(String.format("Account id=%d is already activated", account.getId()));
+        }
+        if(new Date().after(account.getActionTokenValidUntil())){
+            setActionToken(account);
+        }
+
+        sendActivationSms(account);
+
+        emailMessageService.send(new ResetActivationMessageTemplate(account, applicationProperties));
+        return account.getActionToken();
+    }
+
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public String resendActivationCodeRequest(@NotNull Long accountId) throws MessagingException, TemplateException, MessageDeliveryException, IOException {
+        final Account account = getOrElseThrow(accountId, accountDao, new EntityNotFoundException(String.format("Account id=%d not found", accountId)));
+        authorizationManager.checkResetActivationCode(account);
+        return resendActivationCode(accountId);
+    }
+    
     public LoginResponse createLoginResponse(String email) {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         final String token = tokenUtils.generateToken(userDetails);
@@ -238,11 +277,13 @@ public class AccountService {
         Objects.requireNonNull(request, "Request is null");
 
         if ( account instanceof Tenant ) {
+            final Tenant tenant = (Tenant) account;
+
             if ( request.getEnableSms() == null ) {
                 throw new IllegalArgumentException("Enable sms parameter is required");
             }
-            final Tenant tenant = (Tenant) account;
             tenant.setEnableSms(request.getEnableSms());
+            tenant.setIsNeighborhoodNotificationEnable(request.getIsNeighborhoodNotificationEnable());
         }
 
         mapper.fillAccount(request, account);
@@ -325,6 +366,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new AdministratorActivationMessageTemplate(account, applicationProperties));
 
         return account;
@@ -361,6 +403,7 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new PropertyOwnerActivationMessageTemplate(account, applicationProperties));
 
         return account;
@@ -383,20 +426,26 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public PropertyManager createPropertyManager(@NotNull PersistPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
 
         Property managedProperty;
-        if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
-            Objects.requireNonNull(request.getManagedPropertyId(), "Managed property id is null");
 
-            managedProperty = propertyDao.findById(request.getManagedPropertyId());
-            authorizationManager.checkOwner(managedProperty);
-        }
-        else {
-            managedProperty = authorizationManager.getCurrentProperty();
+        switch (authorizationManager.getCurrentAccount().getRole()) {
+            case Administrator:
+                Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
+                managedProperty = propertyDao.findById(request.getPropertyId());
+                break;
+            case PropertyOwner:
+                Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
+                managedProperty = propertyDao.findById(request.getPropertyId());
+                authorizationManager.checkOwner(managedProperty);
+                break;
+            default:
+                managedProperty = authorizationManager.getCurrentProperty();
+                break;
         }
 
         final PropertyManager account = this.getEntityInstance(request.getPrimaryEmail(), PropertyManager.class);
@@ -409,30 +458,38 @@ public class AccountService {
         accountDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager})
     public PropertyManager updatePropertyManager(@NotNull Long accountId, @NotNull PersistPropertyManagerRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
 
         Property managedProperty;
         PropertyManager account;
-        if ( authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyOwner ) {
-            Objects.requireNonNull(request.getManagedPropertyId());
 
-            managedProperty = propertyDao.findById(request.getManagedPropertyId());
-            authorizationManager.checkOwner(managedProperty);
-            account = propertyManagerDao.findById(accountId);
+        switch (authorizationManager.getCurrentAccount().getRole()) {
+            case Administrator:
+                Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
+                managedProperty = propertyDao.findById(request.getPropertyId());
+                account = propertyManagerDao.findById(accountId);
+                break;
+            case PropertyOwner:
+                Objects.requireNonNull(request.getPropertyId(), "Managed property id is null.");
+                managedProperty = propertyDao.findById(request.getPropertyId());
+                authorizationManager.checkOwner(managedProperty);
+                account = propertyManagerDao.findById(accountId);
+                break;
+            default:
+                managedProperty = authorizationManager.getCurrentProperty();
+                account = propertyManagerDao.findById(accountId);
+                authorizationManager.isSelf(account);
         }
-        else {
-            managedProperty = authorizationManager.getCurrentProperty();
-            account = propertyManagerDao.findById(accountId);
-            authorizationManager.isSelf(account);
-        }
+
         preventAccountDuplicity(request.getPrimaryEmail(), account.getPrimaryEmail());
         if ( account.getRole() != AccountRole.PropertyManager ) {
             throw new SecurityException("Account role change is not allowed.");
@@ -445,12 +502,18 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager})
     public SecurityEmployee createSecurityGuy(@NotNull PersistSecurityGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
 
-        final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
+        final PropertyManager manager;
+        if (authorizationManager.getCurrentAccount().getRole() == AccountRole.PropertyManager) {
+            manager = (PropertyManager) authorizationManager.getCurrentAccount();
+        } else {
+            // TODO not best way how to select manager, this need to be changed in future
+            manager = propertyDao.findById(request.getPropertyId()).getManagers().iterator().next();
+        }
 
         final SecurityEmployee account = this.getEntityInstance(request.getPrimaryEmail(), SecurityEmployee.class);
         account.setRole(AccountRole.Security);
@@ -462,12 +525,13 @@ public class AccountService {
         securityEmployeeDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.Security})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.Security})
     public SecurityEmployee updateSecurityGuy(@NotNull Long accountId, @NotNull PersistSecurityGuyRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
@@ -484,12 +548,24 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public MaintenanceEmployee createMaintenanceGuy(@NotNull PersistMaintenanceGuyRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
 
-        final PropertyManager manager = (PropertyManager) authorizationManager.getCurrentAccount();
+        final PropertyManager manager;
+        switch (authorizationManager.getCurrentAccount().getRole()) {
+            case PropertyManager:
+            case PropertyOwner:
+                manager = (PropertyManager) authorizationManager.getCurrentAccount();
+                break;
+            case Administrator:
+                // TODO not best way how to select manager, this need to be changed in future
+                manager = propertyDao.findById(request.getPropertyId()).getManagers().iterator().next();
+                break;
+            default:
+                throw new SecurityException("Not allowed to perform action");
+        }
 
         final MaintenanceEmployee account = this.getEntityInstance(request.getPrimaryEmail(), MaintenanceEmployee.class);
         account.setRole(AccountRole.Maintenance);
@@ -501,12 +577,13 @@ public class AccountService {
         maintenanceEmployeeDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.Maintenance})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.Maintenance})
     public MaintenanceEmployee updateMaintenanceGuy(@NotNull Long accountId, @NotNull PersistMaintenanceGuyRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
@@ -523,26 +600,32 @@ public class AccountService {
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.PropertyOwner})
     public AssistantPropertyManager createAssistantPropertyManager(@NotNull PersistAssistantPropertyManagerRequest request) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
         Objects.requireNonNull(request);
         preventAccountDuplicity(request.getPrimaryEmail());
 
         final Account currentAccount = authorizationManager.getCurrentAccount();
         final PropertyManager manager;
-        if ( currentAccount instanceof PropertyManager ) {
-            manager = (PropertyManager) currentAccount;
-        }
-        else if ( currentAccount instanceof PropertyOwner ) {
-            Objects.requireNonNull(request.getManagerId(), "Manager is null");
-            manager = propertyManagerDao.findById(request.getManagerId());
-            if ( manager == null ) {
-                throw new EntityNotFoundException(String.format("Property manager id=%d not found", request.getManagerId()));
-            }
-            authorizationManager.checkOwner(manager.getManagedProperty());
-        }
-        else {
-            throw new SecurityException("Not allowed to perform action");
+
+        switch(authorizationManager.getCurrentAccount().getRole()) {
+            case PropertyManager:
+                manager = (PropertyManager) currentAccount;
+                break;
+            case PropertyOwner:
+                Objects.requireNonNull(request.getManagerId(), "Manager is null");
+                manager = propertyManagerDao.findById(request.getManagerId());
+                if ( manager == null ) {
+                    throw new EntityNotFoundException(String.format("Property manager id=%d not found", request.getManagerId()));
+                }
+                authorizationManager.checkOwner(manager.getManagedProperty());
+                break;
+            case Administrator:
+                // TODO not best way how to select manager, this need to be changed in future
+                manager = propertyDao.findById(request.getPropertyId()).getManagers().iterator().next();
+                break;
+            default:
+                throw new SecurityException("Not allowed to perform action");
         }
 
         final AssistantPropertyManager account = this.getEntityInstance(request.getPrimaryEmail(), AssistantPropertyManager.class);
@@ -555,12 +638,13 @@ public class AccountService {
         assistantPropertyManagerDao.persist(account);
         setActionToken(account);
 
+        sendActivationSms(account);
         emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
 
         return account;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner})
     public AssistantPropertyManager updateAssistantPropertyManager(@NotNull Long accountId, @NotNull PersistAssistantPropertyManagerRequest request) {
         Objects.requireNonNull(accountId);
         Objects.requireNonNull(request);
@@ -674,5 +758,21 @@ public class AccountService {
         }
     }
 
+    private void sendActivationSms(Account account) throws MessageDeliveryException, MalformedURLException {
+        final boolean enableSms = account.getPrimaryPhone() != null && !account.getPrimaryPhone().isEmpty();
+
+        if ( enableSms ||
+            ( enableSms && AccountRole.Tenant.equals(account.getRole()) && ((Tenant) account).getEnableSms() && authorizationManager.getAccountProperties(account).iterator().next().getEnableSms()) ||
+            ( enableSms && AccountRole.PropertyOwner.equals(account.getRole()) && authorizationManager.getAccountProperties(account).iterator().next().getEnableSms())) {
+
+            String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", account.getActionToken())).toString());
+            logger.info("Generated short url for sms activation account. Url: " + shortUrl);
+            try {
+                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, account.getPrimaryPhone()));
+            } catch (Exception e) {
+                logger.error("There is problem with smsMessageSender.send in accountService", e);
+            }
+        }
+    }
 
 }

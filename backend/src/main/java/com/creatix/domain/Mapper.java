@@ -25,6 +25,7 @@ import com.creatix.domain.dto.notification.security.SecurityNotificationDto;
 import com.creatix.domain.dto.property.*;
 import com.creatix.domain.dto.property.message.CreatePredefinedMessageRequest;
 import com.creatix.domain.dto.property.message.PredefinedMessageDto;
+import com.creatix.domain.dto.property.message.PredefinedMessagePhotoDto;
 import com.creatix.domain.dto.property.slot.*;
 import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
@@ -51,6 +52,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -84,6 +86,9 @@ public class Mapper {
     }
     private String createPropertyPhotoDownloadUrl(PropertyPhoto photo) throws MalformedURLException, URISyntaxException {
         return applicationProperties.buildBackendUrl(String.format("api/properties/%d/photos/%s", photo.getProperty().getId(), photo.getFileName())).toString();
+    }
+    private String createPredefinedMessagePhotoDownloadUrl(PredefinedMessagePhoto photo) throws MalformedURLException, URISyntaxException {
+        return applicationProperties.buildBackendUrl(String.format("/api/properties/%d/messages/predefined/%d/photos/%s", photo.getPredefinedMessage().getProperty().getId(), photo.getPredefinedMessage().getId(), photo.getFileName())).toString();
     }
 
     private void configure(MapperFactory mapperFactory) {
@@ -140,6 +145,7 @@ public class Mapper {
                                 case SubTenant:
                                     accountDto.setIsPrivacyPolicyAccepted(((TenantBase) account).getIsPrivacyPolicyAccepted());
                                     accountDto.setIsTacAccepted(((TenantBase) account).getIsTacAccepted());
+                                    accountDto.setIsNeighborhoodNotificationEnable(((TenantBase) account).getIsNeighborhoodNotificationEnable());
                                     break;
                                 default:
                                     break;
@@ -241,6 +247,13 @@ public class Mapper {
                         if ( !(authorizationManager.hasCurrentAccount()) || authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.SubTenant) ) {
                             // only authenticated non-tenant accounts are allowed to see author of the notification
                             notificationDto.setAuthor(null);
+                        } else {
+                            if (notification.getAuthor() instanceof Tenant) {
+                                Apartment apartment = ((Tenant)notification.getAuthor()).getApartment();
+                                if (apartment != null) {
+                                    notificationDto.getAuthor().setUnitNumber(apartment.getUnitNumber());
+                                }
+                            }
                         }
                     }
                 })
@@ -283,8 +296,25 @@ public class Mapper {
                 .customize(new CustomMapper<PersonalMessageNotification, PersonalMessageNotificationDto>() {
                     @Override
                     public void mapAtoB(PersonalMessageNotification a, PersonalMessageNotificationDto b, MappingContext context) {
+                        final Account currentAccount = authorizationManager.getCurrentAccount();
                         final PersonalMessage personalMessage = a.getPersonalMessageGroup().getMessages().stream()
-                                .filter(m -> Objects.equals(m.getToAccount(), authorizationManager.getCurrentAccount()))
+                                .filter(m -> {
+                                    List<Account> approvedAccounts = new LinkedList<>();
+                                    approvedAccounts.add(currentAccount);
+                                    switch (currentAccount.getRole()) {
+                                        case Tenant:
+                                            // Add sub-tenants accounts
+                                            approvedAccounts.addAll(((Tenant) currentAccount).getSubTenants());
+                                            break;
+                                        case SubTenant:
+                                            // add parent tenant account
+                                            approvedAccounts.add(((SubTenant) currentAccount).getParentTenant());
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    return approvedAccounts.contains(m.getToAccount());
+                                })
                                 .findFirst().orElse(null);
                         if ( personalMessage != null ) {
                             b.setPersonalMessage(toPersonalMessage(personalMessage));
@@ -306,6 +336,21 @@ public class Mapper {
                     public void mapAtoB(NotificationPhoto a, NotificationPhotoDto b, MappingContext context) {
                         try {
                             b.setFileUrl(createNotificationPhotoDownloadUrl(a));
+                        }
+                        catch ( MalformedURLException | URISyntaxException e ) {
+                            throw new IllegalStateException("Failed to create download URL", e);
+                        }
+                    }
+                })
+                .register();
+
+        mapperFactory.classMap(PredefinedMessagePhoto.class, PredefinedMessagePhotoDto.class)
+                .byDefault()
+                .customize(new CustomMapper<PredefinedMessagePhoto, PredefinedMessagePhotoDto>() {
+                    @Override
+                    public void mapAtoB(PredefinedMessagePhoto a, PredefinedMessagePhotoDto b, MappingContext context) {
+                        try {
+                            b.setFileUrl(createPredefinedMessagePhotoDownloadUrl(a));
                         }
                         catch ( MalformedURLException | URISyntaxException e ) {
                             throw new IllegalStateException("Failed to create download URL", e);
@@ -552,6 +597,26 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(MaintenanceSlotSchedule.class, MaintenanceSlotScheduleDto.class)
                 .byDefault()
+                .customize(new CustomMapper<MaintenanceSlotSchedule, MaintenanceSlotScheduleDto>() {
+                    public void mapAtoB(MaintenanceSlotSchedule schedule, MaintenanceSlotScheduleDto scheduleDto, MappingContext context) {
+                        scheduleDto.setDurationPerDayOfWeek(new EnumMap<>(DayOfWeek.class));
+
+                        Arrays.stream(DayOfWeek.values())
+                                .forEach(dayOfWeek -> {
+                                    DurationPerDayOfWeek duration = schedule.getDurationPerDayOfWeek()
+                                            .stream()
+                                            .filter(day -> dayOfWeek.equals(day.getDayOfWeek()))
+                                            .findFirst()
+                                            .orElse(null);
+
+                                    if (duration != null) {
+                                        scheduleDto.getDurationPerDayOfWeek().put(dayOfWeek, new DurationPerDayOfWeekDto(duration.getBeginTime(), duration.getEndTime()));
+                                    } else {
+                                        scheduleDto.getDurationPerDayOfWeek().put(dayOfWeek, new DurationPerDayOfWeekDto(null, null));
+                                    }
+                                });
+                    }
+                })
                 .register();
         mapperFactory.classMap(EventSlot.class, EventSlotDto.class)
                 .byDefault()

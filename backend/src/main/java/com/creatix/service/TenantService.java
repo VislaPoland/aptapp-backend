@@ -14,13 +14,20 @@ import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
+import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.email.SubTenantActivationMessageTemplate;
 import com.creatix.message.template.email.TenantActivationMessageTemplate;
+import com.creatix.message.template.sms.ActivationMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.message.BitlyService;
 import com.creatix.service.message.EmailMessageService;
 import freemarker.template.TemplateException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +62,12 @@ public class TenantService {
     private EmailMessageService emailMessageService;
     @Autowired
     private ApplicationProperties applicationProperties;
+    @Autowired
+    private SmsMessageSender smsMessageSender;
+    @Autowired
+    private BitlyService bitlyService;
+
+    private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private @Nonnull <T, ID> T getOrElseThrow(@Nonnull ID id, @Nonnull DaoBase<T, ID> dao, @Nonnull EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -71,7 +84,10 @@ public class TenantService {
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
                 new EntityNotFoundException(String.format("Apartment with id %d not found", request.getApartmentId())));
-        authorizationManager.checkManager(apartment.getProperty());
+
+        if (authorizationManager.getCurrentAccount().getRole() != AccountRole.Administrator) {
+            authorizationManager.checkManager(apartment.getProperty());
+        }
 
         if ( apartment.getTenant() != null ) {
             throw new IllegalArgumentException(String.format("Apartment id=%d has already tenant id=%d assigned.", apartment.getId(), apartment.getTenant().getId()));
@@ -96,6 +112,12 @@ public class TenantService {
             mapper.fillTenant(request, tenant);
         }
 
+        if (request.getIsNeighborhoodNotificationEnable() != null) {
+            tenant.setIsNeighborhoodNotificationEnable(request.getIsNeighborhoodNotificationEnable());
+        } else {
+            tenant.setIsNeighborhoodNotificationEnable(true);
+        }
+
         tenant.setApartment(apartment);
         tenant.setActive(false);
         tenant.setDeletedAt(null);
@@ -109,16 +131,33 @@ public class TenantService {
 
         emailMessageService.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
 
+        if (apartment.getProperty().getEnableSms()) {
+            String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", tenant.getActionToken())).toString());
+            logger.info("Generated short url for sms activation account. Url: " + shortUrl);
+            try {
+                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, tenant.getPrimaryPhone()));
+            } catch (Exception e) {
+                logger.error("There is problem with smsMessageSender.send in tenantService.", e);
+            }
+        }
+
         return tenant;
     }
 
-    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager, AccountRole.Tenant})
     public @Nonnull Tenant updateTenantFromRequest(long tenantId, @Nonnull PersistTenantRequest request) {
         Objects.requireNonNull(request);
 
         final Apartment apartment = getOrElseThrow(request.getApartmentId(), apartmentDao,
                 new EntityNotFoundException(String.format("Apartment id=%d not found", request.getApartmentId())));
-        authorizationManager.checkManager(apartment.getProperty());
+
+        if (!AccountRole.Tenant.equals(authorizationManager.getCurrentAccount().getRole())) {
+            authorizationManager.checkManager(apartment.getProperty());
+        }
+
+        if (AccountRole.Tenant.equals(authorizationManager.getCurrentAccount().getRole()) && authorizationManager.getCurrentAccount().getId() != tenantId) {
+            throw new AccessDeniedException("Tenant can update only himself.");
+        }
 
         final Tenant tenant = getTenant(tenantId);
         preventAccountDuplicity(request.getPrimaryEmail(), tenant.getPrimaryEmail());
@@ -135,6 +174,11 @@ public class TenantService {
             apartmentPrev.setTenant(null);
             apartmentDao.persist(apartmentPrev);
         }
+
+        if (request.getIsNeighborhoodNotificationEnable() != null) {
+            tenant.setIsNeighborhoodNotificationEnable(request.getIsNeighborhoodNotificationEnable());
+        }
+
         tenant.setApartment(apartment);
         tenantDao.persist(tenant);
         apartment.setTenant(tenant);

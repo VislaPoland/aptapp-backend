@@ -1,2 +1,2 @@
-Security has found no issue.
+Property Patrol has found no issue.
 ${message} ${timestamp}

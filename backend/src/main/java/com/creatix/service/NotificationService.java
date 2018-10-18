@@ -7,10 +7,7 @@ import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotification
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
-import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.MaintenanceEmployee;
-import com.creatix.domain.entity.store.account.SecurityEmployee;
-import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
 import com.creatix.message.MessageDeliveryException;
@@ -25,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +67,8 @@ public class NotificationService {
     private MaintenanceReservationService maintenanceReservationService;
     @Autowired
     private NotificationWatcher notificationWatcher;
+    @Autowired
+    private PropertyDao propertyDao;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -84,6 +84,7 @@ public class NotificationService {
             @Nullable NotificationStatus[] notificationStatus,
             @Nullable NotificationType[] notificationType,
             @Nullable Long startId,
+            @Nullable Long propertyId,
             int pageSize) {
         Objects.requireNonNull(requestType, "Request type is null");
 
@@ -95,6 +96,7 @@ public class NotificationService {
                 notificationType,
                 startId,
                 account,
+                findPropertyById(propertyId),
                 pageSize + 1);
 
 
@@ -137,11 +139,11 @@ public class NotificationService {
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
     }
 
-    public SecurityNotification saveSecurityNotification(@Nonnull SecurityNotification notification) throws IOException, TemplateException {
+    public SecurityNotification saveSecurityNotification(@Nonnull SecurityNotification notification, @Nullable Long propertyId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         notification.setType(NotificationType.Security);
         notification.setAuthor(authorizationManager.getCurrentAccount());
-        notification.setProperty(authorizationManager.getCurrentProperty());
+        notification.setProperty(propertyId != null ? propertyDao.findById(propertyId) : authorizationManager.getCurrentProperty());
         notification.setStatus(NotificationStatus.Pending);
         securityNotificationDao.persist(notification);
 
@@ -153,16 +155,37 @@ public class NotificationService {
     }
 
     @RoleSecured
-    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Nonnull Long slotUnitId) throws IOException, TemplateException {
+    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Nonnull Long slotUnitId, @Nullable Long propertyId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
         Objects.requireNonNull(slotUnitId, "slot unit id is null");
 
+        Account currentAccount = authorizationManager.getCurrentAccount();
+
         notification.setType(NotificationType.Maintenance);
-        notification.setAuthor(authorizationManager.getCurrentAccount());
-        notification.setProperty(authorizationManager.getCurrentProperty());
+        notification.setAuthor(currentAccount);
+        if (propertyId == null) {
+            notification.setProperty(authorizationManager.getCurrentProperty());
+        } else {
+            notification.setProperty(findPropertyById(propertyId));
+        }
         notification.setStatus(NotificationStatus.Pending);
-        if (null != targetUnitNumber) {
-            notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber));
+        switch (currentAccount.getRole()) {
+            case Tenant:
+                notification.setTargetApartment(((Tenant) currentAccount).getApartment());
+                break;
+            case SubTenant:
+                notification.setTargetApartment(((SubTenant) currentAccount).getApartment());
+                break;
+            case Administrator:
+            case Maintenance:
+            case PropertyManager:
+            case AssistantPropertyManager:
+                if (null != targetUnitNumber) {
+                    notification.setTargetApartment(getApartmentByUnitNumber(targetUnitNumber, propertyId));
+                }
+                break;
+            default:
+                break;
         }
         maintenanceNotificationDao.persist(notification);
 
@@ -184,11 +207,17 @@ public class NotificationService {
         }
     }
 
-    public NeighborhoodNotification saveNeighborhoodNotification(@Nonnull String targetUnitNumber, @Nonnull NeighborhoodNotification notification) throws MessageDeliveryException, TemplateException, IOException {
+    public NeighborhoodNotification saveNeighborhoodNotification(@Nonnull String targetUnitNumber, @Nonnull NeighborhoodNotification notification, Long propertyId) throws TemplateException, IOException {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
         Objects.requireNonNull(notification, "Notification is null");
 
-        final Apartment targetApartment = getApartmentByUnitNumber(targetUnitNumber);
+        Account currentAccount = authorizationManager.getCurrentAccount();
+
+        if (currentAccount.getIsNeighborhoodNotificationEnable() != null && currentAccount.getIsNeighborhoodNotificationEnable() != true) {
+            throw new AccessDeniedException("You have been blocked to send any notification messages to your neighbors. To unblock sending the notifications, contact your property manager.");
+        }
+
+        final Apartment targetApartment = getApartmentByUnitNumber(targetUnitNumber, propertyId);
         final Property property = targetApartment.getProperty();
         authorizationManager.checkRead(property);
 
@@ -196,13 +225,16 @@ public class NotificationService {
         if ( tenant != null ) {
 
             notification.setType(NotificationType.Neighborhood);
-            notification.setAuthor(authorizationManager.getCurrentAccount());
+            notification.setAuthor(currentAccount);
             notification.setProperty(property);
             notification.setStatus(NotificationStatus.Pending);
             notification.setRecipient(targetApartment.getTenant());
             notification.setTargetApartment(targetApartment);
-            notificationWatcher.process(notification);
             neighborhoodNotificationDao.persist(notification);
+
+            if ( AccountRole.Tenant.equals(currentAccount.getRole()) || AccountRole.SubTenant.equals(currentAccount.getRole())) {
+                notificationWatcher.process(notification);
+            }
 
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 try {
@@ -246,19 +278,24 @@ public class NotificationService {
         throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
     }
 
-    @RoleSecured(value = {AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public NeighborhoodNotification respondToEscalatedNeighborhoodNotification(long notificationId, @Nonnull NeighborhoodNotificationResponseRequest request) throws IOException, TemplateException {
         Objects.requireNonNull(request, "Notification response request is null");
 
-        final EscalatedNeighborhoodNotification notification = getOrElseThrow(notificationId, escalatedNeighborhoodNotificationDao,
-                new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
+        final List<EscalatedNeighborhoodNotification> notifications = escalatedNeighborhoodNotificationDao.findByNotificationGroup(notificationId);
 
-        if ( authorizationManager.isManager(notification.getProperty()) ) {
-            notification.setStatus(NotificationStatus.Resolved);
-            notification.setResponse(request.getResponse());
-            notification.setRespondedAt(OffsetDateTime.now());
-            notification.setClosedAt(OffsetDateTime.now());
-            escalatedNeighborhoodNotificationDao.persist(notification);
+        if ( notifications != null && !notifications.isEmpty() &&
+                (authorizationManager.isManager(notifications.get(0).getProperty()) || AccountRole.Administrator.equals(authorizationManager.getCurrentAccount().getRole()))) {
+
+            notifications.stream().forEach(escalatedNeighborhoodNotification -> {
+                escalatedNeighborhoodNotification.setStatus(NotificationStatus.Resolved);
+                escalatedNeighborhoodNotification.setResponse(request.getResponse());
+                escalatedNeighborhoodNotification.setRespondedAt(OffsetDateTime.now());
+                escalatedNeighborhoodNotification.setClosedAt(OffsetDateTime.now());
+                escalatedNeighborhoodNotificationDao.persist(escalatedNeighborhoodNotification);
+            });
+
+            EscalatedNeighborhoodNotification notification = notifications.stream().filter(escalatedNeighborhoodNotification -> escalatedNeighborhoodNotification.getId().equals(notificationId)).findAny().orElse(null);
 
             if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
                 pushNotificationSender.sendNotification(new EscalatedNeighborNotificationResolvedTemplate(notification), notification.getAuthor());
@@ -279,7 +316,8 @@ public class NotificationService {
         final SecurityNotification notification = getOrElseThrow(notificationId, securityNotificationDao,
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
 
-        if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ) {
+        if ( notification.getProperty().equals(authorizationManager.getCurrentProperty()) ||
+                AccountRole.Administrator.equals(authorizationManager.getCurrentAccount().getRole()) ) {
             notification.setResponse(request.getResponse());
             notification.setRespondedAt(OffsetDateTime.now());
             notification.setStatus(NotificationStatus.Resolved);
@@ -312,14 +350,14 @@ public class NotificationService {
         throw new SecurityException("You are not eligible to respond to security notifications from another property");
     }
 
-    @RoleSecured({AccountRole.Maintenance, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.Maintenance, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceNotification respondToMaintenanceNotification(@Nonnull Long notificationId, @Nonnull MaintenanceNotificationResponseRequest response) throws IOException, TemplateException {
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
 
         if ( authorizationManager.hasAnyOfRoles(AccountRole.Maintenance) ) {
             return maintenanceReservationService.employeeRespondToMaintenanceNotification(notification, response);
         }
-        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager) ) {
+        else if ( authorizationManager.hasAnyOfRoles(AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager) ) {
             return maintenanceReservationService.tenantRespondToMaintenanceReschedule(notification, response);
         }
         else {
@@ -339,14 +377,29 @@ public class NotificationService {
         return notification;
     }
 
-    private Apartment getApartmentByUnitNumber(@Nonnull String targetUnitNumber) {
+    private Apartment getApartmentByUnitNumber(@Nonnull String targetUnitNumber, Long propertyId) {
         Objects.requireNonNull(targetUnitNumber, "Target unit number is null");
 
-        final Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, authorizationManager.getCurrentProperty());
+        Property property = (propertyId != null) ? propertyDao.findById(propertyId) : authorizationManager.getCurrentProperty();
+
+        final Apartment apartment = apartmentDao.findByUnitNumberWithinProperty(targetUnitNumber, property);
         if ( apartment == null ) {
             throw new EntityNotFoundException(String.format("Apartment with unit number=%s not found", targetUnitNumber));
         }
         return apartment;
     }
 
+    @Nullable
+    private Property findPropertyById(@Nullable Long propertyId) {
+        if (propertyId == null) {
+            return null;
+        }
+
+        Property property = propertyDao.findById(propertyId);
+
+        if (null == property) {
+            throw new EntityNotFoundException(String.format("Property %d not found", propertyId));
+        }
+        return property;
+    }
 }

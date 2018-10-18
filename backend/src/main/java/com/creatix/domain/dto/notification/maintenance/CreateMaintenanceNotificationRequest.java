@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -21,8 +22,7 @@ public class CreateMaintenanceNotificationRequest {
     @ApiModelProperty(value = "ID of the selected slot unit", required = true)
     private Long slotUnitId;
 
-    @ApiModelProperty(value = "Deprecated! Target apartment unit number")
-    @Deprecated
+    @ApiModelProperty(value = "unit number making request - optional")
     private String unitNumber;
 
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home")
@@ -34,4 +34,8 @@ public class CreateMaintenanceNotificationRequest {
     @Size(max = 2048)
     @ApiModelProperty(value = "Pet instructions")
     private String petInstructions;
+
+    @Nullable
+    @ApiModelProperty(value = "ID of the selected property unit", required = true)
+    private Long propertyId;
 }

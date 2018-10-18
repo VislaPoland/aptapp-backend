@@ -1,6 +1,7 @@
 package com.creatix.domain.entity.store;
 
 
+import com.creatix.domain.entity.store.attachment.EventPhoto;
 import com.creatix.domain.enums.AudienceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,6 +12,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.annotation.Nonnull;
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -35,6 +37,9 @@ public class EventSlot extends Slot {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<EventInvite> invites = new HashSet<>();
+
+    @OneToMany(mappedBy = "eventSlot", cascade = {CascadeType.REMOVE})
+    private List<EventPhoto> eventPhotos;
 
     public void addEventInvite(@Nonnull EventInvite eventInvite) {
         eventInvite.setEvent(this);

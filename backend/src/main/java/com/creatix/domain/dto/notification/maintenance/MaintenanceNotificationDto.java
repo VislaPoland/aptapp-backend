@@ -21,8 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 public class MaintenanceNotificationDto extends NotificationDto {
 
-    @ApiModelProperty(value = "Deprecated! Expect this to be null. <br />Target apartment")
-    @Deprecated
+    @ApiModelProperty(value = "Target apartment - optional")
     private BasicApartmentDto targetApartment;
 
     @ApiModelProperty(value = "Target apartment accessibility if tenant is not at home")

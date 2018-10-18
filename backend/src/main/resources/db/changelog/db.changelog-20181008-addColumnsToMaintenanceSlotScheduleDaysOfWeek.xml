@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="martin dupal" id="db.changelog-20181008_1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="duration_per_day_of_week"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="duration_per_day_of_week">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="schedule_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="begin_time" type="TIME WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="TIME WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="day_of_week" type="VARCHAR(24)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time_zone" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+
+        <sql>
+            INSERT INTO duration_per_day_of_week (day_of_week, begin_time, end_time, time_zone, schedule_id)
+            ( SELECT 'MONDAY', begin_time, end_time, time_zone, id FROM maintenance_slot_schedule);
+        </sql>
+
+        <sql>
+            INSERT INTO duration_per_day_of_week (day_of_week, begin_time, end_time, time_zone, schedule_id)
+            ( SELECT 'TUESDAY', begin_time, end_time, time_zone, id FROM maintenance_slot_schedule);
+        </sql>
+
+        <sql>
+            INSERT INTO duration_per_day_of_week (day_of_week, begin_time, end_time, time_zone, schedule_id)
+            ( SELECT 'WEDNESDAY', begin_time, end_time, time_zone, id FROM maintenance_slot_schedule);
+        </sql>
+
+        <sql>
+            INSERT INTO duration_per_day_of_week (day_of_week, begin_time, end_time, time_zone, schedule_id)
+            ( SELECT 'THURSDAY', begin_time, end_time, time_zone, id FROM maintenance_slot_schedule);
+        </sql>
+
+        <sql>
+            INSERT INTO duration_per_day_of_week (day_of_week, begin_time, end_time, time_zone, schedule_id)
+            ( SELECT 'FRIDAY', begin_time, end_time, time_zone, id FROM maintenance_slot_schedule);
+        </sql>
+
+        <sql>
+            INSERT INTO duration_per_day_of_week (day_of_week, begin_time, end_time, time_zone, schedule_id)
+            ( SELECT 'SATURDAY', begin_time, end_time, time_zone, id FROM maintenance_slot_schedule);
+        </sql>
+
+        <sql>
+            INSERT INTO duration_per_day_of_week (day_of_week, begin_time, end_time, time_zone, schedule_id)
+            ( SELECT 'SUNDAY', begin_time, end_time, time_zone, id FROM maintenance_slot_schedule);
+        </sql>
+
+        <sql>
+            ALTER TABLE maintenance_slot_schedule
+            DROP COLUMN begin_time,
+            DROP COLUMN end_time,
+            DROP COLUMN time_zone;
+        </sql>
+
+        <sql>
+            DROP TABLE maintenance_slot_schedule_days_of_week;
+        </sql>
+
+    </changeSet>
+</databaseChangeLog>

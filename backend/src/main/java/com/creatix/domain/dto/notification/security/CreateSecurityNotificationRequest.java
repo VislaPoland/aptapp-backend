@@ -20,4 +20,6 @@ public class CreateSecurityNotificationRequest {
     private String description;
     @ApiModelProperty(value = "Timestamp of notification")
     private Date date = new Date();
+    @ApiModelProperty(value = "Property id")
+    private Long propertyId;
 }

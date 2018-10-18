@@ -49,7 +49,7 @@
                     <table style="box-sizing: border-box; border-collapse: separate !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                         <tr>
                             <td class="align-center" style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top; text-align: center;" valign="top" align="center">
-                                <a href="${applicationUrl}" style="box-sizing: border-box; color: #348eda; text-decoration: underline;"><img src="${logoUrl}" height="100" alt="Apt. App" style="-ms-interpolation-mode: bicubic; max-width: 100%;"></a>
+                                <a href="${applicationUrl}" style="box-sizing: border-box; color: #348eda; text-decoration: underline;"><img src="${logoUrl}" height="80" alt="AptApp" style="-ms-interpolation-mode: bicubic; max-width: 100%; margin-top:20px;"></a>
                             </td>
                         </tr>
                     </table>
@@ -64,14 +64,14 @@
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Welcome to Apt. App - a resourceful and reliable app, which will take your tenant and property staff communication to the next level.</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Here is the code you will need to activate your property: <br>${activationToken}</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Or click link to <a href="${activationPageUrl}" style="box-sizing: border-box; color: #348eda; text-decoration: underline;">activate</a> your account.</p>
+                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Or if you received a text message from us, you can activate your account from there.</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">We look forward to helping you to find quicker resolutions to regain valuable time.</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">-Apt. App</p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
-                                        <p class="bottom" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; color: #031821; margin-bottom: 0; text-align: center; padding-bottom: 5px;"><img src="${iconUrl}" height="40" style="-ms-interpolation-mode: bicubic; max-width: 100%;"></p>
-                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. App a tool you can’t live without. If you see ways we can do better, we would love to hear from you. Please e-mail us at <a href="mailto:hello@aptappmobile.com" style="box-sizing: border-box; text-decoration: underline; color: #999999;">hello@aptappmobile.com</a>.</p>
+                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 20px 0; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. App a tool you can’t live without. If you see ways we can do better, we would love to hear from you. Please e-mail us at <a href="mailto:hello@aptappmobile.com" style="box-sizing: border-box; text-decoration: underline; color: #999999;">hello@aptappmobile.com</a>.</p>
                                     </td>
                                 </tr>
                             </table>

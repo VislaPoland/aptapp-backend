@@ -94,6 +94,11 @@
       "name": "application.admin-url",
       "type": "java.net.URL",
       "description": "Administrative interface URL."
+    },
+    {
+      "name": "pushnotifications.is-throttling-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables/disables throttling for neighbor notifications."
     }
   ]
 }

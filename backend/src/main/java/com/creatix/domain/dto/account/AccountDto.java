@@ -56,5 +56,7 @@ public class AccountDto {
     private Boolean isTacAccepted;
     @ApiModelProperty
     private Boolean isPrivacyPolicyAccepted;
+    @ApiModelProperty
+    private Boolean isNeighborhoodNotificationEnable;
 
 }

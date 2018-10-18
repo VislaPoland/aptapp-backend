@@ -1,5 +1,3 @@
-<#-- @ftlvariable name="hours" type="java.lang.Number" -->
-<#-- @ftlvariable name="times" type="java.lang.Number" -->
-<#-- @ftlvariable name="complainer" type="java.lang.String" -->
-<#-- @ftlvariable name="offender" type="java.lang.String" -->
-A neighbor ${offender} has been notified by ${complainer} ${times} times in ${hours} hours.
+<#-- @ftlvariable name="complainerUnit" type="java.lang.String" -->
+<#-- @ftlvariable name="offenderUnit" type="java.lang.String" -->
+Apt. App Alert: The resident in unit ${complainerUnit} has been sending multiple messages to unit ${offenderUnit}.

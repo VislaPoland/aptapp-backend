@@ -6,6 +6,7 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.notification.PersonalMessage;
 import com.creatix.domain.entity.store.notification.PersonalMessageGroup;
 import com.creatix.domain.entity.store.notification.PersonalMessageNotification;
+import com.creatix.domain.entity.store.notification.PersonalMessagePhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.message.PersonalMessageDeleteStatus;
@@ -17,12 +18,14 @@ import com.creatix.message.template.push.NewPersonalMessageTemplate;
 import com.creatix.message.template.sms.TenantPersonalMessageTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.AttachmentService;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -62,6 +65,8 @@ public class PersonalMessageService {
     private SmsMessageSender smsMessageSender;
     @Autowired
     private PersonalMessageGroupDao personalMessageGroupDao;
+    @Autowired
+    private AttachmentService attachmentService;
 
     public List<PersonalMessage> sendMessageToPropertyManagers(@NotNull Long propertyId, @NotNull final String title, @NotNull final String content) {
         Objects.requireNonNull(propertyId, "Property id can not be null");
@@ -97,12 +102,13 @@ public class PersonalMessageService {
                     catch ( IOException | TemplateException e ) {
                         logger.error(String.format("Failed to dispatch message to account %d", recipientAccount.getId()), e);
                     }
-
+                    
                     return personalMessage;
                 }
         ).collect(Collectors.toList());
 
-        createPersonalMessageNotification(personalMessageGroup);
+        Long notificationId = createPersonalMessageNotification(personalMessageGroup);
+        messages.forEach(personalMessage -> personalMessage.setNotificationId(notificationId));
 
         return messages;
     }
@@ -159,7 +165,8 @@ public class PersonalMessageService {
             }
         }
 
-        createPersonalMessageNotification(personalMessageGroup);
+        Long notificationId = createPersonalMessageNotification(personalMessageGroup);
+        messages.forEach(personalMessage -> personalMessage.setNotificationId(notificationId));
 
         return messages;
     }
@@ -174,9 +181,8 @@ public class PersonalMessageService {
 
         final GenericPushNotification notification = new GenericPushNotification();
         notification.setMessage(templateProcessor.processTemplate(new NewPersonalMessageTemplate(personalMessage)));
+        notification.setBadgeCount(1);
         notification.setTitle("New personal message");
-
-
 
         pushNotificationSender.sendNotification(notification, personalMessage.getToAccount());
 
@@ -184,7 +190,8 @@ public class PersonalMessageService {
         personalMessageDao.persist(personalMessage);
     }
 
-    private void createPersonalMessageNotification(@NotNull PersonalMessageGroup personalMessageGroup) {
+
+    private Long createPersonalMessageNotification(@NotNull PersonalMessageGroup personalMessageGroup) {
         final PersonalMessage message = personalMessageGroup.getMessages().stream().findFirst().orElseThrow(() -> new IllegalStateException("Message group is empty"));
         final PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
         personalMessageNotification.setPersonalMessageGroup(personalMessageGroup);
@@ -194,6 +201,8 @@ public class PersonalMessageService {
         personalMessageNotification.setStatus(NotificationStatus.Pending);
         personalMessageNotification.setTitle(message.getTitle());
         notificationDao.persist(personalMessageNotification);
+
+        return personalMessageNotification.getId();
     }
 
     @RoleSecured
@@ -271,5 +280,22 @@ public class PersonalMessageService {
         return deleteLock.get(key);
     }
 
+    public PersonalMessage storePersonalMessagePhotos(MultipartFile[] files, long personalMessageId) {
+        final PersonalMessage personalMessage = personalMessageDao.findById(personalMessageId);
+        List<PersonalMessagePhoto> photoStoreList;
+        try {
+            photoStoreList = attachmentService.storeAttachments(files, foreignKeyObject -> {
+                PersonalMessagePhoto personalMessagePhoto = new PersonalMessagePhoto();
+                personalMessagePhoto.setPersonalMessage(personalMessage);
+                return personalMessagePhoto;
+            }, personalMessage, PersonalMessagePhoto.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Unable to store photo for personal message.", e);
+        }
 
+        personalMessage.getPersonalMessagePhotos().addAll(photoStoreList);
+        personalMessageDao.persist(personalMessage);
+
+        return personalMessage;
+    }
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="martin dupal" id="db.changelog-20180827_1">
+        <sql>
+            UPDATE property SET lockout_hours = 24 WHERE lockout_hours IS NULL;
+        </sql>
+
+        <sql>
+            UPDATE property SET throttle_slow_limit = 3 WHERE throttle_slow_limit IS NULL;
+        </sql>
+
+        <sql>
+            UPDATE property SET throttle_fast_minutes = 15 WHERE throttle_fast_minutes IS NULL;
+        </sql>
+
+        <sql>
+            UPDATE property SET throttle_fast_limit = 1 WHERE throttle_fast_limit IS NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet author="martin dupal" id="db.changelog-20180827_2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="predefined_message_photo" columnName="enable_sms_escalation"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="property">
+            <column name="enable_sms_escalation" type="boolean" defaultValueBoolean="false"/>
+            <column name="enable_email_escalation" type="boolean" defaultValueBoolean="true"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="martin dupal" id="db.changelog-20180827_3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="account" columnName="is_neighborhood_notification_enable"/>
+            </not>
+    </preConditions>
+        <addColumn tableName="account">
+            <column name="is_neighborhood_notification_enable" type="boolean" defaultValueBoolean="true"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

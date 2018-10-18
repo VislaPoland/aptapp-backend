@@ -58,7 +58,7 @@ public class BusinessMapper extends ConfigurableMapper {
                         businessProfile.setBusinessCategoryList(
                             businessProfileDto.getBusinessCategoryList().stream().map(
                                     c -> businessCategoryDao.findById(c.getId())
-                            ).collect(Collectors.toList())
+                            ).collect(Collectors.toSet())
                         );
                     }
                 })
@@ -80,7 +80,7 @@ public class BusinessMapper extends ConfigurableMapper {
                         businessProfile.setBusinessCategoryList(
                                 businessProfileCreateRequest.getBusinessCategoryList().stream().map(
                                         c -> businessCategoryDao.findById(c.getId())
-                                ).collect(Collectors.toList())
+                                ).collect(Collectors.toSet())
                         );
                     }
                 })

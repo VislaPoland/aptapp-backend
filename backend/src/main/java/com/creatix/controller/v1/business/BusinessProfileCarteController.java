@@ -42,7 +42,7 @@ public class BusinessProfileCarteController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileCarteItemDto> createCartItem(
             @Valid @RequestBody BusinessProfileCarteItemDto request,
             @PathVariable("businessProfileId") long businessProfileId) {
@@ -61,7 +61,7 @@ public class BusinessProfileCarteController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "{businessProfileCartItemId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileCarteItemDto> updateCartItem(@Valid @RequestBody BusinessProfileCarteItemDto request) {
         return new DataResponse<>(
                 businessMapper.toBusinessProfileCarteItem(
@@ -78,7 +78,7 @@ public class BusinessProfileCarteController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{businessProfileCartItemId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileCarteItemDto> deleteCartItem(@PathVariable Long businessProfileCartItemId) {
         return new DataResponse<>(businessMapper.toBusinessProfileCarteItem(businessProfileCarteService.deleteCarteItem(businessProfileCartItemId)));
     }
@@ -92,7 +92,7 @@ public class BusinessProfileCarteController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/{businessProfileCartItemId}/photos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured(feature = ApplicationFeatureType.BUSINESS_PROFILE, value = {AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<BusinessProfileCarteItemDto> storeCartItemPhoto(@RequestParam MultipartFile[] files, @PathVariable long businessProfileCartItemId) throws IOException {
         return new DataResponse<>(
                 businessMapper.toBusinessProfileCarteItem(businessProfileCarteService.storeBusinessProfilePhotos(files, businessProfileCartItemId))

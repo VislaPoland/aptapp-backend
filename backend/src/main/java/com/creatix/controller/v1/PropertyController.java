@@ -10,22 +10,21 @@ import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.ApplicationFeatureService;
-import com.creatix.service.SlotService;
 import com.creatix.service.property.PropertyService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
@@ -42,8 +41,6 @@ public class PropertyController {
     private Mapper mapper;
     @Autowired
     private PropertyService propertyService;
-    @Autowired
-    private SlotService slotService;
     @Autowired
     private ApplicationFeatureService applicationFeatureService;
 
@@ -74,6 +71,53 @@ public class PropertyController {
         return new DataResponse<>(mapper.toPropertyDto(propertyService.getProperty(propertyId)));
     }
 
+    @ApiOperation(value = "Get property accounts to csv")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{propertyId}/csv", method = RequestMethod.GET, produces = "text/csv")
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
+    public ResponseEntity<String> getPropertyAccounts(final HttpServletResponse response, @PathVariable long propertyId) {
+        response.setHeader("Content-Disposition", "attachment; filename=property_"+propertyId+"_accounts.csv");
+        response.setContentType("text/csv");
+        String csvResponse = propertyService.generateCsvResponse(propertyId);
+        return new ResponseEntity<>(csvResponse, HttpStatus.OK);
+
+    }
+
+    @ApiOperation(value = "Get users all properties accounts to csv")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/all/csv", method = RequestMethod.GET, produces = "text/csv")
+    @RoleSecured({AccountRole.Administrator})
+    public ResponseEntity<String> getAllPropertyAccounts(final HttpServletResponse response) {
+        response.setHeader("Content-Disposition", "attachment; filename=all_property_accounts.csv");
+        response.setContentType("text/csv");
+        String csvResponse = propertyService.generateAllCsvResponse();
+        return new ResponseEntity<>(csvResponse, HttpStatus.OK);
+    }
+
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{propertyId}/xlsx", method = RequestMethod.GET, produces = "text/xlsx")
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
+    public void getPropertyAccountsXlsx(final HttpServletResponse response, @PathVariable long propertyId) {
+        response.setHeader("Content-Disposition", "attachment; filename=property_"+propertyId+"_accounts.xlsx");
+        response.setContentType("text/xlsx");
+        Workbook wb = propertyService.generateXlsxResponse(propertyId);
+        try {
+            wb.write(response.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @ApiOperation(value = "Create new property")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -95,7 +139,7 @@ public class PropertyController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/{propertyId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<PropertyDto> updateProperty(@PathVariable Long propertyId, @Valid @RequestBody UpdatePropertyRequest request) {
         return new DataResponse<>(mapper.toPropertyDto(propertyService.updateFromRequest(propertyId, request)));
     }
@@ -156,7 +200,14 @@ public class PropertyController {
                 final byte[] photoFileData = FileUtils.readFileToByteArray(photoFile);
 
                 final HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.valueOf(Files.probeContentType(photoFile.toPath())));
+
+                if (photoFile.toPath().toString().toUpperCase().endsWith(".JPEG")) {
+                    headers.setContentType(MediaType.IMAGE_JPEG);
+                } else if (photoFile.toPath().toString().toUpperCase().endsWith(".GIF")) {
+                    headers.setContentType(MediaType.IMAGE_GIF);
+                } else {
+                    headers.setContentType(MediaType.IMAGE_PNG);
+                }
                 headers.setContentLength(photoFileData.length);
 
                 return new HttpEntity<>(photoFileData, headers);
@@ -192,7 +243,7 @@ public class PropertyController {
     })
     @JsonView(Views.Public.class)
     @GetMapping(path = "/{propertyId}/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public DataResponse<PropertyStatsDto> getPropertyStats(@PathVariable Long propertyId) {
         return new DataResponse<>(propertyService.getPropertyStats(propertyId));
     }

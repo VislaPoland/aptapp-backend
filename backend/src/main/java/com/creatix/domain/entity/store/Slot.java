@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store;
 
+import com.creatix.domain.entity.store.attachment.AttachmentId;
 import com.creatix.domain.enums.AudienceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,11 +33,11 @@ import java.util.Set;
 @EqualsAndHashCode(of = "id")
 @ToString(of = {"id", "beginTime", "endTime"})
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class Slot {
+public abstract class Slot implements AttachmentId {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Property property;
     @NotNull
@@ -79,4 +80,5 @@ public abstract class Slot {
         }
         return removed;
     }
+
 }

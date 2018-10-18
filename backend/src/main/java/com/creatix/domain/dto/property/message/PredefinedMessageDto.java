@@ -1,5 +1,7 @@
 package com.creatix.domain.dto.property.message;
 
+import java.util.List;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,4 +20,6 @@ public class PredefinedMessageDto {
     @NotEmpty
     @Size(max = 255)
     private String body;
+    @ApiModelProperty(value = "Predefined Message photo")
+    private List<PredefinedMessagePhotoDto> photos;
 }

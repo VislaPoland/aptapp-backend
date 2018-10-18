@@ -95,6 +95,8 @@ public class AuthorizationManager {
                 return ((PropertyManager) account).getManagedProperty();
             case AssistantPropertyManager:
                 return ((AssistantPropertyManager) account).getManager().getManagedProperty();
+            case Administrator:
+                return null;
             default:
                 if ( account instanceof ManagedEmployee ) {
                     return ((ManagedEmployee) account).getManager().getManagedProperty();
@@ -106,7 +108,7 @@ public class AuthorizationManager {
     }
 
     public void checkManager(@NotNull Property property) {
-        if ( !(isManager(property)) ) {
+        if ( !(isManager(property)) && !isAdministrator()) {
             throw new SecurityException("Not a apartment manager");
         }
     }
@@ -246,12 +248,6 @@ public class AuthorizationManager {
         }
     }
 
-    // same as read accessibility except Administrator
-    public boolean canUpdateProperty(Property property) {
-        final Account account = getCurrentAccount();
-        return !account.getRole().equals(AccountRole.Administrator) && canWrite(property);
-    }
-
     public boolean canRead(@NotNull MaintenanceReservation reservation) {
         Objects.requireNonNull(reservation, "Maintenance reservation is null");
 
@@ -261,10 +257,11 @@ public class AuthorizationManager {
             if ( reservation.getNotification() != null ) {
                 return Objects.equals(tenant, reservation.getNotification().getAuthor());
             }
-        }
-        else if ( account instanceof EmployeeBase ) {
+        } else if (account instanceof EmployeeBase) {
             final Property property = getCurrentProperty(account);
             return Objects.equals(property, reservation.getSlot().getProperty());
+        } else if (AccountRole.Administrator.equals(account.getRole())) {
+            return true;
         }
 
         return false;
@@ -374,6 +371,8 @@ public class AuthorizationManager {
         switch (sessionAccount.getRole()) {
             case Tenant:
             case SubTenant:
+            case Maintenance:
+            case Security:
                 if (!authorAccountId.equals(sessionAccount.getId())) {
                     throw new SecurityException("You can not modify this item");
                 }
@@ -385,9 +384,6 @@ public class AuthorizationManager {
                     throw new SecurityException("You can not modify this item");
                 }
                 break;
-            case Maintenance:
-            case Security:
-                throw new SecurityException("You can not modify this item");
             case Administrator:
                 // he can do anything
                 break;

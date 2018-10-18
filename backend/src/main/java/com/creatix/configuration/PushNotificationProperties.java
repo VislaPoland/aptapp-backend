@@ -9,6 +9,7 @@ public class PushNotificationProperties {
     private String appleCertificatePath;
     private String appleCertificatePassword;
     private String googleCloudMessagingKey;
+    private boolean isThrottlingEnabled;
 
     public boolean isAppleSandbox() {
         return appleSandbox;
@@ -42,4 +43,11 @@ public class PushNotificationProperties {
         this.googleCloudMessagingKey = googleCloudMessagingKey;
     }
 
+    public boolean getIsThrottlingEnabled() {
+        return isThrottlingEnabled;
+    }
+
+    public void setIsThrottlingEnabled(boolean throttlingEnabled) {
+        isThrottlingEnabled = throttlingEnabled;
+    }
 }

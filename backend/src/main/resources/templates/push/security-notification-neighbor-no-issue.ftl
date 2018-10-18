@@ -1,1 +1,1 @@
-We take your safety very seriously and want to let you know security has found no issue.
+We take your safety very seriously and want to let you know Property Patrol has found no issue.

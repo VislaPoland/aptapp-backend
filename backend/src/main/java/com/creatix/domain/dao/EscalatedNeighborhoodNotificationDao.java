@@ -1,6 +1,8 @@
 package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.notification.EscalatedNeighborhoodNotification;
+import com.creatix.domain.entity.store.notification.NotificationGroup;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,15 @@ public class EscalatedNeighborhoodNotificationDao extends AbstractNotificationDa
         return queryFactory.selectFrom(escalatedNeighborhoodNotification)
                 .where(escalatedNeighborhoodNotification.createdAt.between(dateFrom, dateTo))
                 .orderBy(escalatedNeighborhoodNotification.createdAt.asc())
+                .fetch();
+    }
+
+    public List<EscalatedNeighborhoodNotification> findByNotificationGroup(@Nonnull long notificationId) {
+        return queryFactory.selectFrom(escalatedNeighborhoodNotification)
+                .where(escalatedNeighborhoodNotification.notificationGroup.eq(
+                        queryFactory.selectFrom(escalatedNeighborhoodNotification)
+                        .where(escalatedNeighborhoodNotification.id.eq(notificationId))
+                        .fetchFirst().notificationGroup))
                 .fetch();
     }
 }
