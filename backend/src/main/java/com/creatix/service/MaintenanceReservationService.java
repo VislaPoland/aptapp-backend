@@ -21,6 +21,7 @@ import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PushNotificationSender;
 import freemarker.template.TemplateException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import javax.annotation.Nonnull;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -127,7 +129,13 @@ public class MaintenanceReservationService {
             throw new IllegalArgumentException("No pending reservations found for notification");
         }
         if ( pendingCount > 1 ) {
-            throw new IllegalStateException("Multiple pending reservations found for notification");
+            Iterator<MaintenanceReservation> reservationIterator = reservations.iterator();
+            while (reservationIterator.hasNext()) {
+                MaintenanceReservation reservation = reservationIterator.next();
+                if (reservation.getId() != response.getSlotUnitId())
+                    releaseReservedCapacity(reservation);
+                    reservationDao.delete(reservation);
+            }
         }
 
         final MaintenanceReservation reservation = reservations.get(0);
