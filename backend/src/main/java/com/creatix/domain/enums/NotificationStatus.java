@@ -8,5 +8,10 @@ public enum NotificationStatus {
      *  @see NotificationStatus#Resolved
      */
     @Deprecated
-    Closed
+    Closed,
+
+    /**
+     * Use this status instead of deleting record
+     */
+    Deleted
 }

@@ -160,6 +160,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
         if ( (notificationStatus != null) && (notificationStatus.length > 0) ) {
             predicate = predicate.and(qNotification.status.in(notificationStatus));
         }
+        predicate = predicate.and(qNotification.status.ne(NotificationStatus.Deleted));
 
 
         if (null != notificationTypes) {

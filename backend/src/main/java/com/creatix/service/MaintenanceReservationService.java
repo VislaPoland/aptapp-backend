@@ -97,7 +97,7 @@ public class MaintenanceReservationService {
     }
 
 
-    @RoleSecured(AccountRole.Maintenance)
+    @RoleSecured({AccountRole.Maintenance, AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceReservation deleteById(long reservationId) {
         final MaintenanceReservation reservation = reservationDao.findById(reservationId);
         if ( reservation == null ) {
