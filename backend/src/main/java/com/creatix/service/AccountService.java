@@ -158,7 +158,7 @@ public class AccountService {
         if ( account.getActive() == Boolean.TRUE ) {
             throw new IllegalArgumentException(String.format("Account id=%d is already activated", account.getId()));
         }
-        if(new Date().after(account.getActionTokenValidUntil())){
+        if(account.getActionTokenValidUntil() == null || new Date().after(account.getActionTokenValidUntil())){
             setActionToken(account);
         }
 
