@@ -374,7 +374,7 @@ public class NotificationService {
     }
 
     @RoleSecured(AccountRole.Maintenance)
-    public MaintenanceNotification closeMaintenanceNotification(@Nonnull Long notificationId) throws IOException, TemplateException {
+    public MaintenanceNotification closeMaintenanceNotification(@Nonnull Long notificationId) {
 
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
         notification.setClosedAt(OffsetDateTime.now());
@@ -383,6 +383,28 @@ public class NotificationService {
         maintenanceNotificationDao.persist(notification);
 
         return notification;
+    }
+
+    @RoleSecured({AccountRole.Maintenance, AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public MaintenanceNotification deleteMaintenanceNotification(@Nonnull Long notificationId) {
+
+        final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
+
+        releaseFutureReservationIgnorePastReservation(notification);
+        notification.setClosedAt(OffsetDateTime.now());
+        notification.setStatus(NotificationStatus.Deleted);
+
+        maintenanceNotificationDao.persist(notification);
+
+        return notification;
+    }
+
+    private void releaseFutureReservationIgnorePastReservation(MaintenanceNotification notification) {
+        notification.getReservations().stream().forEach(maintenanceReservation -> {
+            if (maintenanceReservation.getBeginTime().isAfter(OffsetDateTime.now())) {
+                maintenanceReservationService.deleteById(maintenanceReservation.getId());
+            }
+        });
     }
 
     private Apartment getApartmentByUnitNumber(@Nonnull String targetUnitNumber, Long propertyId) {
