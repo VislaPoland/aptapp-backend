@@ -3,7 +3,6 @@ package com.creatix.domain.dto.property;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.property.slot.MaintenanceSlotScheduleDto;
 import com.creatix.domain.enums.CommunicationType;
-import com.creatix.domain.enums.ContactType;
 import com.creatix.domain.enums.FacilityType;
 import com.creatix.domain.enums.PropertyStatus;
 import io.swagger.annotations.ApiModel;
@@ -84,7 +83,7 @@ public class PropertyDto {
         @ApiModelProperty(value = "Contact ID", required = true)
         private Long id;
         @ApiModelProperty(value = "Type of contact", required = true)
-        private ContactType type;
+        private String type;
         @ApiModelProperty(required = true)
         private String value;
         @ApiModelProperty(value = "Type of communication", required = true)
