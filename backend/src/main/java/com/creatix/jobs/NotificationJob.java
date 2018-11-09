@@ -24,7 +24,8 @@ public class NotificationJob{
     @Autowired
     private AccountService accountService;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+// TODO this is planned for release 5
+//    @Scheduled(cron = "0 0 0 * * ?")
     public void resendCodes() throws MessagingException, TemplateException, MessageDeliveryException, IOException {
         log.info("ResendCodes job started");
         for(Account account:  accountService.getInactiveTenantsAndSubTenants()){
