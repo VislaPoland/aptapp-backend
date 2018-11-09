@@ -623,6 +623,19 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(Account.class, EventSlotDetailDto.AccountDto.class)
                 .byDefault()
+                .customize(new CustomMapper<Account, EventSlotDetailDto.AccountDto>() {
+                    @Override
+                    public void mapAtoB(Account a, EventSlotDetailDto.AccountDto b, MappingContext context) {
+                        if (a instanceof SubTenant) {
+                            b.setUnitNumber(((SubTenant) a).getApartment().getUnitNumber());
+                        } else if (a instanceof Tenant) {
+                            b.setUnitNumber(((Tenant) a).getApartment().getUnitNumber());
+                        }
+                        b.setFirstName(a.getFirstName());
+                        b.setLastName(a.getLastName());
+                        b.setId(a.getId());
+                    }
+                })
                 .register();
         mapperFactory.classMap(EventSlot.class, EventSlotDetailDto.class)
                 .byDefault()
@@ -651,7 +664,18 @@ public class Mapper {
 
         mapperFactory.classMap(Account.class, PersonalMessageAccountDto.class)
                 .byDefault()
-                .fieldAToB("id", "userId")
+                .customize(new CustomMapper<Account, PersonalMessageAccountDto>() {
+                    @Override
+                    public void mapAtoB(Account a, PersonalMessageAccountDto b, MappingContext context) {
+                        if (a instanceof SubTenant) {
+                            b.setUnitNumber(((SubTenant) a).getApartment().getUnitNumber());
+                        } else if (a instanceof Tenant) {
+                            b.setUnitNumber(((Tenant) a).getApartment().getUnitNumber());
+                        }
+
+                        b.setUserId(a.getId());
+                    }
+                })
                 .register();
     }
 
