@@ -1,0 +1,1 @@
+The resident in unit ${unitNumber} has accepted new time for: ${notificationTitle} ${date} now at ${time}.

@@ -1,1 +1,1 @@
-Maintenance has approved your appointment ${time} to your calendar.
+Your maintenance technician has completed your request for: ${notificationTitle}

@@ -10,8 +10,8 @@ public class MaintenanceConfirmTemplate extends PushMessageTemplate {
         this.reservation = reservation;
     }
 
-    public String getTime() {
-        return formatTimestamp(reservation.getBeginTime(), reservation.getSlot().getProperty().getZoneId());
+    public String getNotificationTitle() {
+        return reservation.getNotification().getTitle();
     }
 
     @Override

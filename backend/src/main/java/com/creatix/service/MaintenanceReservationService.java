@@ -181,7 +181,7 @@ public class MaintenanceReservationService {
             reservationDao.persist(reservation);
             resolveNotification(reservation);
 
-            pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation), reservation.getEmployee());
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation, authorizationManager.getCurrentAccount().getFullName()), reservation.getEmployee());
         }
         else if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
@@ -189,7 +189,7 @@ public class MaintenanceReservationService {
             reservationDao.persist(reservation);
             resolveNotification(reservation);
 
-            pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation), reservation.getEmployee());
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation, authorizationManager.getCurrentAccount().getFullName()), reservation.getEmployee());
         }
         else {
             throw new IllegalArgumentException("Unsupported response type: " + responseType);

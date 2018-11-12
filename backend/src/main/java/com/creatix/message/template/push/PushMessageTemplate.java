@@ -13,7 +13,10 @@ import java.util.Objects;
 
 public abstract class PushMessageTemplate implements MessageTemplate {
 
-    private DateTimeFormatter timestampFormatter = DateTimeFormatter.ofPattern("MM.dd.yyyy");
+    private DateTimeFormatter timestampFormatter = DateTimeFormatter.ofPattern("MM.dd.yyyy HH:mm a");
+    private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm a");
+    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yyyy");
+
 
     String formatTimestamp(OffsetDateTime tm, @NotNull ZoneId zoneId) {
         Objects.requireNonNull(zoneId, "Zone Id is null");
@@ -24,6 +27,28 @@ public abstract class PushMessageTemplate implements MessageTemplate {
 
         final ZonedDateTime zonedTm = ZonedDateTime.ofInstant(tm.toInstant(), zoneId);
         return timestampFormatter.format(zonedTm);
+    }
+
+    String formatTime(OffsetDateTime tm, @NotNull ZoneId zoneId) {
+        Objects.requireNonNull(zoneId, "Zone Id is null");
+
+        if ( tm == null ) {
+            return "";
+        }
+
+        final ZonedDateTime zonedTm = ZonedDateTime.ofInstant(tm.toInstant(), zoneId);
+        return timeFormatter.format(zonedTm);
+    }
+
+    String formatDate(OffsetDateTime tm, @NotNull ZoneId zoneId) {
+        Objects.requireNonNull(zoneId, "Zone Id is null");
+
+        if ( tm == null ) {
+            return "";
+        }
+
+        final ZonedDateTime zonedTm = ZonedDateTime.ofInstant(tm.toInstant(), zoneId);
+        return dateFormatter.format(zonedTm);
     }
 
     String translateRoleNameFromEnum(AccountRole role) {

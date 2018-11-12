@@ -1,1 +1,0 @@
-Tenant has approved your appointment at ${time}.
