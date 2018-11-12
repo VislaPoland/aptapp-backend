@@ -443,6 +443,7 @@ public class AuthorizationManager {
             case PropertyOwner:
             case PropertyManager:
             case AssistantPropertyManager:
+            case Maintenance:
                 return getIntersection(getAccountProperties(fromAccount), getAccountProperties(toAccount)).size() > 0;
             case Tenant:
             case SubTenant:
