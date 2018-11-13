@@ -9,16 +9,30 @@ public class MaintenanceRescheduleRejectTemplate extends PushMessageTemplate {
 
     private final MaintenanceReservation reservation;
 
-    public MaintenanceRescheduleRejectTemplate(MaintenanceReservation reservation) {
+    private final String staffName;
+
+    public MaintenanceRescheduleRejectTemplate(MaintenanceReservation reservation, String staffName) {
         this.reservation = reservation;
+        this.staffName = staffName;
     }
 
-    public String getTime() {
-        return formatTimestamp(reservation.getBeginTime(), reservation.getSlot().getProperty().getZoneId());
+    public String getUnitNumber() {
+        if (reservation.getNotification().getTargetApartment() != null) {
+            return reservation.getNotification().getTargetApartment().getUnitNumber();
+        }
+        return null;
+    }
+
+    public String getNotificationTitle() {
+        return reservation.getNotification().getTitle();
+    }
+
+    public String getStaffName() {
+        return staffName;
     }
 
     @Override
     public String getTemplateName() {
-        return "maintenance-reschedule-reject";
+        return getUnitNumber() == null ? "maintenance-reschedule-reject-without-unit" : "maintenance-reschedule-reject-with-unit";
     }
 }

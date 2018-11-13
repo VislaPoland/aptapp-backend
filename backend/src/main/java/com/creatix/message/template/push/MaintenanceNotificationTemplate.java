@@ -9,24 +9,32 @@ public class MaintenanceNotificationTemplate extends PushMessageTemplate {
         this.notification = notification;
     }
 
-    public String getRole() {
-        return translateRoleNameFromEnum(notification.getAuthor().getRole());
-    }
-
     public String getName() {
         return notification.getAuthor().getFullName();
     }
 
-    public String getMessage() {
+    public String getTime() {
+        return formatTime(notification.getCreatedAt(), notification.getProperty().getZoneId());
+    }
+
+    public String getDate() {
+        return formatDate(notification.getCreatedAt(), notification.getProperty().getZoneId());
+    }
+
+    public String getUnitNumber() {
+        if (notification.getTargetApartment() != null) {
+            return notification.getTargetApartment().getUnitNumber();
+        }
+        return null;
+    }
+
+    public String getNotificationTitle() {
         return notification.getTitle();
     }
 
-    public String getTimestamp() {
-        return formatTimestamp(notification.getCreatedAt(), notification.getProperty().getZoneId());
-    }
-
+    // in case of employee sender (we don't have apartment number for employee) send template for employee
     @Override
     public String getTemplateName() {
-        return "maintenance-notification";
+        return getUnitNumber() == null ?"maintenance-notification-by-employee" : "maintenance-notification-by-tenant";
     }
 }

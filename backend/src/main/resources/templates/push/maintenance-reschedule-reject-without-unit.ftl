@@ -1,0 +1,1 @@
+${staffName} did not accept request for new appointment time for: ${notificationTitle}. Resident will place new request.
