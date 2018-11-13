@@ -775,4 +775,10 @@ public class AccountService {
         }
     }
 
+    @RoleSecured(AccountRole.Administrator)
+    public void permanentDeleteOfEmployees(Property property) {
+        property.getManagers().stream().forEach(propertyManager -> {
+            accountDao.delete(propertyManager);
+        });
+    }
 }
