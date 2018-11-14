@@ -16,6 +16,9 @@ import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.PropertyStatus;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
+import com.creatix.service.AccountService;
+import com.creatix.service.TenantService;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -56,6 +59,10 @@ public class PropertyService {
     private FileUploadProperties uploadProperties;
     @Autowired
     private PropertyPhotoDao propertyPhotoDao;
+    @Autowired
+    private TenantService tenantService;
+    @Autowired
+    AccountService accountService;
 
     private static String[] columns = { "First Name", "Last Name", "Primary phone", "Primary email", "Created date", "Token valid until" };
 
@@ -141,6 +148,10 @@ public class PropertyService {
     @RoleSecured(AccountRole.Administrator)
     public Property deleteProperty(long propertyId) {
         final Property property = getOrElseThrow(propertyId, propertyDao, new EntityNotFoundException(String.format("Property %d not found", propertyId)));
+
+        tenantService.permanentDeleteOfTenantsFromProperty(property);
+        accountService.permanentDeleteOfEmployees(property);
+
         property.setDeleteDate(new Date());
         propertyDao.persist(property);
         return property;

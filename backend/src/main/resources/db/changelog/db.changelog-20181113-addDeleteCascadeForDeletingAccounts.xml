@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="martin dupal" id="db.changelog-20181113_1">
+        <sql>
+            ALTER TABLE public.notification DROP CONSTRAINT "FK6bcg6ojhy8fbwhi5holfu4y9m";
+            ALTER TABLE public.notification
+            ADD CONSTRAINT "FK6bcg6ojhy8fbwhi5holfu4y9m"
+            FOREIGN KEY (author_id) REFERENCES account (id) ON DELETE CASCADE;
+
+            ALTER TABLE public.notification DROP CONSTRAINT "FK65iryb1txcf687w7va2prjvbs";
+            ALTER TABLE public.notification
+            ADD CONSTRAINT "FK65iryb1txcf687w7va2prjvbs"
+            FOREIGN KEY (recipient_id) REFERENCES account (id) ON DELETE CASCADE;
+        </sql>
+
+        <sql>
+            ALTER TABLE public.account DROP CONSTRAINT "FKmba9bj1dc67e116qaj0x212py";
+            ALTER TABLE public.account
+            ADD CONSTRAINT "FKmba9bj1dc67e116qaj0x212py"
+            FOREIGN KEY (parent_tenant_id) REFERENCES account (id) ON DELETE CASCADE;
+        </sql>
+
+        <sql>
+            ALTER TABLE public.personal_message DROP CONSTRAINT "FK2xxx1smbolr2qj4c4jou5nwtv";
+            ALTER TABLE public.personal_message
+            ADD CONSTRAINT "FK2xxx1smbolr2qj4c4jou5nwtv"
+            FOREIGN KEY (to_account_id) REFERENCES account (id) ON DELETE CASCADE;
+        </sql>
+
+        <sql>
+            ALTER TABLE public.maintenance_reservation DROP CONSTRAINT fk_maintenance_reservation_employee_id_account_id;
+            ALTER TABLE public.maintenance_reservation
+            ADD CONSTRAINT fk_maintenance_reservation_employee_id_account_id
+            FOREIGN KEY (employee_id) REFERENCES account (id) ON DELETE CASCADE;
+        </sql>
+
+        <sql>
+            ALTER TABLE public.maintenance_reservation_units DROP CONSTRAINT fk_maintenance_reservation_units_reservations_id_maintenance_re;
+            ALTER TABLE public.maintenance_reservation_units
+            ADD CONSTRAINT fk_maintenance_reservation_units_reservations_id_maintenance_re
+            FOREIGN KEY (reservations_id) REFERENCES maintenance_reservation (id) ON DELETE CASCADE;
+        </sql>
+
+    </changeSet>
+</databaseChangeLog>

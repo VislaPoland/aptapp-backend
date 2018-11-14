@@ -8,6 +8,7 @@ import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ParkingStall;
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.Vehicle;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.SubTenant;
@@ -275,6 +276,16 @@ public class TenantService {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public @Nonnull Tenant deleteTenant(@Nonnull Long tenantId) {
         return deleteTenant(getTenant(tenantId));
+    }
+
+    @RoleSecured(AccountRole.Administrator)
+    public void permanentDeleteOfTenantsFromProperty(@Nonnull Property property) {
+        List<Apartment> apartments = apartmentDao.findByProperty(property);
+        apartments.stream().forEach(apartment -> {
+            if (apartment.getTenant() != null) {
+                accountDao.delete(apartment.getTenant());
+            }
+        });
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
