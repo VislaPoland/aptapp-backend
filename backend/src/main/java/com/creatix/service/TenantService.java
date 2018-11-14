@@ -99,7 +99,8 @@ public class TenantService {
             tenant = (Tenant) account;
         }
         else if ( account != null ) {
-            throw new IllegalArgumentException(String.format("Account with email=%s already exists", request.getPrimaryEmail()));
+            logger.error("Account with email %s already exists");
+            throw new IllegalArgumentException(String.format("Account with email %s already exists", request.getPrimaryEmail()));
         }
 
         if ( tenant == null ) {

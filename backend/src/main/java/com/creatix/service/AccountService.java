@@ -248,24 +248,25 @@ public class AccountService {
     private Account getAccountByToken(String actionToken) {
         final Account account = accountDao.findByActionToken(actionToken);
         if ( account == null ) {
-            throw new SecurityException(String.format("Action token=%s is not valid", actionToken));
+            logger.error("Action token \"%s\" is not valid");
+            throw new IllegalArgumentException(String.format("Action token is not valid. Please insert valid Action token.", actionToken));
         }
         return account;
     }
 
     public Account activateAccount(String activationCode) {
         final Account account = getAccountByToken(activationCode);
-        if ( account.getActive() ) {
-            return account;
+        if (account.getActive()) {
+            logger.error("Attempt to activate the active account.");
+            throw new IllegalArgumentException("Your activation code shows you are an active user. Please choose \"Login\" and login with your credentials.");
         }
 
         if ( account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate()) ) {
-            throw new SecurityException("Activation code has expired");
+            logger.error("Activation code has expired");
+            throw new IllegalArgumentException("Activation code has expired.");
         }
 
         account.setActive(true);
-        account.setActionToken(null);
-        account.setActionTokenValidUntil(null);
         accountDao.persist(account);
 
         return account;
@@ -342,13 +343,11 @@ public class AccountService {
 
         final Account account = getAccountByToken(request.getToken());
 
-        if ( account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate()) ) {
-            throw new SecurityException(String.format("Token %s has expired", request.getToken()));
+        if (!account.getActive()) {
+            throw new IllegalArgumentException("Account need to be activated.");
         }
 
         account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-        account.setActionToken(null);
-        account.setActionTokenValidUntil(null);
         accountDao.persist(account);
     }
 

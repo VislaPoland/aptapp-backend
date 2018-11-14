@@ -3,6 +3,7 @@ package com.creatix.controller.v1;
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.ErrorMessage;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.tenant.ParkingStallDto;
 import com.creatix.domain.dto.tenant.PersistTenantRequest;
@@ -11,7 +12,6 @@ import com.creatix.domain.dto.tenant.VehicleDto;
 import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.SubTenantDto;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
-import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
 import com.creatix.security.RoleSecured;
@@ -22,7 +22,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -219,5 +221,12 @@ public class TenantController {
     public DataResponse<Void> deleteSubTenant(@PathVariable Long subTenantId) {
         tenantService.deleteSubTenant(subTenantId);
         return new DataResponse<>();
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseEntity integrityViolation(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorMessage(ex.getMessage(), HttpStatus.CONFLICT.toString()));
     }
  }
