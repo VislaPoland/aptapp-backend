@@ -5,12 +5,17 @@ import com.creatix.domain.dto.*;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.service.AccountService;
 import com.fasterxml.jackson.annotation.JsonView;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,10 +40,10 @@ public class AuthController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "/verify-code", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<LoginResponse> verifyCode(@Valid @RequestBody ActivationCode codeRequest) {
+    public ResponseEntity<LoginResponse> verifyCode(@Valid @RequestBody ActivationCode codeRequest) {
         Account activatedAccount = accountService.activateAccount(codeRequest.getCode());
 
-        return new DataResponse<>(accountService.createLoginResponse(activatedAccount.getPrimaryEmail()));
+        return ResponseEntity.ok(accountService.createLoginResponse(activatedAccount.getPrimaryEmail()));
     }
 
     @ApiOperation(value = "Attempt to sign in")
@@ -63,5 +68,12 @@ public class AuthController {
     public DataResponse<Void> logout() {
         accountService.logout();
         return new DataResponse<>();
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseEntity integrityViolation(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorMessage(ex.getMessage(), HttpStatus.CONFLICT.toString()));
     }
 }
