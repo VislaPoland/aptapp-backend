@@ -80,7 +80,9 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                     break;
                 case Administrator:
                     if (property != null) {
-                        predicate = predicate.and(qNotification.property.eq(property));
+                        predicate = predicate.and(
+                                qNotification.property.eq(property)
+                                .or(qNotification.author.eq(account)));
                     }
                 default:
                     predicate = predicate.and(qNotification.author.eq(account));
@@ -115,41 +117,40 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                 case AssistantPropertyManager:
                     predicate = predicate.and(
                             qNotification.property.eq(
-                                    authorizationManager.getCurrentProperty(account)
+                                authorizationManager.getCurrentProperty(account)
                             )
                             .or(
-                                    qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                                qNotification.recipient.eq(authorizationManager.getCurrentAccount())
                             )
                     );
                     break;
                 case Administrator:
                     if (property != null) {
                         predicate = predicate.and(
-                            qNotification.property.eq(
-                                property
-                            ).or(
-                                qNotification.recipient.eq(authorizationManager.getCurrentAccount())
-                            )
+                            qNotification.property.eq(property)
+                            .or(qNotification.recipient.eq(authorizationManager.getCurrentAccount()))
+                            .or(qSubTenantRecipient.parentTenant.apartment.property.eq(property))
+                            .or(qParentTenantOfSubTenantRecipient.apartment.property.eq(property))
                         );
                     }
                     break;
                 case Maintenance:
                     predicate = predicate.and(qNotification.instanceOf(MaintenanceNotification.class)).and(
                             qNotification.property.eq(
-                                    authorizationManager.getCurrentProperty(account)
+                                authorizationManager.getCurrentProperty(account)
                             )
                             .or(
-                                    qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                                qNotification.recipient.eq(authorizationManager.getCurrentAccount())
                             )
                     );
                     break;
                 case Security:
                     predicate = predicate.and(qNotification.instanceOf(SecurityNotification.class)).and(
                             qNotification.property.eq(
-                                    authorizationManager.getCurrentProperty(account)
+                                authorizationManager.getCurrentProperty(account)
                             )
                             .or(
-                                    qNotification.recipient.eq(authorizationManager.getCurrentAccount())
+                                qNotification.recipient.eq(authorizationManager.getCurrentAccount())
                             )
                     );
                     break;
