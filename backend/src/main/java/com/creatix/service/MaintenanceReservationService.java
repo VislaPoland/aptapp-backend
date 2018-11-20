@@ -132,9 +132,15 @@ public class MaintenanceReservationService {
             Iterator<MaintenanceReservation> reservationIterator = reservations.iterator();
             while (reservationIterator.hasNext()) {
                 MaintenanceReservation reservation = reservationIterator.next();
-                if (reservation.getId() != response.getSlotUnitId())
+                if (reservation.getUnits().size() > 1) {
+                    throw new IllegalArgumentException("Too many slotUnit in reservation.");
+                }
+                if (reservation.getUnits().iterator().next().getId() != response.getSlotUnitId()) {
                     releaseReservedCapacity(reservation);
+                    notification.getReservations().remove(reservation);
+                    reservationIterator.remove();
                     reservationDao.delete(reservation);
+                }
             }
         }
 
