@@ -322,6 +322,7 @@ public class Mapper {
                         if ( (a.getPersonalMessageGroup() != null) && (a.getPersonalMessageGroup().getMessages() != null) ) {
                             b.setRecipients(mapperFactory.getMapperFacade().mapAsList(a.getPersonalMessageGroup().getMessages().stream()
                                     .filter(pm -> pm.getToAccount() != null)
+                                    .filter(pm -> !pm.getToAccount().isDeleted())
                                     .map(PersonalMessage::getToAccount).collect(Collectors.toList()), PersonalMessageAccountDto.class));
                         }
 
