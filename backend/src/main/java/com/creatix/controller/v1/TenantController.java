@@ -203,7 +203,7 @@ public class TenantController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = {"/*/subs/{subTenantId}", "/subs/{subTenantId}"}, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager, AccountRole.SubTenant})
     public DataResponse<SubTenantDto> updateSubTenant(@PathVariable Long subTenantId, @Valid @RequestBody UpdateSubTenantRequest request) {
         return new DataResponse<>(mapper.toSubTenantDto(tenantService.updateSubTenant(subTenantId, request)));
     }
