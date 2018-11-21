@@ -245,7 +245,7 @@ public class TenantService {
         return getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
     }
 
-    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public @Nonnull SubTenant updateSubTenant(@Nonnull Long subTenantId, @NotNull UpdateSubTenantRequest request) {
         Objects.requireNonNull(request);
 
