@@ -135,7 +135,7 @@ public class MaintenanceReservationService {
                 if (reservation.getUnits().size() > 1) {
                     throw new IllegalArgumentException("Too many slotUnit in reservation.");
                 }
-                if (reservation.getUnits().iterator().next().getId() != response.getSlotUnitId()) {
+                if (reservation.getId() != response.getSlotUnitId()) {
                     releaseReservedCapacity(reservation);
                     notification.getReservations().remove(reservation);
                     reservationIterator.remove();
