@@ -94,9 +94,10 @@ public class NotificationController {
             @RequestParam(required = false) Long startId,
             @RequestParam(required = false) NotificationStatus[] notificationStatus,
             @RequestParam(required = false) NotificationType[] notificationType,
-            @RequestParam(required = false) Long propertyId) {
+            @RequestParam(required = false) Long propertyId,
+            @RequestParam(required = false) SortEnum order) {
 
-        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, propertyId, pageSize),
+        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, propertyId, pageSize, order),
                 n -> mapper.toNotificationDto(n, this.getMappingClass(n.getClass())));
     }
 

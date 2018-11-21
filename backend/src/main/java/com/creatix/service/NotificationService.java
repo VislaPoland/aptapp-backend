@@ -6,11 +6,11 @@ import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationRe
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
-import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
@@ -18,6 +18,7 @@ import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PushNotificationSender;
 import com.creatix.service.notification.NotificationWatcher;
 import freemarker.template.TemplateException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,10 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -85,7 +88,8 @@ public class NotificationService {
             @Nullable NotificationType[] notificationType,
             @Nullable Long startId,
             @Nullable Long propertyId,
-            int pageSize) {
+            int pageSize,
+            SortEnum order) {
         Objects.requireNonNull(requestType, "Request type is null");
 
         final Account account = authorizationManager.getCurrentAccount();
@@ -99,6 +103,9 @@ public class NotificationService {
                 findPropertyById(propertyId),
                 pageSize + 1);
 
+        if (order != null && notificationType.length == 1 && NotificationType.Maintenance.equals(notificationType[0])) {
+            sortMaintenanceNotifications(order, notifications.stream().map(e -> (MaintenanceNotification) e).collect(Collectors.toList()));
+        }
 
         final Long nextId;
         if ( notifications.size() > pageSize ) {
@@ -110,6 +117,40 @@ public class NotificationService {
         }
 
         return new PageableDataResponse<>(notifications, (long) pageSize, nextId);
+    }
+
+    private void sortMaintenanceNotifications(@Nonnull SortEnum order, List<MaintenanceNotification> notifications) {
+        switch (order) {
+            case ASC:
+                notifications.sort((m1, m2) -> getDateForCompare(m1).isAfter(getDateForCompare(m2)) ? 1 : -1);
+                break;
+            case DESC:
+                notifications.sort((m1, m2) -> m2.getUpdatedAt().isAfter(m2.getUpdatedAt()) ? -1 : 1);
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal argument in order.");
+
+        }
+    }
+
+    private OffsetDateTime getDateForCompare(MaintenanceNotification maintenance) {
+        switch (maintenance.getReservations().size()) {
+            case 0:
+                return maintenance.getUpdatedAt();
+            case 1:
+                return maintenance.getReservations().get(0).getBeginTime();
+            default:
+                return latestReservation(maintenance);
+        }
+    }
+
+    private OffsetDateTime latestReservation(MaintenanceNotification maintenance) {
+        MaintenanceReservation latestReservation = maintenance.getReservations().stream()
+            .filter(res ->  !ReservationStatus.Rescheduled.equals(res.getStatus()))
+            .min((p1, p2) -> p1.getBeginTime().isAfter(p2.getBeginTime()) ? 1 : -1)
+            .orElseThrow(() -> new IllegalArgumentException("No reservation for maintenance notification."));
+
+        return latestReservation.getBeginTime();
     }
 
     public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@Nonnull OffsetDateTime beginDate, @Nonnull OffsetDateTime endDate) {
