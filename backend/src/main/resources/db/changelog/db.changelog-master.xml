@@ -30,5 +30,6 @@
     <include file="classpath:db/changelog/db.changelog-20180827-setDefaultValuesForNotifications.xml"/>
     <include file="classpath:db/changelog/db.changelog-20181008-addColumnsToMaintenanceSlotScheduleDaysOfWeek.xml"/>
     <include file="classpath:db/changelog/db.changelog-20181113-addDeleteCascadeForDeletingAccounts.xml"/>
+    <include file="classpath:db/changelog/db.changelog-20181121-addDeleteCascadeInCommunityBoard.xml"/>
 </databaseChangeLog>
 
