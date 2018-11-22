@@ -776,8 +776,9 @@ public class AccountService {
 
     @RoleSecured(AccountRole.Administrator)
     public void permanentDeleteOfEmployees(Property property) {
-        property.getManagers().stream().forEach(propertyManager -> {
-            accountDao.delete(propertyManager);
-        });
+        assistantPropertyManagerDao.findByProperty(property).stream().forEach(assistantPropertyManager -> assistantPropertyManagerDao.delete(assistantPropertyManager));
+        maintenanceEmployeeDao.findByProperty(property).stream().forEach(maintenanceEmployee -> maintenanceEmployeeDao.delete(maintenanceEmployee));
+        securityEmployeeDao.findByProperty(property).stream().forEach(securityEmployee -> securityEmployeeDao.delete(securityEmployee));
+        property.getManagers().stream().forEach(propertyManager -> accountDao.delete(propertyManager));
     }
 }
