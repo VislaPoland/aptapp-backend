@@ -15,7 +15,7 @@ public class UpdateAccountProfileRequest {
     private String firstName;
     @ApiModelProperty(value = "Last name")
     private String lastName;
-    @Pattern(regexp="^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$", message = "The provided phone number is not valid")
+    @Pattern(regexp="^$|^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$", message = "The provided phone number is not valid")
     @ApiModelProperty(value = "Primary phone")
     private String primaryPhone;
     @ApiModelProperty(value = "Web url")
@@ -23,7 +23,7 @@ public class UpdateAccountProfileRequest {
     @Email
     @ApiModelProperty(value = "Secondary email address")
     private String secondaryEmail;
-    @Pattern(regexp="^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$", message = "The provided phone number is not valid")
+    @Pattern(regexp="^$|^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$", message = "The provided phone number is not valid")
     @ApiModelProperty(value = "Secondary phone number")
     private String secondaryPhone;
     @ApiModelProperty(value = "Indicate that sms message notifications are enabled/disabled")
