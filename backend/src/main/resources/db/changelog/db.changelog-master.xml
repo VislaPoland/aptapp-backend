@@ -32,5 +32,6 @@
     <include file="classpath:db/changelog/db.changelog-20181113-addDeleteCascadeForDeletingAccounts.xml"/>
     <include file="classpath:db/changelog/db.changelog-20181121-addDeleteCascadeInCommunityBoard.xml"/>
     <include file="classpath:db/changelog/db.changelog-20181122-addDeleteCascade.xml" />
+    <include file="classpath:db/changelog/db.changelog-20181122-addDeleteCascade2.xml" />
 </databaseChangeLog>
 
