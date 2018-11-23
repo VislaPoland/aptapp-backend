@@ -31,7 +31,7 @@ public class PersistAccountRequest {
     @ApiModelProperty(value = "Email address", required = true)
     private String primaryEmail;
 
-    @Pattern(regexp="^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$", message = "The provided phone number is not valid")
+    @Pattern(regexp="^$|^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$", message = "The provided phone number is not valid")
     @ApiModelProperty(value = "Phone number")
     private String primaryPhone;
 
@@ -39,7 +39,7 @@ public class PersistAccountRequest {
     @ApiModelProperty(value = "Secondary email address")
     private String secondaryEmail;
 
-    @Pattern(regexp="^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$", message = "The provided phone number is not valid")
+    @Pattern(regexp="^$|^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$", message = "The provided phone number is not valid")
     @ApiModelProperty(value = "Secondary phone number")
     private String secondaryPhone;
 
