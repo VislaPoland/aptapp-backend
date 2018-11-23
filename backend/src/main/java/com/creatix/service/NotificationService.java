@@ -1,12 +1,13 @@
 package com.creatix.service;
 
+import static java.util.stream.Collectors.toList;
+
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
-import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
@@ -32,10 +33,10 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -104,7 +105,7 @@ public class NotificationService {
                 pageSize + 1);
 
         if (order != null && notificationType.length == 1 && NotificationType.Maintenance.equals(notificationType[0])) {
-            sortMaintenanceNotifications(order, notifications.stream().map(e -> (MaintenanceNotification) e).collect(Collectors.toList()));
+            sortMaintenanceNotifications(order, notifications);
         }
 
         final Long nextId;
@@ -119,13 +120,14 @@ public class NotificationService {
         return new PageableDataResponse<>(notifications, (long) pageSize, nextId);
     }
 
-    private void sortMaintenanceNotifications(@Nonnull SortEnum order, List<MaintenanceNotification> notifications) {
+    private void sortMaintenanceNotifications(@Nonnull SortEnum order, List<Notification> notifications) {
         switch (order) {
             case ASC:
-                notifications.sort((m1, m2) -> getDateForCompare(m1).isAfter(getDateForCompare(m2)) ? 1 : -1);
+                Collections.sort(notifications, (m1, m2) -> getDateForCompare((MaintenanceNotification) m2).compareTo(getDateForCompare((MaintenanceNotification)m1)));
+                Collections.reverse(notifications);
                 break;
             case DESC:
-                notifications.sort((m1, m2) -> m2.getUpdatedAt().isAfter(m2.getUpdatedAt()) ? -1 : 1);
+                notifications.sort(Comparator.comparing(Notification::getUpdatedAt));
                 break;
             default:
                 throw new IllegalArgumentException("Illegal argument in order.");
@@ -145,12 +147,13 @@ public class NotificationService {
     }
 
     private OffsetDateTime latestReservation(MaintenanceNotification maintenance) {
-        MaintenanceReservation latestReservation = maintenance.getReservations().stream()
+        List<OffsetDateTime> latestReservation = maintenance.getReservations().stream()
             .filter(res ->  !ReservationStatus.Rescheduled.equals(res.getStatus()))
-            .min((p1, p2) -> p1.getBeginTime().isAfter(p2.getBeginTime()) ? 1 : -1)
-            .orElseThrow(() -> new IllegalArgumentException("No reservation for maintenance notification."));
+            .map(maintenanceReservation -> maintenanceReservation.getBeginTime())
+            .sorted()
+            .collect(toList());
 
-        return latestReservation.getBeginTime();
+        return latestReservation.get(0);
     }
 
     public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@Nonnull OffsetDateTime beginDate, @Nonnull OffsetDateTime endDate) {
