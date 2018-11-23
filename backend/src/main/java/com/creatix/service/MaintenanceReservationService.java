@@ -137,9 +137,11 @@ public class MaintenanceReservationService {
                 }
                 if (reservation.getId() != response.getSlotUnitId()) {
                     releaseReservedCapacity(reservation);
-                    notification.getReservations().remove(reservation);
-                    reservationIterator.remove();
-                    reservationDao.delete(reservation);
+                    if (MaintenanceNotificationResponseRequest.ResponseType.Confirm.equals(response.getResponse())) {
+                        notification.getReservations().remove(reservation);
+                        reservationIterator.remove();
+                        reservationDao.delete(reservation);
+                    }
                 }
             }
         }
