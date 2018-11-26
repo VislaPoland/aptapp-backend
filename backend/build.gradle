@@ -4,17 +4,20 @@ version = '1.0.0'
 buildscript {
 	ext {
 		springBootVersion = '1.5.6.RELEASE'
+		querydslVersion = '4.2.1'
 	}
 	repositories {
 		mavenCentral()
         maven { url 'https://repo.spring.io/snapshot' }
         maven { url 'https://repo.spring.io/milestone' }
         maven { url 'https://repo.spring.io/plugins-release' }
+		maven { url "https://plugins.gradle.org/m2/" }
 		jcenter()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 		classpath('io.spring.gradle:propdeps-plugin:0.0.9.RELEASE')
+		classpath "gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:1.0.10"
 	}
 }
 apply plugin: 'propdeps'
@@ -26,6 +29,7 @@ apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'pmd'
+apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -49,16 +53,7 @@ pmd {
 			"java-unusedcode"
 	]
 	toolVersion = '5.8.1'
-}
-
-idea {
-//    1. Go to Settings -> Build, Execution, Deployment -> Compiler -> Annotation Processors;
-//    2. Check Enable annotation processing checkbox;
-//    3. In "Store generated sources relative to:" select Module content root.
-	module {
-		sourceDirs += file('src/main/generated')
-		generatedSourceDirs += file('src/main/generated')
-	}
+	sourceSets = [sourceSets.main]
 }
 
 repositories {
@@ -97,11 +92,11 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-mail')
 	// orm
 	compile('org.hibernate:hibernate-core:5.3.7.Final')
-	compile('com.querydsl:querydsl-jpa:4.2.1')
-	compile('com.querydsl:querydsl-apt:4.2.1:jpa')
-	compile('com.querydsl:querydsl-sql:4.2.1')
+	compile group: 'com.querydsl', name: 'querydsl-core', version: querydslVersion
+	compile group: 'com.querydsl', name: 'querydsl-jpa', version: querydslVersion
+	compile group: 'com.querydsl', name: 'querydsl-sql', version: querydslVersion
 	//validation
-	compile('org.hibernate:hibernate-validator:5.2.4.Final')
+	compile('org.hibernate:hibernate-validator:5.3.6.Final')
 
 	// other
 	compile('org.projectlombok:lombok:1.16.18')
@@ -111,7 +106,7 @@ dependencies {
 	compile('org.apache.commons:commons-text:1.1')
 	compile('io.springfox:springfox-swagger2:2.5.0')
 	compile('commons-io:commons-io:2.5')
-	compile('ma.glasnost.orika:orika-core:1.5.1')
+	compile('ma.glasnost.orika:orika-core:1.5.2')
 	compile('org.freemarker:freemarker:2.3.23')
 	compile('com.twilio.sdk:twilio:7.15.5')
 	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0')
@@ -140,6 +135,15 @@ dependencies {
 
 compileJava.dependsOn(processResources)
 
-task wrapper(type: Wrapper) {
-	gradleVersion = '2.9'
+sourceSets {
+    main {
+        java {
+            srcDir "$buildDir/generated-sources/apt"
+        }
+    }
+}
+
+querydsl {
+    jpa = true
+    querydslSourcesDir = "$buildDir/generated-sources/apt"
 }
