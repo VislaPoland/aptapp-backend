@@ -43,6 +43,8 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
+
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -627,6 +629,9 @@ public class Mapper {
                 .customize(new CustomMapper<Account, EventSlotDetailDto.AccountDto>() {
                     @Override
                     public void mapAtoB(Account a, EventSlotDetailDto.AccountDto b, MappingContext context) {
+                        // because we are using LazyLoad to load proxy entities we must do this
+                        a = (Account) Hibernate.unproxy(a);
+
                         if (a instanceof SubTenant) {
                             b.setUnitNumber(((SubTenant) a).getApartment().getUnitNumber());
                         } else if (a instanceof Tenant) {
@@ -668,6 +673,10 @@ public class Mapper {
                 .customize(new CustomMapper<Account, PersonalMessageAccountDto>() {
                     @Override
                     public void mapAtoB(Account a, PersonalMessageAccountDto b, MappingContext context) {
+
+                        // because we are using LazyLoad to load proxy entities we must do this
+                        a = (Account) Hibernate.unproxy(a);
+
                         if (a instanceof SubTenant) {
                             b.setUnitNumber(((SubTenant) a).getApartment().getUnitNumber());
                         } else if (a instanceof Tenant) {
