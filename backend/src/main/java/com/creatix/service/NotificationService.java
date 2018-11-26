@@ -128,6 +128,7 @@ public class NotificationService {
                 break;
             case DESC:
                 notifications.sort(Comparator.comparing(Notification::getUpdatedAt));
+                Collections.reverse(notifications);
                 break;
             default:
                 throw new IllegalArgumentException("Illegal argument in order.");
