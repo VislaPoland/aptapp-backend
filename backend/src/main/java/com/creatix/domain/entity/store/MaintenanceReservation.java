@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store;
 
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.ReservationStatus;
@@ -64,6 +65,15 @@ public class MaintenanceReservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status;
+    @Column(nullable = false)
+    @NotNull
+    private OffsetDateTime createdAt;
+    @Column(nullable = false)
+    @NotNull
+    private OffsetDateTime updatedAt;
+    @ManyToOne
+    @JoinColumn
+    private Account updatedByAccount;
 
     @QueryInit("targetApartment.tenant")
     @ManyToOne
