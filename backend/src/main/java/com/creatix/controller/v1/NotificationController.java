@@ -222,7 +222,7 @@ public class NotificationController {
     @DeleteMapping(path = "/maintenance/{notificationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured(value = {AccountRole.Maintenance, AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceNotificationDto> deleteMaintenanceNotification(@PathVariable Long notificationId) {
-        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.deleteMaintenanceNotification(notificationId)));
+        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.deleteMaintenanceNotificationAndNotify(notificationId)));
     }
 
     @ApiOperation(value = "Get single neighborhood notification")

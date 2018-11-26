@@ -431,7 +431,7 @@ public class NotificationService {
     }
 
     @RoleSecured({AccountRole.Maintenance, AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
-    public MaintenanceNotification deleteMaintenanceNotification(@Nonnull Long notificationId) {
+    public MaintenanceNotification deleteMaintenanceNotificationAndNotify(@Nonnull Long notificationId) {
 
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
 
@@ -441,7 +441,23 @@ public class NotificationService {
 
         maintenanceNotificationDao.persist(notification);
 
+        if (AccountRole.Tenant.equals(authorizationManager.getCurrentAccount().getRole()) ||
+                AccountRole.SubTenant.equals(authorizationManager.getCurrentAccount().getRole())) {
+            sendPushNotificationToMaintener(notification);
+        }
+
         return notification;
+    }
+
+    private void sendPushNotificationToMaintener(MaintenanceNotification notification) {
+        List<MaintenanceEmployee> maintenanceEmployeeList = maintenanceEmployeeDao.findByProperty(authorizationManager.getCurrentProperty());
+        maintenanceEmployeeList.stream().forEach(maintenanceEmployee -> {
+            try {
+                pushNotificationSender.sendNotification(new MaintenanceDeleteTemplate(notification, authorizationManager.getCurrentAccount()), ((Account) maintenanceEmployee));
+            } catch (IOException | TemplateException e) {
+                logger.error("Problem with sending push notification for deleting maintenance notification.", e);
+            }
+        });
     }
 
     private void releaseFutureReservationIgnorePastReservation(MaintenanceNotification notification) {
