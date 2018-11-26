@@ -633,9 +633,15 @@ public class Mapper {
                         a = (Account) Hibernate.unproxy(a);
 
                         if (a instanceof SubTenant) {
-                            b.setUnitNumber(((SubTenant) a).getApartment().getUnitNumber());
+                            final Apartment apartment = ((SubTenant) a).getApartment();
+                            if (apartment != null) {
+                                b.setUnitNumber(apartment.getUnitNumber());
+                            }
                         } else if (a instanceof Tenant) {
-                            b.setUnitNumber(((Tenant) a).getApartment().getUnitNumber());
+                            final Apartment apartment = ((Tenant) a).getApartment();
+                            if (apartment != null) {
+                                b.setUnitNumber(apartment.getUnitNumber());
+                            }
                         }
                         b.setFirstName(a.getFirstName());
                         b.setLastName(a.getLastName());
@@ -678,9 +684,15 @@ public class Mapper {
                         a = (Account) Hibernate.unproxy(a);
 
                         if (a instanceof SubTenant) {
-                            b.setUnitNumber(((SubTenant) a).getApartment().getUnitNumber());
+                            final Apartment apartment = ((SubTenant) a).getApartment();
+                            if (apartment != null) {
+                                b.setUnitNumber(apartment.getUnitNumber());
+                            }
                         } else if (a instanceof Tenant) {
-                            b.setUnitNumber(((Tenant) a).getApartment().getUnitNumber());
+                            final Apartment apartment = ((Tenant) a).getApartment();
+                            if (apartment != null) {
+                                b.setUnitNumber(apartment.getUnitNumber());
+                            }
                         }
 
                         b.setUserId(a.getId());
