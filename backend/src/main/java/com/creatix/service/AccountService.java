@@ -248,8 +248,8 @@ public class AccountService {
     private Account getAccountByToken(String actionToken) {
         final Account account = accountDao.findByActionToken(actionToken);
         if ( account == null ) {
-            logger.error("Action token \"%s\" is not valid");
-            throw new IllegalArgumentException(String.format("Action token is not valid. Please insert valid Action token.", actionToken));
+            logger.warn("Action token is not valid");
+            throw new IllegalArgumentException("Action token is not valid. Please insert valid Action token.");
         }
         return account;
     }
@@ -257,17 +257,16 @@ public class AccountService {
     public Account activateAccount(String activationCode) {
         final Account account = getAccountByToken(activationCode);
         if (account.getActive()) {
-            logger.error("Attempt to activate the active account.");
-            throw new IllegalArgumentException("Your activation code shows you are an active user. Please choose \"Login\" and login with your credentials.");
-        }
+            logger.info(String.format("Attempt to activate already active account '%s'.", account.getPrimaryEmail()));
+        } else {
+            if (account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate())) {
+                logger.warn("Activation code has expired");
+                throw new IllegalArgumentException("Activation code has expired.");
+            }
 
-        if ( account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate()) ) {
-            logger.error("Activation code has expired");
-            throw new IllegalArgumentException("Activation code has expired.");
+            account.setActive(true);
+            accountDao.persist(account);
         }
-
-        account.setActive(true);
-        accountDao.persist(account);
 
         return account;
     }
