@@ -135,14 +135,14 @@ public class MaintenanceReservationService {
                 if (reservation.getUnits().size() > 1) {
                     throw new IllegalArgumentException("Too many slotUnit in reservation.");
                 }
-                if (reservation.getId() != response.getSlotUnitId()) {
+                
+                if ((reservation.getId() != response.getSlotUnitId() && MaintenanceNotificationResponseRequest.ResponseType.Confirm.equals(response.getResponse())) || (reservationIterator.hasNext() && MaintenanceNotificationResponseRequest.ResponseType.Reschedule.equals(response.getResponse()))) {
                     releaseReservedCapacity(reservation);
-                    if (MaintenanceNotificationResponseRequest.ResponseType.Confirm.equals(response.getResponse())) {
-                        notification.getReservations().remove(reservation);
-                        reservationIterator.remove();
-                        reservationDao.delete(reservation);
-                    }
+                    notification.getReservations().remove(reservation);
+                    reservationIterator.remove();
+                    reservationDao.delete(reservation);
                 }
+
             }
         }
 
