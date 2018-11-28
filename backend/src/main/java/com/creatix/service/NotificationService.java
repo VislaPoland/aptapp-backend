@@ -95,6 +95,9 @@ public class NotificationService {
 
         final Account account = authorizationManager.getCurrentAccount();
 
+        // HACK: pls remove!!!
+        pageSize = 9999;
+
         List<Notification> notifications = notificationDao.findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
                 requestType,
                 notificationStatus,
