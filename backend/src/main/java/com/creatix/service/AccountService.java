@@ -257,11 +257,12 @@ public class AccountService {
     public Account activateAccount(String activationCode) {
         final Account account = getAccountByToken(activationCode);
         if (account.getActive()) {
-            logger.info(String.format("Attempt to activate already active account '%s'.", account.getPrimaryEmail()));
+            logger.warn(String.format("Attempt to activate already active account '%s'.", account.getPrimaryEmail()));
+            throw new IllegalArgumentException("Your activation code shows you are an active user. Please choose \"Login\" and login with your credentials.");
         } else {
             if (account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate())) {
-                logger.warn("Activation code has expired");
-                throw new IllegalArgumentException("Activation code has expired.");
+                logger.warn("Activation code has expired. Please use most recent activation code received.");
+                throw new IllegalArgumentException("Activation code has expired. Please use most recent activation code received.");
             }
 
             account.setActive(true);
