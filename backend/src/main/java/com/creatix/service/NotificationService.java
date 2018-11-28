@@ -430,6 +430,12 @@ public class NotificationService {
 
         maintenanceNotificationDao.persist(notification);
 
+        try {
+            pushNotificationSender.sendNotification(new MaintenanceCompleteTemplate(notification), notification.getAuthor());
+        } catch (IOException | TemplateException e) {
+            logger.error("Problem with sending push notification for closing maintenance notification.", e);
+        }
+
         return notification;
     }
 

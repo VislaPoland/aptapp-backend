@@ -13,7 +13,6 @@ import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.ReservationStatus;
-import com.creatix.message.template.push.MaintenanceConfirmTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleConfirmTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleRejectTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleTemplate;
@@ -225,7 +224,6 @@ public class MaintenanceReservationService {
         reservationDao.persist(reservation);
 
         resolveNotification(reservation);
-        pushNotificationSender.sendNotification(new MaintenanceConfirmTemplate(reservation), reservation.getNotification().getAuthor());
 
         return reservation;
     }
