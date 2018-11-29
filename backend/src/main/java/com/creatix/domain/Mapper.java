@@ -842,7 +842,7 @@ public class Mapper {
     public SubTenantDto toSubTenantDto(@NotNull SubTenant subTenant) {
         Objects.requireNonNull(subTenant);
 
-        return mapperFactory.getMapperFacade().map(subTenant, com.creatix.domain.dto.tenant.subs.SubTenantDto.class);
+        return mapperFactory.getMapperFacade().map(subTenant, SubTenantDto.class);
     }
 
     public SubTenant toSubTenant(@NotNull CreateSubTenantRequest request) {
