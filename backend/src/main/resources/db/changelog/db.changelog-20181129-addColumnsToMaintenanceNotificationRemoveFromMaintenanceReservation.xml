@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Kamil Kolarik" id="db.changelog-20181129_1">
+        <comment>Remove columns from maintenance_reservetion.</comment>
+        <dropColumn tableName="maintenance_reservation" columnName="created_at"/>
+        <dropColumn tableName="maintenance_reservation" columnName="updated_at"/>
+        <dropColumn tableName="maintenance_reservation" columnName="updated_by_account_id"/>
+    </changeSet>
+
+    <changeSet author="Kamil Kolarik" id="db.changelog-20181129_2">
+        <comment>Add column to notification.</comment>
+        <addColumn tableName="notification">
+            <column name="updated_by_account_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="Kamil Kolarik" id="db.changelog-20181129_3">
+        <addForeignKeyConstraint
+                baseColumnNames="updated_by_account_id"
+                baseTableName="notification"
+                constraintName="fk_notification_updated_by_account_id_account_id"
+                referencedColumnNames="id"
+                referencedTableName="account"/>
+    </changeSet>
+    
+</databaseChangeLog>

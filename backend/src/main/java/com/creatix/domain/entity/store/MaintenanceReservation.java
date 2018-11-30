@@ -65,15 +65,6 @@ public class MaintenanceReservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status;
-    @Column(nullable = false)
-    @NotNull
-    private OffsetDateTime createdAt;
-    @Column(nullable = false)
-    @NotNull
-    private OffsetDateTime updatedAt;
-    @ManyToOne
-    @JoinColumn
-    private Account updatedByAccount;
 
     @QueryInit("targetApartment.tenant")
     @ManyToOne

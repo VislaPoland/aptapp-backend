@@ -35,5 +35,6 @@
     <include file="classpath:db/changelog/db.changelog-20181123-addDeleteCascade2.xml" />
     <include file="classpath:db/changelog/db.changelog-20181126-addColumnsToMaintenanceReservation.xml"/>
     <include file="classpath:db/changelog/db.changelog-20181126-addHttpToAllBusinessProfiles.xml" />
+    <include file="classpath:db/changelog/db.changelog-20181129-addColumnsToMaintenanceNotificationRemoveFromMaintenanceReservation.xml"/>
 </databaseChangeLog>
 
