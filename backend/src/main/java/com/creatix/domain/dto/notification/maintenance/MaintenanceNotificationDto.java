@@ -3,6 +3,7 @@ package com.creatix.domain.dto.notification.maintenance;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.apartment.BasicApartmentDto;
 import com.creatix.domain.dto.notification.NotificationDto;
+import com.creatix.domain.dto.property.BasicAccountDto;
 import com.creatix.domain.dto.property.slot.MaintenanceReservationDto;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiModel;
@@ -43,4 +44,7 @@ public class MaintenanceNotificationDto extends NotificationDto {
     @Size(max = 2048)
     @ApiModelProperty(value = "Pet instructions")
     private String petInstructions;
+
+    @ApiModelProperty(value = "Last update by account")
+    private BasicAccountDto updatedByAccount;
 }

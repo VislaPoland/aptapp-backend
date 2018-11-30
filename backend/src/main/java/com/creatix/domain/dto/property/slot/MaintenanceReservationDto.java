@@ -1,9 +1,7 @@
 package com.creatix.domain.dto.property.slot;
 
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.account.AccountDto;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
-import com.creatix.domain.dto.property.BasicAccountDto;
 import com.creatix.domain.enums.ReservationStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiModel;
@@ -40,10 +38,4 @@ public class MaintenanceReservationDto {
     private MaintenanceNotificationDto notification;
     @ApiModelProperty(required = true)
     private ReservationStatus status;
-    @ApiModelProperty(value = "Timestamp of create", dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
-    private OffsetDateTime createdAt;
-    @ApiModelProperty(value = "Timestamp of update", dataType = "java.lang.String", example = "2016-07-06T11:02:38.564Z")
-    private OffsetDateTime updatedAt;
-    @ApiModelProperty(value = "Updated by account")
-    private BasicAccountDto updatedByAccount;
 }
