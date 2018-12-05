@@ -13,7 +13,6 @@ import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.ReservationStatus;
-import com.creatix.message.template.push.MaintenanceConfirmTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleConfirmTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleRejectTemplate;
 import com.creatix.message.template.push.MaintenanceRescheduleTemplate;
@@ -21,6 +20,7 @@ import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PushNotificationSender;
 import freemarker.template.TemplateException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +29,7 @@ import javax.annotation.Nonnull;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -95,7 +96,7 @@ public class MaintenanceReservationService {
     }
 
 
-    @RoleSecured(AccountRole.Maintenance)
+    @RoleSecured({AccountRole.Maintenance, AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public MaintenanceReservation deleteById(long reservationId) {
         final MaintenanceReservation reservation = reservationDao.findById(reservationId);
         if ( reservation == null ) {
@@ -127,7 +128,21 @@ public class MaintenanceReservationService {
             throw new IllegalArgumentException("No pending reservations found for notification");
         }
         if ( pendingCount > 1 ) {
-            throw new IllegalStateException("Multiple pending reservations found for notification");
+            Iterator<MaintenanceReservation> reservationIterator = reservations.iterator();
+            while (reservationIterator.hasNext()) {
+                MaintenanceReservation reservation = reservationIterator.next();
+                if (reservation.getUnits().size() > 1) {
+                    throw new IllegalArgumentException("Too many slotUnit in reservation.");
+                }
+                
+                if ((reservation.getId() != response.getSlotUnitId() && MaintenanceNotificationResponseRequest.ResponseType.Confirm.equals(response.getResponse())) || (reservationIterator.hasNext() && MaintenanceNotificationResponseRequest.ResponseType.Reschedule.equals(response.getResponse()))) {
+                    releaseReservedCapacity(reservation);
+                    notification.getReservations().remove(reservation);
+                    reservationIterator.remove();
+                    reservationDao.delete(reservation);
+                }
+
+            }
         }
 
         final MaintenanceReservation reservation = reservations.get(0);
@@ -173,7 +188,7 @@ public class MaintenanceReservationService {
             reservationDao.persist(reservation);
             resolveNotification(reservation);
 
-            pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation), reservation.getEmployee());
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleConfirmTemplate(reservation, authorizationManager.getCurrentAccount().getFullName()), reservation.getEmployee());
         }
         else if ( responseType == MaintenanceNotificationResponseRequest.ResponseType.Reject ) {
             reservation.setStatus(ReservationStatus.Rejected);
@@ -181,7 +196,7 @@ public class MaintenanceReservationService {
             reservationDao.persist(reservation);
             resolveNotification(reservation);
 
-            pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation), reservation.getEmployee());
+            pushNotificationSender.sendNotification(new MaintenanceRescheduleRejectTemplate(reservation, authorizationManager.getCurrentAccount().getFullName()), reservation.getEmployee());
         }
         else {
             throw new IllegalArgumentException("Unsupported response type: " + responseType);
@@ -209,7 +224,6 @@ public class MaintenanceReservationService {
         reservationDao.persist(reservation);
 
         resolveNotification(reservation);
-        pushNotificationSender.sendNotification(new MaintenanceConfirmTemplate(reservation), reservation.getNotification().getAuthor());
 
         return reservation;
     }

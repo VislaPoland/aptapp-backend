@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store;
 
+import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.ReservationStatus;

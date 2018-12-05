@@ -1,5 +1,7 @@
 package com.creatix.service;
 
+import static java.util.stream.Collectors.toList;
+
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;
@@ -10,7 +12,6 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
-import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.*;
 import com.creatix.security.AuthorizationManager;
@@ -18,6 +19,7 @@ import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PushNotificationSender;
 import com.creatix.service.notification.NotificationWatcher;
 import freemarker.template.TemplateException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,8 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -85,10 +89,14 @@ public class NotificationService {
             @Nullable NotificationType[] notificationType,
             @Nullable Long startId,
             @Nullable Long propertyId,
-            int pageSize) {
+            int pageSize,
+            SortEnum order) {
         Objects.requireNonNull(requestType, "Request type is null");
 
         final Account account = authorizationManager.getCurrentAccount();
+
+        // HACK: pls remove!!!
+        pageSize = 9999;
 
         List<Notification> notifications = notificationDao.findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
                 requestType,
@@ -99,6 +107,9 @@ public class NotificationService {
                 findPropertyById(propertyId),
                 pageSize + 1);
 
+        if (order != null && notificationType.length == 1 && NotificationType.Maintenance.equals(notificationType[0])) {
+            sortMaintenanceNotifications(order, notifications);
+        }
 
         final Long nextId;
         if ( notifications.size() > pageSize ) {
@@ -110,6 +121,43 @@ public class NotificationService {
         }
 
         return new PageableDataResponse<>(notifications, (long) pageSize, nextId);
+    }
+
+    private void sortMaintenanceNotifications(@Nonnull SortEnum order, List<Notification> notifications) {
+        switch (order) {
+            case ASC:
+                Collections.sort(notifications, (m1, m2) -> getDateForCompare((MaintenanceNotification) m2).compareTo(getDateForCompare((MaintenanceNotification)m1)));
+                Collections.reverse(notifications);
+                break;
+            case DESC:
+                notifications.sort(Comparator.comparing(Notification::getUpdatedAt));
+                Collections.reverse(notifications);
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal argument in order.");
+
+        }
+    }
+
+    private OffsetDateTime getDateForCompare(MaintenanceNotification maintenance) {
+        switch (maintenance.getReservations().size()) {
+            case 0:
+                return maintenance.getUpdatedAt();
+            case 1:
+                return maintenance.getReservations().get(0).getBeginTime();
+            default:
+                return latestReservation(maintenance);
+        }
+    }
+
+    private OffsetDateTime latestReservation(MaintenanceNotification maintenance) {
+        List<OffsetDateTime> latestReservation = maintenance.getReservations().stream()
+            .filter(res ->  !ReservationStatus.Rescheduled.equals(res.getStatus()))
+            .map(maintenanceReservation -> maintenanceReservation.getBeginTime())
+            .sorted()
+            .collect(toList());
+
+        return latestReservation.get(0);
     }
 
     public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@Nonnull OffsetDateTime beginDate, @Nonnull OffsetDateTime endDate) {
@@ -155,9 +203,11 @@ public class NotificationService {
     }
 
     @RoleSecured
-    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Nonnull Long slotUnitId, @Nullable Long propertyId) throws IOException, TemplateException {
+    public MaintenanceNotification saveMaintenanceNotification(String targetUnitNumber, @Nonnull MaintenanceNotification notification, @Deprecated @Nonnull Long slotUnitId, List<Long> slotsUnitId, @Nullable Long propertyId) throws IOException, TemplateException {
         Objects.requireNonNull(notification, "Notification is null");
-        Objects.requireNonNull(slotUnitId, "slot unit id is null");
+
+// TODO uncomment this after deleting deprecated "slotUnitId"
+//        Objects.requireNonNull(slotsUnitId, "slot unit id is null");
 
         Account currentAccount = authorizationManager.getCurrentAccount();
 
@@ -189,7 +239,14 @@ public class NotificationService {
         }
         maintenanceNotificationDao.persist(notification);
 
-        maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
+        // TODO delete original slotUnitId after FE and APP update and release
+        if (slotsUnitId != null && slotsUnitId.size() > 0) {
+            for (Long slotUnitIdFromList : slotsUnitId) {
+                maintenanceReservationService.createMaintenanceReservation(notification, slotUnitIdFromList);
+            }
+        } else {
+            maintenanceReservationService.createMaintenanceReservation(notification, slotUnitId);
+        }
 
         for ( MaintenanceEmployee employee : maintenanceEmployeeDao.findByProperty(notification.getProperty()) ) {
             pushNotificationSender.sendNotification(new MaintenanceNotificationTemplate(notification), employee);
@@ -222,7 +279,7 @@ public class NotificationService {
         authorizationManager.checkRead(property);
 
         final Tenant tenant = targetApartment.getTenant();
-        if ( tenant != null ) {
+        if (tenant != null) {
 
             notification.setType(NotificationType.Neighborhood);
             notification.setAuthor(currentAccount);
@@ -239,8 +296,7 @@ public class NotificationService {
             if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
                 try {
                     smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
-                }
-                catch ( Exception e ) {
+                } catch (Exception e) {
                     logger.info(String.format("Failed to sms notify %s", tenant.getPrimaryEmail()), e);
                 }
             }
@@ -366,7 +422,7 @@ public class NotificationService {
     }
 
     @RoleSecured(AccountRole.Maintenance)
-    public MaintenanceNotification closeMaintenanceNotification(@Nonnull Long notificationId) throws IOException, TemplateException {
+    public MaintenanceNotification closeMaintenanceNotification(@Nonnull Long notificationId) {
 
         final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
         notification.setClosedAt(OffsetDateTime.now());
@@ -374,7 +430,51 @@ public class NotificationService {
 
         maintenanceNotificationDao.persist(notification);
 
+        try {
+            pushNotificationSender.sendNotification(new MaintenanceCompleteTemplate(notification), notification.getAuthor());
+        } catch (IOException | TemplateException e) {
+            logger.error("Problem with sending push notification for closing maintenance notification.", e);
+        }
+
         return notification;
+    }
+
+    @RoleSecured({AccountRole.Maintenance, AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
+    public MaintenanceNotification deleteMaintenanceNotificationAndNotify(@Nonnull Long notificationId) {
+
+        final MaintenanceNotification notification = getMaintenanceNotification(notificationId);
+
+        releaseFutureReservationIgnorePastReservation(notification);
+        notification.setClosedAt(OffsetDateTime.now());
+        notification.setStatus(NotificationStatus.Deleted);
+
+        maintenanceNotificationDao.persist(notification);
+
+        if (AccountRole.Tenant.equals(authorizationManager.getCurrentAccount().getRole()) ||
+                AccountRole.SubTenant.equals(authorizationManager.getCurrentAccount().getRole())) {
+            sendPushNotificationToMaintener(notification);
+        }
+
+        return notification;
+    }
+
+    private void sendPushNotificationToMaintener(MaintenanceNotification notification) {
+        List<MaintenanceEmployee> maintenanceEmployeeList = maintenanceEmployeeDao.findByProperty(authorizationManager.getCurrentProperty());
+        maintenanceEmployeeList.stream().forEach(maintenanceEmployee -> {
+            try {
+                pushNotificationSender.sendNotification(new MaintenanceDeleteTemplate(notification, authorizationManager.getCurrentAccount()), ((Account) maintenanceEmployee));
+            } catch (IOException | TemplateException e) {
+                logger.error("Problem with sending push notification for deleting maintenance notification.", e);
+            }
+        });
+    }
+
+    private void releaseFutureReservationIgnorePastReservation(MaintenanceNotification notification) {
+        notification.getReservations().stream().forEach(maintenanceReservation -> {
+            if (maintenanceReservation.getBeginTime().isAfter(OffsetDateTime.now())) {
+                maintenanceReservationService.deleteById(maintenanceReservation.getId());
+            }
+        });
     }
 
     private Apartment getApartmentByUnitNumber(@Nonnull String targetUnitNumber, Long propertyId) {

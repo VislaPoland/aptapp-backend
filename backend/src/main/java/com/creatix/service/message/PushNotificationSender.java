@@ -59,7 +59,7 @@ public class PushNotificationSender {
         public void messageSendFailed(ApnsNotification message, Throwable e) {
             if (e instanceof ApnsDeliveryErrorException) {
                 ApnsDeliveryErrorException exception = (ApnsDeliveryErrorException) e;
-                logger.error(String.format("Error sending apple push message! %s", message.toString()), e);
+                logger.warn(String.format("Error sending apple push message! %s", message.toString()), e);
                 switch (exception.getDeliveryError()) {
                     case INVALID_TOKEN:
                         deviceDao.clearInvalidToken(Utilities.encodeHex(message.getDeviceToken()));

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="martin dupal" id="db.changelog-20181121_1">
+        <sql>
+            ALTER TABLE public.personal_message DROP CONSTRAINT "FKnfesnctt0le8rghyi3xter3ns";
+            ALTER TABLE public.personal_message
+            ADD CONSTRAINT "FKnfesnctt0le8rghyi3xter3ns"
+            FOREIGN KEY (from_account_id) REFERENCES account (id) ON DELETE CASCADE;
+        </sql>
+
+    </changeSet>
+</databaseChangeLog>

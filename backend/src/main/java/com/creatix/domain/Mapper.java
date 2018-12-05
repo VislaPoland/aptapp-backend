@@ -43,6 +43,8 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
+
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -322,6 +324,7 @@ public class Mapper {
                         if ( (a.getPersonalMessageGroup() != null) && (a.getPersonalMessageGroup().getMessages() != null) ) {
                             b.setRecipients(mapperFactory.getMapperFacade().mapAsList(a.getPersonalMessageGroup().getMessages().stream()
                                     .filter(pm -> pm.getToAccount() != null)
+                                    .filter(pm -> !pm.getToAccount().isDeleted())
                                     .map(PersonalMessage::getToAccount).collect(Collectors.toList()), PersonalMessageAccountDto.class));
                         }
 
@@ -623,6 +626,28 @@ public class Mapper {
                 .register();
         mapperFactory.classMap(Account.class, EventSlotDetailDto.AccountDto.class)
                 .byDefault()
+                .customize(new CustomMapper<Account, EventSlotDetailDto.AccountDto>() {
+                    @Override
+                    public void mapAtoB(Account a, EventSlotDetailDto.AccountDto b, MappingContext context) {
+                        // because we are using LazyLoad to load proxy entities we must do this
+                        a = (Account) Hibernate.unproxy(a);
+
+                        if (a instanceof SubTenant) {
+                            final Apartment apartment = ((SubTenant) a).getApartment();
+                            if (apartment != null) {
+                                b.setUnitNumber(apartment.getUnitNumber());
+                            }
+                        } else if (a instanceof Tenant) {
+                            final Apartment apartment = ((Tenant) a).getApartment();
+                            if (apartment != null) {
+                                b.setUnitNumber(apartment.getUnitNumber());
+                            }
+                        }
+                        b.setFirstName(a.getFirstName());
+                        b.setLastName(a.getLastName());
+                        b.setId(a.getId());
+                    }
+                })
                 .register();
         mapperFactory.classMap(EventSlot.class, EventSlotDetailDto.class)
                 .byDefault()
@@ -651,7 +676,28 @@ public class Mapper {
 
         mapperFactory.classMap(Account.class, PersonalMessageAccountDto.class)
                 .byDefault()
-                .fieldAToB("id", "userId")
+                .customize(new CustomMapper<Account, PersonalMessageAccountDto>() {
+                    @Override
+                    public void mapAtoB(Account a, PersonalMessageAccountDto b, MappingContext context) {
+
+                        // because we are using LazyLoad to load proxy entities we must do this
+                        a = (Account) Hibernate.unproxy(a);
+
+                        if (a instanceof SubTenant) {
+                            final Apartment apartment = ((SubTenant) a).getApartment();
+                            if (apartment != null) {
+                                b.setUnitNumber(apartment.getUnitNumber());
+                            }
+                        } else if (a instanceof Tenant) {
+                            final Apartment apartment = ((Tenant) a).getApartment();
+                            if (apartment != null) {
+                                b.setUnitNumber(apartment.getUnitNumber());
+                            }
+                        }
+
+                        b.setUserId(a.getId());
+                    }
+                })
                 .register();
     }
 
@@ -796,7 +842,7 @@ public class Mapper {
     public SubTenantDto toSubTenantDto(@NotNull SubTenant subTenant) {
         Objects.requireNonNull(subTenant);
 
-        return mapperFactory.getMapperFacade().map(subTenant, com.creatix.domain.dto.tenant.subs.SubTenantDto.class);
+        return mapperFactory.getMapperFacade().map(subTenant, SubTenantDto.class);
     }
 
     public SubTenant toSubTenant(@NotNull CreateSubTenantRequest request) {

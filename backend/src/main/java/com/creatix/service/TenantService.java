@@ -8,6 +8,7 @@ import com.creatix.domain.dto.tenant.subs.CreateSubTenantRequest;
 import com.creatix.domain.dto.tenant.subs.UpdateSubTenantRequest;
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.ParkingStall;
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.Vehicle;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.SubTenant;
@@ -99,7 +100,8 @@ public class TenantService {
             tenant = (Tenant) account;
         }
         else if ( account != null ) {
-            throw new IllegalArgumentException(String.format("Account with email=%s already exists", request.getPrimaryEmail()));
+            logger.error("Account with email %s already exists");
+            throw new IllegalArgumentException(String.format("Account with email %s already exists", request.getPrimaryEmail()));
         }
 
         if ( tenant == null ) {
@@ -243,12 +245,12 @@ public class TenantService {
         return getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
     }
 
-    @RoleSecured({AccountRole.Tenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
+    @RoleSecured({AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
     public @Nonnull SubTenant updateSubTenant(@Nonnull Long subTenantId, @NotNull UpdateSubTenantRequest request) {
         Objects.requireNonNull(request);
 
         final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
-        if ( authorizationManager.isSelf(subTenant.getParentTenant()) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
+        if ( authorizationManager.isSelf(subTenant) || authorizationManager.isSelf(subTenant.getParentTenant()) || authorizationManager.hasAnyOfRoles(AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager) ) {
             mapper.fillSubTenant(request, subTenant);
             subTenantDao.persist(subTenant);
             return subTenant;
@@ -275,6 +277,16 @@ public class TenantService {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public @Nonnull Tenant deleteTenant(@Nonnull Long tenantId) {
         return deleteTenant(getTenant(tenantId));
+    }
+
+    @RoleSecured(AccountRole.Administrator)
+    public void permanentDeleteOfTenantsFromProperty(@Nonnull Property property) {
+        List<Apartment> apartments = apartmentDao.findByProperty(property);
+        apartments.stream().forEach(apartment -> {
+            if (apartment.getTenant() != null) {
+                accountDao.delete(apartment.getTenant());
+            }
+        });
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})

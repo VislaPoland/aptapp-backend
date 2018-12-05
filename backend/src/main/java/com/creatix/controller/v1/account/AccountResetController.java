@@ -2,6 +2,7 @@ package com.creatix.controller.v1.account;
 
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.ErrorMessage;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.account.AskResetPasswordRequest;
 import com.creatix.domain.dto.account.ResetCodeRequest;
@@ -16,8 +17,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -73,5 +77,12 @@ public class AccountResetController {
     public DataResponse<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         accountService.resetAccountPasswordFromRequest(request);
         return new DataResponse<>();
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseEntity integrityViolation(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorMessage(ex.getMessage(), HttpStatus.CONFLICT.toString()));
     }
 }

@@ -1,7 +1,6 @@
 package com.creatix.domain.entity.store;
 
 import com.creatix.domain.enums.CommunicationType;
-import com.creatix.domain.enums.ContactType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
@@ -22,9 +21,8 @@ public class Contact {
     private Long id;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     @NotNull
-    private ContactType type;
+    private String type;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

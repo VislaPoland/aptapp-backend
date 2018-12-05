@@ -158,7 +158,7 @@ public class AccountService {
         if ( account.getActive() == Boolean.TRUE ) {
             throw new IllegalArgumentException(String.format("Account id=%d is already activated", account.getId()));
         }
-        if(new Date().after(account.getActionTokenValidUntil())){
+        if(account.getActionTokenValidUntil() == null || new Date().after(account.getActionTokenValidUntil())){
             setActionToken(account);
         }
 
@@ -248,25 +248,26 @@ public class AccountService {
     private Account getAccountByToken(String actionToken) {
         final Account account = accountDao.findByActionToken(actionToken);
         if ( account == null ) {
-            throw new SecurityException(String.format("Action token=%s is not valid", actionToken));
+            logger.warn("Action token is not valid");
+            throw new IllegalArgumentException("Action token is not valid. Please insert valid Action token.");
         }
         return account;
     }
 
     public Account activateAccount(String activationCode) {
         final Account account = getAccountByToken(activationCode);
-        if ( account.getActive() ) {
-            return account;
-        }
+        if (account.getActive()) {
+            logger.warn(String.format("Attempt to activate already active account '%s'.", account.getPrimaryEmail()));
+            throw new IllegalArgumentException("Your activation code shows you are an active user. Please choose \"Login\" and login with your credentials.");
+        } else {
+            if (account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate())) {
+                logger.warn("Activation code has expired. Please use most recent activation code received.");
+                throw new IllegalArgumentException("Activation code has expired. Please use most recent activation code received.");
+            }
 
-        if ( account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate()) ) {
-            throw new SecurityException("Activation code has expired");
+            account.setActive(true);
+            accountDao.persist(account);
         }
-
-        account.setActive(true);
-        account.setActionToken(null);
-        account.setActionTokenValidUntil(null);
-        accountDao.persist(account);
 
         return account;
     }
@@ -342,13 +343,11 @@ public class AccountService {
 
         final Account account = getAccountByToken(request.getToken());
 
-        if ( account.getActionTokenValidUntil() == null || account.getActionTokenValidUntil().before(DateTime.now().toDate()) ) {
-            throw new SecurityException(String.format("Token %s has expired", request.getToken()));
+        if (!account.getActive()) {
+            throw new IllegalArgumentException("Account need to be activated.");
         }
 
         account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-        account.setActionToken(null);
-        account.setActionTokenValidUntil(null);
         accountDao.persist(account);
     }
 
@@ -775,4 +774,11 @@ public class AccountService {
         }
     }
 
+    @RoleSecured(AccountRole.Administrator)
+    public void permanentDeleteOfEmployees(Property property) {
+        assistantPropertyManagerDao.findByProperty(property).stream().forEach(assistantPropertyManager -> assistantPropertyManagerDao.delete(assistantPropertyManager));
+        maintenanceEmployeeDao.findByProperty(property).stream().forEach(maintenanceEmployee -> maintenanceEmployeeDao.delete(maintenanceEmployee));
+        securityEmployeeDao.findByProperty(property).stream().forEach(securityEmployee -> securityEmployeeDao.delete(securityEmployee));
+        property.getManagers().stream().forEach(propertyManager -> accountDao.delete(propertyManager));
+    }
 }

@@ -94,9 +94,10 @@ public class NotificationController {
             @RequestParam(required = false) Long startId,
             @RequestParam(required = false) NotificationStatus[] notificationStatus,
             @RequestParam(required = false) NotificationType[] notificationType,
-            @RequestParam(required = false) Long propertyId) {
+            @RequestParam(required = false) Long propertyId,
+            @RequestParam(required = false) SortEnum order) {
 
-        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, propertyId, pageSize),
+        return mapper.toPageableDataResponse(notificationService.filterNotifications(requestType, notificationStatus, notificationType, startId, propertyId, pageSize, order),
                 n -> mapper.toNotificationDto(n, this.getMappingClass(n.getClass())));
     }
 
@@ -124,7 +125,7 @@ public class NotificationController {
     @RoleSecured(feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@Valid @RequestBody CreateMaintenanceNotificationRequest dto) throws IOException, TemplateException {
         MaintenanceNotification n = mapper.fromMaintenanceNotificationRequest(dto);
-        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n, dto.getSlotUnitId(), dto.getPropertyId())));
+        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n, dto.getSlotUnitId(), dto.getSlotsUnitId(), dto.getPropertyId())));
     }
 
     @ApiOperation(value = "Get all maintenance notifications in date range")
@@ -209,6 +210,19 @@ public class NotificationController {
     @RoleSecured(value = AccountRole.Maintenance, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<MaintenanceNotificationDto> closeMaintenanceNotification(@PathVariable Long notificationId) throws IOException, TemplateException {
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.closeMaintenanceNotification(notificationId)));
+    }
+
+    @ApiOperation(value = "Delete maintenance notification and release reservation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 403, message = "Forbidden")
+    })
+    @JsonView(Views.NotificationsWithReservation.class)
+    @DeleteMapping(path = "/maintenance/{notificationId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured(value = {AccountRole.Maintenance, AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager}, feature = ApplicationFeatureType.MAINTENANCE)
+    public DataResponse<MaintenanceNotificationDto> deleteMaintenanceNotification(@PathVariable Long notificationId) {
+        return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.deleteMaintenanceNotificationAndNotify(notificationId)));
     }
 
     @ApiOperation(value = "Get single neighborhood notification")

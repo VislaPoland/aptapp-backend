@@ -3,6 +3,7 @@ package com.creatix.domain.dto.tenant.subs;
 import com.creatix.domain.dto.AddressDto;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.property.PropertyDto;
+import com.creatix.domain.enums.AccountRole;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -32,6 +33,9 @@ public class SubTenantDto {
     @NotEmpty
     private String primaryEmail;
 
+    @ApiModelProperty(value = "Role", required = true)
+    private AccountRole role;
+
     @ApiModelProperty(value = "Parent tenant ID")
     private Long parentTenantId;
 
@@ -43,4 +47,11 @@ public class SubTenantDto {
 
     @ApiModelProperty(value = "Associated apartment", required = true)
     private ApartmentDto apartment;
+
+    @ApiModelProperty
+    private Boolean isTacAccepted;
+    @ApiModelProperty
+    private Boolean isPrivacyPolicyAccepted;
+    @ApiModelProperty
+    private Boolean isNeighborhoodNotificationEnable;
 }

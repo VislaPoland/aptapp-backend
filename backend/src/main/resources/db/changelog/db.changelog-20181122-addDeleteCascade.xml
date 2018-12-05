@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="martin dupal" id="db.changelog-20181121_1">
+        <sql>
+            ALTER TABLE public.discount_coupon_usage DROP CONSTRAINT "FKjxco38ivag9h7aojvncu670x1";
+            ALTER TABLE public.discount_coupon_usage
+            ADD CONSTRAINT "fk_discount_coupon_usage_id_account_id"
+            FOREIGN KEY (account_id) REFERENCES account (id) ON DELETE CASCADE;
+        </sql>
+
+        <sql>
+            ALTER TABLE public.maintenance_reservation DROP CONSTRAINT "fk_maintenance_reservation_notification_id_notification_id";
+            ALTER TABLE public.maintenance_reservation
+            ADD CONSTRAINT "fk_maintenance_reservation_notification_id_notification_id"
+            FOREIGN KEY (notification_id) REFERENCES notification (id) ON DELETE CASCADE;
+        </sql>
+
+        <sql>
+            ALTER TABLE public.maintenance_reservation DROP CONSTRAINT "FK4jhckovtii8fhtio9u1y37tj1";
+            ALTER TABLE public.maintenance_reservation
+            ADD CONSTRAINT "fk_maintenance_reservation_id_notification_id"
+            FOREIGN KEY (notification_id) REFERENCES notification (id) ON DELETE CASCADE;
+        </sql>
+
+        <sql>
+            ALTER TABLE public.community_board_comment DROP CONSTRAINT "FKc5x7mc91ej8owotbb7lqg4lbf";
+            ALTER TABLE public.community_board_comment
+            ADD CONSTRAINT "fk_community_board_comment_id_parent_comment_id"
+            FOREIGN KEY (parent_comment_id) REFERENCES community_board_comment (id) ON DELETE CASCADE;
+        </sql>
+
+        <sql>
+            ALTER TABLE public.community_board_comment DROP CONSTRAINT "FKca50s0c40uk4m239v7yhr4m67";
+            ALTER TABLE public.community_board_comment
+            ADD CONSTRAINT "fk_community_board_comment_id_community_board_item_id"
+            FOREIGN KEY (community_board_item_id) REFERENCES community_board_item (id) ON DELETE CASCADE;
+        </sql>
+
+        <sql>
+            ALTER TABLE public.attachment DROP CONSTRAINT "FKm0ib55lh3hu556hjexu1nygiq";
+            ALTER TABLE public.attachment
+            ADD CONSTRAINT "fk_attachment_id_community_board_item_id"
+            FOREIGN KEY (community_board_item_id) REFERENCES community_board_item (id) ON DELETE CASCADE;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

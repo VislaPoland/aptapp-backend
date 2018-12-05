@@ -2,6 +2,7 @@ package com.creatix.controller.v1;
 
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
+import com.creatix.domain.dto.ErrorMessage;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.apartment.ApartmentDto;
 import com.creatix.domain.dto.DataResponse;
@@ -14,7 +15,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -97,5 +100,12 @@ public class ApartmentController {
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public DataResponse<ApartmentDto> deleteApartment(@PathVariable Long apartmentId) {
         return new DataResponse<>(mapper.toApartmentDto(apartmentService.deleteApartment(apartmentId)));
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseEntity integrityViolation(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorMessage(ex.getMessage(), HttpStatus.CONFLICT.toString()));
     }
 }

@@ -117,6 +117,7 @@ public class AccountDao extends DaoBase<Account, Long> {
         return queryFactory.selectFrom(account)
                 .where(account.active.eq(false)
                 .and(account.role.in(AccountRole.Tenant, AccountRole.SubTenant))
+                .and(account.deletedAt.isNull())
                 ).fetch();
     }
 

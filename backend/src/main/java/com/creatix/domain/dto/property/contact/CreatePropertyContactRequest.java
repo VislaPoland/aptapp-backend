@@ -1,7 +1,6 @@
 package com.creatix.domain.dto.property.contact;
 
 import com.creatix.domain.enums.CommunicationType;
-import com.creatix.domain.enums.ContactType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,7 +13,7 @@ public class CreatePropertyContactRequest {
 
     @NotNull
     @ApiModelProperty(value = "Type of contact", required = true)
-    private ContactType type;
+    private String type;
 
     @NotNull
     @ApiModelProperty(required = true)

@@ -3,13 +3,13 @@ package com.creatix.domain.dao;
 import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.ManagedEmployee;
+import static com.creatix.domain.entity.store.QMaintenanceReservation.maintenanceReservation;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-
-import static com.creatix.domain.entity.store.QMaintenanceReservation.maintenanceReservation;
 
 @Repository
 @Transactional

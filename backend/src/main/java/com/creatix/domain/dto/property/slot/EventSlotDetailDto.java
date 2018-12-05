@@ -26,6 +26,8 @@ public class EventSlotDetailDto extends EventSlotDto {
         private String firstName;
         @ApiModelProperty(required = true)
         private String lastName;
+        @ApiModelProperty(required = true)
+        private String unitNumber;
     }
 
     @ApiModel

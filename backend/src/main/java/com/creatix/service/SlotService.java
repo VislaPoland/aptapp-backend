@@ -15,6 +15,7 @@ import com.creatix.domain.entity.store.notification.NotificationGroup;
 import com.creatix.domain.enums.*;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.push.EventNotificationAdjustTemplate;
+import com.creatix.message.template.push.EventNotificationCancelTemplate;
 import com.creatix.message.template.push.EventNotificationTemplate;
 import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
@@ -229,10 +230,10 @@ public class SlotService {
 
         final EventSlot slot = getOrElseThrow(slotId, eventSlotDao, new EntityNotFoundException(String.format("Slot id=%d not found", slotId)));
 
-//        for ( final Account attendant : getEventAttendants(slot) ) {
-//            // notify attendant by push notification
-//            pushNotificationSender.sendNotification(new EventNotificationCancelTemplate(slot), attendant);
-//        }
+        for ( final Account attendant : getEventAttendants(slot) ) {
+            // notify attendant by push notification
+            pushNotificationSender.sendNotification(new EventNotificationCancelTemplate(slot), attendant);
+        }
 
         eventSlotDao.delete(slot);
 

@@ -21,5 +21,7 @@ public class PersonalMessageAccountDto {
     private String primaryPhone;
     @ApiModelProperty("User's primary email")
     private String primaryEmail;
+    @ApiModelProperty("Apartment unit number")
+    private String unitNumber;
 
 }
