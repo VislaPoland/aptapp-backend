@@ -15,11 +15,11 @@ public class MaintenanceRescheduleTemplate extends PushMessageTemplate {
     }
 
     public String getTime() {
-        return formatTime(reservationNew.getNotification().getCreatedAt(), reservationNew.getNotification().getProperty().getZoneId());
+        return formatTime(reservationNew.getBeginTime(), reservationNew.getNotification().getProperty().getZoneId());
     }
 
     public String getDate() {
-        return formatDate(reservationNew.getNotification().getCreatedAt(), reservationNew.getNotification().getProperty().getZoneId());
+        return formatDate(reservationNew.getBeginTime(), reservationNew.getNotification().getProperty().getZoneId());
     }
 
     public String getNotificationTitle() {

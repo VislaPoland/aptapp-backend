@@ -14,11 +14,11 @@ public class MaintenanceNotificationTemplate extends PushMessageTemplate {
     }
 
     public String getTime() {
-        return formatTime(notification.getCreatedAt(), notification.getProperty().getZoneId());
+        return formatTime(notification.getReservations().get(0).getBeginTime(), notification.getProperty().getZoneId());
     }
 
     public String getDate() {
-        return formatDate(notification.getCreatedAt(), notification.getProperty().getZoneId());
+        return formatDate(notification.getReservations().get(0).getBeginTime(), notification.getProperty().getZoneId());
     }
 
     public String getUnitNumber() {
