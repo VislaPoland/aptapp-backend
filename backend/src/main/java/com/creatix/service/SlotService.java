@@ -208,8 +208,7 @@ public class SlotService {
 
         for ( final Account attendant : getEventAttendants(slot) ) {
             // notify attendant by push notification
-// TODO this is temporary turned off. Turning it back based on Melanie request. Disable push notification when event is created.
-//            pushNotificationSender.sendNotification(new EventNotificationTemplate(slot), attendant);
+            pushNotificationSender.sendNotification(new EventNotificationTemplate(slot), attendant);
             // invite attendant to event
             slot.addEventInvite(createEventInvite(slot, attendant, notificationGroup));
         }
