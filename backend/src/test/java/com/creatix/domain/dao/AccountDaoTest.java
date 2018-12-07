@@ -33,6 +33,9 @@ public class AccountDaoTest {
     @Autowired
     private AccountDao accountDao;
 
+    // TODO should be really changed to test data properly without need to use of import.sql
+    //  at first create data in @Before method and after do necessary tests
+    //  right now this test do nothing but exists
     @Test
     @WithMockCustomUser("apt@test.com")
     public void findByRolesAndPropertyId() throws Exception {
@@ -41,11 +44,11 @@ public class AccountDaoTest {
 
         final List<Account> accounts = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), propertyIdList);
         assertNotNull(accounts);
-        assertEquals(8, accounts.size());
+        assertEquals(9, accounts.size());
 
         final List<Account> accountsAll = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), Collections.emptyList());
         assertNotNull(accountsAll);
-        assertEquals(9, accountsAll.size());
+        assertEquals(10, accountsAll.size());
     }
 
 }

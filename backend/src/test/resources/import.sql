@@ -5,16 +5,16 @@ SELECT setval('hibernate_sequence', 99999);
 -------------------
 
 -- administrator
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at) VALUES ('Account', 108, true, 'Cool Company', 'Joe', 'Admin', '$2a$10$IXniWKP6M12dNGoTzHW9Feo/7Jn4nke0GeRGvvU7n38WuYkY40eyG','joe.admin@mail.com', '123456789', 'Administrator', '2016-06-16 15:36:38');
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at) VALUES ('Account', 108, true, 'Joe', 'Admin', '$2a$10$IXniWKP6M12dNGoTzHW9Feo/7Jn4nke0GeRGvvU7n38WuYkY40eyG','joe.admin@mail.com', '123456789', 'Administrator', '2016-06-16 15:36:38');
 
 -- property owner
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at) VALUES ('PropertyOwner', 1, true, 'South Water Apartments', 'Helen', 'Owner', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'helen.owner@apartments.com', '(743) 635-5652', 'PropertyOwner', '2016-06-16 15:36:38');
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at) VALUES ('PropertyOwner', 1, true, 'Helen', 'Owner', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'helen.owner@apartments.com', '(743) 635-5652', 'PropertyOwner', '2016-06-16 15:36:38');
 
 -- address
 INSERT INTO public.address (id, house_number, state, street_name, town, zip_code) VALUES (1, '747', 'IL', 'Main Street', 'Chicago', '606609');
 
 -- property schedule
-INSERT INTO public.maintenance_slot_schedule(id, begin_time, end_time, initial_capacity, time_zone, unit_duration_minutes) VALUES (1, '09:00', '17:00', 1, 'UTC', 30);
+INSERT INTO public.maintenance_slot_schedule(id, initial_capacity, unit_duration_minutes) VALUES (1, 1, 30);
 
 -- property
 INSERT INTO public.property (id, name, status, address_id, owner_id, schedule_id, time_zone, enable_sms) VALUES (1, 'South Water Apartments', 'Active', 1, 1, 1, 'America/Chicago', true);
@@ -40,11 +40,11 @@ INSERT INTO public.property_contacts (property_id, contacts_id) VALUES (1, 1);
 INSERT INTO public.property_contacts (property_id, contacts_id) VALUES (1, 2);
 
 -- property manager
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, managed_property_id, created_at) VALUES ('PropertyManager', 2, true, 'South Water Apartments', 'Mark', 'Building', '$2a$10$R6ntl54odFxGtmo/vFx.Kem91x5dXSVxjHLF7bCvHgpryYGShWUSq', 'mark.building@apartments.com', '(854) 253-6566', 'PropertyManager', 1, '2016-06-16 15:36:38');
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, managed_property_id, created_at) VALUES ('PropertyManager', 2, true, 'Mark', 'Building', '$2a$10$R6ntl54odFxGtmo/vFx.Kem91x5dXSVxjHLF7bCvHgpryYGShWUSq', 'mark.building@apartments.com', '(854) 253-6566', 'PropertyManager', 1, '2016-06-16 15:36:38');
 
 -- employees
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at, manager_id) VALUES ('SecurityEmployee', 44, true, 'South Water Apartments', 'Martin', 'Security', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'martin.security@apartments.com', '(743) 635-5651', 'Security', '2016-06-16 15:36:38', 2);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at, manager_id) VALUES ('MaintenanceEmployee', 45, true, 'South Water Apartments', 'Martin', 'Maintenance', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'martin.maintenance@apartments.com', '(743) 635-5651', 'Maintenance', '2016-06-16 15:36:38', 2);
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at, manager_id) VALUES ('SecurityEmployee', 44, true, 'Martin', 'Security', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'martin.security@apartments.com', '(743) 635-5651', 'Security', '2016-06-16 15:36:38', 2);
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, created_at, manager_id) VALUES ('MaintenanceEmployee', 45, true, 'Martin', 'Maintenance', '$2a$10$iNna7fvFEhY61WvFbc76Xe7ezV5uSHenCu/Yj8BS8x/d5yyxzd426', 'martin.maintenance@apartments.com', '(743) 635-5651', 'Maintenance', '2016-06-16 15:36:38', 2);
 
 
 -- apartments
@@ -109,10 +109,11 @@ UPDATE public.apartment SET left_id = 12 WHERE id = 22;
 
 
 -- tenant
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 3, true, 'South Water Apartments', 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt@test.com', '(905) 545-0256', 'Tenant', 22, '123456', '2017-06-16 15:36:38', '2016-06-16 15:36:38', false);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 451, true, 'South Water Apartments', 'Tomas', 'Sedlak', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'tomas.sedlak@thinkcreatix.com', '+421948519283', 'Tenant', 21, null, null, '2016-06-16 15:36:38', true);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 434, false, 'South Water Apartments', 'Peter', 'Pan', null, 'inactive.tenant@test.com', '', 'Tenant', 33, null, null, '2016-06-16 15:36:38', true);
-INSERT INTO public.account (dtype, id, active, company_name, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms, parent_tenant_id) VALUES ('SubTenant', 133245, true, 'South Water Apartments', 'Alan', 'SubTenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt2@test.com', '(901) 222-3213', 'SubTenant', 22, null, null, '2016-06-16 15:36:38', true, 3);
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 3, true, 'John', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt@test.com', '(905) 545-0256', 'Tenant', 22, '123456', '2017-06-16 15:36:38', '2016-06-16 15:36:38', false);
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 451, true, 'Tomas', 'Sedlak', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'tomas.sedlak@thinkcreatix.com', '+421948519283', 'Tenant', 21, null, null, '2016-06-16 15:36:38', true);
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 434, false, 'Peter', 'Pan', null, 'inactive.tenant@test.com', '', 'Tenant', 33, null, null, '2016-06-16 15:36:38', true);
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms) VALUES ('Tenant', 4, false, 'Test', 'Tenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt3@test.com', '(905) 545-0256', 'Tenant', 33, '1234567', '2017-06-16 15:36:38', '2016-06-16 15:36:38', false);
+INSERT INTO public.account (dtype, id, active, first_name, last_name, password_hash, primary_email, primary_phone, role, apartment_id, action_token, action_token_valid_until, created_at, enable_sms, parent_tenant_id) VALUES ('SubTenant', 133245, true, 'Alan', 'SubTenant', '$2a$10$pTLqZgRdpj/s.SP.ebNKauZXGOIOMxahdeKAswKgx24c7Q2YdLdCS', 'apt2@test.com', '(901) 222-3213', 'SubTenant', 22, null, null, '2016-06-16 15:36:38', true, 3);
 
 INSERT INTO public.notification_group (id, created_at) VALUES (1, '2016-02-01 18:30:00');
 

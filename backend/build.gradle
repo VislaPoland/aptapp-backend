@@ -76,7 +76,6 @@ war {
 
 war.dependsOn createBuildVersionFile
 
-
 dependencies {
 
 	optional('org.springframework.boot:spring-boot-configuration-processor')

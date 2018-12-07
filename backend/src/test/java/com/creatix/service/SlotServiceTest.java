@@ -3,14 +3,14 @@ package com.creatix.service;
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
 import com.creatix.domain.dao.SlotDao;
-import com.creatix.domain.dto.property.slot.PersistEventSlotRequest;
-import com.creatix.domain.dto.property.slot.PersistMaintenanceSlotScheduleRequest;
-import com.creatix.domain.dto.property.slot.ScheduledSlotsResponse;
-import com.creatix.domain.dto.property.slot.SlotDto;
-import com.creatix.domain.entity.store.*;
-import com.creatix.domain.entity.store.notification.MaintenanceNotification;
+import com.creatix.domain.dto.property.slot.*;
+import com.creatix.domain.entity.store.EventInvite;
+import com.creatix.domain.entity.store.EventSlot;
+import com.creatix.domain.entity.store.MaintenanceSlotSchedule;
+import com.creatix.domain.entity.store.Slot;
 import com.creatix.domain.enums.AudienceType;
 import com.creatix.mock.WithMockCustomUser;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.*;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -117,6 +115,13 @@ public class SlotServiceTest {
         request.setDaysOfWeek(EnumSet.allOf(DayOfWeek.class));
         request.setInitialCapacity(1);
         request.setUnitDurationMinutes(60);
+        Map<DayOfWeek, DayDuration> durationPerDayOfWeek = ImmutableMap.<DayOfWeek, DayDuration>builder().put(
+                DayOfWeek.FRIDAY,
+                new DayDuration()
+                        .setBeginTime(LocalTime.parse("09:00:00.000"))
+                        .setEndTime(LocalTime.parse("17:00:00.000"))
+        ).build();
+        request.setDurationPerDayOfWeek(durationPerDayOfWeek);
         final MaintenanceSlotSchedule schedule = slotService.createSchedule(1L, request);
         assertNotNull(schedule);
         assertEquals((Long) 1L, schedule.getProperty().getId());
@@ -143,6 +148,13 @@ public class SlotServiceTest {
         request.setDaysOfWeek(EnumSet.allOf(DayOfWeek.class));
         request.setInitialCapacity(1);
         request.setUnitDurationMinutes(60);
+        Map<DayOfWeek, DayDuration> durationPerDayOfWeek = ImmutableMap.<DayOfWeek, DayDuration>builder().put(
+                DayOfWeek.FRIDAY,
+                new DayDuration()
+                        .setBeginTime(LocalTime.parse("09:00:00.000"))
+                        .setEndTime(LocalTime.parse("17:00:00.000"))
+        ).build();
+        request.setDurationPerDayOfWeek(durationPerDayOfWeek);
 
         final MaintenanceSlotSchedule schedule1 = slotService.createSchedule(1L, request);
         assertNotNull(schedule1);
