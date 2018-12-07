@@ -328,11 +328,13 @@ public class AuthorizationManager {
     public boolean canResetActivationCode(@NotNull Account account) {
         Objects.requireNonNull(account, "Account is null");
 
+        if ( AccountRole.Administrator.equals(getCurrentAccount().getRole()) ) {
+            return true;
+        }
+
         final Property property = getCurrentProperty(account);
 
         switch ( getCurrentAccount().getRole() ) {
-            case Administrator:
-                return true;
             case PropertyOwner:
                 return isOwner(property);
             case PropertyManager:

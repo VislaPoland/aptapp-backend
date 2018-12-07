@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Welcome to Apt. App - A smarter way to communicate</title>
+    <title>Apt. App - A smarter way to communicate</title>
     <style media="all" type="text/css">
         @media only screen and (max-width: 620px) {
             table[class=body] h1,
@@ -44,7 +44,6 @@
         <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
         <td class="container" style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto !important; max-width: 580px; padding: 10px; width: 580px;" width="580" valign="top">
             <div class="content" style="box-sizing: border-box; display: block; margin: 0 auto; max-width: 580px; padding: 10px;">
-                <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">Welcome to Apt. App – A smarter way to communicate.</span>
                 <div class="header" style="box-sizing: border-box; margin-top: 20px; width: 100%; margin-bottom: 0; padding: 5px 0; background-color: #031821;">
                     <table style="box-sizing: border-box; border-collapse: separate !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                         <tr>
@@ -61,15 +60,9 @@
                                 <tr>
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Hello ${name},</p>
-                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Hooray! ${propertyName} has teamed up with Apt. App offering YOU the technology to quickly prioritize your day, explore the neighborhood, and keep updated on community events. It's a snap to use and we have a great feeling you are going to LOVE it!</p>
-                                        <ol style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: left; color: #031821;">
-                                            <li>Download Apt. App from your Google Play or Apple App store</li>
-                                            <li>Tap "New User" on bottom right of Apt. App home screen</li>
-                                            <li>Enter your unique activation code which is: ${activationToken}</li>
-                                            <li>Create new password</li>
-                                            <li>Start enjoying Apt. App</li>
-                                        </ol>
-                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Your username and password will also be valid for your desktop login to Apt. App:<br><a href="${applicationUrl}" style="box-sizing: border-box; color: #348eda; text-decoration: underline;">${applicationUrl}</a></p>
+                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Here is the reactivated code you will need to activate your account: <br>${activationToken}</p>
+                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Or click link to <a href="${activationPageUrl}" style="box-sizing: border-box; color: #348eda; text-decoration: underline;">activate</a> your account.</p>
+                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Or if you received a text message from us, you can activate your account from there.</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">&nbsp;</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">-Apt. App</p>
                                     </td>

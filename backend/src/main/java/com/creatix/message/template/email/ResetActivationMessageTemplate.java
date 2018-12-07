@@ -2,11 +2,17 @@ package com.creatix.message.template.email;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.enums.AccountRole;
+import com.google.common.collect.ImmutableSet;
 
 public class ResetActivationMessageTemplate extends ActivationMessageTemplate {
 
+    private final Account account;
+    private static final ImmutableSet WEB_RESET_ROLES = ImmutableSet.of(AccountRole.Administrator, AccountRole.PropertyOwner);
+
     public ResetActivationMessageTemplate(Account account, ApplicationProperties properties) {
         super(account, properties);
+        this.account = account;
     }
 
     @Override
@@ -16,6 +22,6 @@ public class ResetActivationMessageTemplate extends ActivationMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "activation-reset";
+        return (WEB_RESET_ROLES.contains(account.getRole())) ? "activation-reset-web" : "activation-reset";
     }
 }

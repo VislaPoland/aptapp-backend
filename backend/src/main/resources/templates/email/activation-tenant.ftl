@@ -61,26 +61,24 @@
                                 <tr>
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Hello ${name},</p>
-                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Welcome to Apt. App – a mobile app made FOR residents BY residents. All features have been carefully designed to facilitate in exceptional communication and communities. Now you are empowered to communicate with your neighbors in a safe, completely anonymous way about noise complaints and community concerns. While also having the tools at your fingertips to explore your community within your property and surrounding neighborhood. Your enhanced living experience starts…. Now!</p>
+                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Welcome to Apt. App - a mobile app made FOR residents BY residents. All features have been carefully designed to facilitate in exceptional communication and communities. Now you are empowered to communicate with your neighbors in a safe, completely anonymous way about noise complaints and community concerns. While also having the tools at your fingertips to explore your community within your property and surrounding neighborhood. Your enhanced living experience starts... Now!</p>
 
                                         <ol style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: left; color: #031821;">
                                             <li>Download Apt. App from your Google Play or Apple App store</li>
-                                            <li>Use the code or link below to activate your account and follow prompts</li>
+                                            <li>Tap "New User" on bottom right of Apt. App home screen</li>
+                                            <li>Enter your unique activation code which is: ${activationToken}</li>
+                                            <li>Create new password</li>
                                             <li>Start enjoying Apt. App</li>
                                         </ol>
 
-                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Here is the code you will need to activate your account: <br>${activationToken}</p>
-                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Or click link to <a href="${activationPageUrl}" style="box-sizing: border-box; color: #348eda; text-decoration: underline;">activate</a> your account.</p>
-                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Or if you received a text message from us, you can activate your account from there.</p>
-
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">Please double check that your information is correct in the settings of the app and change as appropriate. Unless your email is incorrect in which case, please contact your property management team to make the change.</p>
-
+                                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">&nbsp;</p>
                                         <p style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: center; color: #031821;">-Apt. App</p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
-                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 20px 0; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. App a tool you can’t live without. If you see ways we can do better, we would love to hear from you. Please e-mail us at <a href="mailto:hello@aptappmobile.com" style="box-sizing: border-box; text-decoration: underline; color: #999999;">hello@aptappmobile.com</a>.</p>
+                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 20px 0; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. App a tool you can't live without. If you see ways we can do better, we would love to hear from you. Please e-mail us at <a href="mailto:hello@aptappmobile.com" style="box-sizing: border-box; text-decoration: underline; color: #999999;">hello@aptappmobile.com</a>.</p>
                                     </td>
                                 </tr>
                             </table>

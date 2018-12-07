@@ -134,10 +134,8 @@ public class TenantService {
         emailMessageService.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
 
         if (apartment.getProperty().getEnableSms()) {
-            String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", tenant.getActionToken())).toString());
-            logger.info("Generated short url for sms activation account. Url: " + shortUrl);
             try {
-                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, tenant.getPrimaryPhone()));
+                smsMessageSender.send(new ActivationMessageTemplate(tenant.getActionToken(), tenant.getPrimaryPhone()));
             } catch (Exception e) {
                 logger.error("There is problem with smsMessageSender.send in tenantService.", e);
             }

@@ -1,17 +1,27 @@
 package com.creatix.message.template.email;
 
 import com.creatix.configuration.ApplicationProperties;
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.EmployeeBase;
 
 public class EmployeeActivationMessageTemplate extends ActivationMessageTemplate {
 
-    public EmployeeActivationMessageTemplate(EmployeeBase account, ApplicationProperties properties) {
+    private final EmployeeBase account;
+    private final Property property;
+
+    public EmployeeActivationMessageTemplate(EmployeeBase account, Property property, ApplicationProperties properties) {
         super(account, properties);
+        this.account = account;
+        this.property = property;
     }
 
     @Override
     public String getSubject() {
         return "Welcome to Apt. App!";
+    }
+
+    public String getPropertyName() {
+        return property.getName();
     }
 
     @Override
