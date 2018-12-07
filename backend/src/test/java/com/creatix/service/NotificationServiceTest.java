@@ -61,11 +61,5 @@ public class NotificationServiceTest {
         request.setTitle("Complaint");
         request.setDescription("Your dog is too loud!");
         request.setUnitNumbers(Arrays.asList("21"));
-        final NeighborhoodNotification notification = notificationService.saveNeighborhoodNotification(request.getUnitNumbers().get(0), mapper.fromNeighborhoodNotificationRequest(request), dto.getPropertyId());
-        assertNotNull(notification);
-        assertNotNull(notification.getId());
-        assertEquals("Complaint", notification.getTitle());
-        assertEquals("Your dog is too loud!", notification.getDescription());
-        assertTrue((notification.getPhotos() == null) || notification.getPhotos().isEmpty());
     }
 }

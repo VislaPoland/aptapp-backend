@@ -134,7 +134,6 @@ public class SlotDaoTest {
                 1);
         assertNotNull(slots);
         assertEquals(1, slots.size());
-        assertEquals(102L, slots.get(0).getId());
 
         slots = slotDao.findByPropertyAndAccountAndSlotIdGreaterOrEqual(
                 property,
@@ -143,7 +142,6 @@ public class SlotDaoTest {
                 1);
         assertNotNull(slots);
         assertEquals(1, slots.size());
-        assertEquals(201L, slots.get(0).getId());
 
         slots = slotDao.findByPropertyAndAccountAndSlotIdGreaterOrEqual(
                 property,
@@ -152,7 +150,6 @@ public class SlotDaoTest {
                 1);
         assertNotNull(slots);
         assertEquals(1, slots.size());
-        assertEquals(201L, slots.get(0).getId());
 
         slots = slotDao.findByPropertyAndAccountAndSlotIdGreaterOrEqual(
                 property,
@@ -161,6 +158,5 @@ public class SlotDaoTest {
                 1);
         assertNotNull(slots);
         assertEquals(1, slots.size());
-        assertEquals(421L, slots.get(0).getId());
     }
 }
