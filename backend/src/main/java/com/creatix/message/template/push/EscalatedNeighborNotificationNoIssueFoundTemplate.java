@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 public class EscalatedNeighborNotificationNoIssueFoundTemplate extends NeighborNotificationTemplate {
 
@@ -10,6 +11,6 @@ public class EscalatedNeighborNotificationNoIssueFoundTemplate extends NeighborN
 
     @Override
     public String getTemplateName() {
-        return "escalated-neighbor-notification-no-issue-found";
+        return PushNotificationTemplateName.ESCALATED_NEIGHBOR_NOTIFICATION_NO_ISSUE.getValue();
     }
 }

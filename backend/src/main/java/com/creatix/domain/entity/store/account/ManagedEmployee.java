@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store.account;
 
+import com.creatix.domain.entity.store.Property;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -22,5 +23,10 @@ public abstract class ManagedEmployee extends EmployeeBase {
 
     @ManyToOne
     private PropertyManager manager;
+
+    @Override
+    public Property getProperty() {
+        return manager.getManagedProperty();
+    }
 
 }

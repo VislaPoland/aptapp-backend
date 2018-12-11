@@ -2,6 +2,7 @@ package com.creatix.message.template.email;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.enums.EmailTemplateName;
 
 public class AdministratorActivationMessageTemplate extends ActivationMessageTemplate {
 
@@ -11,6 +12,6 @@ public class AdministratorActivationMessageTemplate extends ActivationMessageTem
 
     @Override
     public String getTemplateName() {
-        return "activation-administrator";
+        return EmailTemplateName.ACTIVATION_ADMINISTRATOR.getValue();
     }
 }

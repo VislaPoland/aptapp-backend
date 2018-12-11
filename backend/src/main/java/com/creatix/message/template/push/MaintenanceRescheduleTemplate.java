@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.MaintenanceReservation;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 
 public class MaintenanceRescheduleTemplate extends PushMessageTemplate {
@@ -28,6 +29,6 @@ public class MaintenanceRescheduleTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "maintenance-reschedule";
+        return PushNotificationTemplateName.MAINTENANCE_RESCHEDULE.getValue();
     }
 }

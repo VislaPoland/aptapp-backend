@@ -23,6 +23,7 @@ import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.BitlyService;
 import com.creatix.service.message.EmailMessageService;
+import com.twilio.exception.ApiException;
 import freemarker.template.TemplateException;
 
 import org.slf4j.Logger;
@@ -136,7 +137,7 @@ public class TenantService {
         if (apartment.getProperty().getEnableSms()) {
             try {
                 smsMessageSender.send(new ActivationMessageTemplate(tenant.getActionToken(), tenant.getPrimaryPhone()));
-            } catch (Exception e) {
+            } catch (ApiException | IOException | MessageDeliveryException | TemplateException e) {
                 logger.error("There is problem with smsMessageSender.send in tenantService.", e);
             }
         }

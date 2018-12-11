@@ -1,5 +1,8 @@
 package com.creatix.message.template.push;
 
+import com.creatix.domain.enums.PushNotificationTemplateName;
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 import java.time.Duration;
 
 public class EscalatedNeighborNotificationTemplate extends PushMessageTemplate {
@@ -14,7 +17,7 @@ public class EscalatedNeighborNotificationTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "escalated-neighbor-notification";
+        return PushNotificationTemplateName.ESCALATED_NEIGHBOR_NOTIFICATION.getValue();
     }
 
     public int getTimes() {

@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 import com.creatix.util.StringUtils;
 
 public class NeighborNotificationTemplate extends PushMessageTemplate {
@@ -13,7 +14,7 @@ public class NeighborNotificationTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "neighbor-notification";
+        return PushNotificationTemplateName.NEIGHBOR_NOTIFICATION.getValue();
     }
 
     public String getMessage() {

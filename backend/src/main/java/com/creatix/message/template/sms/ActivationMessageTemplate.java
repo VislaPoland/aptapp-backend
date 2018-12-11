@@ -1,6 +1,8 @@
 package com.creatix.message.template.sms;
 
 import javax.annotation.Nonnull;
+
+import com.creatix.domain.enums.SmsTemplateName;
 import com.creatix.message.MessageDeliveryException;
 
 /**
@@ -30,7 +32,7 @@ public class ActivationMessageTemplate implements SmsMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "activation-account";
+        return SmsTemplateName.ACTIVATION_ACCOUNT.getValue();
     }
 
 }

@@ -2,6 +2,7 @@ package com.creatix.message.template.email;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.SubTenant;
+import com.creatix.domain.enums.EmailTemplateName;
 
 public class SubTenantActivationMessageTemplate extends ActivationMessageTemplate {
 
@@ -10,5 +11,5 @@ public class SubTenantActivationMessageTemplate extends ActivationMessageTemplat
     }
 
     @Override
-    public String getTemplateName() { return "activation-tenant"; }
+    public String getTemplateName() { return EmailTemplateName.ACTIVATION_TENANT.getValue(); }
 }

@@ -2,6 +2,7 @@ package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.notification.SecurityNotification;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 public class SecurityNotificationTemplate extends PushMessageTemplate {
     protected final SecurityNotification notification;
@@ -12,7 +13,7 @@ public class SecurityNotificationTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "security-notification";
+        return PushNotificationTemplateName.SECURITY_NOTIFICATION.getValue();
     }
 
     public String getRole() {

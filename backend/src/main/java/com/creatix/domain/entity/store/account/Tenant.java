@@ -1,9 +1,6 @@
 package com.creatix.domain.entity.store.account;
 
-import com.creatix.domain.entity.store.Address;
-import com.creatix.domain.entity.store.Apartment;
-import com.creatix.domain.entity.store.ParkingStall;
-import com.creatix.domain.entity.store.Vehicle;
+import com.creatix.domain.entity.store.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -50,6 +47,11 @@ public class Tenant extends TenantBase {
     @Transient
     public String getFullName() {
         return getFirstName() + " " + getLastName();
+    }
+
+    @Override
+    public Property getProperty() {
+        return apartment != null ? apartment.getProperty() : null;
     }
 
     public void addVehicle(@NotNull Vehicle vehicle) {

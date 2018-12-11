@@ -1,6 +1,7 @@
 package com.creatix.message.template.push.community.board;
 
 import com.creatix.domain.entity.store.community.board.CommunityBoardItem;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 import com.creatix.message.template.push.PushMessageTemplate;
 
 /**
@@ -25,7 +26,7 @@ public class CommunityItemUpdatedSubscriberTemplate extends PushMessageTemplate 
 
     @Override
     public String getTemplateName() {
-        return "community-item-update-subscriber";
+        return PushNotificationTemplateName.COMMUNITY_ITEM_UPDATE.getValue();
     }
 
     public CommunityBoardItem getCommunityBoardItem() {

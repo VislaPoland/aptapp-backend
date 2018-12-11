@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 import javax.annotation.Nonnull;
 import java.time.Duration;
@@ -18,7 +19,7 @@ public class EscalatedManagerNotificationTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return complainerUnit == null ? "escalated-manager-notification-from-more-tenants" : "escalated-manager-notification";
+        return complainerUnit == null ? PushNotificationTemplateName.ESCALATED_MANAGER_NOTIFICATION_MORE.getValue() : PushNotificationTemplateName.ESCALATED_MANAGER_NOTIFICATION.getValue();
     }
 
     @Nonnull

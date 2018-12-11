@@ -3,6 +3,7 @@ package com.creatix.message.template.email;
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.EmailTemplateName;
 import com.google.common.collect.ImmutableSet;
 
 public class ResetActivationMessageTemplate extends ActivationMessageTemplate {
@@ -22,6 +23,6 @@ public class ResetActivationMessageTemplate extends ActivationMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return (WEB_RESET_ROLES.contains(account.getRole())) ? "activation-reset-web" : "activation-reset";
+        return (WEB_RESET_ROLES.contains(account.getRole())) ? EmailTemplateName.ACTIVATION_RESET_WEB.getValue() : EmailTemplateName.ACTIVATION_RESET.getValue();
     }
 }

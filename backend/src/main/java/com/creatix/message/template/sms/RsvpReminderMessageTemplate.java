@@ -1,6 +1,7 @@
 package com.creatix.message.template.sms;
 
 import com.creatix.domain.entity.store.EventInvite;
+import com.creatix.domain.enums.SmsTemplateName;
 
 import javax.annotation.Nonnull;
 
@@ -19,7 +20,7 @@ public class RsvpReminderMessageTemplate implements SmsMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "rsvp-reminder";
+        return SmsTemplateName.RSVP_REMINDER.getValue();
     }
 
     @Nonnull

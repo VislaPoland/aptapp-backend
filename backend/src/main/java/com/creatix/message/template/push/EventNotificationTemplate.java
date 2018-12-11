@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.EventSlot;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 public class EventNotificationTemplate extends PushMessageTemplate {
     protected final EventSlot event;
@@ -19,6 +20,6 @@ public class EventNotificationTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "event-notification";
+        return PushNotificationTemplateName.EVENT_NOTIFICATION.getValue();
     }
 }

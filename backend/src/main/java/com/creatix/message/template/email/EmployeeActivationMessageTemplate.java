@@ -3,6 +3,7 @@ package com.creatix.message.template.email;
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.EmployeeBase;
+import com.creatix.domain.enums.EmailTemplateName;
 
 public class EmployeeActivationMessageTemplate extends ActivationMessageTemplate {
 
@@ -26,6 +27,6 @@ public class EmployeeActivationMessageTemplate extends ActivationMessageTemplate
 
     @Override
     public String getTemplateName() {
-        return "activation-employee";
+        return EmailTemplateName.ACTIVATION_EMPLOYEE.getValue();
     }
 }

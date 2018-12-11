@@ -1,5 +1,7 @@
 package com.creatix.message.template.sms;
 
+import com.creatix.domain.enums.SmsTemplateName;
+
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 
@@ -21,7 +23,7 @@ public class ActivationWebMessageTemplate implements SmsMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "activation-account-web";
+        return SmsTemplateName.ACTIVATION_ACCOUNT_WEB.getValue();
     }
 
     public String getActivationUrl() {

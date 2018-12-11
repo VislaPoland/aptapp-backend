@@ -1,5 +1,7 @@
 package com.creatix.message.template.sms;
 
+import com.creatix.domain.enums.SmsTemplateName;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -23,7 +25,7 @@ public class EscalatedManagerSmsTemplateForMoreTenants implements SmsMessageTemp
 
     @Override
     public String getTemplateName() {
-        return "escalated-notification-for-more-tenants";
+        return SmsTemplateName.ESCALATED_NOTIFICATION_MORE.getValue();
     }
 
     public String getOffenderUnit() {
