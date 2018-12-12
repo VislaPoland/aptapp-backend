@@ -1,6 +1,7 @@
 package com.creatix.message.template.push.businessProfile;
 
 import com.creatix.domain.entity.store.business.DiscountCoupon;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 import com.creatix.message.template.push.PushMessageTemplate;
 
 /**
@@ -16,7 +17,7 @@ public class DiscountCouponCreatedTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "discount-coupon-created";
+        return PushNotificationTemplateName.DISCOUNT_COUPON_CREATED.getValue();
     }
 
 }

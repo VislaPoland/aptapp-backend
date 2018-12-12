@@ -27,4 +27,9 @@ public class PropertyManager extends EmployeeBase {
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ManagedEmployee> employees;
 
+    @Override
+    public Property getProperty() {
+        return managedProperty;
+    }
+
 }

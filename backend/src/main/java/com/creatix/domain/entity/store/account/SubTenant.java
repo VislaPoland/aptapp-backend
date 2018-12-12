@@ -28,9 +28,10 @@ public class SubTenant extends TenantBase {
         return parentTenant != null ? parentTenant.getApartment() : null;
     }
 
+    @Override
     @Transient
     public Property getProperty() {
-        return parentTenant != null ? parentTenant.getApartment().getProperty() : null;
+        return parentTenant != null ? parentTenant.getProperty() : null;
     }
 
     @Transient

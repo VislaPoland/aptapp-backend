@@ -2,6 +2,7 @@ package com.creatix.message.template.email;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.PropertyOwner;
+import com.creatix.domain.enums.EmailTemplateName;
 
 public class PropertyOwnerActivationMessageTemplate extends ActivationMessageTemplate {
 
@@ -11,6 +12,6 @@ public class PropertyOwnerActivationMessageTemplate extends ActivationMessageTem
 
     @Override
     public String getTemplateName() {
-        return "activation-property-owner";
+        return EmailTemplateName.ACTIVATION_PROPERTY_OWNER.getValue();
     }
 }

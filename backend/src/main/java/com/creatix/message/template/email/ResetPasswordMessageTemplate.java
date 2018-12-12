@@ -2,6 +2,7 @@ package com.creatix.message.template.email;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.enums.EmailTemplateName;
 
 import java.net.MalformedURLException;
 
@@ -17,7 +18,7 @@ public class ResetPasswordMessageTemplate implements EmailMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "reset-password";
+        return EmailTemplateName.RESET_PASSWORD.getValue();
     }
 
     @Override

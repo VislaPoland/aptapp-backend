@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.EventInvite;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 import javax.annotation.Nonnull;
 
@@ -17,7 +18,7 @@ public class RsvpReminderMessageTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "rsvp-reminder";
+        return PushNotificationTemplateName.RSVP_REMINDER.getValue();
     }
 
     @Nonnull

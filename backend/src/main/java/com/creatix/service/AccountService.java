@@ -14,9 +14,13 @@ import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.email.*;
 import com.creatix.message.template.sms.ActivationMessageTemplate;
+import com.creatix.message.template.sms.ActivationWebMessageTemplate;
+import com.creatix.message.template.sms.SmsMessageTemplate;
 import com.creatix.security.*;
 import com.creatix.service.message.BitlyService;
 import com.creatix.service.message.EmailMessageService;
+import com.google.common.collect.ImmutableSet;
+import com.twilio.exception.ApiException;
 import freemarker.template.TemplateException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -97,6 +101,7 @@ public class AccountService {
     private BitlyService bitlyService;
 
     private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
+    private static final ImmutableSet WEB_SMS_ROLES = ImmutableSet.of(AccountRole.Administrator, AccountRole.PropertyOwner);
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -158,7 +163,7 @@ public class AccountService {
         if ( account.getActive() == Boolean.TRUE ) {
             throw new IllegalArgumentException(String.format("Account id=%d is already activated", account.getId()));
         }
-        if(account.getActionTokenValidUntil() == null || new Date().after(account.getActionTokenValidUntil())){
+        if ( account.getActionTokenValidUntil() == null || new Date().after(account.getActionTokenValidUntil()) ) {
             setActionToken(account);
         }
 
@@ -458,7 +463,7 @@ public class AccountService {
         setActionToken(account);
 
         sendActivationSms(account);
-        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, managedProperty, applicationProperties));
 
         return account;
     }
@@ -515,6 +520,7 @@ public class AccountService {
         }
 
         final SecurityEmployee account = this.getEntityInstance(request.getPrimaryEmail(), SecurityEmployee.class);
+        final Property managedProperty = manager.getManagedProperty();
         account.setRole(AccountRole.Security);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -525,7 +531,7 @@ public class AccountService {
         setActionToken(account);
 
         sendActivationSms(account);
-        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, managedProperty, applicationProperties));
 
         return account;
     }
@@ -567,6 +573,7 @@ public class AccountService {
         }
 
         final MaintenanceEmployee account = this.getEntityInstance(request.getPrimaryEmail(), MaintenanceEmployee.class);
+        final Property managedProperty = manager.getManagedProperty();
         account.setRole(AccountRole.Maintenance);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -577,7 +584,7 @@ public class AccountService {
         setActionToken(account);
 
         sendActivationSms(account);
-        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, managedProperty, applicationProperties));
 
         return account;
     }
@@ -628,6 +635,7 @@ public class AccountService {
         }
 
         final AssistantPropertyManager account = this.getEntityInstance(request.getPrimaryEmail(), AssistantPropertyManager.class);
+        final Property managedProperty = manager.getManagedProperty();
         account.setRole(AccountRole.AssistantPropertyManager);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -638,7 +646,7 @@ public class AccountService {
         setActionToken(account);
 
         sendActivationSms(account);
-        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, managedProperty, applicationProperties));
 
         return account;
     }
@@ -757,18 +765,30 @@ public class AccountService {
         }
     }
 
-    private void sendActivationSms(Account account) throws MessageDeliveryException, MalformedURLException {
-        final boolean enableSms = account.getPrimaryPhone() != null && !account.getPrimaryPhone().isEmpty();
+    private SmsMessageTemplate getSmsActivationTemplate(@NotNull Account account) throws MalformedURLException, MessageDeliveryException {
+        SmsMessageTemplate activationSmsMessageTemplate = null;
+        final Property property = account.getProperty();
+        final boolean hasPropertyEnabledSms = property != null && property.getEnableSms();
 
-        if ( enableSms ||
-            ( enableSms && AccountRole.Tenant.equals(account.getRole()) && ((Tenant) account).getEnableSms() && authorizationManager.getAccountProperties(account).iterator().next().getEnableSms()) ||
-            ( enableSms && AccountRole.PropertyOwner.equals(account.getRole()) && authorizationManager.getAccountProperties(account).iterator().next().getEnableSms())) {
-
+        if (WEB_SMS_ROLES.contains(account.getRole())) {
             String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", account.getActionToken())).toString());
             logger.info("Generated short url for sms activation account. Url: " + shortUrl);
+            activationSmsMessageTemplate = new ActivationWebMessageTemplate(shortUrl, account.getPrimaryPhone());
+        } else if (hasPropertyEnabledSms) {
+            activationSmsMessageTemplate = new ActivationMessageTemplate(account.getActionToken(), account.getPrimaryPhone());
+        }
+
+        return activationSmsMessageTemplate;
+    }
+
+    private void sendActivationSms(@NotNull Account account) {
+        if (StringUtils.isNotEmpty(account.getPrimaryPhone())) {
             try {
-                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, account.getPrimaryPhone()));
-            } catch (Exception e) {
+                SmsMessageTemplate sms = getSmsActivationTemplate(account);
+                if (sms != null) {
+                    smsMessageSender.send(sms);
+                }
+            } catch (ApiException | IOException | MessageDeliveryException | TemplateException e) {
                 logger.error("There is problem with smsMessageSender.send in accountService", e);
             }
         }

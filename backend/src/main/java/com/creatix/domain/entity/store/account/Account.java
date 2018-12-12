@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store.account;
 
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import lombok.Data;
@@ -96,6 +97,11 @@ public class Account {
     @Transient
     public String getFullName() {
         return String.format("%s %s", getFirstName(), getLastName());
+    }
+
+    @Transient
+    public Property getProperty() {
+        return null;
     }
 
     public static Comparator<Account> COMPARE_BY_FIRST_LAST_NAME = (a, b) -> new CompareToBuilder()

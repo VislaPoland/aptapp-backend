@@ -23,6 +23,7 @@ import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.BitlyService;
 import com.creatix.service.message.EmailMessageService;
+import com.twilio.exception.ApiException;
 import freemarker.template.TemplateException;
 
 import org.slf4j.Logger;
@@ -134,11 +135,9 @@ public class TenantService {
         emailMessageService.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
 
         if (apartment.getProperty().getEnableSms()) {
-            String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", tenant.getActionToken())).toString());
-            logger.info("Generated short url for sms activation account. Url: " + shortUrl);
             try {
-                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, tenant.getPrimaryPhone()));
-            } catch (Exception e) {
+                smsMessageSender.send(new ActivationMessageTemplate(tenant.getActionToken(), tenant.getPrimaryPhone()));
+            } catch (ApiException | IOException | MessageDeliveryException | TemplateException e) {
                 logger.error("There is problem with smsMessageSender.send in tenantService.", e);
             }
         }

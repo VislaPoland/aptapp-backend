@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import com.creatix.domain.enums.EmailTemplateName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ public class EscalatedManagerMessageForMoreTenantsTemplate implements EmailMessa
 
     @Override
     public String getTemplateName() {
-        return "escalated-notification-for-more-tenants";
+        return EmailTemplateName.ESCALATED_NOTIFICATION_MORE.getValue();
     }
 
     @Nonnull
