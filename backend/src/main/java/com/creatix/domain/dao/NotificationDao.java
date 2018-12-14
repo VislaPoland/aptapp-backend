@@ -80,9 +80,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                     break;
                 case Administrator:
                     if (property != null) {
-                        predicate = predicate.and(
-                                qNotification.property.eq(property)
-                                .or(qNotification.author.eq(account)));
+                        predicate = predicate.and(qNotification.property.eq(property));
                     }
                 default:
                     predicate = predicate.and(qNotification.author.eq(account));
@@ -127,11 +125,10 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                 case Administrator:
                     if (property != null) {
                         predicate = predicate.and(
-                            qNotification.property.eq(property)
-                            .or(qNotification.recipient.eq(authorizationManager.getCurrentAccount()))
-                            .or(qSubTenantRecipient.parentTenant.apartment.property.eq(property))
-                            .or(qParentTenantOfSubTenantRecipient.apartment.property.eq(property))
-                        );
+                                        qNotification.property.eq(property)
+                                    ).and(
+                                        qNotification.recipient.eq(authorizationManager.getCurrentAccount()).not()
+                                    );
                     }
                     break;
                 case Maintenance:
