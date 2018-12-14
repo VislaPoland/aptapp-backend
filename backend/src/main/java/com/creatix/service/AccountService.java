@@ -6,6 +6,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.*;
+import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.account.device.Device;
@@ -91,6 +92,10 @@ public class AccountService {
     private SecurityEmployeeDao securityEmployeeDao;
     @Autowired
     private MaintenanceEmployeeDao maintenanceEmployeeDao;
+    @Autowired
+    private TenantDao tenantDao;
+    @Autowired
+    private SubTenantDao subTenantDao;
     @Autowired
     private HttpSession httpSession;
     @Autowired
@@ -800,5 +805,28 @@ public class AccountService {
         maintenanceEmployeeDao.findByProperty(property).stream().forEach(maintenanceEmployee -> maintenanceEmployeeDao.delete(maintenanceEmployee));
         securityEmployeeDao.findByProperty(property).stream().forEach(securityEmployee -> securityEmployeeDao.delete(securityEmployee));
         property.getManagers().stream().forEach(propertyManager -> accountDao.delete(propertyManager));
+    }
+
+    @RoleSecured({AccountRole.Administrator, AccountRole.AssistantPropertyManager, AccountRole.PropertyManager})
+    public @Nonnull Tenant switchSubTenantToPrimaryTenant(@Nonnull Long subTenantId) {
+        Objects.requireNonNull(subTenantId);
+
+        final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
+        final Tenant tenant = subTenant.getParentTenant();
+        final Apartment apartment = subTenant.getApartment();
+
+        if (tenant == null || apartment == null) {
+            throw new SecurityException("Co-resident is not able to be primary resident.");
+        }
+
+        final SubTenant newSubTenant = mapper.switchTenantToSubTenant(tenant);
+        final Tenant newTenant = mapper.switchSubTenantToTenant(subTenant);
+        newTenant.addSubTenant(newSubTenant);
+        newSubTenant.setParentTenant(newTenant);
+
+        tenantDao.persistSubTenantToTenant(newTenant, newSubTenant.getId());
+        subTenantDao.persistTenantToSubTenant(newSubTenant);
+
+        return newTenant;
     }
 }
