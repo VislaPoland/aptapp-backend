@@ -130,6 +130,8 @@ dependencies {
 
 	// ensure that the embedded servlet container does not interfere with the servlet container
 	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+
+	compile("org.springframework.boot:spring-boot-devtools")
 }
 
 compileJava.dependsOn(processResources)

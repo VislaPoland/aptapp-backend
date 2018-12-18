@@ -101,4 +101,13 @@ public class Tenant extends TenantBase {
 
         return remove;
     }
+
+    public void addSubTenant(@NotNull SubTenant subTenant) {
+        Objects.requireNonNull(subTenant, "SubTenant is null");
+        if ( subTenants == null ) {
+            subTenants = new HashSet<>();
+        }
+
+        subTenants.add(subTenant);
+    }
 }

@@ -28,5 +28,4 @@ public class TestUtils {
         AuthenticatedUserDetails userDetails = new AuthenticatedUserDetails(account);
         SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(userDetails, userDetails.getAuthorities()));
     }
-
 }

@@ -317,6 +317,21 @@ public class AccountController {
         return new DataResponse<>(accountService.resetActivationCode(accountId));
     }
 
+    @ApiOperation(value = "Switch sub-tenant to primary resident of apartment")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 422, message = "Unprocessable")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/switch/{subTenantId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.Administrator, AccountRole.AssistantPropertyManager, AccountRole.PropertyManager})
+    public DataResponse<AccountDto> switchSubTenantToPrimaryTenant(@PathVariable Long subTenantId) {
+        return new DataResponse<>(mapper.toAccountDto(accountService.switchSubTenantToPrimaryTenant(subTenantId)));
+    }
+
     @ApiOperation(value = "Resend activation (re-generate if expired) code")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),

@@ -699,6 +699,42 @@ public class Mapper {
                     }
                 })
                 .register();
+
+        mapperFactory.classMap(SubTenant.class, Tenant.class)
+                .exclude("address")
+                .exclude("enableSms")
+                .exclude("apartment")
+                .exclude("subTenants")
+                .exclude("vehicles")
+                .exclude("parkingStalls")
+                .byDefault()
+                .customize(new CustomMapper<SubTenant, Tenant>() {
+                    @Override
+                    public void mapAtoB(SubTenant a, Tenant b, MappingContext context) {
+                        // because we are using LazyLoad to load proxy entities we must do this
+                        a = (SubTenant) Hibernate.unproxy(a);
+                        Tenant parent = a.getParentTenant();
+                        b.setRole(AccountRole.Tenant);
+                        b.setApartment(parent.getApartment());
+                        b.setEnableSms(parent.getEnableSms());
+                        b.setVehicles(parent.getVehicles());
+                        b.setParkingStalls(parent.getParkingStalls());
+
+                        SubTenant finalA = a;
+                        b.setSubTenants(
+                                parent.getSubTenants()
+                                        .stream()
+                                        .filter(subTenant -> !subTenant.getId()
+                                                .equals(finalA.getId()))
+                                        .collect(Collectors.toSet()));
+                    }
+
+                    @Override
+                    public void mapBtoA(Tenant a, SubTenant b, MappingContext context) {
+                        b.setRole(AccountRole.SubTenant);
+                    }
+                })
+                .register();
     }
 
     public PropertyPhotoDto toPropertyPhotoDto(@NotNull PropertyPhoto propertyPhoto) {
@@ -849,6 +885,18 @@ public class Mapper {
         Objects.requireNonNull(request);
 
         return mapperFactory.getMapperFacade().map(request, SubTenant.class);
+    }
+
+    public SubTenant switchTenantToSubTenant(@NotNull Tenant tenant) {
+        Objects.requireNonNull(tenant);
+
+        return mapperFactory.getMapperFacade().map(tenant, SubTenant.class);
+    }
+
+    public Tenant switchSubTenantToTenant(@NotNull SubTenant subTenant) {
+        Objects.requireNonNull(subTenant);
+
+        return mapperFactory.getMapperFacade().map(subTenant, Tenant.class);
     }
 
     public PredefinedMessageDto toPredefinedMessageDto(@NotNull PredefinedMessage entity) {
