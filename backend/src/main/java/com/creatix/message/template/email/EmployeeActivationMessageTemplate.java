@@ -6,13 +6,10 @@ import com.creatix.domain.entity.store.account.EmployeeBase;
 import com.creatix.domain.enums.EmailTemplateName;
 
 public class EmployeeActivationMessageTemplate extends ActivationMessageTemplate {
-
-    private final EmployeeBase account;
     private final Property property;
 
     public EmployeeActivationMessageTemplate(EmployeeBase account, Property property, ApplicationProperties properties) {
         super(account, properties);
-        this.account = account;
         this.property = property;
     }
 

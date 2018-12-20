@@ -15,6 +15,10 @@ public class TenantActivationMessageTemplate extends ActivationMessageTemplate {
         return "Welcome to Apt. App - Empowered & Enhanced Resident Living";
     }
 
+    public String getPropertyName() {
+        return account.getProperty().getName();
+    }
+
     @Override
     public String getTemplateName() {
         return EmailTemplateName.ACTIVATION_TENANT.getValue();
