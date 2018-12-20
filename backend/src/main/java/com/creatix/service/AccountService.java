@@ -821,6 +821,7 @@ public class AccountService {
 
         final SubTenant newSubTenant = mapper.switchTenantToSubTenant(tenant);
         final Tenant newTenant = mapper.switchSubTenantToTenant(subTenant);
+
         newTenant.addSubTenant(newSubTenant);
         newSubTenant.setParentTenant(newTenant);
 

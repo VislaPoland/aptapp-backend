@@ -1,7 +1,6 @@
 package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.Apartment;
-import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
 import lombok.NonNull;
 import org.springframework.stereotype.Repository;
@@ -10,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.creatix.domain.entity.store.account.QTenant.tenant;
 
@@ -46,6 +46,12 @@ public class TenantDao extends AbstractAccountDao<Tenant> {
         em.createNativeQuery("UPDATE account SET " + generateSQLUpdateParams(tenant) + " WHERE id = " + tenant.getId()).executeUpdate();
         em.createNativeQuery("UPDATE parking_stall SET using_tenant_id = " + tenant.getId() + " WHERE using_tenant_id = " + subtenantId).executeUpdate();
         em.createNativeQuery("UPDATE vehicle SET owner_id = " + tenant.getId() + " WHERE owner_id = " + subtenantId).executeUpdate();
+
+        em.createNativeQuery("UPDATE account SET parent_tenant_id=" + tenant.getId() + " WHERE id IN (" +
+                tenant.getSubTenants().stream()
+                        .map(s -> s.getId().toString())
+                        .collect(Collectors.joining(",")) + ")")
+                        .executeUpdate();
     }
 
 }
