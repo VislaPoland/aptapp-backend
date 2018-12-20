@@ -56,6 +56,7 @@ public class MaintenanceController {
                 .collect(Collectors.toList()));
     }
 
+    @Deprecated
     @ApiOperation(value = "Delete maintenance reservation")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),

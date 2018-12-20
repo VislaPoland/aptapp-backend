@@ -36,5 +36,7 @@
     <include file="classpath:db/changelog/db.changelog-20181126-addColumnsToMaintenanceReservation.xml"/>
     <include file="classpath:db/changelog/db.changelog-20181126-addHttpToAllBusinessProfiles.xml" />
     <include file="classpath:db/changelog/db.changelog-20181129-addColumnsToMaintenanceNotificationRemoveFromMaintenanceReservation.xml"/>
+    <include file="classpath:db/changelog/db.changelog-20181218-createTableNotificationHistory.xml"/>
+    <include file="classpath:db/changelog/db.changelog-20190103-fillNotificationHistory.xml"/>
 </databaseChangeLog>
 

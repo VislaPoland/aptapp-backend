@@ -238,6 +238,7 @@ public class NotificationService {
                 break;
         }
         maintenanceNotificationDao.persist(notification);
+        maintenanceNotificationDao.createNotificationHistoryLog(notification, NotificationHistoryStatus.Pending.name());
 
         // TODO delete original slotUnitId after FE and APP update and release
         if (slotsUnitId != null && slotsUnitId.size() > 0) {
@@ -431,6 +432,7 @@ public class NotificationService {
         notification.setStatus(NotificationStatus.Closed);
 
         maintenanceNotificationDao.persist(notification);
+        maintenanceNotificationDao.createNotificationHistoryLog(notification, NotificationHistoryStatus.Closed.name());
 
         try {
             pushNotificationSender.sendNotification(new MaintenanceCompleteTemplate(notification), notification.getAuthor());
@@ -451,6 +453,7 @@ public class NotificationService {
         notification.setStatus(NotificationStatus.Deleted);
 
         maintenanceNotificationDao.persist(notification);
+        maintenanceNotificationDao.createNotificationHistoryLog(notification, NotificationHistoryStatus.Deleted.name());
 
         if (AccountRole.Tenant.equals(authorizationManager.getCurrentAccount().getRole()) ||
                 AccountRole.SubTenant.equals(authorizationManager.getCurrentAccount().getRole())) {

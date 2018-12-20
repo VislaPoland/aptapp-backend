@@ -11,6 +11,7 @@ import com.creatix.domain.entity.store.SlotUnit;
 import com.creatix.domain.entity.store.account.MaintenanceEmployee;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.NotificationHistoryStatus;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.ReservationStatus;
 import com.creatix.message.template.push.MaintenanceRescheduleConfirmTemplate;
@@ -107,9 +108,8 @@ public class MaintenanceReservationService {
         }
 
         releaseReservedCapacity(reservation);
-        resolveNotification(reservation);
-
         reservationDao.delete(reservation);
+
         return reservation;
     }
 
@@ -260,6 +260,8 @@ public class MaintenanceReservationService {
         final MaintenanceNotification notification = reservationOld.getNotification();
         notification.setStatus(NotificationStatus.Pending);
         maintenanceNotificationDao.persist(notification);
+        maintenanceNotificationDao.createNotificationHistoryLog(notification, NotificationHistoryStatus.Rescheduled.name());
+
         final MaintenanceSlot slot = (MaintenanceSlot) slotUnit.getSlot();
 
         final MaintenanceReservation reservationNew = new MaintenanceReservation();
@@ -286,12 +288,12 @@ public class MaintenanceReservationService {
     private void resolveNotification(@Nonnull MaintenanceReservation maintenanceReservation) {
         Objects.requireNonNull(maintenanceReservation);
 
-
         final MaintenanceNotification notification = maintenanceReservation.getNotification();
         Objects.requireNonNull(notification, "Maintenance is missing notification");
 
         notification.setStatus(NotificationStatus.Resolved);
         maintenanceNotificationDao.persist(notification);
+        maintenanceNotificationDao.createNotificationHistoryLog(notification, maintenanceReservation.getStatus().name());
     }
 
     private void reserveCapacity(MaintenanceReservation reservation) {

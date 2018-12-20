@@ -35,5 +35,7 @@ public class NotificationDto {
     private List<NotificationPhotoDto> photos;
     @ApiModelProperty(value = "Author of the notification")
     private BasicAccountDto author;
+    @ApiModelProperty(value = "History of the notification")
+    private List<NotificationHistoryDto> history;
 
 }
