@@ -4,6 +4,7 @@ import com.creatix.domain.entity.store.account.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Repository
@@ -41,7 +42,7 @@ public class AbstractAccountDao<T extends Account> extends DaoBase<T, Long> {
                 ", secondary_email=" + prepareStringInput(account.getSecondaryEmail()) +
                 ", secondary_phone=" + prepareStringInput(account.getSecondaryPhone()) +
                 ", deleted_at=" + prepareStringInput(String.valueOf(account.getDeletedAt())) +
-                ", updated_at=" + prepareStringInput(String.valueOf(account.getUpdatedAt())) +
+                ", updated_at=" + prepareStringInput(OffsetDateTime.now().toString()) +
                 ", created_at=" + prepareStringInput(String.valueOf(account.getCreatedAt())) +
                 ", is_neighborhood_notification_enable=" + account.getIsNeighborhoodNotificationEnable();
     }
