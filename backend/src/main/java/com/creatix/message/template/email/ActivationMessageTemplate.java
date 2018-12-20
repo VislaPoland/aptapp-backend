@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 
 public abstract class ActivationMessageTemplate implements EmailMessageTemplate {
 
-    private final Account account;
+    protected final Account account;
     private final ApplicationProperties properties;
 
     public ActivationMessageTemplate(Account account, ApplicationProperties properties) {

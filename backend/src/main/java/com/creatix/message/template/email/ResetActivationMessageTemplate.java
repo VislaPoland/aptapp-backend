@@ -8,12 +8,10 @@ import com.google.common.collect.ImmutableSet;
 
 public class ResetActivationMessageTemplate extends ActivationMessageTemplate {
 
-    private final Account account;
     private static final ImmutableSet WEB_RESET_ROLES = ImmutableSet.of(AccountRole.Administrator, AccountRole.PropertyOwner);
 
     public ResetActivationMessageTemplate(Account account, ApplicationProperties properties) {
         super(account, properties);
-        this.account = account;
     }
 
     @Override
