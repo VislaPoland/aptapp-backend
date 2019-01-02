@@ -8,6 +8,7 @@ import com.creatix.domain.dao.NotificationGroupDao;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.PropertyManager;
 import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.account.TenantBase;
 import com.creatix.domain.entity.store.notification.EscalatedNeighborhoodNotification;
 import com.creatix.domain.entity.store.notification.NeighborhoodNotification;
 import com.creatix.domain.entity.store.notification.NotificationGroup;
@@ -112,7 +113,7 @@ class PropertyNotificationWatcher {
         }
 
         final Tenant accountOffender = notification.getTargetApartment().getTenant();
-        final Tenant accountComplainer = (Tenant) notification.getAuthor();
+        final TenantBase accountComplainer = (TenantBase) notification.getAuthor();
 
         final NeighborRelation relation = new NeighborRelation(accountComplainer, accountOffender);
 
@@ -164,12 +165,12 @@ class PropertyNotificationWatcher {
                                                          null,
                                                          notification,
                                                          manager,
-                                                         disruptiveNeighborComplaints.get(offender).stream().map( neighborComplaint -> neighborComplaint.getComplainerAppartmentUnit()).collect(Collectors.joining(", ")), notificationGroup);
+                                                         disruptiveNeighborComplaints.get(offender).stream().map( neighborComplaint -> neighborComplaint.getComplainerApartmentUnit()).collect(Collectors.joining(", ")), notificationGroup);
                     sendPushEscalationNotificationToManager(accountOffender.getApartment().getUnitNumber(), null, manager);
                     sendEscalationEmailForMoreTenants( property,
                                                        accountOffender,
                                                        manager,
-                                                       disruptiveNeighborComplaints.get(offender).stream().map(neighborComplaint -> neighborComplaint.getComplainerAppartmentUnit() + " \t-\t " +neighborComplaint.getComplainerMessage()).collect(toList()) );
+                                                       disruptiveNeighborComplaints.get(offender).stream().map(neighborComplaint -> neighborComplaint.getComplainerApartmentUnit() + " \t-\t " +neighborComplaint.getComplainerMessage()).collect(toList()) );
                     sendEscalationSmsForMoreTenants(property, manager, accountOffender.getApartment().getUnitNumber());
                 }
             });
@@ -208,7 +209,7 @@ class PropertyNotificationWatcher {
         notificationDao.persist(notificationManager);
     }
 
-    private void sendEscalationNotificationToOffender(@Nonnull Tenant offender, Tenant accountComplainer, @Nonnull NeighborhoodNotification notificationSrc) {
+    private void sendEscalationNotificationToOffender(@Nonnull Tenant offender, TenantBase accountComplainer, @Nonnull NeighborhoodNotification notificationSrc) {
         final EscalatedNeighborhoodNotification notificationTenant = new EscalatedNeighborhoodNotification();
         notificationTenant.setAuthor(accountComplainer);
         notificationTenant.setProperty(notificationSrc.getProperty());

@@ -279,29 +279,31 @@ public class NotificationService {
         authorizationManager.checkRead(property);
 
         final Tenant tenant = targetApartment.getTenant();
-        if (tenant != null) {
 
-            notification.setType(NotificationType.Neighborhood);
-            notification.setAuthor(currentAccount);
-            notification.setProperty(property);
-            notification.setStatus(NotificationStatus.Pending);
-            notification.setRecipient(targetApartment.getTenant());
-            notification.setTargetApartment(targetApartment);
-            neighborhoodNotificationDao.persist(notification);
-
-            if ( AccountRole.Tenant.equals(currentAccount.getRole()) || AccountRole.SubTenant.equals(currentAccount.getRole())) {
-                notificationWatcher.process(notification);
-            }
-
-            if ( (property.getEnableSms() == Boolean.TRUE) && (tenant.getEnableSms() == Boolean.TRUE) && (StringUtils.isNotBlank(tenant.getPrimaryPhone())) ) {
-                try {
-                    smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
-                } catch (Exception e) {
-                    logger.info(String.format("Failed to sms notify %s", tenant.getPrimaryEmail()), e);
-                }
-            }
-            pushNotificationSender.sendNotification(new NeighborNotificationTemplate(notification), tenant);
+        if (tenant == null) {
+            throw new AccessDeniedException("Selected apartment is currently unoccupied.");
         }
+
+        notification.setType(NotificationType.Neighborhood);
+        notification.setAuthor(currentAccount);
+        notification.setProperty(property);
+        notification.setStatus(NotificationStatus.Pending);
+        notification.setRecipient(targetApartment.getTenant());
+        notification.setTargetApartment(targetApartment);
+        neighborhoodNotificationDao.persist(notification);
+
+        if ( AccountRole.Tenant.equals(currentAccount.getRole()) || AccountRole.SubTenant.equals(currentAccount.getRole())) {
+            notificationWatcher.process(notification);
+        }
+
+        if ( Boolean.TRUE.equals(property.getEnableSms()) && Boolean.TRUE.equals(tenant.getEnableSms()) && StringUtils.isNotBlank(tenant.getPrimaryPhone()) ) {
+            try {
+                smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
+            } catch (Exception e) {
+                logger.info(String.format("Failed to sms notify %s", tenant.getPrimaryEmail()), e);
+            }
+        }
+        pushNotificationSender.sendNotification(new NeighborNotificationTemplate(notification), tenant);
 
         return notification;
     }
