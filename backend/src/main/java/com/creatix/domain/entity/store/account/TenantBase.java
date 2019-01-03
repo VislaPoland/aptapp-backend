@@ -1,5 +1,6 @@
 package com.creatix.domain.entity.store.account;
 
+import com.creatix.domain.entity.store.Apartment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,5 +16,7 @@ public abstract class TenantBase extends Account {
     private Boolean isTacAccepted;
     @Column
     private Boolean isPrivacyPolicyAccepted;
+
+    public abstract Apartment getApartment();
 
 }
