@@ -10,6 +10,10 @@ public class SubTenantActivationMessageTemplate extends ActivationMessageTemplat
         super(account, properties);
     }
 
+    public String getPropertyName() {
+        return account.getProperty().getName();
+    }
+
     @Override
     public String getTemplateName() { return EmailTemplateName.ACTIVATION_TENANT.getValue(); }
 }
