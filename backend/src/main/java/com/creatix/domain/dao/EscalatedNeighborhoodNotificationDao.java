@@ -1,8 +1,8 @@
 package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.notification.EscalatedNeighborhoodNotification;
-import com.creatix.domain.entity.store.notification.NotificationGroup;
 
+import com.creatix.security.AuthorizationManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +15,10 @@ import static com.creatix.domain.entity.store.notification.QEscalatedNeighborhoo
 @Repository
 @Transactional
 public class EscalatedNeighborhoodNotificationDao extends AbstractNotificationDao<EscalatedNeighborhoodNotification> {
+
+    public EscalatedNeighborhoodNotificationDao(AuthorizationManager authorizationManager, NotificationGroupDao notificationGroupDao, NotificationHistoryDao notificationHistoryDao) {
+        super(authorizationManager, notificationGroupDao, notificationHistoryDao);
+    }
 
     @Nonnull
     public List<EscalatedNeighborhoodNotification> findByCreatedAtBetween(@Nonnull OffsetDateTime dateFrom, @Nonnull OffsetDateTime dateTo) {

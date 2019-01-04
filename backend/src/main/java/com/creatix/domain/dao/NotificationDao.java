@@ -24,9 +24,9 @@ import java.util.stream.Stream;
 @Transactional
 public class NotificationDao extends AbstractNotificationDao<Notification> {
 
-    @Autowired
-    private AuthorizationManager authorizationManager;
-
+    public NotificationDao(AuthorizationManager authorizationManager, NotificationGroupDao notificationGroupDao, NotificationHistoryDao notificationHistoryDao) {
+        super(authorizationManager, notificationGroupDao, notificationHistoryDao);
+    }
 
     public List<Notification> findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
             @NotNull NotificationRequestType requestType,
