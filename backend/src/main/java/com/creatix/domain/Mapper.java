@@ -250,8 +250,14 @@ public class Mapper {
                             // only authenticated non-tenant accounts are allowed to see author of the notification
                             notificationDto.setAuthor(null);
                         } else {
-                            if (notification.getAuthor() instanceof Tenant) {
-                                Apartment apartment = ((Tenant)notification.getAuthor()).getApartment();
+                            final Account author = notification.getAuthor();
+                            if (author instanceof Tenant) {
+                                Apartment apartment = ((Tenant)author).getApartment();
+                                if (apartment != null) {
+                                    notificationDto.getAuthor().setUnitNumber(apartment.getUnitNumber());
+                                }
+                            } else if (author instanceof SubTenant) {
+                                Apartment apartment = ((SubTenant) author).getApartment();
                                 if (apartment != null) {
                                     notificationDto.getAuthor().setUnitNumber(apartment.getUnitNumber());
                                 }
