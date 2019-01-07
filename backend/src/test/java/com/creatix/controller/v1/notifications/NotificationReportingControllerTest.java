@@ -26,13 +26,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.util.NestedServletException;
 
-import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
@@ -103,7 +103,8 @@ public class NotificationReportingControllerTest {
         // check if date was sat to provide it into service
         verify(notificationService).getAllMaintenanceNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
         arguments = offsetDateTimeArgumentCaptor.getAllValues();
-        arguments.forEach(Assert::assertNotNull);
+        // list only two last arguments (previous two are null)
+        arguments.subList(2,4).forEach(Assert::assertNotNull);
 
         verify(mapper).toMaintenanceNotificationDto(any());
     }
@@ -143,7 +144,7 @@ public class NotificationReportingControllerTest {
 
     @Test
     public void shouldFailedWhenRangeIsInvalid() throws Exception {
-        thrown.expect(AptValidationException.class);
+        thrown.expect(NestedServletException.class);
         thrown.expectCause(new AptValidationExceptionMatcher("Start date has to be before end date of requested range."));
 
         mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_WITH_ARGS, endDateTime, startDateTime))

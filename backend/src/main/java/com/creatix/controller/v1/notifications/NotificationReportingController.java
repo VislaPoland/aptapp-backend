@@ -26,6 +26,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
+
 @RestController
 @RequestMapping(path = {"/api/notifications/reporting", "/api/v1/notifications/reporting"})
 @ApiVersion(1.0)
@@ -43,11 +46,30 @@ public class NotificationReportingController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE)
+    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE) // TODO validate access level for reportings
     public DataResponse<List<MaintenanceNotificationDto>> getMaintenanceNotificationsInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
-        List<MaintenanceNotificationDto> data = notificationService.getAllMaintenanceNotificationsInDateRange(from, till).stream()
+
+        OffsetDateTime localFrom = from , localTill = till;
+
+        if(from == null && till == null) {
+            // get range for current month
+            OffsetDateTime now = OffsetDateTime.now();
+            localFrom = now.with(firstDayOfMonth());
+            localTill = now.with(lastDayOfMonth());
+        }
+
+        if(localFrom == null ^ localTill == null) {
+            throw new AptValidationException("Both parameters (from, till) must be set or empty.");
+        }
+
+        assert localTill != null;
+        if (localTill.isBefore(localFrom)) {
+            throw new AptValidationException("Start date has to be before end date of requested range.");
+        }
+
+        List<MaintenanceNotificationDto> data = notificationService.getAllMaintenanceNotificationsInDateRange(localFrom, localTill).stream()
                 .map(mapper::toMaintenanceNotificationDto)
                 .collect(Collectors.toList());
         return new DataResponse<>(data);
