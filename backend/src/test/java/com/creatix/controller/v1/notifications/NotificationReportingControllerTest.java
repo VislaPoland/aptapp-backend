@@ -100,7 +100,11 @@ public class NotificationReportingControllerTest {
         List<OffsetDateTime> arguments = offsetDateTimeArgumentCaptor.getAllValues();
         arguments.forEach(Assert::assertNull);
 
-        verify(notificationService).getAllMaintenanceNotificationsInDateRange(any(), any());
+        // check if date was sat to provide it into service
+        verify(notificationService).getAllMaintenanceNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
+        arguments = offsetDateTimeArgumentCaptor.getAllValues();
+        arguments.forEach(Assert::assertNotNull);
+
         verify(mapper).toMaintenanceNotificationDto(any());
     }
 
