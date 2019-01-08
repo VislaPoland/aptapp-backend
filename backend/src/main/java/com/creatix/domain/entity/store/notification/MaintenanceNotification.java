@@ -2,7 +2,6 @@ package com.creatix.domain.entity.store.notification;
 
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.MaintenanceReservation;
-import com.creatix.domain.entity.store.account.Account;
 import com.querydsl.core.annotations.QueryInit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -55,7 +54,7 @@ public class MaintenanceNotification extends Notification {
 
     public void addReservation(@NotNull MaintenanceReservation reservation) {
         Objects.requireNonNull(reservation, "Reservation is null");
-        if ( reservations == null ) {
+        if (reservations == null) {
             reservations = new ArrayList<>();
         }
 

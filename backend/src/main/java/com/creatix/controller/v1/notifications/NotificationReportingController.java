@@ -33,34 +33,35 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 @RequestMapping(path = {"/api/notifications/reporting", "/api/v1/notifications/reporting"})
 @ApiVersion(1.0)
 @RequiredArgsConstructor
+@ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Success"),
+        @ApiResponse(code = 400, message = "Bad request"),
+        @ApiResponse(code = 401, message = "Unauthorized"),
+        @ApiResponse(code = 403, message = "Forbidden")
+})
+@RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE)
 public class NotificationReportingController {
 
     private final Mapper mapper;
     private final NotificationService notificationService;
 
     @ApiOperation(value = "Get all maintenance notifications in date range")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE)
     public DataResponse<List<MaintenanceNotificationDto>> getMaintenanceNotificationsInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
 
-        OffsetDateTime localFrom = from , localTill = till;
+        OffsetDateTime localFrom = from, localTill = till;
 
-        if(from == null && till == null) {
+        if (from == null && till == null) {
             // get range for current month
             OffsetDateTime now = OffsetDateTime.now();
             localFrom = now.with(firstDayOfMonth());
             localTill = now.with(lastDayOfMonth());
         }
 
-        if(localFrom == null ^ localTill == null) {
+        if (localFrom == null ^ localTill == null) {
             throw new AptValidationException("Both parameters (from, till) must be set or empty.");
         }
 

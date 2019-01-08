@@ -5,17 +5,17 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-@Table(indexes = {
-    @Index(columnList = "schedule_id")
-})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true, exclude = { "schedule", "reservations" })
+@ToString(callSuper = true, exclude = {"schedule", "reservations"})
 public class MaintenanceSlot extends Slot {
 
     @OneToMany(mappedBy = "slot")
