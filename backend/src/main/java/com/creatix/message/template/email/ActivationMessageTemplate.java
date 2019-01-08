@@ -17,7 +17,7 @@ public abstract class ActivationMessageTemplate implements EmailMessageTemplate 
 
     @Override
     public String getSubject() {
-        return "Welcome to Apt. App – A smarter way to communicate";
+        return "Welcome to Apt. App - A smarter way to communicate";
     }
 
     @Override

@@ -34,6 +34,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
@@ -63,8 +65,6 @@ public class TenantService {
     private ApplicationProperties applicationProperties;
     @Autowired
     private SmsMessageSender smsMessageSender;
-    @Autowired
-    private BitlyService bitlyService;
 
     private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
@@ -74,6 +74,22 @@ public class TenantService {
             throw ex;
         }
         return item;
+    }
+
+    @RoleSecured({AccountRole.Administrator})
+    @ParametersAreNonnullByDefault
+    public void generateTenant(Long apartmentId, String firstName, String lastName, String email, @Nullable String phoneNumber) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+        Objects.requireNonNull(firstName);
+        Objects.requireNonNull(lastName);
+        Objects.requireNonNull(email);
+
+        PersistTenantRequest request = new PersistTenantRequest();
+        request.setFirstName(firstName);
+        request.setLastName(lastName);
+        request.setPrimaryEmail(email);
+        request.setPrimaryPhone(phoneNumber);
+        request.setApartmentId(apartmentId);
+        createTenantFromRequest(request);
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
