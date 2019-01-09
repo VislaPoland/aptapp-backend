@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
 
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
+
 @Component
 public class DateUtils {
 
@@ -15,7 +18,25 @@ public class DateUtils {
      * @return range of dates
      */
     public Pair<OffsetDateTime, OffsetDateTime> getRangeForCurrentMonth() {
-        return null;
+        // get range for current month
+        OffsetDateTime now = OffsetDateTime.now();
+
+        return new Pair<OffsetDateTime, OffsetDateTime>() {
+            @Override
+            public OffsetDateTime getLeft() {
+                return now.with(firstDayOfMonth());
+            }
+
+            @Override
+            public OffsetDateTime getRight() {
+                return now.with(lastDayOfMonth());
+            }
+
+            @Override
+            public OffsetDateTime setValue(OffsetDateTime value) {
+                return null;
+            }
+        };
     }
 
     /**
@@ -35,6 +56,16 @@ public class DateUtils {
      * @throws com.creatix.controller.exception.AptValidationException when date range is invalid
      */
     public void assertRange(OffsetDateTime from, OffsetDateTime to) throws AptValidationException {
+        if(from == null && to == null) {
+            throw new AptValidationException("Both parameters (from, till) must be set.");
+        }
 
+        if (from == null ^ to == null) {
+            throw new AptValidationException("Both parameters (from, till) must be set.");
+        }
+
+        if (to.isBefore(from)) {
+            throw new AptValidationException("Start date has to be before end date of requested range.");
+        }
     }
 }
