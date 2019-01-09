@@ -4,6 +4,7 @@ import com.creatix.controller.exception.AptValidationException;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
+import com.creatix.mathers.AptValidationExceptionMatcher;
 import com.creatix.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -161,22 +162,5 @@ public class NotificationReportingControllerTest {
         notificationDto.setDescription(DESCRIPTION);
 
         when(mapper.toMaintenanceNotificationDto(any())).thenReturn(notificationDto);
-    }
-
-    @RequiredArgsConstructor
-    private static class AptValidationExceptionMatcher extends TypeSafeMatcher<AptValidationException> {
-
-        private final String message;
-
-        @Override
-        protected boolean matchesSafely(AptValidationException item) {
-            return StringUtils.equals(message, item.getMessage());
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("expected message")
-                    .appendValue(message);
-        }
     }
 }
