@@ -49,7 +49,28 @@ public class NotificationReportingController {
     public DataResponse<List<NotificationReportDto>> getMaintenanceNotificationsInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
+        return getNotificationsInDateRange(from, till, NotificationType.Maintenance);
+    }
 
+    @ApiOperation(value = "Get all Neighborhood notifications in date range")
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/neighborhood", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<List<NotificationReportDto>> getNeighborhoodNotificationsInDateRange(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
+        return getNotificationsInDateRange(from, till, NotificationType.Neighborhood);
+    }
+
+    @ApiOperation(value = "Get all Security notifications in date range")
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/security", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<List<NotificationReportDto>> getSecurityNotificationsInDateRange(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
+        return getNotificationsInDateRange(from, till, NotificationType.Security);
+    }
+
+    private DataResponse<List<NotificationReportDto>> getNotificationsInDateRange(OffsetDateTime from, OffsetDateTime till, NotificationType notificationType) throws AptValidationException {
         OffsetDateTime localFrom = from, localTill = till;
 
         if (from == null && till == null) {
@@ -61,6 +82,8 @@ public class NotificationReportingController {
 
         dateUtils.assertRange(localFrom, localTill);
 
-        return new DataResponse<>(notificationReportService.getReportsByRange(localFrom, localTill, NotificationType.Maintenance));
+        return new DataResponse<>(notificationReportService.getReportsByRange(localFrom, localTill, notificationType));
     }
+
+
 }
