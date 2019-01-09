@@ -6,10 +6,8 @@ import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDt
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.mathers.AptValidationExceptionMatcher;
 import com.creatix.service.NotificationService;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
+import com.creatix.util.DateUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,8 +34,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -63,6 +60,9 @@ public class NotificationReportingControllerTest {
     @MockBean
     private Mapper mapper;
 
+    @MockBean
+    private DateUtils dateUtils;
+
     @SpyBean
     private NotificationReportingController notificationReportingController;
 
@@ -85,6 +85,8 @@ public class NotificationReportingControllerTest {
     public void shouldReturnMaintenanceNotificationsForCurrentMonth() throws Exception {
         mockDataForGETMaintenance();
 
+        doNothing().when(dateUtils).assertRange(any(),any());
+
         mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -95,24 +97,23 @@ public class NotificationReportingControllerTest {
                         jsonPath(DATA.concat("[0].description"), is(DESCRIPTION))
                 );
 
-
         verify(notificationReportingController).getMaintenanceNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
 
         List<OffsetDateTime> arguments = offsetDateTimeArgumentCaptor.getAllValues();
         arguments.forEach(Assert::assertNull);
 
-        // check if date was sat to provide it into service
-        verify(notificationService).getAllMaintenanceNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
-        arguments = offsetDateTimeArgumentCaptor.getAllValues();
-        // list only two last arguments (previous two are null)
-        arguments.subList(2,4).forEach(Assert::assertNotNull);
+        verify(dateUtils).getRangeForCurrentMonth();
+        verify(dateUtils).assertRange(any(), any());
 
+        // check if date was set to provide it into service
+        verify(notificationService).getAllMaintenanceNotificationsInDateRange(startDateTime, endDateTime);
         verify(mapper).toMaintenanceNotificationDto(any());
     }
 
     @Test
     public void shouldReturnMaintenanceNotificationForGivenRange() throws Exception {
         mockDataForGETMaintenance();
+        doNothing().when(dateUtils).assertRange(any(),any());
 
         mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_WITH_ARGS, startDateTime.toString(), endDateTime.toString()))
                 .andDo(print())
@@ -129,28 +130,26 @@ public class NotificationReportingControllerTest {
         List<OffsetDateTime> arguments = offsetDateTimeArgumentCaptor.getAllValues();
         arguments.forEach(Assert::assertNotNull);
 
+        verify(dateUtils, times(0)).getRangeForCurrentMonth();
+        verify(dateUtils).assertRange(any(), any());
+
         verify(notificationService).getAllMaintenanceNotificationsInDateRange(startDateTime, endDateTime);
         verify(mapper).toMaintenanceNotificationDto(any());
     }
 
     @Test
-    public void shouldFailedWhenNotBothRangeValuesGiven() throws Exception {
+    public void shouldFailedWhenExceptionThrown() throws Exception {
+        doThrow(new AptValidationException("Both parameters (from, till) must be set.")).when(dateUtils).assertRange(any(), any());
         thrown.expect(NestedServletException.class);
-        thrown.expectCause(new AptValidationExceptionMatcher("Both parameters (from, till) must be set or empty."));
+        thrown.expectCause(new AptValidationExceptionMatcher("Both parameters (from, till) must be set."));
 
         mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_WITH_ONE_ARG, startDateTime))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
-    }
 
-    @Test
-    public void shouldFailedWhenRangeIsInvalid() throws Exception {
-        thrown.expect(NestedServletException.class);
-        thrown.expectCause(new AptValidationExceptionMatcher("Start date has to be before end date of requested range."));
-
-        mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_WITH_ARGS, endDateTime, startDateTime))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+        verify(dateUtils).assertRange(any(), any());
+        verify(notificationService, times(0)).getAllMaintenanceNotificationsInDateRange(any(), any());
+        verify(mapper, times(0)).toMaintenanceNotificationDto(any());
     }
 
     private void mockDataForGETMaintenance() {
@@ -162,5 +161,9 @@ public class NotificationReportingControllerTest {
         notificationDto.setDescription(DESCRIPTION);
 
         when(mapper.toMaintenanceNotificationDto(any())).thenReturn(notificationDto);
+
+        when(dateUtils.getRangeForCurrentMonth()).thenReturn(
+            new ImmutablePair<>(startDateTime, endDateTime)
+        );
     }
 }

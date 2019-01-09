@@ -1,6 +1,7 @@
 package com.creatix.util;
 
 import com.creatix.controller.exception.AptValidationException;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 
@@ -21,22 +22,7 @@ public class DateUtils {
         // get range for current month
         OffsetDateTime now = OffsetDateTime.now();
 
-        return new Pair<OffsetDateTime, OffsetDateTime>() {
-            @Override
-            public OffsetDateTime getLeft() {
-                return now.with(firstDayOfMonth());
-            }
-
-            @Override
-            public OffsetDateTime getRight() {
-                return now.with(lastDayOfMonth());
-            }
-
-            @Override
-            public OffsetDateTime setValue(OffsetDateTime value) {
-                return null;
-            }
-        };
+        return new ImmutablePair<>(now.with(firstDayOfMonth()),now.with(lastDayOfMonth()));
     }
 
     /**
