@@ -3,11 +3,14 @@ package com.creatix.controller.v1.notifications;
 import com.creatix.controller.exception.AptValidationException;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
 import com.creatix.domain.dto.notification.reporting.NotificationReportDto;
+import com.creatix.domain.dto.notification.reporting.NotificationReportGlobalInfoDto;
+import com.creatix.domain.dto.notification.reporting.NotificationReportGroupByAccountDto;
 import com.creatix.domain.enums.NotificationType;
 import com.creatix.mathers.AptValidationExceptionMatcher;
 import com.creatix.service.notification.NotificationReportService;
 import com.creatix.util.DateUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,12 +53,17 @@ public class NotificationReportingControllerTest {
     private static final String ENDPOINT_GET_MAINTENANCE = "/api/v1/notifications/reporting/maintenance";
     private static final String ENDPOINT_GET_MAINTENANCE_WITH_ARGS = "/api/v1/notifications/reporting/maintenance?from={from}&till={till}";
     private static final String ENDPOINT_GET_MAINTENANCE_WITH_ONE_ARG = "/api/v1/notifications/reporting/maintenance?from={from}";
+    private static final String ENDPOINT_GET_MAINTENANCE_GLOBAL_INFO = "/api/v1/notifications/reporting/maintenance/global?from={from}&till={till}";
+    private static final String ENDPOINT_GET_MAINTENANCE_GROUPED_BY_TECHNICIAN = "/api/v1/notifications/reporting/maintenance/technician?from={from}&till={till}";
+
     private static final String ENDPOINT_GET_NEIGHBORHOOD = "/api/v1/notifications/reporting/neighborhood";
     private static final String ENDPOINT_GET_NEIGHBORHOOD_WITH_ARGS = "/api/v1/notifications/reporting/neighborhood?from={from}&till={till}";
     private static final String ENDPOINT_GET_NEIGHBORHOOD_WITH_ONE_ARG = "/api/v1/notifications/reporting/neighborhood?from={from}";
+
     private static final String ENDPOINT_GET_SECURITY = "/api/v1/notifications/reporting/security";
     private static final String ENDPOINT_GET_SECURITY_WITH_ARGS = "/api/v1/notifications/reporting/security?from={from}&till={till}";
     private static final String ENDPOINT_GET_SECURITY_WITH_ONE_ARG = "/api/v1/notifications/reporting/security?from={from}";
+
     private static final String DESCRIPTION = "description";
     private static final String DATA = "$.data";
 
@@ -77,8 +85,8 @@ public class NotificationReportingControllerTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private OffsetDateTime startDateTime = OffsetDateTime.of(2019, 1, 1,1,0,0,0, ZoneOffset.UTC);
-    private OffsetDateTime endDateTime = OffsetDateTime.of(2019, 1, 2,1,0,0,0, ZoneOffset.UTC);
+    private OffsetDateTime startDateTime = OffsetDateTime.of(2019, 1, 1, 1, 0, 0, 0, ZoneOffset.UTC);
+    private OffsetDateTime endDateTime = OffsetDateTime.of(2019, 1, 2, 1, 0, 0, 0, ZoneOffset.UTC);
 
     @Before
     public void setup() {
@@ -131,10 +139,55 @@ public class NotificationReportingControllerTest {
         testFailNotificationForType(ENDPOINT_GET_SECURITY_WITH_ONE_ARG, NotificationType.Security);
     }
 
-    private void testNotificationWithoutDatesForType(String endpoint, NotificationType notificationType, Callable<Void> callable) throws Exception {
-        mockDataForGETMaintenance();
+    @Test
+    public void shouldReturnGlobalInfoForMaintenance() throws Exception {
+        when(notificationReportService.getGlobalStatistics(any(), any(), any())).thenReturn(
+                new NotificationReportGlobalInfoDto(1L, 1D, 1L, 1L, 1L)
+        );
+        doNothing().when(dateUtils).assertRange(any(), any());
 
-        doNothing().when(dateUtils).assertRange(any(),any());
+        mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_GLOBAL_INFO, startDateTime, endDateTime))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(DATA.concat(".requests"), is(1)))
+                .andExpect(jsonPath(DATA.concat(".openRequests"), is(1D)))
+                .andExpect(jsonPath(DATA.concat(".pastDueDateRequests"), is(1)))
+                .andExpect(jsonPath(DATA.concat(".averageTimeToConfirm"), is(1)))
+                .andExpect(jsonPath(DATA.concat(".averageTimeToResolve"), is(1)));
+
+        verify(dateUtils, times(0)).getRangeForCurrentMonth();
+        verify(dateUtils).assertRange(any(), any());
+
+        verify(notificationReportService).getGlobalStatistics(startDateTime, endDateTime, NotificationType.Maintenance);
+    }
+
+    @Test
+    public void shouldReturnNotificationReportForTechnician() throws Exception {
+        when(notificationReportService.getMaintenanceReportsGroupedByTechnician(any(), any()))
+                .thenReturn(Collections.singletonList(new NotificationReportGroupByAccountDto(1L, 1L, 1L, 1L)));
+        doNothing().when(dateUtils).assertRange(any(), any());
+
+        mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_GROUPED_BY_TECHNICIAN, startDateTime, endDateTime))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(
+                        jsonPath(DATA, hasSize(1))
+                )
+                .andExpect(jsonPath(DATA.concat("[0].confirmed"), is(1)))
+                .andExpect(jsonPath(DATA.concat("[0].resolved"), is(1)))
+                .andExpect(jsonPath(DATA.concat("[0].averageTimeToConfirm"), is(1)))
+                .andExpect(jsonPath(DATA.concat("[0].averageTimeToResolve"), is(1)));
+
+        verify(dateUtils, times(0)).getRangeForCurrentMonth();
+        verify(dateUtils).assertRange(any(), any());
+
+        verify(notificationReportService).getMaintenanceReportsGroupedByTechnician(startDateTime, endDateTime);
+    }
+
+    private void testNotificationWithoutDatesForType(String endpoint, NotificationType notificationType, Callable<Void> callable) throws Exception {
+        mockDataForGETNotificationReport();
+
+        doNothing().when(dateUtils).assertRange(any(), any());
 
         mockMvc.perform(get(endpoint))
                 .andDo(print())
@@ -156,10 +209,10 @@ public class NotificationReportingControllerTest {
     }
 
     private void testNofificaitonWithDatesForType(String endpoint, NotificationType notificationType, Callable<Void> callable) throws Exception {
-        mockDataForGETMaintenance();
-        doNothing().when(dateUtils).assertRange(any(),any());
+        mockDataForGETNotificationReport();
+        doNothing().when(dateUtils).assertRange(any(), any());
 
-        mockMvc.perform(get(endpoint, startDateTime.toString(), endDateTime.toString()))
+        mockMvc.perform(get(endpoint, startDateTime, endDateTime))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(
@@ -191,7 +244,7 @@ public class NotificationReportingControllerTest {
         verify(notificationReportService).getReportsByRange(any(), any(), notificationType);
     }
 
-    private void mockDataForGETMaintenance() {
+    private void mockDataForGETNotificationReport() {
         when(notificationReportService.getReportsByRange(any(), any(), any())).thenReturn(Collections.singletonList(
                 new NotificationReportDto(1L, "title", DESCRIPTION, startDateTime, endDateTime, 1L, 1L, "status")
         ));
@@ -200,11 +253,11 @@ public class NotificationReportingControllerTest {
         notificationDto.setDescription(DESCRIPTION);
 
         when(dateUtils.getRangeForCurrentMonth()).thenReturn(
-            new ImmutablePair<>(startDateTime, endDateTime)
+                new ImmutablePair<>(startDateTime, endDateTime)
         );
     }
 
-    private Callable<Void> assertMaintenance(Consumer<OffsetDateTime> assertFunction) throws AptValidationException {
+    private Callable<Void> assertMaintenance(Consumer<OffsetDateTime> assertFunction) {
         return () -> {
             verify(notificationReportingController).getMaintenanceNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
 
@@ -215,7 +268,7 @@ public class NotificationReportingControllerTest {
         };
     }
 
-    private Callable<Void> assertNeighborhood(Consumer<OffsetDateTime> assertFunction) throws AptValidationException {
+    private Callable<Void> assertNeighborhood(Consumer<OffsetDateTime> assertFunction) {
         return () -> {
             verify(notificationReportingController).getNeighborhoodNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
 
@@ -226,7 +279,7 @@ public class NotificationReportingControllerTest {
         };
     }
 
-    private Callable<Void> assertSecurity(Consumer<OffsetDateTime> assertFunction) throws AptValidationException {
+    private Callable<Void> assertSecurity(Consumer<OffsetDateTime> assertFunction) {
         return () -> {
             verify(notificationReportingController).getSecurityNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
 

@@ -5,6 +5,8 @@ import com.creatix.controller.exception.AptValidationException;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.notification.reporting.NotificationReportDto;
+import com.creatix.domain.dto.notification.reporting.NotificationReportGlobalInfoDto;
+import com.creatix.domain.dto.notification.reporting.NotificationReportGroupByAccountDto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.ApplicationFeatureType;
 import com.creatix.domain.enums.NotificationType;
@@ -68,6 +70,24 @@ public class NotificationReportingController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
         return getNotificationsInDateRange(from, till, NotificationType.Security);
+    }
+
+    @ApiOperation(value = "Get global maintenance report information in date range")
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/maintenance/global", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<NotificationReportGlobalInfoDto> getMaintenanceNotificationsGlobalInfoInDateRange(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
+        return null;
+    }
+
+    @ApiOperation(value = "Get global maintenance information grouped by technician in date range")
+    @JsonView(Views.Public.class)
+    @RequestMapping(path = "/maintenance/technician", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public DataResponse<List<NotificationReportGroupByAccountDto>> getMaintenanceNotificationsByTechnicianInDateRange(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
+        return null;
     }
 
     private DataResponse<List<NotificationReportDto>> getNotificationsInDateRange(OffsetDateTime from, OffsetDateTime till, NotificationType notificationType) throws AptValidationException {
