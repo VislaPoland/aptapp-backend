@@ -2,14 +2,14 @@ package com.creatix.controller.v1.notifications;
 
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.controller.exception.AptValidationException;
-import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
-import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationDto;
+import com.creatix.domain.dto.notification.reporting.NotificationReportDto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.ApplicationFeatureType;
+import com.creatix.domain.enums.NotificationType;
 import com.creatix.security.RoleSecured;
-import com.creatix.service.NotificationService;
+import com.creatix.service.notification.NotificationReportService;
 import com.creatix.util.DateUtils;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = {"/api/notifications/reporting", "/api/v1/notifications/reporting"})
@@ -41,14 +40,13 @@ import java.util.stream.Collectors;
 @RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE)
 public class NotificationReportingController {
 
-    private final Mapper mapper;
-    private final NotificationService notificationService;
+    private final NotificationReportService notificationReportService;
     private final DateUtils dateUtils;
 
     @ApiOperation(value = "Get all maintenance notifications in date range")
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<List<MaintenanceNotificationDto>> getMaintenanceNotificationsInDateRange(
+    public DataResponse<List<NotificationReportDto>> getMaintenanceNotificationsInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
 
@@ -63,9 +61,6 @@ public class NotificationReportingController {
 
         dateUtils.assertRange(localFrom, localTill);
 
-        List<MaintenanceNotificationDto> data = notificationService.getAllMaintenanceNotificationsInDateRange(localFrom, localTill).stream()
-                .map(mapper::toMaintenanceNotificationDto)
-                .collect(Collectors.toList());
-        return new DataResponse<>(data);
+        return new DataResponse<>(notificationReportService.getReportsByRange(localFrom, localTill, NotificationType.Maintenance));
     }
 }
