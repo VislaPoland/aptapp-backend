@@ -4,12 +4,14 @@ import com.creatix.domain.dao.notifications.NotificationReportDao;
 import com.creatix.domain.dto.notification.reporting.NotificationReportDto;
 import com.creatix.domain.dto.notification.reporting.NotificationReportGlobalInfoDto;
 import com.creatix.domain.dto.notification.reporting.NotificationReportGroupByAccountDto;
+import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NotificationType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -30,6 +32,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
+@ParametersAreNonnullByDefault
 public class NotificationReportService {
 
     private final NotificationReportDao notificationReportDao;
@@ -45,7 +48,7 @@ public class NotificationReportService {
      */
     public List<NotificationReportDto> getReportsByRange(OffsetDateTime from, OffsetDateTime till,
                                                          NotificationType notificationType) {
-        return null;
+        return notificationReportDao.getNotificationReport(from, till, notificationType);
     }
 
     /**
@@ -58,7 +61,7 @@ public class NotificationReportService {
      * @return technician statistics for resolving and confirmation of {@link com.creatix.domain.entity.store.notification.MaintenanceNotification}
      */
     public List<NotificationReportGroupByAccountDto> getMaintenanceReportsGroupedByTechnician(OffsetDateTime from, OffsetDateTime till) {
-        return null;
+        return notificationReportDao.getNotificationReportGroupedByAccount(from, till, NotificationType.Maintenance, AccountRole.Maintenance);
     }
 
     /**
@@ -72,6 +75,6 @@ public class NotificationReportService {
      */
     public NotificationReportGlobalInfoDto getGlobalStatistics(OffsetDateTime from, OffsetDateTime till,
                                                                NotificationType notificationType) {
-        return null;
+        return notificationReportDao.getGlobalInfo(from, till, notificationType);
     }
 }
