@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.function.BiFunction;
 
 @RestController
 @RequestMapping(path = {"/api/notifications/reporting", "/api/v1/notifications/reporting"})
@@ -78,7 +79,7 @@ public class NotificationReportingController {
     public DataResponse<NotificationReportGlobalInfoDto> getMaintenanceNotificationsGlobalInfoInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
-        return null;
+        return getResponseAfterDateTimeValidation(from, till, (f, t) -> notificationReportService.getGlobalStatistics(f, t, NotificationType.Maintenance));
     }
 
     @ApiOperation(value = "Get global maintenance information grouped by technician in date range")
@@ -87,10 +88,16 @@ public class NotificationReportingController {
     public DataResponse<List<NotificationReportGroupByAccountDto>> getMaintenanceNotificationsByTechnicianInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
-        return null;
+        return getResponseAfterDateTimeValidation(from, till, notificationReportService::getMaintenanceReportsGroupedByTechnician);
     }
 
     private DataResponse<List<NotificationReportDto>> getNotificationsInDateRange(OffsetDateTime from, OffsetDateTime till, NotificationType notificationType) throws AptValidationException {
+        return getResponseAfterDateTimeValidation(from, till, (f, t) ->
+           notificationReportService.getReportsByRange(f,t, notificationType)
+        );
+    }
+
+    private <E> DataResponse<E> getResponseAfterDateTimeValidation(OffsetDateTime from, OffsetDateTime till, BiFunction<OffsetDateTime, OffsetDateTime, E> notificationReportServiceFragment) throws AptValidationException {
         OffsetDateTime localFrom = from, localTill = till;
 
         if (from == null && till == null) {
@@ -102,8 +109,7 @@ public class NotificationReportingController {
 
         dateUtils.assertRange(localFrom, localTill);
 
-        return new DataResponse<>(notificationReportService.getReportsByRange(localFrom, localTill, notificationType));
+        return new DataResponse<>(notificationReportServiceFragment.apply(localFrom, localTill));
     }
-
 
 }
