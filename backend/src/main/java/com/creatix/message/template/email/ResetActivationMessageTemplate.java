@@ -16,7 +16,7 @@ public class ResetActivationMessageTemplate extends ActivationMessageTemplate {
 
     @Override
     public String getSubject() {
-        return "Activation code for Apt. App – A smarter way to communicate";
+        return "Activation code for Apt. App - A smarter way to communicate";
     }
 
     @Override

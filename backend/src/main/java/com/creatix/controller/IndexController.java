@@ -2,14 +2,17 @@ package com.creatix.controller;
 
 import com.creatix.configuration.ApplicationProperties;
 import com.creatix.configuration.MailProperties;
+import com.creatix.controller.exception.AptValidationException;
 import com.creatix.message.template.email.ExceptionNotificationMessageTemplate;
 import com.creatix.service.message.EmailMessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -54,20 +57,18 @@ import java.util.stream.Collectors;
  */
 @RestController
 @ControllerAdvice
+@RequiredArgsConstructor
 class IndexController {
 
     private final Logger logger = LoggerFactory.getLogger(IndexController.class);
 
-    @Autowired
-    private MailProperties mailProperties;
-    @Autowired
-    private ApplicationProperties applicationProperties;
-    @Autowired
-    private EmailMessageService emailMessageService;
-    @Autowired
-    private HttpServletRequest httpServletRequest;
-    @Autowired
-    private ObjectMapper jsonMapper;
+    private final MailProperties mailProperties;
+    private final ApplicationProperties applicationProperties;
+    private final EmailMessageService emailMessageService;
+
+    private final HttpServletRequest httpServletRequest;
+
+    private final ObjectMapper jsonMapper;
 
     @ApiOperation(value = "Download static file")
     @ApiResponses(value = {
@@ -91,7 +92,7 @@ class IndexController {
         final HttpHeaders headers = new HttpHeaders();
         if (strAbsolutePath.toUpperCase().endsWith(".JPEG")) {
             headers.setContentType(MediaType.IMAGE_JPEG);
-        } else if (strAbsolutePath.toString().toUpperCase().endsWith(".GIF")) {
+        } else if (strAbsolutePath.toUpperCase().endsWith(".GIF")) {
             headers.setContentType(MediaType.IMAGE_GIF);
         } else {
             headers.setContentType(MediaType.IMAGE_PNG);
@@ -150,36 +151,39 @@ class IndexController {
         handleException(ex, HttpStatus.UNPROCESSABLE_ENTITY, response);
     }
 
+    @ExceptionHandler({AptValidationException.class})
+    public void aptValidationException(Exception ex, HttpServletResponse response) throws IOException {
+        handleException(ex, HttpStatus.BAD_REQUEST, response);
+    }
+
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public void validationExceptionHandling(Exception ex, HttpServletResponse response) throws IOException {
         MethodArgumentNotValidException validException = (MethodArgumentNotValidException) ex;
         List<ObjectError> errors = validException.getBindingResult().getAllErrors();
         Map<String, Map<String, String>> validationErrorMap = errors.stream()
-            .filter(e -> e instanceof FieldError)
-            .map(e -> (FieldError) e)
-            .map(fieldError -> {
-                Map<String, String> fieldMap = new HashMap<>();
-                fieldMap.put(
-                        "code",
-                        fieldError.getCodes()[fieldError.getCodes().length - 1]
-                );
-                fieldMap.put(
-                        "message",
-                        fieldError.getDefaultMessage()
-                );
-                return new ImmutablePair<>(fieldError.getField(), fieldMap);
-            })
-            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                .filter(e -> e instanceof FieldError)
+                .map(e -> (FieldError) e)
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fieldError -> ImmutableMap.of(
+                                "code", fieldError.getCodes()[fieldError.getCodes().length - 1],
+                                "message", fieldError.getDefaultMessage()
+                        )
+                ));
         final ValidationErrorMessage errorMessage = new ValidationErrorMessage();
         fillErrorMessage(ex, HttpStatus.UNPROCESSABLE_ENTITY, errorMessage);
         errorMessage.setValidationErrors(validationErrorMap);
         response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+        response.setCharacterEncoding("UTF-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getOutputStream().print(jsonMapper.writeValueAsString(errorMessage));
+        response.getWriter().print(jsonMapper.writeValueAsString(errorMessage));
     }
 
     private void handleException(Exception ex, HttpStatus status, HttpServletResponse resp) throws IOException {
         switch ( status ) {
+            case BAD_REQUEST:
+                logger.info("Apt validation exception", ex);
+                break;
             case UNAUTHORIZED:
             case FORBIDDEN:
                 logger.info("Unauthorized access", ex);
@@ -191,11 +195,12 @@ class IndexController {
         }
 
         resp.setStatus(status.value());
+        resp.setCharacterEncoding("UTF-8");
         resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         final ErrorMessage errorMessage = new ErrorMessage();
         fillErrorMessage(ex, status, errorMessage);
-        resp.getOutputStream().print(jsonMapper.writeValueAsString(errorMessage));
+        resp.getWriter().print(jsonMapper.writeValueAsString(errorMessage));
     }
 
     private void notifyAdminAboutException(Exception e) {
@@ -212,6 +217,10 @@ class IndexController {
         }
     }
 
+    private ErrorMessage fillErrorMessage(Exception ex, HttpStatus status) {
+        return fillErrorMessage(ex, status, new ErrorMessage());
+    }
+
     private ErrorMessage fillErrorMessage(Exception ex, HttpStatus status, ErrorMessage errorMessage) {
         final String exceptionMessage = StringUtils.trim(StringUtils.isEmpty(ex.getMessage()) ? status.getReasonPhrase() : ex.getMessage());
         errorMessage.setError(exceptionMessage);
@@ -224,7 +233,7 @@ class IndexController {
     }
 
     @Data
-    private static class ErrorMessage {
+    static class ErrorMessage {
         private long timestamp;
         private int status;
         private String error;
