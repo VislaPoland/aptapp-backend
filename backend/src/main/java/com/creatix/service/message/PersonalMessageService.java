@@ -192,12 +192,13 @@ public class PersonalMessageService {
 
 
     private Long createPersonalMessageNotification(@NotNull PersonalMessageGroup personalMessageGroup) {
+        final int maxDescriptionLength = 100;
         final PersonalMessage message = personalMessageGroup.getMessages().stream().findFirst().orElseThrow(() -> new IllegalStateException("Message group is empty"));
         final PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
         personalMessageNotification.setPersonalMessageGroup(personalMessageGroup);
         personalMessageNotification.setAuthor(authorizationManager.getCurrentAccount());
         personalMessageNotification.setRecipient(message.getToAccount());
-        personalMessageNotification.setDescription(message.getContent());
+        personalMessageNotification.setDescription(StringUtils.abbreviate(message.getContent().trim(), maxDescriptionLength));
         personalMessageNotification.setStatus(NotificationStatus.Pending);
         personalMessageNotification.setTitle(message.getTitle());
         notificationDao.persist(personalMessageNotification);
