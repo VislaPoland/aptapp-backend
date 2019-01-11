@@ -49,6 +49,8 @@ public abstract class AbstractNotificationDao<T extends Notification> extends Da
         historyRecord.setAuthor(authorizationManager.getCurrentAccount());
         historyRecord.setNotification(notification);
         historyRecord.setStatus(NotificationHistoryStatus.valueOf(status));
+        historyRecord.setType(notification.getType());
+        historyRecord.setProperty(notification.getProperty());
 
         notificationHistoryDao.persist(historyRecord);
     }
