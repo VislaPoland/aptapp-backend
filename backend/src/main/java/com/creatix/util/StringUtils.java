@@ -23,7 +23,6 @@ public class StringUtils {
                 .collect(Collectors.toList());
     }
 
-
     // TODO: Delete this mapper from web and mobile repository. Use only this mapper. Maybe do it with enum.
     public static String translateTileFromEnumString(String titleEnumString) {
         switch ( titleEnumString ) {
@@ -47,4 +46,5 @@ public class StringUtils {
                 return titleEnumString;
         }
     }
+
 }
