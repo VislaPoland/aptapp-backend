@@ -73,7 +73,7 @@ public class NotificationReportingController {
         return getNotificationsInDateRange(from, till, NotificationType.Security, propertyId);
     }
 
-    @ApiOperation(value = "Get global maintenance report information in date range")
+    @ApiOperation(value = "Get global Maintenance report information in date range")
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance/global", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<NotificationReportGlobalInfoDto> getMaintenanceNotificationsGlobalInfoInDateRange(
@@ -83,7 +83,7 @@ public class NotificationReportingController {
         return getResponseAfterDateTimeValidation(from, till, (f, t) -> notificationReportService.getGlobalStatistics(f, t, NotificationType.Maintenance, propertyId));
     }
 
-    @ApiOperation(value = "Get global maintenance information grouped by technician in date range")
+    @ApiOperation(value = "Get global Maintenance information grouped by technician in date range")
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance/technician", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<List<NotificationReportGroupByAccountDto>> getMaintenanceNotificationsByTechnicianInDateRange(

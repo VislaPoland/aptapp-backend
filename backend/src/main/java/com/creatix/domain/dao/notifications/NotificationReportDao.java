@@ -23,11 +23,12 @@ public class NotificationReportDao {
      * @param from left value of datetime range
      * @param till right value of datetime range
      * @param notificationType filter result by type
+     * @param propertyId
      * @return results of statistic query
      */
     public NotificationReportGlobalInfoDto getGlobalInfo(OffsetDateTime from,
-                                                                          OffsetDateTime till,
-                                                                          NotificationType notificationType) {
+                                                         OffsetDateTime till,
+                                                         NotificationType notificationType, Long propertyId) {
         return null;
     }
 
@@ -36,11 +37,12 @@ public class NotificationReportDao {
      * @param from left value of datetime range
      * @param till right value of datetime range
      * @param notificationType filter result by type
+     * @param propertyId
      * @return results of statistic query
      */
     public List<NotificationReportDto> getNotificationReport(OffsetDateTime from,
-                                                                              OffsetDateTime till,
-                                                                              NotificationType notificationType) {
+                                                             OffsetDateTime till,
+                                                             NotificationType notificationType, Long propertyId) {
         return null;
     }
 
@@ -51,13 +53,14 @@ public class NotificationReportDao {
      * @param notificationType filter result by type
      * @param accountRole accountRole for which to join results (and group by)
      *
+     * @param propertyId
      * @return results of statistic query
      */
     public List<NotificationReportGroupByAccountDto>
     getNotificationReportGroupedByAccount(OffsetDateTime from,
                                           OffsetDateTime till,
                                           NotificationType notificationType,
-                                          AccountRole accountRole) {
+                                          AccountRole accountRole, Long propertyId) {
         return null;
     }
 }

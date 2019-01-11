@@ -49,7 +49,7 @@ public class NotificationReportService {
      */
     public List<NotificationReportDto> getReportsByRange(OffsetDateTime from, OffsetDateTime till,
                                                          NotificationType notificationType, Long propertyId) {
-        return notificationReportDao.getNotificationReport(from, till, notificationType);
+        return notificationReportDao.getNotificationReport(from, till, notificationType, propertyId);
     }
 
     /**
@@ -63,7 +63,7 @@ public class NotificationReportService {
      * @return technician statistics for resolving and confirmation of {@link com.creatix.domain.entity.store.notification.MaintenanceNotification}
      */
     public List<NotificationReportGroupByAccountDto> getMaintenanceReportsGroupedByTechnician(OffsetDateTime from, OffsetDateTime till, Long propertyId) {
-        return notificationReportDao.getNotificationReportGroupedByAccount(from, till, NotificationType.Maintenance, AccountRole.Maintenance);
+        return notificationReportDao.getNotificationReportGroupedByAccount(from, till, NotificationType.Maintenance, AccountRole.Maintenance, propertyId);
     }
 
     /**
@@ -72,12 +72,12 @@ public class NotificationReportService {
      * @param from left value of datetime range
      * @param till right value of datetime range
      * @param notificationType notification type consumer want to get reports
-     * @param propertyId
+     * @param propertyId property under which we want to get statistics
      *
      * @return statistics for given notification type by given range
      */
     public NotificationReportGlobalInfoDto getGlobalStatistics(OffsetDateTime from, OffsetDateTime till,
                                                                NotificationType notificationType, Long propertyId) {
-        return notificationReportDao.getGlobalInfo(from, till, notificationType);
+        return notificationReportDao.getGlobalInfo(from, till, notificationType, propertyId);
     }
 }

@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 public class NotificationReportServiceTest {
 
+    private static final long PROPERTY_ID = 1L;
     @MockBean
     private NotificationReportDao notificationReportDao;
 
@@ -28,29 +29,35 @@ public class NotificationReportServiceTest {
 
     @Test
     public void getReportsByRange() {
-        when(notificationReportDao.getNotificationReport(any(), any(), any())).thenReturn(null);
+        when(notificationReportDao.getNotificationReport(any(), any(), any(), any())).thenReturn(null);
 
-        notificationReportService.getReportsByRange(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, 1L);
+        notificationReportService.getReportsByRange(
+                OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, PROPERTY_ID);
 
-        verify(notificationReportDao).getNotificationReport(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance);
+        verify(notificationReportDao).getNotificationReport(
+                OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, PROPERTY_ID);
     }
 
     @Test
     public void getMaintenanceReportsGroupedByTechnician() {
-        when(notificationReportDao.getNotificationReportGroupedByAccount(any(), any(), any(), any())).thenReturn(null);
+        when(notificationReportDao.getNotificationReportGroupedByAccount(any(), any(), any(), any(), any())).thenReturn(null);
 
-        notificationReportService.getMaintenanceReportsGroupedByTechnician(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, 1L);
+        notificationReportService.getMaintenanceReportsGroupedByTechnician(
+                OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, PROPERTY_ID);
 
         verify(notificationReportDao).getNotificationReportGroupedByAccount(
-                OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, AccountRole.Maintenance);
+                OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK,
+                NotificationType.Maintenance, AccountRole.Maintenance, PROPERTY_ID);
     }
 
     @Test
     public void getGlobalStatistics() {
-        when(notificationReportDao.getGlobalInfo(any(), any(), any())).thenReturn(null);
+        when(notificationReportDao.getGlobalInfo(any(), any(), any(), any())).thenReturn(null);
 
-        notificationReportService.getGlobalStatistics(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, 1L);
+        notificationReportService.getGlobalStatistics(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK,
+                NotificationType.Maintenance, PROPERTY_ID);
 
-        verify(notificationReportService).getGlobalStatistics(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, 1L);
+        verify(notificationReportDao).getGlobalInfo(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK,
+                NotificationType.Maintenance, PROPERTY_ID);
     }
 }
