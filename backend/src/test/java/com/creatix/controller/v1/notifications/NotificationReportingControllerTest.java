@@ -10,7 +10,6 @@ import com.creatix.mathers.AptValidationExceptionMatcher;
 import com.creatix.service.notification.NotificationReportService;
 import com.creatix.util.DateUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,6 +36,7 @@ import java.util.function.Consumer;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -50,19 +50,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(NotificationReportingController.class)
 public class NotificationReportingControllerTest {
 
-    private static final String ENDPOINT_GET_MAINTENANCE = "/api/v1/notifications/reporting/maintenance";
-    private static final String ENDPOINT_GET_MAINTENANCE_WITH_ARGS = "/api/v1/notifications/reporting/maintenance?from={from}&till={till}";
-    private static final String ENDPOINT_GET_MAINTENANCE_WITH_ONE_ARG = "/api/v1/notifications/reporting/maintenance?from={from}";
-    private static final String ENDPOINT_GET_MAINTENANCE_GLOBAL_INFO = "/api/v1/notifications/reporting/maintenance/global?from={from}&till={till}";
-    private static final String ENDPOINT_GET_MAINTENANCE_GROUPED_BY_TECHNICIAN = "/api/v1/notifications/reporting/maintenance/technician?from={from}&till={till}";
+    private static final String ENDPOINT_GET_MAINTENANCE = "/api/v1/notifications/1/reporting/maintenance";
+    private static final String ENDPOINT_GET_MAINTENANCE_WITH_ARGS = "/api/v1/notifications/1/reporting/maintenance?from={from}&till={till}";
+    private static final String ENDPOINT_GET_MAINTENANCE_WITH_ONE_ARG = "/api/v1/notifications/1/reporting/maintenance?from={from}";
+    private static final String ENDPOINT_GET_MAINTENANCE_GLOBAL_INFO = "/api/v1/notifications/1/reporting/maintenance/global?from={from}&till={till}";
+    private static final String ENDPOINT_GET_MAINTENANCE_GROUPED_BY_TECHNICIAN = "/api/v1/notifications/1/reporting/maintenance/technician?from={from}&till={till}";
 
-    private static final String ENDPOINT_GET_NEIGHBORHOOD = "/api/v1/notifications/reporting/neighborhood";
-    private static final String ENDPOINT_GET_NEIGHBORHOOD_WITH_ARGS = "/api/v1/notifications/reporting/neighborhood?from={from}&till={till}";
-    private static final String ENDPOINT_GET_NEIGHBORHOOD_WITH_ONE_ARG = "/api/v1/notifications/reporting/neighborhood?from={from}";
+    private static final String ENDPOINT_GET_NEIGHBORHOOD = "/api/v1/notifications/1/reporting/neighborhood";
+    private static final String ENDPOINT_GET_NEIGHBORHOOD_WITH_ARGS = "/api/v1/notifications/1/reporting/neighborhood?from={from}&till={till}";
+    private static final String ENDPOINT_GET_NEIGHBORHOOD_WITH_ONE_ARG = "/api/v1/notifications/1/reporting/neighborhood?from={from}";
 
-    private static final String ENDPOINT_GET_SECURITY = "/api/v1/notifications/reporting/security";
-    private static final String ENDPOINT_GET_SECURITY_WITH_ARGS = "/api/v1/notifications/reporting/security?from={from}&till={till}";
-    private static final String ENDPOINT_GET_SECURITY_WITH_ONE_ARG = "/api/v1/notifications/reporting/security?from={from}";
+    private static final String ENDPOINT_GET_SECURITY = "/api/v1/notifications/1/reporting/security";
+    private static final String ENDPOINT_GET_SECURITY_WITH_ARGS = "/api/v1/notifications/1/reporting/security?from={from}&till={till}";
+    private static final String ENDPOINT_GET_SECURITY_WITH_ONE_ARG = "/api/v1/notifications/1/reporting/security?from={from}";
 
     private static final String DESCRIPTION = "description";
     private static final String DATA = "$.data";
@@ -81,6 +81,9 @@ public class NotificationReportingControllerTest {
 
     @Captor
     private ArgumentCaptor<OffsetDateTime> offsetDateTimeArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<Long> longArgumentCaptor;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -141,7 +144,7 @@ public class NotificationReportingControllerTest {
 
     @Test
     public void shouldReturnGlobalInfoForMaintenance() throws Exception {
-        when(notificationReportService.getGlobalStatistics(any(), any(), any())).thenReturn(
+        when(notificationReportService.getGlobalStatistics(any(), any(), any(), any())).thenReturn(
                 new NotificationReportGlobalInfoDto(1L, 1D, 1L, 1L, 1L)
         );
         doNothing().when(dateUtils).assertRange(any(), any());
@@ -158,12 +161,12 @@ public class NotificationReportingControllerTest {
         verify(dateUtils, times(0)).getRangeForCurrentMonth();
         verify(dateUtils).assertRange(any(), any());
 
-        verify(notificationReportService).getGlobalStatistics(startDateTime, endDateTime, NotificationType.Maintenance);
+        verify(notificationReportService).getGlobalStatistics(startDateTime, endDateTime, NotificationType.Maintenance, 1l);
     }
 
     @Test
     public void shouldReturnNotificationReportForTechnician() throws Exception {
-        when(notificationReportService.getMaintenanceReportsGroupedByTechnician(any(), any()))
+        when(notificationReportService.getMaintenanceReportsGroupedByTechnician(any(), any(), any()))
                 .thenReturn(Collections.singletonList(new NotificationReportGroupByAccountDto(1L, 1L, 1L, 1L)));
         doNothing().when(dateUtils).assertRange(any(), any());
 
@@ -181,7 +184,7 @@ public class NotificationReportingControllerTest {
         verify(dateUtils, times(0)).getRangeForCurrentMonth();
         verify(dateUtils).assertRange(any(), any());
 
-        verify(notificationReportService).getMaintenanceReportsGroupedByTechnician(startDateTime, endDateTime);
+        verify(notificationReportService).getMaintenanceReportsGroupedByTechnician(startDateTime, endDateTime, 1L);
     }
 
     private void testNotificationWithoutDatesForType(String endpoint, NotificationType notificationType, Callable<Void> callable) throws Exception {
@@ -205,7 +208,7 @@ public class NotificationReportingControllerTest {
         verify(dateUtils).assertRange(any(), any());
 
         // check if date was set to provide it into service
-        verify(notificationReportService).getReportsByRange(startDateTime, endDateTime, notificationType);
+        verify(notificationReportService).getReportsByRange(startDateTime, endDateTime, notificationType, 1L);
     }
 
     private void testNofificaitonWithDatesForType(String endpoint, NotificationType notificationType, Callable<Void> callable) throws Exception {
@@ -227,7 +230,7 @@ public class NotificationReportingControllerTest {
         verify(dateUtils, times(0)).getRangeForCurrentMonth();
         verify(dateUtils).assertRange(any(), any());
 
-        verify(notificationReportService).getReportsByRange(startDateTime, endDateTime, notificationType);
+        verify(notificationReportService).getReportsByRange(startDateTime, endDateTime, notificationType, 1L);
     }
 
     private void testFailNotificationForType(String endpoint, NotificationType notificationType) throws Exception {
@@ -241,11 +244,11 @@ public class NotificationReportingControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(dateUtils).assertRange(any(), any());
-        verify(notificationReportService).getReportsByRange(any(), any(), notificationType);
+        verify(notificationReportService).getReportsByRange(any(), any(), notificationType, 1L);
     }
 
     private void mockDataForGETNotificationReport() {
-        when(notificationReportService.getReportsByRange(any(), any(), any())).thenReturn(Collections.singletonList(
+        when(notificationReportService.getReportsByRange(any(), any(), any(), any())).thenReturn(Collections.singletonList(
                 new NotificationReportDto(1L, "title", DESCRIPTION, startDateTime, endDateTime, 1L, 1L, "status")
         ));
 
@@ -259,10 +262,12 @@ public class NotificationReportingControllerTest {
 
     private Callable<Void> assertMaintenance(Consumer<OffsetDateTime> assertFunction) {
         return () -> {
-            verify(notificationReportingController).getMaintenanceNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
+            verify(notificationReportingController).getMaintenanceNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture(), longArgumentCaptor.capture());
 
             List<OffsetDateTime> arguments = offsetDateTimeArgumentCaptor.getAllValues();
             arguments.forEach(assertFunction);
+
+            assertEquals(1L, (long) longArgumentCaptor.getValue());
 
             return null;
         };
@@ -270,10 +275,12 @@ public class NotificationReportingControllerTest {
 
     private Callable<Void> assertNeighborhood(Consumer<OffsetDateTime> assertFunction) {
         return () -> {
-            verify(notificationReportingController).getNeighborhoodNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
+            verify(notificationReportingController).getNeighborhoodNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture(), longArgumentCaptor.capture());
 
             List<OffsetDateTime> arguments = offsetDateTimeArgumentCaptor.getAllValues();
             arguments.forEach(assertFunction);
+
+            assertEquals(1L, (long) longArgumentCaptor.getValue());
 
             return null;
         };
@@ -281,10 +288,12 @@ public class NotificationReportingControllerTest {
 
     private Callable<Void> assertSecurity(Consumer<OffsetDateTime> assertFunction) {
         return () -> {
-            verify(notificationReportingController).getSecurityNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture());
+            verify(notificationReportingController).getSecurityNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture(), longArgumentCaptor.capture());
 
             List<OffsetDateTime> arguments = offsetDateTimeArgumentCaptor.getAllValues();
             arguments.forEach(assertFunction);
+
+            assertEquals(1L, (long) longArgumentCaptor.getValue());
 
             return null;
         };

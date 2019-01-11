@@ -127,6 +127,8 @@ dependencies {
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')
+	
+	testCompile('io.github.benas:random-beans:3.7.0')
 
 	// ensure that the embedded servlet container does not interfere with the servlet container
 	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")

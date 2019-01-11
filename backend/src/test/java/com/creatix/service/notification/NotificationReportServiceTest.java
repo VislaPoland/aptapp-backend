@@ -30,7 +30,7 @@ public class NotificationReportServiceTest {
     public void getReportsByRange() {
         when(notificationReportDao.getNotificationReport(any(), any(), any())).thenReturn(null);
 
-        notificationReportService.getReportsByRange(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance);
+        notificationReportService.getReportsByRange(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, 1L);
 
         verify(notificationReportDao).getNotificationReport(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance);
     }
@@ -39,7 +39,7 @@ public class NotificationReportServiceTest {
     public void getMaintenanceReportsGroupedByTechnician() {
         when(notificationReportDao.getNotificationReportGroupedByAccount(any(), any(), any(), any())).thenReturn(null);
 
-        notificationReportService.getMaintenanceReportsGroupedByTechnician(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK);
+        notificationReportService.getMaintenanceReportsGroupedByTechnician(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, 1L);
 
         verify(notificationReportDao).getNotificationReportGroupedByAccount(
                 OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, AccountRole.Maintenance);
@@ -49,8 +49,8 @@ public class NotificationReportServiceTest {
     public void getGlobalStatistics() {
         when(notificationReportDao.getGlobalInfo(any(), any(), any())).thenReturn(null);
 
-        notificationReportService.getGlobalStatistics(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance);
+        notificationReportService.getGlobalStatistics(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, 1L);
 
-        verify(notificationReportService).getGlobalStatistics(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance);
+        verify(notificationReportService).getGlobalStatistics(OFFSET_DATE_TIME_MOCK, OFFSET_DATE_TIME_MOCK, NotificationType.Maintenance, 1L);
     }
 }

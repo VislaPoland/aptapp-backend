@@ -161,7 +161,7 @@ public class NotificationService {
     }
 
     /**
-     * this method is @deprecated use {@link com.creatix.service.notification.NotificationReportService#getReportsByRange(OffsetDateTime, OffsetDateTime, NotificationType)}
+     * this method is @deprecated use {@link com.creatix.service.notification.NotificationReportService#getReportsByRange(OffsetDateTime, OffsetDateTime, NotificationType, Long)}
      * with {@link NotificationType#Maintenance} as the third input parameter
      *
      * @param beginDate left value of datetime range

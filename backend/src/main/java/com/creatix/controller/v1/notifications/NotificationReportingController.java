@@ -21,17 +21,14 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.function.BiFunction;
 
 @RestController
-@RequestMapping(path = {"/api/notifications/reporting", "/api/v1/notifications/reporting"})
+@RequestMapping(path = {"/api/notifications/{propertyId}/reporting", "/api/v1/notifications/{propertyId}/reporting"})
 @ApiVersion(1.0)
 @RequiredArgsConstructor
 @ApiResponses(value = {
@@ -46,13 +43,14 @@ public class NotificationReportingController {
     private final NotificationReportService notificationReportService;
     private final DateUtils dateUtils;
 
-    @ApiOperation(value = "Get all maintenance notifications in date range")
+    @ApiOperation(value = "Get all Maintenance notifications in date range")
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<List<NotificationReportDto>> getMaintenanceNotificationsInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
-        return getNotificationsInDateRange(from, till, NotificationType.Maintenance);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @PathVariable Long propertyId) throws AptValidationException {
+        return getNotificationsInDateRange(from, till, NotificationType.Maintenance, propertyId);
     }
 
     @ApiOperation(value = "Get all Neighborhood notifications in date range")
@@ -60,8 +58,9 @@ public class NotificationReportingController {
     @RequestMapping(path = "/neighborhood", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<List<NotificationReportDto>> getNeighborhoodNotificationsInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
-        return getNotificationsInDateRange(from, till, NotificationType.Neighborhood);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @PathVariable Long propertyId) throws AptValidationException {
+        return getNotificationsInDateRange(from, till, NotificationType.Neighborhood, propertyId);
     }
 
     @ApiOperation(value = "Get all Security notifications in date range")
@@ -69,8 +68,9 @@ public class NotificationReportingController {
     @RequestMapping(path = "/security", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<List<NotificationReportDto>> getSecurityNotificationsInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
-        return getNotificationsInDateRange(from, till, NotificationType.Security);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @PathVariable Long propertyId) throws AptValidationException {
+        return getNotificationsInDateRange(from, till, NotificationType.Security, propertyId);
     }
 
     @ApiOperation(value = "Get global maintenance report information in date range")
@@ -78,8 +78,9 @@ public class NotificationReportingController {
     @RequestMapping(path = "/maintenance/global", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<NotificationReportGlobalInfoDto> getMaintenanceNotificationsGlobalInfoInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
-        return getResponseAfterDateTimeValidation(from, till, (f, t) -> notificationReportService.getGlobalStatistics(f, t, NotificationType.Maintenance));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @PathVariable Long propertyId) throws AptValidationException {
+        return getResponseAfterDateTimeValidation(from, till, (f, t) -> notificationReportService.getGlobalStatistics(f, t, NotificationType.Maintenance, propertyId));
     }
 
     @ApiOperation(value = "Get global maintenance information grouped by technician in date range")
@@ -87,13 +88,14 @@ public class NotificationReportingController {
     @RequestMapping(path = "/maintenance/technician", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<List<NotificationReportGroupByAccountDto>> getMaintenanceNotificationsByTechnicianInDateRange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) throws AptValidationException {
-        return getResponseAfterDateTimeValidation(from, till, notificationReportService::getMaintenanceReportsGroupedByTechnician);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @PathVariable Long propertyId) throws AptValidationException {
+        return getResponseAfterDateTimeValidation(from, till, (from1, till1) -> notificationReportService.getMaintenanceReportsGroupedByTechnician(from1, till1, propertyId));
     }
 
-    private DataResponse<List<NotificationReportDto>> getNotificationsInDateRange(OffsetDateTime from, OffsetDateTime till, NotificationType notificationType) throws AptValidationException {
+    private DataResponse<List<NotificationReportDto>> getNotificationsInDateRange(OffsetDateTime from, OffsetDateTime till, NotificationType notificationType, Long propertyId) throws AptValidationException {
         return getResponseAfterDateTimeValidation(from, till, (f, t) ->
-           notificationReportService.getReportsByRange(f,t, notificationType)
+           notificationReportService.getReportsByRange(f,t, notificationType, propertyId)
         );
     }
 
