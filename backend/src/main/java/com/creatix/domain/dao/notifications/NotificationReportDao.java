@@ -19,16 +19,18 @@ public class NotificationReportDao {
     private EntityManager entityManager;
 
     /**
+     * retrieve global info for Maintenance notifications which are connected to maintenance_reservation table
+     * {@link com.creatix.domain.entity.store.MaintenanceReservation}
      *
      * @param from left value of datetime range
      * @param till right value of datetime range
-     * @param notificationType filter result by type
-     * @param propertyId
+     * @param propertyId property for which we are collecting statistics data
+     *
      * @return results of statistic query
      */
-    public NotificationReportGlobalInfoDto getGlobalInfo(OffsetDateTime from,
-                                                         OffsetDateTime till,
-                                                         NotificationType notificationType, Long propertyId) {
+    public NotificationReportGlobalInfoDto getMaintenanceGlobalInfo(OffsetDateTime from,
+                                                                    OffsetDateTime till,
+                                                                    Long propertyId) {
         return null;
     }
 
@@ -37,7 +39,8 @@ public class NotificationReportDao {
      * @param from left value of datetime range
      * @param till right value of datetime range
      * @param notificationType filter result by type
-     * @param propertyId
+     * @param propertyId property for which we are collecting statistics data
+     *
      * @return results of statistic query
      */
     public List<NotificationReportDto> getNotificationReport(OffsetDateTime from,
@@ -52,8 +55,8 @@ public class NotificationReportDao {
      * @param till right value of datetime range
      * @param notificationType filter result by type
      * @param accountRole accountRole for which to join results (and group by)
+     * @param propertyId property for which we are collecting statistics data
      *
-     * @param propertyId
      * @return results of statistic query
      */
     public List<NotificationReportGroupByAccountDto>

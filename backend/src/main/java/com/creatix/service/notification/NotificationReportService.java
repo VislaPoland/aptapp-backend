@@ -1,5 +1,6 @@
 package com.creatix.service.notification;
 
+import com.creatix.controller.exception.AptValidationException;
 import com.creatix.domain.dao.notifications.NotificationReportDao;
 import com.creatix.domain.dto.notification.reporting.NotificationReportDto;
 import com.creatix.domain.dto.notification.reporting.NotificationReportGlobalInfoDto;
@@ -69,6 +70,8 @@ public class NotificationReportService {
     /**
      * return global information about the notification's resolution and confirmation for given type
      *
+     * interface is prepared to consume any type of notification, but implemented only Maintenance yet.
+     *
      * @param from left value of datetime range
      * @param till right value of datetime range
      * @param notificationType notification type consumer want to get reports
@@ -77,7 +80,11 @@ public class NotificationReportService {
      * @return statistics for given notification type by given range
      */
     public NotificationReportGlobalInfoDto getGlobalStatistics(OffsetDateTime from, OffsetDateTime till,
-                                                               NotificationType notificationType, Long propertyId) {
-        return notificationReportDao.getGlobalInfo(from, till, notificationType, propertyId);
+                                                               NotificationType notificationType, Long propertyId) throws AptValidationException {
+        if(!NotificationType.Maintenance.equals(notificationType)) {
+            throw new AptValidationException(String.format("Unable to get global statistics. Unsupported notification type %s", notificationType.name()));
+        }
+
+        return notificationReportDao.getMaintenanceGlobalInfo(from, till, propertyId);
     }
 }
