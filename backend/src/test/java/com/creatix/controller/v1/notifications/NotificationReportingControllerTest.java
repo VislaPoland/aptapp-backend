@@ -145,7 +145,7 @@ public class NotificationReportingControllerTest {
     @Test
     public void shouldReturnGlobalInfoForMaintenance() throws Exception {
         when(notificationReportService.getGlobalStatistics(any(), any(), any(), any())).thenReturn(
-                new NotificationReportGlobalInfoDto(1L, 1D, 1L, 1L, 1L)
+                new NotificationReportGlobalInfoDto(1L, 1D, 1L, 1D, 1D)
         );
         doNothing().when(dateUtils).assertRange(any(), any());
 
