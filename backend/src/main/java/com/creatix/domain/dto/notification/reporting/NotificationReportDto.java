@@ -24,9 +24,11 @@ public class NotificationReportDto {
     private final Long responseTime;
     private final Long resolutionTime;
     private final String status;
+    @ApiModelProperty(value = "Response to notification")
+    private final String response;
 
     @Setter
-    private BasicApartmentDto apartment;
+    private BasicApartmentDto targetApartment;
 
     @Setter
     private NotificationReportAccountDto createdBy;

@@ -155,8 +155,8 @@ public class NotificationReportingControllerTest {
                 .andExpect(jsonPath(DATA.concat(".requests"), is(1)))
                 .andExpect(jsonPath(DATA.concat(".openRequests"), is(1D)))
                 .andExpect(jsonPath(DATA.concat(".pastDueDateRequests"), is(1)))
-                .andExpect(jsonPath(DATA.concat(".averageTimeToConfirm"), is(1)))
-                .andExpect(jsonPath(DATA.concat(".averageTimeToResolve"), is(1)));
+                .andExpect(jsonPath(DATA.concat(".averageTimeToConfirm"), is(1D)))
+                .andExpect(jsonPath(DATA.concat(".averageTimeToResolve"), is(1D)));
 
         verify(dateUtils, times(0)).getRangeForCurrentMonth();
         verify(dateUtils).assertRange(any(), any());
@@ -249,7 +249,7 @@ public class NotificationReportingControllerTest {
 
     private void mockDataForGETNotificationReport() {
         when(notificationReportService.getReportsByRange(any(), any(), any(), any())).thenReturn(Collections.singletonList(
-                new NotificationReportDto(1L, "title", DESCRIPTION, startDateTime, endDateTime, 1L, 1L, "status")
+                new NotificationReportDto(1L, "title", DESCRIPTION, startDateTime, endDateTime, 1L, 1L, "status", null)
         ));
 
         MaintenanceNotificationDto notificationDto = new MaintenanceNotificationDto();
