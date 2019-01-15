@@ -161,13 +161,13 @@ public class NotificationReportingControllerTest {
         verify(dateUtils, times(0)).getRangeForCurrentMonth();
         verify(dateUtils).assertRange(any(), any());
 
-        verify(notificationReportService).getGlobalStatistics(startDateTime, endDateTime, NotificationType.Maintenance, 1l);
+        verify(notificationReportService).getGlobalStatistics(startDateTime, endDateTime, NotificationType.Maintenance, 1L);
     }
 
     @Test
     public void shouldReturnNotificationReportForTechnician() throws Exception {
         when(notificationReportService.getMaintenanceReportsGroupedByTechnician(any(), any(), any()))
-                .thenReturn(Collections.singletonList(new NotificationReportGroupByAccountDto(1L, 1L, 1L, 1L)));
+                .thenReturn(Collections.singletonList(new NotificationReportGroupByAccountDto(1L, 1L, 1D, 1D)));
         doNothing().when(dateUtils).assertRange(any(), any());
 
         mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_GROUPED_BY_TECHNICIAN, startDateTime, endDateTime))

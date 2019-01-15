@@ -44,11 +44,23 @@ public class NotificationHistory {
 
     @PrePersist
     public void prePersist() {
-        createdAt = OffsetDateTime.now();
+        if (createdAt == null) {
+            createdAt = OffsetDateTime.now();
+        }
     }
 
     @Override
     public String toString() {
-        return "NotificationHistory(status=" + status + ", createdAt=" + createdAt + ")";
+        return "NotificationHistory(" +
+                "notification_id = " +
+                notification.getId() +
+                ",author = " +
+                author.getId() +
+                ", status = " +
+                status +
+                ", createdAt = " +
+                createdAt +
+                ", type = " +
+                type;
     }
 }

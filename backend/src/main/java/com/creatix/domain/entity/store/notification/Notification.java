@@ -1,5 +1,10 @@
 package com.creatix.domain.entity.store.notification;
 
+import com.creatix.domain.dto.apartment.BasicApartmentDto;
+import com.creatix.domain.dto.notification.reporting.NotificationReportAccountDto;
+import com.creatix.domain.dto.notification.reporting.NotificationReportDto;
+import com.creatix.domain.dto.notification.reporting.NotificationReportGlobalInfoDto;
+import com.creatix.domain.dto.notification.reporting.NotificationReportGroupByAccountDto;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.NotificationStatus;
@@ -15,6 +20,115 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@SqlResultSetMappings({
+        @SqlResultSetMapping(
+                name = Notification.MAINTENANCE_GLOBAL_INFO_MAPPING,
+                classes = {
+                        @ConstructorResult(
+                                targetClass = NotificationReportGlobalInfoDto.class,
+                                columns = {
+                                        @ColumnResult(name = "requests", type = Long.class),
+                                        @ColumnResult(name = "openRequests"),
+                                        @ColumnResult(name = "passDueDateRequests", type = Long.class),
+                                        @ColumnResult(name = "averageTimeToConfirm"),
+                                        @ColumnResult(name = "averageTimeToResolve")
+                                }
+                        )
+                }
+        ),
+        @SqlResultSetMapping(
+                name = Notification.NOTIFICATION_REPORT_GROUPED_BY_ACCOUNT_MAPPING,
+                classes = {
+                        @ConstructorResult(
+                                targetClass = NotificationReportGroupByAccountDto.class,
+                                columns = {
+                                        @ColumnResult(name = "confirmed", type = Long.class),
+                                        @ColumnResult(name = "resolved", type = Long.class),
+                                        @ColumnResult(name = "averageTimeToConfirm", type = Double.class),
+                                        @ColumnResult(name = "averageTimeToResolve", type = Double.class)
+
+                                }
+                        ),
+                        @ConstructorResult(
+                                targetClass = NotificationReportAccountDto.class,
+                                columns = {
+                                        @ColumnResult(name = "account_id", type = Long.class),
+                                        @ColumnResult(name = "firstName"),
+                                        @ColumnResult(name = "lastName"),
+                                        @ColumnResult(name = "fullName")
+                                }
+                        ),
+                        @ConstructorResult(
+                                targetClass = BasicApartmentDto.class,
+                                columns = {
+                                        @ColumnResult(name = "apartment_id", type = Long.class),
+                                        @ColumnResult(name = "unit_number")
+                                }
+                        )
+                }
+        ),
+        @SqlResultSetMapping(
+                name = Notification.NOTIFICATION_REPORT_MAPPING,
+                classes = {
+                        @ConstructorResult(
+                                targetClass = NotificationReportDto.class,
+                                columns = {
+                                        @ColumnResult(name = "id", type = Long.class),
+                                        @ColumnResult(name = "title"),
+                                        @ColumnResult(name = "description"),
+                                        @ColumnResult(name = "createdAt", type = OffsetDateTime.class),
+                                        @ColumnResult(name = "respondedAt", type = OffsetDateTime.class),
+                                        @ColumnResult(name = "responseTime", type = Long.class),
+                                        @ColumnResult(name = "resolutionTime", type = Long.class),
+                                        @ColumnResult(name = "status"),
+                                        @ColumnResult(name = "response")
+                                }
+                        ),
+                        @ConstructorResult(
+                                targetClass = BasicApartmentDto.class,
+                                columns = {
+                                        @ColumnResult(name = "targetApartmentId", type = Long.class),
+                                        @ColumnResult(name = "targetApartmentUnitNumber")
+                                }
+                        ),
+                        @ConstructorResult(
+                                targetClass = NotificationReportAccountDto.class,
+                                columns = {
+                                        @ColumnResult(name = "authorId", type = Long.class),
+                                        @ColumnResult(name = "authorFirstName"),
+                                        @ColumnResult(name = "authorLastName"),
+                                        @ColumnResult(name = "authorFullName")
+                                }
+                        ),
+                        @ConstructorResult(
+                                targetClass = BasicApartmentDto.class,
+                                columns = {
+                                        @ColumnResult(name = "authorApartmentId", type = Long.class),
+                                        @ColumnResult(name = "authorApartmentUnitNumber")
+                                }
+                        ),
+                        @ConstructorResult(
+                                targetClass = NotificationReportAccountDto.class,
+                                columns = {
+                                        @ColumnResult(name = "respondedById", type = Long.class),
+                                        @ColumnResult(name = "respondedByFirstName"),
+                                        @ColumnResult(name = "respondedByLastName"),
+                                        @ColumnResult(name = "respondedByFullName")
+                                }
+                        ),
+                        @ConstructorResult(
+                                targetClass = NotificationReportAccountDto.class,
+                                columns = {
+                                        @ColumnResult(name = "resolvedById", type = Long.class),
+                                        @ColumnResult(name = "resolvedByFirstName"),
+                                        @ColumnResult(name = "resolvedByLastName"),
+                                        @ColumnResult(name = "resolvedByFullName")
+                                }
+                        )
+                }
+        )
+}
+)
 @Entity
 @Table(indexes = {
         @Index(columnList = "author_id"),
@@ -26,6 +140,11 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(of = "id")
 public abstract class Notification {
+
+    public static final String NOTIFICATION_REPORT_GROUPED_BY_ACCOUNT_MAPPING = "notificationReportGroupedByAccountMapping";
+    public static final String MAINTENANCE_GLOBAL_INFO_MAPPING = "maintenanceGlobalInfoMapping";
+    public static final String NOTIFICATION_REPORT_MAPPING = "notificationReportMapping";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
@@ -72,7 +191,7 @@ public abstract class Notification {
     @JoinColumn
     private Account recipient;
 
-    @ManyToOne(optional = true)
+    @ManyToOne()
     private Property property;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)

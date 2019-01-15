@@ -12,8 +12,8 @@ public class NotificationReportGroupByAccountDto {
 
     private final Long confirmed;
     private final Long resolved;
-    private final Long averageTimeToConfirm;
-    private final Long averageTimeToResolve;
+    private final Double averageTimeToConfirm;
+    private final Double averageTimeToResolve;
 
     @Setter
     private NotificationReportAccountDto account;

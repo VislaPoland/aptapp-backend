@@ -34,6 +34,7 @@ public class NotificationReportDto {
     private NotificationReportAccountDto createdBy;
 
     @Setter
+    @ApiModelProperty(value = "one who responded / confirmed notification")
     private NotificationReportAccountDto respondedBy;
 
     @Setter
