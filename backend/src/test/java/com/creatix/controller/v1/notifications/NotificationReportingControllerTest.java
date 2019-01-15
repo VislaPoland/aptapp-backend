@@ -178,8 +178,8 @@ public class NotificationReportingControllerTest {
                 )
                 .andExpect(jsonPath(DATA.concat("[0].confirmed"), is(1)))
                 .andExpect(jsonPath(DATA.concat("[0].resolved"), is(1)))
-                .andExpect(jsonPath(DATA.concat("[0].averageTimeToConfirm"), is(1)))
-                .andExpect(jsonPath(DATA.concat("[0].averageTimeToResolve"), is(1)));
+                .andExpect(jsonPath(DATA.concat("[0].averageTimeToConfirm"), is(1D)))
+                .andExpect(jsonPath(DATA.concat("[0].averageTimeToResolve"), is(1D)));
 
         verify(dateUtils, times(0)).getRangeForCurrentMonth();
         verify(dateUtils).assertRange(any(), any());
