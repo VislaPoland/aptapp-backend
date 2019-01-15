@@ -12,10 +12,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -43,16 +43,16 @@ public class IndexControllerTest {
         HttpServletRequest httpServletRequest = spy(new MockHttpServletRequest());
         when(httpServletRequest.getServletPath()).thenReturn(MOCKED_PATH);
 
-        IndexController indexController = new IndexController(httpServletRequest, objectMapperMock);
+        IndexController indexController = new IndexController(null, null, null, httpServletRequest, objectMapperMock);
 
         AptValidationException aptValidationException = new AptValidationException(BAD_PARAMETER);
 
         HttpServletResponse httpServletResponse = spy(new MockHttpServletResponse());
-        ServletOutputStream outputStreamMock = mock(ServletOutputStream.class);
-        when(httpServletResponse.getOutputStream()).thenReturn(outputStreamMock);
-        doNothing().when(outputStreamMock).print(any());
+        PrintWriter outputStreamMock = mock(PrintWriter.class);
+        when(httpServletResponse.getWriter()).thenReturn(outputStreamMock);
+        doNothing().when(outputStreamMock).print(anyString());
 
-        indexController.aptValidationExceptionHandling(aptValidationException, httpServletResponse);
+        indexController.aptValidationException(aptValidationException, httpServletResponse);
 
         verify(objectMapperMock).writeValueAsString(errorMessageArgumentCaptor.capture());
 
