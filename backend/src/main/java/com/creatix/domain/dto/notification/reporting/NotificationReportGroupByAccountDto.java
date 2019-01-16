@@ -12,7 +12,7 @@ public class NotificationReportGroupByAccountDto {
 
     private final Long confirmed;
     private final Long resolved;
-    private final Double averageTimeToConfirm;
+    private final Double averageTimeToResponse;
     private final Double averageTimeToResolve;
 
     @Setter

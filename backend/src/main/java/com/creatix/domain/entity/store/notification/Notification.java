@@ -30,7 +30,7 @@ import java.util.List;
                                         @ColumnResult(name = "requests", type = Long.class),
                                         @ColumnResult(name = "openRequests"),
                                         @ColumnResult(name = "passDueDateRequests", type = Long.class),
-                                        @ColumnResult(name = "averageTimeToConfirm"),
+                                        @ColumnResult(name = "averageTimeToResponse"),
                                         @ColumnResult(name = "averageTimeToResolve")
                                 }
                         )
@@ -44,7 +44,7 @@ import java.util.List;
                                 columns = {
                                         @ColumnResult(name = "confirmed", type = Long.class),
                                         @ColumnResult(name = "resolved", type = Long.class),
-                                        @ColumnResult(name = "averageTimeToConfirm", type = Double.class),
+                                        @ColumnResult(name = "averageTimeToResponse", type = Double.class),
                                         @ColumnResult(name = "averageTimeToResolve", type = Double.class)
 
                                 }

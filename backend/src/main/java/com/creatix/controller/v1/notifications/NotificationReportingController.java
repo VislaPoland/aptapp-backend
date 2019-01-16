@@ -23,6 +23,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -47,8 +48,8 @@ public class NotificationReportingController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<List<NotificationReportDto>> getMaintenanceNotificationsInDateRange(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate till,
             @PathVariable Long propertyId) throws AptValidationException {
         return getNotificationsInDateRange(from, till, NotificationType.Maintenance, propertyId);
     }
@@ -57,8 +58,8 @@ public class NotificationReportingController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/neighborhood", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<List<NotificationReportDto>> getNeighborhoodNotificationsInDateRange(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate till,
             @PathVariable Long propertyId) throws AptValidationException {
         return getNotificationsInDateRange(from, till, NotificationType.Neighborhood, propertyId);
     }
@@ -67,8 +68,8 @@ public class NotificationReportingController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/security", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<List<NotificationReportDto>> getSecurityNotificationsInDateRange(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate till,
             @PathVariable Long propertyId) throws AptValidationException {
         return getNotificationsInDateRange(from, till, NotificationType.Security, propertyId);
     }
@@ -77,8 +78,8 @@ public class NotificationReportingController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance/global", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<NotificationReportGlobalInfoDto> getMaintenanceNotificationsGlobalInfoInDateRange(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate till,
             @PathVariable Long propertyId) throws AptValidationException {
         return getResponseAfterDateTimeValidation(from, till, (f, t) -> notificationReportService.getGlobalStatistics(f, t, NotificationType.Maintenance, propertyId));
     }
@@ -87,29 +88,32 @@ public class NotificationReportingController {
     @JsonView(Views.Public.class)
     @RequestMapping(path = "/maintenance/technician", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<List<NotificationReportGroupByAccountDto>> getMaintenanceNotificationsByTechnicianInDateRange(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate till,
             @PathVariable Long propertyId) throws AptValidationException {
         return getResponseAfterDateTimeValidation(from, till, (from1, till1) -> notificationReportService.getMaintenanceReportsGroupedByTechnician(from1, till1, propertyId));
     }
 
-    private DataResponse<List<NotificationReportDto>> getNotificationsInDateRange(OffsetDateTime from, OffsetDateTime till, NotificationType notificationType, Long propertyId) throws AptValidationException {
+    private DataResponse<List<NotificationReportDto>> getNotificationsInDateRange(LocalDate from, LocalDate till, NotificationType notificationType, Long propertyId) throws AptValidationException {
         return getResponseAfterDateTimeValidation(from, till, (f, t) ->
            notificationReportService.getReportsByRange(f,t, notificationType, propertyId)
         );
     }
 
-    private <E> DataResponse<E> getResponseAfterDateTimeValidation(OffsetDateTime from, OffsetDateTime till, BiFunction<OffsetDateTime, OffsetDateTime, E> notificationReportServiceFragment) throws AptValidationException {
-        OffsetDateTime localFrom = from, localTill = till;
+    private <E> DataResponse<E> getResponseAfterDateTimeValidation(LocalDate from, LocalDate till, BiFunction<OffsetDateTime, OffsetDateTime, E> notificationReportServiceFragment) throws AptValidationException {
+        OffsetDateTime localFrom, localTill;
+        Pair<OffsetDateTime, OffsetDateTime> range;
 
         if (from == null && till == null) {
             // get range for current month
-            Pair<OffsetDateTime, OffsetDateTime> range = dateUtils.getRangeForCurrentMonth();
-            localFrom = range.getLeft();
-            localTill = range.getRight();
+            range = dateUtils.getRangeForCurrentMonth();
+        } else {
+            dateUtils.assertRange(from, till);
+            range = dateUtils.getRangeFromDates(from, till);
         }
 
-        dateUtils.assertRange(localFrom, localTill);
+        localFrom = range.getLeft();
+        localTill = range.getRight();
 
         return new DataResponse<>(notificationReportServiceFragment.apply(localFrom, localTill));
     }

@@ -27,6 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.util.NestedServletException;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -83,6 +84,9 @@ public class NotificationReportingControllerTest {
     private ArgumentCaptor<OffsetDateTime> offsetDateTimeArgumentCaptor;
 
     @Captor
+    private ArgumentCaptor<LocalDate> localDateArgumentCaptor;
+
+    @Captor
     private ArgumentCaptor<Long> longArgumentCaptor;
 
     @Rule
@@ -90,6 +94,8 @@ public class NotificationReportingControllerTest {
 
     private OffsetDateTime startDateTime = OffsetDateTime.of(2019, 1, 1, 1, 0, 0, 0, ZoneOffset.UTC);
     private OffsetDateTime endDateTime = OffsetDateTime.of(2019, 1, 2, 1, 0, 0, 0, ZoneOffset.UTC);
+    private LocalDate startDate = LocalDate.of(2019, 1, 1);
+    private LocalDate endDate = LocalDate.of(2019, 1, 2);
 
     @Before
     public void setup() {
@@ -148,8 +154,9 @@ public class NotificationReportingControllerTest {
                 new NotificationReportGlobalInfoDto(1L, 1D, 1L, 1D, 1D)
         );
         doNothing().when(dateUtils).assertRange(any(), any());
+        when(dateUtils.getRangeFromDates(any(), any())).thenReturn(new ImmutablePair<>(startDateTime, endDateTime));
 
-        mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_GLOBAL_INFO, startDateTime, endDateTime))
+        mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_GLOBAL_INFO, startDate, endDate))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(DATA.concat(".requests"), is(1)))
@@ -168,9 +175,10 @@ public class NotificationReportingControllerTest {
     public void shouldReturnNotificationReportForTechnician() throws Exception {
         when(notificationReportService.getMaintenanceReportsGroupedByTechnician(any(), any(), any()))
                 .thenReturn(Collections.singletonList(new NotificationReportGroupByAccountDto(1L, 1L, 1D, 1D)));
+        when(dateUtils.getRangeFromDates(any(), any())).thenReturn(new ImmutablePair<>(startDateTime, endDateTime));
         doNothing().when(dateUtils).assertRange(any(), any());
 
-        mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_GROUPED_BY_TECHNICIAN, startDateTime, endDateTime))
+        mockMvc.perform(get(ENDPOINT_GET_MAINTENANCE_GROUPED_BY_TECHNICIAN, startDate, endDate))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(
@@ -205,7 +213,6 @@ public class NotificationReportingControllerTest {
         callable.call();
 
         verify(dateUtils).getRangeForCurrentMonth();
-        verify(dateUtils).assertRange(any(), any());
 
         // check if date was set to provide it into service
         verify(notificationReportService).getReportsByRange(startDateTime, endDateTime, notificationType, 1L);
@@ -213,9 +220,10 @@ public class NotificationReportingControllerTest {
 
     private void testNofificaitonWithDatesForType(String endpoint, NotificationType notificationType, Callable<Void> callable) throws Exception {
         mockDataForGETNotificationReport();
+        when(dateUtils.getRangeFromDates(any(), any())).thenReturn(new ImmutablePair<>(startDateTime, endDateTime));
         doNothing().when(dateUtils).assertRange(any(), any());
 
-        mockMvc.perform(get(endpoint, startDateTime, endDateTime))
+        mockMvc.perform(get(endpoint, startDate, endDate))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(
@@ -239,7 +247,7 @@ public class NotificationReportingControllerTest {
         thrown.expect(NestedServletException.class);
         thrown.expectCause(new AptValidationExceptionMatcher(message));
 
-        mockMvc.perform(get(endpoint, startDateTime))
+        mockMvc.perform(get(endpoint, startDate))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
@@ -262,7 +270,7 @@ public class NotificationReportingControllerTest {
 
     private Callable<Void> assertMaintenance(Consumer<OffsetDateTime> assertFunction) {
         return () -> {
-            verify(notificationReportingController).getMaintenanceNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture(), longArgumentCaptor.capture());
+            verify(notificationReportingController).getMaintenanceNotificationsInDateRange(localDateArgumentCaptor.capture(), localDateArgumentCaptor.capture(), longArgumentCaptor.capture());
 
             List<OffsetDateTime> arguments = offsetDateTimeArgumentCaptor.getAllValues();
             arguments.forEach(assertFunction);
@@ -275,7 +283,7 @@ public class NotificationReportingControllerTest {
 
     private Callable<Void> assertNeighborhood(Consumer<OffsetDateTime> assertFunction) {
         return () -> {
-            verify(notificationReportingController).getNeighborhoodNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture(), longArgumentCaptor.capture());
+            verify(notificationReportingController).getNeighborhoodNotificationsInDateRange(localDateArgumentCaptor.capture(), localDateArgumentCaptor.capture(), longArgumentCaptor.capture());
 
             List<OffsetDateTime> arguments = offsetDateTimeArgumentCaptor.getAllValues();
             arguments.forEach(assertFunction);
@@ -288,7 +296,7 @@ public class NotificationReportingControllerTest {
 
     private Callable<Void> assertSecurity(Consumer<OffsetDateTime> assertFunction) {
         return () -> {
-            verify(notificationReportingController).getSecurityNotificationsInDateRange(offsetDateTimeArgumentCaptor.capture(), offsetDateTimeArgumentCaptor.capture(), longArgumentCaptor.capture());
+            verify(notificationReportingController).getSecurityNotificationsInDateRange(localDateArgumentCaptor.capture(), localDateArgumentCaptor.capture(), longArgumentCaptor.capture());
 
             List<OffsetDateTime> arguments = offsetDateTimeArgumentCaptor.getAllValues();
             arguments.forEach(assertFunction);

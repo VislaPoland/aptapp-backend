@@ -11,6 +11,6 @@ public class NotificationReportGlobalInfoDto {
     private final Long requests;
     private final Double openRequests;
     private final Long pastDueDateRequests;
-    private final Double averageTimeToConfirm;
+    private final Double averageTimeToResponse;
     private final Double averageTimeToResolve;
 }

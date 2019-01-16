@@ -1,6 +1,5 @@
 package com.creatix.domain.dao.notifications;
 
-import com.creatix.domain.dao.NotificationHistoryDao;
 import com.creatix.domain.dto.apartment.BasicApartmentDto;
 import com.creatix.domain.dto.notification.reporting.NotificationReportAccountDto;
 import com.creatix.domain.dto.notification.reporting.NotificationReportDto;
@@ -29,7 +28,6 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.OffsetDateTime;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -54,9 +52,6 @@ public class NotificationReportDaoTest {
     @SpyBean
     private NotificationReportDao notificationReportDao;
 
-    @SpyBean
-    private NotificationHistoryDao notificationHistoryDao;
-
     private EnhancedRandom random;
 
     private static final OffsetDateTime NOW = OffsetDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -66,7 +61,6 @@ public class NotificationReportDaoTest {
     private MaintenanceEmployee technician1;
     private MaintenanceEmployee technician2;
 
-    private List<NotificationHistory> histories = new LinkedList<>();
     private Apartment apartment1;
     private Apartment apartment2;
     private Tenant author2;
@@ -284,7 +278,7 @@ public class NotificationReportDaoTest {
         assertEquals(technician2.getId(), report.getAccount().getId());
 
         Long average = 0L;
-        assertNotEquals(average, report.getAverageTimeToConfirm());
+        assertNotEquals(average, report.getAverageTimeToResponse());
     }
 
     private NotificationHistory changeNotificationStatus(NotificationHistory notificationHistory, OffsetDateTime when, OffsetDateTime responded,
@@ -306,7 +300,6 @@ public class NotificationReportDaoTest {
 
         notificationHistory = createNotificationHistory(notification, author, notificationHistoryStatus, when);
         testEntityManager.persistAndFlush(notificationHistory);
-        histories.add(notificationHistory);
 
         return notificationHistory;
     }
@@ -334,7 +327,6 @@ public class NotificationReportDaoTest {
 
         NotificationHistory notificationHistory = createNotificationHistory(maintenanceNotification, author, NotificationHistoryStatus.Pending, NOW);
         testEntityManager.persistAndFlush(notificationHistory);
-        histories.add(notificationHistory);
 
         createMaintenanceReservation(maintenanceNotification, reservationBegin, ReservationStatus.Pending, employee);
 

@@ -13,10 +13,10 @@ select cou.requests,
         ) as passDueDateRequests,
        (
         CASE
-            WHEN a1.averageTimeToConfirm IS NULL THEN 0
-            ELSE a1.averageTimeToConfirm
+            WHEN a1.averageTimeToResponse IS NULL THEN 0
+            ELSE a1.averageTimeToResponse
         END
-        ) as averageTimeToConfirm,
+        ) as averageTimeToResponse,
         (
         CASE
             WHEN a2.averageTimeToResolve IS NULL THEN 0
@@ -58,7 +58,7 @@ from
  ) as pdd,
   /* get average time to confirm notification & average time to resolve notification */
   (
-    select avg(extract(epoch FROM (nh2.created_at - nh1.created_at))) as averageTimeToConfirm
+    select avg(extract(epoch FROM (nh2.created_at - nh1.created_at))) as averageTimeToResponse
     from notification_history nh1
     JOIN notification_history nh2 on nh1.notification_id = nh2.notification_id
     where nh1.property_id = :propertyId and nh1.created_at between :from and :to and nh1.type = :type
