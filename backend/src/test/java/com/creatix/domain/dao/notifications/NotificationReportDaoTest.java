@@ -7,10 +7,7 @@ import com.creatix.domain.dto.notification.reporting.NotificationReportGlobalInf
 import com.creatix.domain.dto.notification.reporting.NotificationReportGroupByAccountDto;
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
-import com.creatix.domain.entity.store.notification.MaintenanceNotification;
-import com.creatix.domain.entity.store.notification.Notification;
-import com.creatix.domain.entity.store.notification.NotificationGroup;
-import com.creatix.domain.entity.store.notification.NotificationHistory;
+import com.creatix.domain.entity.store.notification.*;
 import com.creatix.domain.enums.*;
 import io.github.benas.randombeans.EnhancedRandomBuilder;
 import io.github.benas.randombeans.FieldDefinitionBuilder;
@@ -64,6 +61,7 @@ public class NotificationReportDaoTest {
     private Apartment apartment1;
     private Apartment apartment2;
     private Tenant author2;
+    private SubTenant subTenant;
 
     @Before
     public void setup() {
@@ -115,6 +113,11 @@ public class NotificationReportDaoTest {
         author2 = random.nextObject(Tenant.class, "id", "secondaryEmail");
         author2.setApartment(apartment1);
         testEntityManager.persistAndFlush(author2);
+
+        subTenant = random.nextObject(SubTenant.class, "id", "secondaryEmail");
+        subTenant.setParentTenant(author2);
+        testEntityManager.persistAndFlush(subTenant);
+
     }
 
     @Test
@@ -151,6 +154,39 @@ public class NotificationReportDaoTest {
         // average times are computed but not tests because currently there is used @PrePersist.
         //  which prevent us to mock createdAt for NotificationHistory entity
         //  this test should be covered by E2E or executing pure SQL statements.
+    }
+
+    @Test
+    public void getNotificationReportWithParentAccountForApartment() {
+        NotificationHistory notificationHistory = createNeighborhoodNotification(subTenant, apartment2);
+
+        changeNeighborhooddotificationStatus(notificationHistory, NOW.plusDays(2), NeighborhoodNotificationResponse.SorryNotMe, author);
+
+        List<NotificationReportDto> reports = notificationReportDao.getNotificationReport(NOW.minusDays(1L), NOW.plusDays(1L), NotificationType.Neighborhood, property.getId());
+
+        assertEquals(1, reports.size());
+
+        NotificationReportDto report = reports.get(0);
+
+        assertEquals(NotificationHistoryStatus.Resolved.name(), report.getStatus());
+        assertEquals(NeighborhoodNotificationResponse.SorryNotMe.name(), report.getResponse());
+
+        NotificationReportAccountDto account;
+        account = report.getCreatedBy();
+
+        assertEquals(subTenant.getId(), account.getId());
+
+        BasicApartmentDto apartment = account.getApartment();
+        assertNotNull(apartment);
+        assertEquals(apartment1.getId(), apartment.getId());
+
+        apartment = report.getTargetApartment();
+        assertEquals(apartment2.getId(), apartment.getId());
+
+        assertNull(report.getRespondedBy());
+
+        account = report.getResolvedBy();
+        assertEquals(author.getId(), account.getId());
     }
 
     @Test
@@ -304,6 +340,19 @@ public class NotificationReportDaoTest {
         return notificationHistory;
     }
 
+    private void changeNeighborhooddotificationStatus(NotificationHistory notificationHistory, OffsetDateTime responded, NeighborhoodNotificationResponse response, Account respondedBy) {
+        NeighborhoodNotification notification = (NeighborhoodNotification) notificationHistory.getNotification();
+        notification.setStatus(NotificationStatus.Resolved);
+        notification.setUpdatedAt(responded);
+        notification.setRespondedAt(responded);
+        notification.setResponse(response);
+
+        testEntityManager.persistAndFlush(notification);
+
+        notificationHistory = createNotificationHistory(notification, respondedBy, NotificationHistoryStatus.Resolved, responded);
+        testEntityManager.persistAndFlush(notificationHistory);
+    }
+
     private NotificationHistory createMaintenanceNotification(ManagedEmployee employee) {
         return createMaintenanceNotification(NOW.plusDays(1), author, employee);
     }
@@ -329,6 +378,16 @@ public class NotificationReportDaoTest {
         testEntityManager.persistAndFlush(notificationHistory);
 
         createMaintenanceReservation(maintenanceNotification, reservationBegin, ReservationStatus.Pending, employee);
+
+        return notificationHistory;
+    }
+
+    private NotificationHistory createNeighborhoodNotification(Account author, Apartment targetApartment) {
+        NeighborhoodNotification neighborhoodNotification = generateNeighborhoodNotification(NotificationStatus.Pending, NOW, author, targetApartment);
+        testEntityManager.persistAndFlush(neighborhoodNotification);
+
+        NotificationHistory notificationHistory = createNotificationHistory(neighborhoodNotification, author, NotificationHistoryStatus.Pending, NOW);
+        testEntityManager.persistAndFlush(notificationHistory);
 
         return notificationHistory;
     }
@@ -371,19 +430,30 @@ public class NotificationReportDaoTest {
         return generateMaintenanceNotification(notificationStatus, NOW, null, author);
     }
 
-    private MaintenanceNotification generateMaintenanceNotification(NotificationStatus notificationStatus, OffsetDateTime updated, OffsetDateTime respondedAt, Account author) {
-        MaintenanceNotification maintenanceNotification = random.nextObject(
-                MaintenanceNotification.class, "id", "targetApartment", "type", "author",
+    private <T extends Notification> T generateNotification(NotificationStatus notificationStatus, OffsetDateTime updated, Account author, Class<T> clazz, NotificationType notificationType) {
+        T notification = random.nextObject(
+                clazz, "id", "targetApartment", "type", "author",
                 "recipient", "property", "notificationGroup", "createdAt", "updatedAt", "deletedAt", "status", "history", "reservations");
-        maintenanceNotification.setType(NotificationType.Maintenance);
-        maintenanceNotification.setCreatedAt(NOW);
-        maintenanceNotification.setUpdatedAt(updated);
-        maintenanceNotification.setRespondedAt(updated);
-        maintenanceNotification.setStatus(notificationStatus);
-        maintenanceNotification.setAuthor(author);
-        maintenanceNotification.setNotificationGroup(notificationGroup);
-        maintenanceNotification.setProperty(property);
+        notification.setType(notificationType);
+        notification.setCreatedAt(NOW);
+        notification.setUpdatedAt(updated);
+        notification.setStatus(notificationStatus);
+        notification.setAuthor(author);
+        notification.setNotificationGroup(notificationGroup);
+        notification.setProperty(property);
 
+        return notification;
+    }
+
+    private MaintenanceNotification generateMaintenanceNotification(NotificationStatus notificationStatus, OffsetDateTime updated, OffsetDateTime respondedAt, Account author) {
+        MaintenanceNotification maintenanceNotification = generateNotification(notificationStatus, updated, author, MaintenanceNotification.class, NotificationType.Maintenance);
+        maintenanceNotification.setRespondedAt(respondedAt);
         return maintenanceNotification;
+    }
+
+    private NeighborhoodNotification generateNeighborhoodNotification(NotificationStatus notificationStatus, OffsetDateTime updated, Account author, Apartment targetApartment) {
+        NeighborhoodNotification neighborhoodNotification = generateNotification(notificationStatus, updated, author, NeighborhoodNotification.class, NotificationType.Neighborhood);
+        neighborhoodNotification.setTargetApartment(targetApartment);
+        return neighborhoodNotification;
     }
 }
