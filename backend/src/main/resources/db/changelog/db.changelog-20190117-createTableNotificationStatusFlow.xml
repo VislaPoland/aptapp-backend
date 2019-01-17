@@ -19,10 +19,6 @@
 
         <addPrimaryKey columnNames="id" constraintName="notification_status_flow_pkey" tableName="notification_status_flow"/>
 
-        <createIndex tableName="notification_status_flow" indexName="ix_notification_status_flow_type">
-            <column name="type"/>
-        </createIndex>
-
         <createIndex tableName="notification_status_flow" indexName="ix_notification_status_flow_global_status_for_type">
             <column name="global_status"/>
             <column name="type"/>
