@@ -37,7 +37,7 @@ from
    from notification_history nh
           join notification n on nh.notification_id = n.id and
                                  (n.status = 'Resolved' or n.status = 'Closed' or n.status = 'Deleted') /* it is needed the Closed or Deleted? */
-   where nh.property_id = :propertyId AND nh.created_at between :from and :to and nh.type = :type
+   where n.property_id = :propertyId AND n.created_at between :from and :to and n.type = :type
  ) as r,
   /* get count of pass due date notifications */
  (
