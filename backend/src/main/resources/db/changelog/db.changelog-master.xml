@@ -39,5 +39,6 @@
     <include file="classpath:db/changelog/db.changelog-20181218-createTableNotificationHistory.xml"/>
     <include file="classpath:db/changelog/db.changelog-20190103-fillNotificationHistory.xml"/>
     <include file="classpath:db/changelog/db.changelog-20190111-addColumnsToNotificationHistory.xml"/>
+    <include file="classpath:db/changelog/db.changelog-20190117-createTableNotificationStatusFlow.xml"/>
 </databaseChangeLog>
 

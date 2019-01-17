@@ -8,6 +8,7 @@ import com.creatix.domain.dto.notification.reporting.NotificationReportGroupByAc
 import com.creatix.domain.entity.store.*;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
+import com.creatix.domain.entity.store.notification.reporting.NotificationStatusFlow;
 import com.creatix.domain.enums.*;
 import io.github.benas.randombeans.EnhancedRandomBuilder;
 import io.github.benas.randombeans.FieldDefinitionBuilder;
@@ -78,6 +79,7 @@ public class NotificationReportDaoTest {
 
         // clean up data from database
         testEntityManager.getEntityManager().createNativeQuery("DELETE FROM notification_history").executeUpdate();
+        testEntityManager.getEntityManager().createNativeQuery("DELETE FROM notification_status_flow").executeUpdate();
 
         notificationGroup = new NotificationGroup();
         notificationGroup.setCreatedAt(NOW);
@@ -117,6 +119,38 @@ public class NotificationReportDaoTest {
         subTenant = random.nextObject(SubTenant.class, "id", "secondaryEmail");
         subTenant.setParentTenant(author2);
         testEntityManager.persistAndFlush(subTenant);
+
+        NotificationStatusFlow notificationStatusFlow = new NotificationStatusFlow();
+        notificationStatusFlow.setId(1L);
+        notificationStatusFlow.setGlobalStatus(NotificationHistoryStatus.Resolved);
+        notificationStatusFlow.setStatus(NotificationHistoryStatus.Resolved); // not corresponding with reality but don't want to rewrite tests
+        notificationStatusFlow.setType(NotificationType.Maintenance);
+
+        testEntityManager.persistAndFlush(notificationStatusFlow);
+
+        notificationStatusFlow = new NotificationStatusFlow();
+        notificationStatusFlow.setId(2L);
+        notificationStatusFlow.setGlobalStatus(NotificationHistoryStatus.Responded);
+        notificationStatusFlow.setStatus(NotificationHistoryStatus.Confirmed);
+        notificationStatusFlow.setType(NotificationType.Maintenance);
+
+        testEntityManager.persistAndFlush(notificationStatusFlow);
+
+        notificationStatusFlow = new NotificationStatusFlow();
+        notificationStatusFlow.setId(3L);
+        notificationStatusFlow.setGlobalStatus(NotificationHistoryStatus.Responded);
+        notificationStatusFlow.setStatus(NotificationHistoryStatus.Rejected);
+        notificationStatusFlow.setType(NotificationType.Maintenance);
+
+        testEntityManager.persistAndFlush(notificationStatusFlow);
+
+        notificationStatusFlow = new NotificationStatusFlow();
+        notificationStatusFlow.setId(4L);
+        notificationStatusFlow.setGlobalStatus(NotificationHistoryStatus.Resolved);
+        notificationStatusFlow.setStatus(NotificationHistoryStatus.Resolved);
+        notificationStatusFlow.setType(NotificationType.Neighborhood);
+
+        testEntityManager.persistAndFlush(notificationStatusFlow);
 
     }
 

@@ -22,7 +22,7 @@ stats.resolved,
 FROM (
     select
         a.id as account_id,
-        sum(case when nh.status = 'Confirmed' then 1 end) as confirmed,
+        sum(case when nh.status = 'Confirmed' then 1 end) as confirmed, /* expecting only confirmed */
         sum(case when nh.status = 'Resolved' then 1 end) as resolved
     FROM notification_history nh
     JOIN notification n on n.id = nh.notification_id
@@ -39,7 +39,8 @@ LEFT JOIN (
     from notification_history nh1
     JOIN notification_history nh2 on nh1.notification_id = nh2.notification_id
     where nh1.property_id = :propertyId and nh1.created_at between :from and :to and nh1.type = :type
-    AND nh1.status = 'Pending' AND nh2.status = 'Confirmed'
+    AND nh1.status = 'Pending'
+    AND nh2.status IN (select status from notification_status_flow WHERE global_status = 'Responded' AND type = :type)
     group by nh2.author_id
   ) as a1 on a1.author_id = stats.account_id
 LEFT JOIN
@@ -49,7 +50,8 @@ LEFT JOIN
     JOIN notification n on n.id = nh1.notification_id
     JOIN notification_history nh2 on nh1.notification_id = nh2.notification_id
     where nh1.property_id = :propertyId and n.created_at between :from and :to and n.type = :type
-    AND nh1.status = 'Confirmed' AND nh2.status = 'Resolved'
+    AND nh1.status = 'Pending'
+    AND nh2.status IN (select status from notification_status_flow WHERE global_status = 'Resolved' AND type = :type)
     group by nh2.author_id
   ) as a2 on a2.author_id = stats.account_id
 where a.role = :role

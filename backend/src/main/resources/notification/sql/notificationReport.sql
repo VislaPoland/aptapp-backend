@@ -68,9 +68,9 @@ SELECT
     ac2.first_name || ' ' || ac2.last_name as resolvedByFullName
 FROM
   notification n
-  LEFT JOIN notification_history nh1 on nh1.notification_id = n.id AND nh1.status = 'Confirmed'
+  LEFT JOIN notification_history nh1 on nh1.notification_id = n.id AND nh1.status IN (select status from notification_status_flow WHERE global_status = 'Responded' AND type = :type)
     LEFT JOIN account ac1 ON ac1.id = nh1.author_id
-  LEFT JOIN notification_history nh2 on nh2.notification_id = n.id AND nh2.status = 'Resolved'
+  LEFT JOIN notification_history nh2 on nh2.notification_id = n.id AND nh2.status IN (select status from notification_status_flow WHERE global_status = 'Resolved' AND type = :type)
     LEFT JOIN account ac2 ON ac2.id = nh2.author_id
   LEFT JOIN apartment a on a.id = n.target_apartment_id
    JOIN account ac ON ac.id = n.author_id

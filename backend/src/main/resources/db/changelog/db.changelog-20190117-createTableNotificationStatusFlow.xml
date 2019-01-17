@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Peter Sokolík" id="db.changelog-20190117_1">
+        <comment>add columns to notification_status_flow table</comment>
+
+        <createTable tableName="notification_status_flow">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="global_status" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addPrimaryKey columnNames="id" constraintName="notification_status_flow_pkey" tableName="notification_status_flow"/>
+
+        <createIndex tableName="notification_status_flow" indexName="ix_notification_status_flow_type">
+            <column name="type"/>
+        </createIndex>
+
+        <createIndex tableName="notification_status_flow" indexName="ix_notification_status_flow_global_status_for_type">
+            <column name="global_status"/>
+            <column name="type"/>
+        </createIndex>
+
+        <addUniqueConstraint tableName="notification_status_flow" columnNames="type, status, global_status"/>
+
+        <sql>
+            INSERT INTO notification_status_flow (id, type, status, global_status)
+            VALUES
+            (1, 'Maintenance', 'Pending', 'Pending'),
+            (2, 'Neighborhood', 'Pending', 'Pending'),
+            (3, 'Security', 'Pending', 'Pending'),
+            (4, 'Security', 'Resolved', 'Resolved'),
+            (5, 'Neighborhood', 'Resolved', 'Resolved'),
+            (6, 'Maintenance', 'Closed', 'Resolved'),
+            (7, 'Maintenance', 'Confirmed', 'Responded'),
+            (8, 'Maintenance', 'Rescheduled', 'Responded'),
+            (9, 'Maintenance', 'Rejected', 'Responded')
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

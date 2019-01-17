@@ -62,7 +62,8 @@ from
     from notification_history nh1
     JOIN notification_history nh2 on nh1.notification_id = nh2.notification_id
     where nh1.property_id = :propertyId and nh1.created_at between :from and :to and nh1.type = :type
-    AND nh1.status = 'Pending' AND nh2.status = 'Confirmed'
+    AND nh1.status = 'Pending'
+    AND nh2.status IN (select status from notification_status_flow WHERE global_status = 'Responded' AND type = :type)
   ) as a1,
   (
     select avg(extract(epoch FROM (nh2.created_at - nh1.created_at))) as averageTimeToResolve
@@ -70,5 +71,6 @@ from
     join notification n on n.id = nh1.notification_id
     JOIN notification_history nh2 on nh1.notification_id = nh2.notification_id
     where nh1.property_id = :propertyId and n.created_at between :from and :to and nh1.type = :type
-    AND nh1.status = 'Confirmed' AND nh2.status = 'Resolved'
+    AND nh1.status = 'Pending'
+    AND nh2.status IN (select status from notification_status_flow WHERE global_status = 'Resolved' AND type = :type)
   ) as a2
