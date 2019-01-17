@@ -44,8 +44,18 @@ SELECT
     ac.first_name as authorFirstName,
     ac.last_name as authorLastName,
     ac.first_name || ' ' || ac.last_name as authorFullName,
-    ap.id as authorApartmentId,
-    ap.unit_number as authorApartmentUnitNumber,
+    /* */
+    (
+    case WHEN ap.id IS NULL THEN parent_apartment.id
+    ELSE ap.id
+    END
+     )as authorApartmentId,
+    (
+    case when ap.unit_number IS NULL THEN parent_apartment.unit_number
+    ELSE ap.unit_number
+    END
+     )as authorApartmentUnitNumber,
+    /* */
     a.id as targetApartmentId,
     a.unit_number as targetApartmentUnitNumber,
     ac1.id as respondedById,
@@ -65,6 +75,8 @@ FROM
   LEFT JOIN apartment a on a.id = n.target_apartment_id
    JOIN account ac ON ac.id = n.author_id
    LEFT JOIN apartment ap ON ap.id = ac.apartment_id
+   LEFT JOIN account parent ON ac.parent_tenant_id = parent.id
+   LEFT JOIN apartment parent_apartment on parent_apartment.id = parent.apartment_id
 WHERE
   n.created_at BETWEEN :from AND :to AND
 n.type = :type AND n.property_id = :propertyId
