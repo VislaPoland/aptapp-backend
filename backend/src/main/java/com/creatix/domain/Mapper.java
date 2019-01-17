@@ -66,20 +66,24 @@ public class Mapper {
 
     private final Logger logger = LoggerFactory.getLogger(Mapper.class);
 
-    private MapperFactory mapperFactory;
+    private final MapperFactory mapperFactory;
+
+    private final ManagedEmployeeDao managedEmployeeDao;
+
+    private final AssistantPropertyManagerDao assistantPropertyManagerDao;
+
+    private final ApplicationProperties applicationProperties;
+
+    private final AuthorizationManager authorizationManager;
 
     @Autowired
-    private ManagedEmployeeDao managedEmployeeDao;
-    @Autowired
-    private AssistantPropertyManagerDao assistantPropertyManagerDao;
-    @Autowired
-    private ApplicationProperties applicationProperties;
-    @Autowired
-    private AuthorizationManager authorizationManager;
-
-    @Autowired
-    public Mapper(MapperFactory mapperFactory) {
+    public Mapper(MapperFactory mapperFactory, ManagedEmployeeDao managedEmployeeDao, AssistantPropertyManagerDao assistantPropertyManagerDao,
+    ApplicationProperties applicationProperties, AuthorizationManager authorizationManager) {
         this.mapperFactory = mapperFactory;
+        this.managedEmployeeDao = managedEmployeeDao;
+        this.assistantPropertyManagerDao = assistantPropertyManagerDao;
+        this.applicationProperties = applicationProperties;
+        this.authorizationManager = authorizationManager;
         this.configure(mapperFactory);
     }
 
@@ -93,7 +97,7 @@ public class Mapper {
         return applicationProperties.buildBackendUrl(String.format("/api/properties/%d/messages/predefined/%d/photos/%s", photo.getPredefinedMessage().getProperty().getId(), photo.getPredefinedMessage().getId(), photo.getFileName())).toString();
     }
 
-    private void configure(MapperFactory mapperFactory) {
+    protected void configure(MapperFactory mapperFactory) {
 
         mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(OffsetDateTime.class, OffsetDateTime.class));
         mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(LocalTime.class, LocalTime.class));

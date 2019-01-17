@@ -12,9 +12,6 @@ import javax.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(indexes = {
-        @Index(columnList = "target_apartment_id")
-})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -34,6 +31,7 @@ public class NeighborhoodNotification extends Notification {
     /**
      * If recipient of notification returns recipient account as tenant class.
      * Otherwise returns null
+     *
      * @return Recipient account as Tenant or null
      */
     @Nullable

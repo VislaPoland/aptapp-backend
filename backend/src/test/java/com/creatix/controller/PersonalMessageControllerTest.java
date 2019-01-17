@@ -2,17 +2,11 @@ package com.creatix.controller;
 
 import com.creatix.AptAppBackendApplication;
 import com.creatix.TestContext;
-import com.creatix.controller.v1.NotificationController;
 import com.creatix.controller.v1.message.CreatePersonalMessageRequest;
 import com.creatix.controller.v1.message.PersonalMessageController;
 import com.creatix.controller.v1.message.PersonalMessageRequestType;
 import com.creatix.domain.dto.DataResponse;
-import com.creatix.domain.dto.PageableDataResponse;
-import com.creatix.domain.dto.notification.NotificationDto;
 import com.creatix.domain.dto.notification.message.PersonalMessageDto;
-import com.creatix.domain.dto.notification.personal.PersonalMessageNotificationDto;
-import com.creatix.domain.enums.NotificationRequestType;
-import com.creatix.domain.enums.NotificationType;
 import com.creatix.mock.WithMockCustomUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -39,12 +34,10 @@ public class PersonalMessageControllerTest {
 
     @Autowired
     private PersonalMessageController personalMessageController;
-    @Autowired
-    private NotificationController notificationController;
 
     @Test
     @WithMockCustomUser("mark.building@apartments.com")
-    public void createPersonalMessage() throws Exception {
+    public void createPersonalMessage() {
 
         final CreatePersonalMessageRequest createMsgReq = new CreatePersonalMessageRequest();
         createMsgReq.setContent("Hello, this is my personal message");

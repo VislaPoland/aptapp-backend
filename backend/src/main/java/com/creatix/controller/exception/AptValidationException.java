@@ -7,7 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
  *
  * use this exception only in places where you are not able to use simple {@link MethodArgumentNotValidException}
  */
-public class AptValidationException extends Exception {
+public class AptValidationException extends RuntimeException {
 
     public AptValidationException(String message) {
         super(message);

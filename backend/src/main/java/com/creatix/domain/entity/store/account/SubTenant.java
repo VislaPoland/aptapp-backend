@@ -8,12 +8,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
-@Table(indexes = {
-        @Index(columnList = "parent_tenant_id")
-})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"parentTenant"})

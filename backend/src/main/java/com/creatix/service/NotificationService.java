@@ -160,6 +160,15 @@ public class NotificationService {
         return latestReservation.get(0);
     }
 
+    /**
+     * this method is @deprecated use {@link com.creatix.service.notification.NotificationReportService#getReportsByRange(OffsetDateTime, OffsetDateTime, NotificationType, Long)}
+     * with {@link NotificationType#Maintenance} as the third input parameter
+     *
+     * @param beginDate left value of datetime range
+     * @param endDate right value of datetime range
+     * @return list of MaintenanceNotification type
+     */
+    @Deprecated
     public List<MaintenanceNotification> getAllMaintenanceNotificationsInDateRange(@Nonnull OffsetDateTime beginDate, @Nonnull OffsetDateTime endDate) {
         Objects.requireNonNull(beginDate, "Begin date is null");
         Objects.requireNonNull(endDate, "End date is null");

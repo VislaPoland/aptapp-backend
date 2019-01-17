@@ -1,7 +1,9 @@
 package com.creatix.domain.entity.store.notification;
 
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.NotificationHistoryStatus;
+import com.creatix.domain.enums.NotificationType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
@@ -33,13 +35,32 @@ public class NotificationHistory {
     @Enumerated(EnumType.STRING)
     private NotificationHistoryStatus status;
 
+    @ManyToOne(optional = false)
+    private Property property;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
+
     @PrePersist
     public void prePersist() {
-        createdAt = OffsetDateTime.now();
+        if (createdAt == null) {
+            createdAt = OffsetDateTime.now();
+        }
     }
 
     @Override
     public String toString() {
-        return "NotificationHistory(status=" + status + ", createdAt=" + createdAt + ")";
+        return "NotificationHistory(" +
+                "notification_id = " +
+                notification.getId() +
+                ",author = " +
+                author.getId() +
+                ", status = " +
+                status +
+                ", createdAt = " +
+                createdAt +
+                ", type = " +
+                type;
     }
 }

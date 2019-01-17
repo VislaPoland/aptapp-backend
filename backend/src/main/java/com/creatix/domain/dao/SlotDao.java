@@ -37,6 +37,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
                 .orderBy(slot.id.asc())
                 .fetch();
     }
+
     public List<Slot> findByPropertyAndAccountAndSlotIdGreaterOrEqual(@Nonnull Property property, @Nonnull Account account, @Nonnull Long slotId, @Nonnull Integer pageSize) {
         Objects.requireNonNull(property, "Property is null");
         Objects.requireNonNull(slotId, "Slot id is null");
@@ -71,7 +72,7 @@ public class SlotDao extends DaoBase<Slot, Long> {
         final QSlot slot = QSlot.slot;
         final QMaintenanceReservation maintenanceReservations = QMaintenanceReservation.maintenanceReservation;
         final QManagedEmployee maintenanceEmployee = QManagedEmployee.managedEmployee;
-        final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;;
+        final QMaintenanceNotification maintenanceNotification = QMaintenanceNotification.maintenanceNotification;
         final QSubTenant maintenanceSubTenantAuthor = QSubTenant.subTenant;
         final QTenant maintenanceParentTenantOfSubTenantAuthor = QTenant.tenant;
 
@@ -122,17 +123,16 @@ public class SlotDao extends DaoBase<Slot, Long> {
         }
 
         // allow to see only appropriate events (filter by audience)
-        if ( account instanceof ManagedEmployee ) {
+        if (account instanceof ManagedEmployee) {
             env.predicate = env.predicate.and(
                     slot.instanceOf(MaintenanceSlot.class)
-                    .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
-                    .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Employees)));
-        }
-        else if ( account instanceof TenantBase ) {
+                            .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
+                            .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Employees)));
+        } else if (account instanceof TenantBase) {
             env.predicate = env.predicate.and(
                     slot.instanceOf(MaintenanceSlot.class)
-                    .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
-                    .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Tenants)));
+                            .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Everyone))
+                            .or(slot.as(QEventSlot.class).audience.eq(AudienceType.Tenants)));
         }
 
         return env;

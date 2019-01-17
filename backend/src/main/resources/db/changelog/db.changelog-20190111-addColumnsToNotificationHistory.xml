@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Peter Sokolík" id="db.changelog-20190111_1">
+        <comment>add columns to notification_history table</comment>
+
+        <addColumn tableName="notification_history">
+            <column name="property_id" type="bigint"/>
+            <column name="type" type="VARCHAR(255)"/>
+        </addColumn>
+
+    </changeSet>
+
+    <changeSet author="Peter Sokolík" id="db.changelog-20190111_2">
+        <comment>fill data into new columns</comment>
+        <sql>UPDATE notification_history nh
+            SET property_id = n.property_id, type = n.type
+            FROM notification n
+            WHERE n.id = nh.notification_id</sql>
+    </changeSet>
+
+    <changeSet author="Peter Sokolík" id="db.changelog-20190111_3">
+        <comment>add constraint for property_id</comment>
+
+        <addForeignKeyConstraint
+                baseTableName="notification_history"
+                baseColumnNames="property_id"
+                constraintName="fk_notification_history_property_id"
+                referencedTableName="property"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet author="Peter Sokolík" id="db.changelog-20190111_4">
+        <comment>add index to property_id</comment>
+
+        <createIndex tableName="notification_history" indexName="ix_notification_history_property_id">
+            <column name="property_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -13,9 +13,6 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(indexes = {
-        @Index(columnList = "apartment_id")
-})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"vehicles", "subTenants", "apartment"})
@@ -56,7 +53,7 @@ public class Tenant extends TenantBase {
 
     public void addVehicle(@NotNull Vehicle vehicle) {
         Objects.requireNonNull(vehicle, "Vehicle is null");
-        if ( vehicles == null ) {
+        if (vehicles == null) {
             vehicles = new HashSet<>();
         }
 
@@ -66,12 +63,12 @@ public class Tenant extends TenantBase {
 
     public boolean removeVehicle(@NotNull Vehicle vehicle) {
         Objects.requireNonNull(vehicle, "Vehicle is null");
-        if ( vehicles == null ) {
+        if (vehicles == null) {
             return false;
         }
 
         final boolean remove = vehicles.remove(vehicle);
-        if ( remove ) {
+        if (remove) {
             vehicle.setOwner(null);
         }
 
@@ -80,7 +77,7 @@ public class Tenant extends TenantBase {
 
     public void addParkingStall(@NotNull ParkingStall parkingStall) {
         Objects.requireNonNull(parkingStall, "Parking stall is null");
-        if ( parkingStalls == null ) {
+        if (parkingStalls == null) {
             parkingStalls = new HashSet<>();
         }
 
@@ -90,12 +87,12 @@ public class Tenant extends TenantBase {
 
     public boolean removeParkingStall(@NotNull ParkingStall parkingStall) {
         Objects.requireNonNull(parkingStall, "Parking stall is null");
-        if ( parkingStalls == null ) {
+        if (parkingStalls == null) {
             return false;
         }
 
         final boolean remove = parkingStalls.remove(parkingStall);
-        if ( remove ) {
+        if (remove) {
             parkingStall.setUsingTenant(null);
         }
 
@@ -104,7 +101,7 @@ public class Tenant extends TenantBase {
 
     public void addSubTenant(@NotNull SubTenant subTenant) {
         Objects.requireNonNull(subTenant, "SubTenant is null");
-        if ( subTenants == null ) {
+        if (subTenants == null) {
             subTenants = new HashSet<>();
         }
 
