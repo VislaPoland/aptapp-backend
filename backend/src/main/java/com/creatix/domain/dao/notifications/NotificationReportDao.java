@@ -39,33 +39,23 @@ public class NotificationReportDao {
     private static final String PARAM_PROPERTY_ID = "propertyId";
     private static final String PARAM_ROLE = "role";
 
-    private static final String MAINTENANCE_GLOBAL_INFO_SQL = "maintenanceGlobalInfo.sql";
-    private static final String GROUPED_NOTIFICATION_REPORT_BY_ACCOUNT_SQL = "groupedNotificationReportByAccount.sql";
-    private static final String NOTIFICATION_REPORT = "notificationReport.sql";
-
     // cache sql query templates statically
-    private static final String QUERY_MAINTENANCE_GLOBAL_INFO;
-    private static final String QUERY_GROUPED_NOTIFICATION_REPORT_BY_ACCOUNT;
-    private static final String QUERY_NOTIFICATION_REPORT;
-
-    static {
-        QUERY_MAINTENANCE_GLOBAL_INFO = getSqlQuery(MAINTENANCE_GLOBAL_INFO_SQL);
-        QUERY_GROUPED_NOTIFICATION_REPORT_BY_ACCOUNT = getSqlQuery(GROUPED_NOTIFICATION_REPORT_BY_ACCOUNT_SQL);
-        QUERY_NOTIFICATION_REPORT = getSqlQuery(NOTIFICATION_REPORT);
-    }
+    private static final String QUERY_MAINTENANCE_GLOBAL_INFO = getSqlQuery("maintenanceGlobalInfo.sql");
+    private static final String QUERY_GROUPED_NOTIFICATION_REPORT_BY_ACCOUNT = getSqlQuery("groupedNotificationReportByAccount.sql");
+    private static final String QUERY_NOTIFICATION_REPORT = getSqlQuery("notificationReport.sql");
 
     private static String getSqlQuery(String queryName) {
         String QUERY_MAINTENANCE_GLOBAL_INFO_TEMP;
         String path = Paths.get("notification", "sql", queryName).toString();
-        InputStream inputStream = NotificationReportDao.class.getClassLoader().getResourceAsStream(path);
 
-        try {
+        try (InputStream inputStream = NotificationReportDao.class.getClassLoader().getResourceAsStream(path)) {
             assert inputStream != null;
             QUERY_MAINTENANCE_GLOBAL_INFO_TEMP = IOUtils.toString(inputStream, Charset.defaultCharset());
         } catch (IOException e) {
             e.printStackTrace();
             QUERY_MAINTENANCE_GLOBAL_INFO_TEMP = null;
         }
+
         return QUERY_MAINTENANCE_GLOBAL_INFO_TEMP;
     }
 
