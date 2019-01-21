@@ -21,8 +21,7 @@ import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PushNotificationSender;
 import freemarker.template.TemplateException;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,25 +36,25 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MaintenanceReservationService {
 
     private static final int DEFAULT_RESERVATION_CAPACITY = 1;
 
     private static final Object syncLock = new Object();
 
-    @Autowired
-    private AuthorizationManager authorizationManager;
-    @Autowired
-    private ReservationDao reservationDao;
-    @Autowired
-    private SlotUnitDao slotUnitDao;
-    @Autowired
-    private PushNotificationSender pushNotificationSender;
-    @Autowired
-    private MaintenanceNotificationDao maintenanceNotificationDao;
+    private final AuthorizationManager authorizationManager;
+
+    private final ReservationDao reservationDao;
+
+    private final SlotUnitDao slotUnitDao;
+
+    private final PushNotificationSender pushNotificationSender;
+
+    private final MaintenanceNotificationDao maintenanceNotificationDao;
 
     @RoleSecured
-    MaintenanceReservation createMaintenanceReservation(@Nonnull MaintenanceNotification maintenanceNotification, @Nonnull Long slotUnitId) throws IOException, TemplateException {
+    public MaintenanceReservation createMaintenanceReservation(@Nonnull MaintenanceNotification maintenanceNotification, @Nonnull Long slotUnitId) {
         Objects.requireNonNull(maintenanceNotification, "Maintenance notification is null");
         Objects.requireNonNull(slotUnitId, "Slot unit id is null");
 
