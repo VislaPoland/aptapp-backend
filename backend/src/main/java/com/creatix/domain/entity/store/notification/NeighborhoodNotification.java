@@ -2,6 +2,7 @@ package com.creatix.domain.entity.store.notification;
 
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NeighborhoodNotificationResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,11 +43,10 @@ public class NeighborhoodNotification extends Notification {
             return null;
         }
 
-        switch (this.getRecipient().getRole()) {
-            case Tenant:
-                return (Tenant) this.getRecipient();
-            default:
-                return null;
+        if (AccountRole.Tenant.equals(this.getRecipient().getRole())) {
+            return (Tenant) this.getRecipient();
         }
+
+        return null;
     }
 }
