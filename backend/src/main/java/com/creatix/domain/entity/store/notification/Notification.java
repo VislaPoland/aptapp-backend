@@ -124,6 +124,15 @@ import java.util.List;
                                         @ColumnResult(name = "resolvedByLastName"),
                                         @ColumnResult(name = "resolvedByFullName")
                                 }
+                        ),
+                        @ConstructorResult(
+                                targetClass = NotificationReportAccountDto.class,
+                                columns =  {
+                                        @ColumnResult(name = "receivedById", type = Long.class),
+                                        @ColumnResult(name = "receivedByFirstName"),
+                                        @ColumnResult(name = "receivedByLastName"),
+                                        @ColumnResult(name = "receivedByFullName")
+                                }
                         )
                 }
         )
