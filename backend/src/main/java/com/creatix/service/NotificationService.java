@@ -1,13 +1,12 @@
 package com.creatix.service;
 
-import static java.util.stream.Collectors.toList;
-
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.PageableDataResponse;
 import com.creatix.domain.dto.notification.maintenance.MaintenanceNotificationResponseRequest;
 import com.creatix.domain.dto.notification.neighborhood.NeighborhoodNotificationResponseRequest;
 import com.creatix.domain.dto.notification.security.SecurityNotificationResponseRequest;
 import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.MaintenanceReservation;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.notification.*;
@@ -19,11 +18,9 @@ import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PushNotificationSender;
 import com.creatix.service.notification.NotificationWatcher;
 import freemarker.template.TemplateException;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,41 +35,28 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @Transactional
+@Slf4j
+@RequiredArgsConstructor
 public class NotificationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
-
-
-    @Autowired
-    private NotificationDao notificationDao;
-    @Autowired
-    private MaintenanceNotificationDao maintenanceNotificationDao;
-    @Autowired
-    private EscalatedNeighborhoodNotificationDao escalatedNeighborhoodNotificationDao;
-    @Autowired
-    private NeighborhoodNotificationDao neighborhoodNotificationDao;
-    @Autowired
-    private SecurityNotificationDao securityNotificationDao;
-    @Autowired
-    private ApartmentDao apartmentDao;
-    @Autowired
-    private AuthorizationManager authorizationManager;
-    @Autowired
-    private SmsMessageSender smsMessageSender;
-    @Autowired
-    private PushNotificationSender pushNotificationSender;
-    @Autowired
-    private SecurityEmployeeDao securityEmployeeDao;
-    @Autowired
-    private MaintenanceEmployeeDao maintenanceEmployeeDao;
-    @Autowired
-    private MaintenanceReservationService maintenanceReservationService;
-    @Autowired
-    private NotificationWatcher notificationWatcher;
-    @Autowired
-    private PropertyDao propertyDao;
+    private final NotificationDao notificationDao;
+    private final MaintenanceNotificationDao maintenanceNotificationDao;
+    private final EscalatedNeighborhoodNotificationDao escalatedNeighborhoodNotificationDao;
+    private final NeighborhoodNotificationDao neighborhoodNotificationDao;
+    private final SecurityNotificationDao securityNotificationDao;
+    private final ApartmentDao apartmentDao;
+    private final AuthorizationManager authorizationManager;
+    private final SmsMessageSender smsMessageSender;
+    private final PushNotificationSender pushNotificationSender;
+    private final SecurityEmployeeDao securityEmployeeDao;
+    private final MaintenanceEmployeeDao maintenanceEmployeeDao;
+    private final MaintenanceReservationService maintenanceReservationService;
+    private final NotificationWatcher notificationWatcher;
+    private final PropertyDao propertyDao;
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -85,8 +69,8 @@ public class NotificationService {
 
     public PageableDataResponse<List<Notification>> filterNotifications(
             @Nonnull NotificationRequestType requestType,
-            @Nullable NotificationStatus[] notificationStatus,
-            @Nullable NotificationType[] notificationType,
+            @Nullable NotificationStatus[] notificationStatuses,
+            @Nullable NotificationType[] notificationTypes,
             @Nullable Long startId,
             @Nullable Long propertyId,
             int pageSize,
@@ -100,14 +84,14 @@ public class NotificationService {
 
         List<Notification> notifications = notificationDao.findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
                 requestType,
-                notificationStatus,
-                notificationType,
+                notificationStatuses,
+                notificationTypes,
                 startId,
                 account,
                 findPropertyById(propertyId),
                 pageSize + 1);
 
-        if (order != null && notificationType.length == 1 && NotificationType.Maintenance.equals(notificationType[0])) {
+        if (order != null && notificationTypes != null && notificationTypes.length == 1 && NotificationType.Maintenance.equals(notificationTypes[0])) {
             sortMaintenanceNotifications(order, notifications);
         }
 
@@ -126,7 +110,7 @@ public class NotificationService {
     private void sortMaintenanceNotifications(@Nonnull SortEnum order, List<Notification> notifications) {
         switch (order) {
             case ASC:
-                Collections.sort(notifications, (m1, m2) -> getDateForCompare((MaintenanceNotification) m2).compareTo(getDateForCompare((MaintenanceNotification)m1)));
+                notifications.sort((m1, m2) -> getDateForCompare((MaintenanceNotification) m2).compareTo(getDateForCompare((MaintenanceNotification) m1)));
                 Collections.reverse(notifications);
                 break;
             case DESC:
@@ -153,7 +137,7 @@ public class NotificationService {
     private OffsetDateTime latestReservation(MaintenanceNotification maintenance) {
         List<OffsetDateTime> latestReservation = maintenance.getReservations().stream()
             .filter(res ->  !ReservationStatus.Rescheduled.equals(res.getStatus()))
-            .map(maintenanceReservation -> maintenanceReservation.getBeginTime())
+            .map(MaintenanceReservation::getBeginTime)
             .sorted()
             .collect(toList());
 
@@ -280,7 +264,7 @@ public class NotificationService {
 
         Account currentAccount = authorizationManager.getCurrentAccount();
 
-        if (currentAccount.getIsNeighborhoodNotificationEnable() != null && currentAccount.getIsNeighborhoodNotificationEnable() != true) {
+        if (currentAccount.getIsNeighborhoodNotificationEnable() != null && !currentAccount.getIsNeighborhoodNotificationEnable()) {
             throw new AccessDeniedException("You have been blocked to send any notification messages to your neighbors. To unblock sending the notifications, contact your property manager.");
         }
 
@@ -310,7 +294,7 @@ public class NotificationService {
             try {
                 smsMessageSender.send(new com.creatix.message.template.sms.NeighborNotificationTemplate(tenant));
             } catch (Exception e) {
-                logger.info(String.format("Failed to sms notify %s", tenant.getPrimaryEmail()), e);
+                log.info(String.format("Failed to sms notify %s", tenant.getPrimaryEmail()), e);
             }
         }
         pushNotificationSender.sendNotification(new NeighborNotificationTemplate(notification), tenant);
@@ -326,24 +310,24 @@ public class NotificationService {
                 new EntityNotFoundException(String.format("Notification id=%d not found", notificationId)));
 
         final Tenant tenant = notification.getRecipientAsTenant();
-        if ( tenant != null ) {
-            if ( authorizationManager.isSelf(tenant) ) {
-                notification.setStatus(NotificationStatus.Resolved);
-                notification.setResponse(request.getResponse());
-                notification.setRespondedAt(OffsetDateTime.now());
-                neighborhoodNotificationDao.persist(notification);
 
-                if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
-                    pushNotificationSender.sendNotification(new NeighborNotificationResolvedTemplate(notification), tenant);
-                }
-                else if ( request.getResponse() == NeighborhoodNotificationResponse.SorryNotMe ) {
-                    pushNotificationSender.sendNotification(new NeighborNotificationNotMeTemplate(notification), tenant);
-                }
-
-                return notification;
-            }
+        if(tenant == null || !authorizationManager.isSelf(tenant)) {
+            throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
         }
-        throw new SecurityException("You are only eligible to respond to notifications targeted at your apartment");
+
+        notification.setStatus(NotificationStatus.Resolved);
+        notification.setResponse(request.getResponse());
+        notification.setRespondedAt(OffsetDateTime.now());
+        neighborhoodNotificationDao.persist(notification);
+
+        if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
+            pushNotificationSender.sendNotification(new NeighborNotificationResolvedTemplate(notification), notification.getAuthor());
+        }
+        else if ( request.getResponse() == NeighborhoodNotificationResponse.SorryNotMe ) {
+            pushNotificationSender.sendNotification(new NeighborNotificationNotMeTemplate(notification), notification.getAuthor());
+        }
+
+        return notification;
     }
 
     @RoleSecured(value = {AccountRole.Administrator, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
@@ -355,7 +339,7 @@ public class NotificationService {
         if ( notifications != null && !notifications.isEmpty() &&
                 (authorizationManager.isManager(notifications.get(0).getProperty()) || AccountRole.Administrator.equals(authorizationManager.getCurrentAccount().getRole()))) {
 
-            notifications.stream().forEach(escalatedNeighborhoodNotification -> {
+            notifications.forEach(escalatedNeighborhoodNotification -> {
                 escalatedNeighborhoodNotification.setStatus(NotificationStatus.Resolved);
                 escalatedNeighborhoodNotification.setResponse(request.getResponse());
                 escalatedNeighborhoodNotification.setRespondedAt(OffsetDateTime.now());
@@ -364,6 +348,8 @@ public class NotificationService {
             });
 
             EscalatedNeighborhoodNotification notification = notifications.stream().filter(escalatedNeighborhoodNotification -> escalatedNeighborhoodNotification.getId().equals(notificationId)).findAny().orElse(null);
+
+            assert notification != null;
 
             if ( request.getResponse() == NeighborhoodNotificationResponse.Resolved ) {
                 pushNotificationSender.sendNotification(new EscalatedNeighborNotificationResolvedTemplate(notification), notification.getAuthor());
@@ -446,7 +432,7 @@ public class NotificationService {
         try {
             pushNotificationSender.sendNotification(new MaintenanceCompleteTemplate(notification), notification.getAuthor());
         } catch (IOException | TemplateException e) {
-            logger.error("Problem with sending push notification for closing maintenance notification.", e);
+            log.error("Problem with sending push notification for closing maintenance notification.", e);
         }
 
         return notification;
@@ -474,17 +460,17 @@ public class NotificationService {
 
     private void sendPushNotificationToMaintener(MaintenanceNotification notification) {
         List<MaintenanceEmployee> maintenanceEmployeeList = maintenanceEmployeeDao.findByProperty(authorizationManager.getCurrentProperty());
-        maintenanceEmployeeList.stream().forEach(maintenanceEmployee -> {
+        maintenanceEmployeeList.forEach(maintenanceEmployee -> {
             try {
-                pushNotificationSender.sendNotification(new MaintenanceDeleteTemplate(notification, authorizationManager.getCurrentAccount()), ((Account) maintenanceEmployee));
+                pushNotificationSender.sendNotification(new MaintenanceDeleteTemplate(notification, authorizationManager.getCurrentAccount()), maintenanceEmployee);
             } catch (IOException | TemplateException e) {
-                logger.error("Problem with sending push notification for deleting maintenance notification.", e);
+                log.error("Problem with sending push notification for deleting maintenance notification.", e);
             }
         });
     }
 
     private void releaseFutureReservationIgnorePastReservation(MaintenanceNotification notification) {
-        notification.getReservations().stream().forEach(maintenanceReservation -> {
+        notification.getReservations().forEach(maintenanceReservation -> {
             if (maintenanceReservation.getBeginTime().isAfter(OffsetDateTime.now())) {
                 maintenanceReservationService.deleteById(maintenanceReservation.getId());
             }
