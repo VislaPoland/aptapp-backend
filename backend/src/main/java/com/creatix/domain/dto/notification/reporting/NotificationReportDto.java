@@ -39,4 +39,7 @@ public class NotificationReportDto {
 
     @Setter
     private NotificationReportAccountDto resolvedBy;
+
+    @Setter
+    private NotificationReportAccountDto receivedBy;
 }
