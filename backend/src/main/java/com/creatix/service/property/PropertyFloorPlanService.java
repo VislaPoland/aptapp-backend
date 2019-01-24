@@ -30,7 +30,7 @@ public class PropertyFloorPlanService {
     private final Validator validator;
     private final ApartmentService apartmentService;
     private final TenantService tenantService;
-    private static final String SEPARATOR = ";";
+    private static final String SEPARATOR = ",";
 
     private void checkConsistencyCsvRecord(CsvRecord csvRecord) throws AptValidationException {
         Set<ConstraintViolation<CsvRecord>> violations = validator.validate(csvRecord);
