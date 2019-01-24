@@ -127,7 +127,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                         predicate = predicate.and(
                                         qNotification.property.eq(property)
                                     ).and(
-                                        qNotification.recipient.eq(authorizationManager.getCurrentAccount()).not()
+                                        qNotification.author.eq(authorizationManager.getCurrentAccount()).not()
                                     );
                     }
                     break;
