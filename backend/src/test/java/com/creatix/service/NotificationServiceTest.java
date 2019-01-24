@@ -46,30 +46,43 @@ public class NotificationServiceTest {
 
     @MockBean
     private  NotificationDao notificationDao;
+
     @MockBean
     private  MaintenanceNotificationDao maintenanceNotificationDao;
+
     @MockBean
     private  EscalatedNeighborhoodNotificationDao escalatedNeighborhoodNotificationDao;
+
     @MockBean
     private  NeighborhoodNotificationDao neighborhoodNotificationDao;
+
     @MockBean
     private  SecurityNotificationDao securityNotificationDao;
+
     @MockBean
     private  ApartmentDao apartmentDao;
+
     @MockBean
     private  AuthorizationManager authorizationManager;
+
     @MockBean
     private  SmsMessageSender smsMessageSender;
+
     @MockBean
     private  PushNotificationSender pushNotificationSender;
+
     @MockBean
     private  SecurityEmployeeDao securityEmployeeDao;
+
     @MockBean
     private  MaintenanceEmployeeDao maintenanceEmployeeDao;
+
     @MockBean
     private  MaintenanceReservationService maintenanceReservationService;
+
     @MockBean
     private  NotificationWatcher notificationWatcher;
+
     @MockBean
     private  PropertyDao propertyDao;
 

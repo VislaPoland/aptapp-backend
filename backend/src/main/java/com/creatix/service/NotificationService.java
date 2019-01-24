@@ -69,8 +69,8 @@ public class NotificationService {
 
     public PageableDataResponse<List<Notification>> filterNotifications(
             @Nonnull NotificationRequestType requestType,
-            @Nullable NotificationStatus[] notificationStatus,
-            @Nullable NotificationType[] notificationType,
+            @Nullable NotificationStatus[] notificationStatuses,
+            @Nullable NotificationType[] notificationTypes,
             @Nullable Long startId,
             @Nullable Long propertyId,
             int pageSize,
@@ -84,14 +84,14 @@ public class NotificationService {
 
         List<Notification> notifications = notificationDao.findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
                 requestType,
-                notificationStatus,
-                notificationType,
+                notificationStatuses,
+                notificationTypes,
                 startId,
                 account,
                 findPropertyById(propertyId),
                 pageSize + 1);
 
-        if (order != null && notificationType != null && notificationType.length == 1 && NotificationType.Maintenance.equals(notificationType[0])) {
+        if (order != null && notificationTypes != null && notificationTypes.length == 1 && NotificationType.Maintenance.equals(notificationTypes[0])) {
             sortMaintenanceNotifications(order, notifications);
         }
 
