@@ -86,7 +86,8 @@ public class NotificationReportDaoTest {
         notificationGroup.setCreatedAt(NOW);
         testEntityManager.persistAndFlush(notificationGroup);
 
-        author = random.nextObject(PropertyOwner.class, "id", "secondaryEmail");
+        author = random.nextObject(PropertyOwner.class, "id", "secondaryEmail", "role");
+        author.setRole(AccountRole.PropertyOwner);
         testEntityManager.persistAndFlush(author);
 
         technician1 = random.nextObject(MaintenanceEmployee.class, "id", "secondaryEmail", "manager", "role");
