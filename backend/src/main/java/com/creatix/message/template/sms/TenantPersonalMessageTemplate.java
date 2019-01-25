@@ -9,11 +9,11 @@ import com.creatix.domain.enums.SmsTemplateName;
 public class TenantPersonalMessageTemplate implements SmsMessageTemplate {
 
     private final String recipient;
-    private final PersonalMessage personalMessage;
+    private final String propertyName;
 
-    public TenantPersonalMessageTemplate(String recipient, PersonalMessage personalMessage) {
+    public TenantPersonalMessageTemplate(String recipient, String propertyName) {
         this.recipient = recipient;
-        this.personalMessage = personalMessage;
+        this.propertyName = propertyName;
     }
 
     @Override
@@ -21,8 +21,8 @@ public class TenantPersonalMessageTemplate implements SmsMessageTemplate {
         return SmsTemplateName.PERSONAL_MESSAGE.getValue();
     }
 
-    public String getMessageContent() {
-        return this.personalMessage.getContent();
+    public String getPropertyName() {
+        return this.propertyName;
     }
 
     @Override

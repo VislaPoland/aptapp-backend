@@ -1,1 +1,1 @@
-You have new message: ${messageContent}
+Heads up! You have an important message from ${propertyName} management in your Apt. App Activity Log.
