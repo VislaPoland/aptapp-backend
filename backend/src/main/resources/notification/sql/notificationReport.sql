@@ -1,5 +1,5 @@
 WITH max_status AS (
-  SELECT nh.notification_id, max(nh.created_at) created_at
+  SELECT nh.notification_id, max(nh.id) id
   FROM notification_history nh
   JOIN notification n ON n.id = nh.notification_id
   WHERE n.created_at BETWEEN :from AND :to AND n.type = :type AND n.property_id = :propertyId
@@ -7,7 +7,7 @@ WITH max_status AS (
 ), nhstatus AS (
   SELECT nh.status, nh.notification_id
   FROM notification_history nh
-  WHERE nh.notification_id = (SELECT notification_id FROM max_status WHERE created_at = nh.created_at)
+  WHERE nh.notification_id = (SELECT notification_id FROM max_status WHERE id = nh.id)
 )
 SELECT
   n.id,
