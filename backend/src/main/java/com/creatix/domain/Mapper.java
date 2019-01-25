@@ -308,25 +308,7 @@ public class Mapper {
                 .customize(new CustomMapper<PersonalMessageNotification, PersonalMessageNotificationDto>() {
                     @Override
                     public void mapAtoB(PersonalMessageNotification a, PersonalMessageNotificationDto b, MappingContext context) {
-                        final Account currentAccount = authorizationManager.getCurrentAccount();
                         final PersonalMessage personalMessage = a.getPersonalMessageGroup().getMessages().stream()
-                                .filter(m -> {
-                                    List<Account> approvedAccounts = new LinkedList<>();
-                                    approvedAccounts.add(currentAccount);
-                                    switch (currentAccount.getRole()) {
-                                        case Tenant:
-                                            // Add sub-tenants accounts
-                                            approvedAccounts.addAll(((Tenant) currentAccount).getSubTenants());
-                                            break;
-                                        case SubTenant:
-                                            // add parent tenant account
-                                            approvedAccounts.add(((SubTenant) currentAccount).getParentTenant());
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    return approvedAccounts.contains(m.getToAccount());
-                                })
                                 .findFirst().orElse(null);
                         if ( personalMessage != null ) {
                             b.setPersonalMessage(toPersonalMessage(personalMessage));

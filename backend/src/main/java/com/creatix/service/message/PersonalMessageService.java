@@ -151,7 +151,7 @@ public class PersonalMessageService {
 
                 if ( StringUtils.isNotBlank(recipientAccount.getPrimaryPhone()) ) {
                     try {
-                        smsMessageSender.send(new TenantPersonalMessageTemplate(recipientAccount.getPrimaryPhone(), personalMessage));
+                        smsMessageSender.send(new TenantPersonalMessageTemplate(recipientAccount.getPrimaryPhone(), recipientAccount.getProperty().getName()));
                     }
                     catch ( Exception e ) {
                         logger.error(String.format("Failed to send sms for account %d to phone number %s", recipientAccount.getId(), recipientAccount.getPrimaryPhone()), e);
