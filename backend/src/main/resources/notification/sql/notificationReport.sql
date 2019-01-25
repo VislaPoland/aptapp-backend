@@ -65,7 +65,11 @@ SELECT
     ac2.id as resolvedById,
     ac2.first_name as resolvedByFirstName,
     ac2.last_name as resolvedByLastName,
-    ac2.first_name || ' ' || ac2.last_name as resolvedByFullName
+    ac2.first_name || ' ' || ac2.last_name as resolvedByFullName,
+    receivedBy.id as receivedById,
+    receivedBy.first_name as receivedByFirstName,
+    receivedBy.last_name as receivedByLastName,
+    receivedBy.first_name || ' ' || ac2.last_name as receivedByFullName
 FROM
   notification n
   LEFT JOIN notification_history nh1 on nh1.notification_id = n.id AND nh1.status IN (select status from notification_status_flow WHERE global_status = 'Responded' AND type = :type)
@@ -73,6 +77,7 @@ FROM
   LEFT JOIN notification_history nh2 on nh2.notification_id = n.id AND nh2.status IN (select status from notification_status_flow WHERE global_status = 'Resolved' AND type = :type)
     LEFT JOIN account ac2 ON ac2.id = nh2.author_id
   LEFT JOIN apartment a on a.id = n.target_apartment_id
+   JOIN account receivedBy ON receivedBy.apartment_id = a.id
    JOIN account ac ON ac.id = n.author_id
    LEFT JOIN apartment ap ON ap.id = ac.apartment_id
    LEFT JOIN account parent ON ac.parent_tenant_id = parent.id

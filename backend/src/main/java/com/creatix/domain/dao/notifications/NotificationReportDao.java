@@ -183,6 +183,11 @@ public class NotificationReportDao {
             result.setResolvedBy(account);
         }
 
+        account = (NotificationReportAccountDto) mappedEntities[6];
+        if(account.getId() != null) {
+            result.setReceivedBy(account);
+        }
+
         return result;
     }
 

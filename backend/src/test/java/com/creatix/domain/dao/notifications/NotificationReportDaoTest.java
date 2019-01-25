@@ -63,6 +63,7 @@ public class NotificationReportDaoTest {
     private Apartment apartment2;
     private Tenant author2;
     private SubTenant subTenant;
+    private Tenant receiver;
 
     @Before
     public void setup() {
@@ -85,7 +86,8 @@ public class NotificationReportDaoTest {
         notificationGroup.setCreatedAt(NOW);
         testEntityManager.persistAndFlush(notificationGroup);
 
-        author = random.nextObject(PropertyOwner.class, "id", "secondaryEmail");
+        author = random.nextObject(PropertyOwner.class, "id", "secondaryEmail", "role");
+        author.setRole(AccountRole.PropertyOwner);
         testEntityManager.persistAndFlush(author);
 
         technician1 = random.nextObject(MaintenanceEmployee.class, "id", "secondaryEmail", "manager", "role");
@@ -119,6 +121,10 @@ public class NotificationReportDaoTest {
         subTenant = random.nextObject(SubTenant.class, "id", "secondaryEmail");
         subTenant.setParentTenant(author2);
         testEntityManager.persistAndFlush(subTenant);
+
+        receiver = random.nextObject(Tenant.class, "id", "secondaryEmail");
+        receiver.setApartment(apartment2);
+        testEntityManager.persistAndFlush(receiver);
 
         NotificationStatusFlow notificationStatusFlow = new NotificationStatusFlow();
         notificationStatusFlow.setId(1L);
@@ -221,6 +227,27 @@ public class NotificationReportDaoTest {
 
         account = report.getResolvedBy();
         assertEquals(author.getId(), account.getId());
+    }
+
+    /**
+     * Should return received by as the primary tenant for target apartment
+     */
+    @Test
+    public void getNotificationReportWithReceivedBy() {
+        NotificationHistory notificationHistory = createNeighborhoodNotification(subTenant, apartment2);
+
+        changeNeighborhooddotificationStatus(notificationHistory, NOW.plusDays(2), NeighborhoodNotificationResponse.SorryNotMe, author);
+
+        List<NotificationReportDto> reports = notificationReportDao.getNotificationReport(NOW.minusDays(1L), NOW.plusDays(1L), NotificationType.Neighborhood, property.getId());
+
+        assertEquals(1, reports.size());
+
+        NotificationReportDto report = reports.get(0);
+
+        NotificationReportAccountDto receivedBy = report.getReceivedBy();
+        assertNotNull(receivedBy);
+
+        assertEquals(receiver.getId(), receivedBy.getId());
     }
 
     @Test
