@@ -27,6 +27,8 @@ public class SmsMessageSender {
     static final String MISSING_ACCOUNT_SID_CONFIGURATION = "Missing account sid configuration";
     static final String MISSING_AUTH_TOKEN_CONFIGURATION = "Missing auth token configuration";
     static final String MISSING_FROM_NUMBER_CONFIGURATION = "Missing from number configuration";
+    static final String MESSAGE_TEMPLATE_CANNOT_BE_NULL = "Message template cannot be null";
+
     private static final String SMS_DELIVERY_FAILED_FORMAT = "SMS delivery failed. Error %d: %s";
     private final TwilioProperties twilioProperties;
     private final SmsTemplateProcessor templateProcessor;
@@ -42,7 +44,11 @@ public class SmsMessageSender {
     }
 
     public void send(SmsMessageTemplate template) throws IOException, TemplateException, MessageDeliveryException {
-        if (template != null && StringUtils.isNotBlank(template.getRecipient())) {
+        if (template == null) {
+            throw new MessageDeliveryException(MESSAGE_TEMPLATE_CANNOT_BE_NULL);
+        }
+
+        if (StringUtils.isNotBlank(template.getRecipient())) {
             send(templateProcessor.processTemplate(template), template.getRecipient());
         }
     }
@@ -85,7 +91,6 @@ public class SmsMessageSender {
     }
 
     /**
-     *
      * return if it is specific exception connected with blacklisted number
      *
      * @param twilioException exception given from twilio
@@ -99,7 +104,8 @@ public class SmsMessageSender {
 
     /**
      * separated invoke message to be able to mock/stub this metod
-     * @param body what will be send
+     *
+     * @param body           what will be send
      * @param recipientPhone who will receive message
      * @return invocation result
      */

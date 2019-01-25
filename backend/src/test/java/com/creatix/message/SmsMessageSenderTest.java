@@ -43,7 +43,9 @@ public class SmsMessageSenderTest {
     private SmsMessageSender smsMessageSender;
 
     @Test
-    public void shouldNotDoAnythingWhenNull() throws MessageDeliveryException, TemplateException, IOException {
+    public void shouldThrowExceptionWhenTemplateIsNull() throws MessageDeliveryException, TemplateException, IOException {
+        thrown.expect(MessageDeliveryException.class);
+        thrown.expectMessage(MESSAGE_TEMPLATE_CANNOT_BE_NULL);
 
         smsMessageSender.send(null);
 
