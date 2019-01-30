@@ -158,6 +158,14 @@ public class NotificationReportDaoTest {
 
         testEntityManager.persistAndFlush(notificationStatusFlow);
 
+        notificationStatusFlow = new NotificationStatusFlow();
+        notificationStatusFlow.setId(5L);
+        notificationStatusFlow.setGlobalStatus(NotificationHistoryStatus.Resolved);
+        notificationStatusFlow.setStatus(NotificationHistoryStatus.Resolved);
+        notificationStatusFlow.setType(NotificationType.Security);
+
+        testEntityManager.persistAndFlush(notificationStatusFlow);
+
     }
 
     @Test
@@ -200,7 +208,7 @@ public class NotificationReportDaoTest {
     public void getNotificationReportWithParentAccountForApartment() {
         NotificationHistory notificationHistory = createNeighborhoodNotification(subTenant, apartment2);
 
-        changeNeighborhooddotificationStatus(notificationHistory, NOW.plusDays(2), NeighborhoodNotificationResponse.SorryNotMe, author);
+        changeNeighborhoodNotificationStatus(notificationHistory, NOW.plusDays(2), NeighborhoodNotificationResponse.SorryNotMe, author);
 
         List<NotificationReportDto> reports = notificationReportDao.getNotificationReport(NOW.minusDays(1L), NOW.plusDays(1L), NotificationType.Neighborhood, property.getId());
 
@@ -230,13 +238,41 @@ public class NotificationReportDaoTest {
     }
 
     /**
+     * Should return security notification data
+     */
+    @Test
+    public void getSecurityNotificationReportWithoutApartment() {
+        NotificationHistory notificationHistory = createSecurityNotification(subTenant);
+
+        changeSecurityNotificationStatus(notificationHistory, NOW.plusDays(2), NotificationHistoryStatus.Resolved, author);
+
+        List<NotificationReportDto> reports = notificationReportDao.getNotificationReport(NOW.minusDays(1L), NOW.plusDays(1L), NotificationType.Security, property.getId());
+        assertEquals(1, reports.size());
+
+        NotificationReportDto report = reports.get(0);
+
+        assertEquals(NotificationHistoryStatus.Resolved.name(), report.getStatus());
+
+        NotificationReportAccountDto account;
+        account = report.getCreatedBy();
+
+        assertEquals(subTenant.getId(), account.getId());
+
+        BasicApartmentDto apartment = report.getTargetApartment();
+        assertNull(apartment);
+
+        account = report.getResolvedBy();
+        assertEquals(author.getId(), account.getId());
+    }
+
+    /**
      * Should return received by as the primary tenant for target apartment
      */
     @Test
     public void getNotificationReportWithReceivedBy() {
         NotificationHistory notificationHistory = createNeighborhoodNotification(subTenant, apartment2);
 
-        changeNeighborhooddotificationStatus(notificationHistory, NOW.plusDays(2), NeighborhoodNotificationResponse.SorryNotMe, author);
+        changeNeighborhoodNotificationStatus(notificationHistory, NOW.plusDays(2), NeighborhoodNotificationResponse.SorryNotMe, author);
 
         List<NotificationReportDto> reports = notificationReportDao.getNotificationReport(NOW.minusDays(1L), NOW.plusDays(1L), NotificationType.Neighborhood, property.getId());
 
@@ -401,7 +437,7 @@ public class NotificationReportDaoTest {
         return notificationHistory;
     }
 
-    private void changeNeighborhooddotificationStatus(NotificationHistory notificationHistory, OffsetDateTime responded, NeighborhoodNotificationResponse response, Account respondedBy) {
+    private void changeNeighborhoodNotificationStatus(NotificationHistory notificationHistory, OffsetDateTime responded, NeighborhoodNotificationResponse response, Account respondedBy) {
         NeighborhoodNotification notification = (NeighborhoodNotification) notificationHistory.getNotification();
         notification.setStatus(NotificationStatus.Resolved);
         notification.setUpdatedAt(responded);
@@ -411,6 +447,18 @@ public class NotificationReportDaoTest {
         testEntityManager.persistAndFlush(notification);
 
         notificationHistory = createNotificationHistory(notification, respondedBy, NotificationHistoryStatus.Resolved, responded);
+        testEntityManager.persistAndFlush(notificationHistory);
+    }
+
+    private void  changeSecurityNotificationStatus(NotificationHistory notificationHistory, OffsetDateTime responded, NotificationHistoryStatus notificationHistoryStatus, Account respondedBy) {
+        SecurityNotification notification = (SecurityNotification) notificationHistory.getNotification();
+        notification.setStatus(NotificationStatus.valueOf(notificationHistoryStatus.name()));
+        notification.setUpdatedAt(responded);
+        notification.setRespondedAt(responded);
+
+        testEntityManager.persistAndFlush(notification);
+
+        notificationHistory = createNotificationHistory(notification, respondedBy, notificationHistoryStatus, responded);
         testEntityManager.persistAndFlush(notificationHistory);
     }
 
@@ -448,6 +496,16 @@ public class NotificationReportDaoTest {
         testEntityManager.persistAndFlush(neighborhoodNotification);
 
         NotificationHistory notificationHistory = createNotificationHistory(neighborhoodNotification, author, NotificationHistoryStatus.Pending, NOW);
+        testEntityManager.persistAndFlush(notificationHistory);
+
+        return notificationHistory;
+    }
+
+    private NotificationHistory createSecurityNotification(Account author) {
+        SecurityNotification securityNotification = generateSecurityNotification(NotificationStatus.Pending, NOW, author);
+        testEntityManager.persistAndFlush(securityNotification);
+
+        NotificationHistory notificationHistory = createNotificationHistory(securityNotification, author, NotificationHistoryStatus.Pending, NOW);
         testEntityManager.persistAndFlush(notificationHistory);
 
         return notificationHistory;
@@ -516,5 +574,9 @@ public class NotificationReportDaoTest {
         NeighborhoodNotification neighborhoodNotification = generateNotification(notificationStatus, updated, author, NeighborhoodNotification.class, NotificationType.Neighborhood);
         neighborhoodNotification.setTargetApartment(targetApartment);
         return neighborhoodNotification;
+    }
+
+    private SecurityNotification generateSecurityNotification(NotificationStatus notificationStatus, OffsetDateTime updated, Account author) {
+        return generateNotification(notificationStatus, updated, author, SecurityNotification.class, NotificationType.Security);
     }
 }
