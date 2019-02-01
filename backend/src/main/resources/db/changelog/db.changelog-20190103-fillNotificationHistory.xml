@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Peter Sokolík" id="db.changelog-20190103_1">
+        <comment>Fill notification_history table from notification table</comment>
+
+        <sqlFile path="db.changelog-20190103-fillNotificationHistory.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet author="Kamil Kolarik" id="db.changelog-20190103_2">
+        <comment>Remove unnecessary column from notification</comment>
+
+        <dropColumn tableName="notification" columnName="updated_by_account_id"/>
+    </changeSet>
+
+</databaseChangeLog>

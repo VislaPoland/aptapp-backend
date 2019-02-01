@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.notification.SecurityNotification;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 public class SecurityNotificationNeighborNoIssueTemplate extends SecurityNotificationTemplate {
     public SecurityNotificationNeighborNoIssueTemplate(SecurityNotification notification) {
@@ -9,6 +10,6 @@ public class SecurityNotificationNeighborNoIssueTemplate extends SecurityNotific
 
     @Override
     public String getTemplateName() {
-        return "security-notification-neighbor-no-issue";
+        return PushNotificationTemplateName.SECURITY_NOTIFICATION_NEIGHBOR_NO_ISSUE.getValue();
     }
 }

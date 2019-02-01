@@ -2,22 +2,22 @@ package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.notification.Notification;
 import com.creatix.domain.entity.store.notification.NotificationGroup;
+import com.creatix.domain.entity.store.notification.NotificationHistory;
+import com.creatix.domain.enums.NotificationHistoryStatus;
+import com.creatix.security.AuthorizationManager;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 
-@Component
-@Transactional
+
+@RequiredArgsConstructor
 public abstract class AbstractNotificationDao<T extends Notification> extends DaoBase<T, Long> {
-
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
-    private NotificationGroupDao notificationGroupDao;
+    protected final AuthorizationManager authorizationManager;
+    private final NotificationGroupDao notificationGroupDao;
+    private final NotificationHistoryDao notificationHistoryDao;
 
     @Override
     public void persist(T notification) {
@@ -42,6 +42,17 @@ public abstract class AbstractNotificationDao<T extends Notification> extends Da
         if ( defaultGroupCreated ) {
             logger.info("Created default group for notification, id={}", notification.getId());
         }
+    }
+
+    public void createNotificationHistoryLog(T notification, String status) {
+        final NotificationHistory historyRecord = new NotificationHistory();
+        historyRecord.setAuthor(authorizationManager.getCurrentAccount());
+        historyRecord.setNotification(notification);
+        historyRecord.setStatus(NotificationHistoryStatus.valueOf(status));
+        historyRecord.setType(notification.getType());
+        historyRecord.setProperty(notification.getProperty());
+
+        notificationHistoryDao.persist(historyRecord);
     }
 
 }

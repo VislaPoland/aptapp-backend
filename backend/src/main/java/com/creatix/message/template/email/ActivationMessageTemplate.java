@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 
 public abstract class ActivationMessageTemplate implements EmailMessageTemplate {
 
-    private final Account account;
+    protected final Account account;
     private final ApplicationProperties properties;
 
     public ActivationMessageTemplate(Account account, ApplicationProperties properties) {
@@ -17,7 +17,7 @@ public abstract class ActivationMessageTemplate implements EmailMessageTemplate 
 
     @Override
     public String getSubject() {
-        return "Welcome to Apt. App – A smarter way to communicate";
+        return "Welcome to Apt. App - A smarter way to communicate";
     }
 
     @Override

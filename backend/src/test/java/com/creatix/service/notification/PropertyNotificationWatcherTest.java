@@ -19,6 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 
+/**
+ * TODO this test should be completely rewritten. Not testing the
+ *  PropertyNotificationWatcher but composition of all objects inside
+ */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
 @SpringBootTest(classes = AptAppBackendApplication.class)
@@ -43,19 +47,13 @@ public class PropertyNotificationWatcherTest extends TestContext {
         notificationWatcher.process(mockNotification());
     }
 
-    @Test
-    public void testThrottleClear() throws Exception {
-        notificationWatcher.process(mockNotification());
-        Thread.sleep(75 * 1000);
-        notificationWatcher.process(mockNotification());
-    }
-
     private NeighborhoodNotification mockNotification() {
         final NeighborhoodNotification n = new NeighborhoodNotification();
         n.setTargetApartment(apartmentDao.findById(13L));
         n.setCreatedAt(OffsetDateTime.now());
         n.setAuthor(tenantDao.findById(451L));
         n.setProperty(propertyDao.findById(1L));
+        n.setTitle("title");
 
         n.getProperty().setThrottleFastMinutes(1);
 

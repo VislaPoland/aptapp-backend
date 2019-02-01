@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.MaintenanceReservation;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 public class MaintenanceRescheduleConfirmTemplate extends PushMessageTemplate {
 
@@ -38,6 +39,6 @@ public class MaintenanceRescheduleConfirmTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return (getUnitNumber() == null) ? "maintenance-reschedule-confirm-without-unit" : "maintenance-reschedule-confirm-with-unit";
+        return (getUnitNumber() == null) ? PushNotificationTemplateName.MAINTENANCE_RESCHEDULE_CONFIRM_WITHOUT_UNIT.getValue() : PushNotificationTemplateName.MAINTENANCE_RESCHEDULE_CONFIRM_WITH_UNIT.getValue();
     }
 }

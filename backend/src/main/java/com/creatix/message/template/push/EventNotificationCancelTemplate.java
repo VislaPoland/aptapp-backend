@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.EventSlot;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 public class EventNotificationCancelTemplate extends EventNotificationTemplate {
 
@@ -10,6 +11,6 @@ public class EventNotificationCancelTemplate extends EventNotificationTemplate {
 
     @Override
     public String getTemplateName() {
-        return "event-notification-cancel";
+        return PushNotificationTemplateName.EVENT_NOTIFICATION_CANCEL.getValue();
     }
 }

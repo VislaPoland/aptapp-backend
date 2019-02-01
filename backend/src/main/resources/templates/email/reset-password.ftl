@@ -81,7 +81,7 @@
                                 </tr>
                                 <tr>
                                     <td style="box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; vertical-align: top;" valign="top">
-                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 20px 0; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. App a tool you can’t live without. If you see ways we can do better, we would love to hear from you. Please e-mail us at <a href="mailto:hello@aptappmobile.com" style="box-sizing: border-box; text-decoration: underline; color: #999999;">hello@aptappmobile.com</a>.</p>
+                                        <p class="italic" style="font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 14px; font-weight: normal; margin: 20px 0; font-style: italic; text-align: center; color: #031821;">We are always striving to make Apt. App a tool you can't live without. If you see ways we can do better, we would love to hear from you. Please e-mail us at <a href="mailto:hello@aptappmobile.com" style="box-sizing: border-box; text-decoration: underline; color: #999999;">hello@aptappmobile.com</a>.</p>
                                     </td>
                                 </tr>
                             </table>

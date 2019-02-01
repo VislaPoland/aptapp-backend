@@ -6,8 +6,9 @@
         <properties>
             <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/aptapp"/>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
-            <property name="hibernate.connection.username" value="postgres"/>
-            <property name="hibernate.connection.password" value=""/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL94Dialect"/>
+            <property name="hibernate.connection.username" value="aptapp"/>
+            <property name="hibernate.connection.password" value="aptapp"/>
             <property name="hibernate.archive.autodetection" value="class"/>
             <property name="hibernate.naming-strategy" value="org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy"/>
             <property name="hibernate.globally_quoted_identifiers" value="true"/>

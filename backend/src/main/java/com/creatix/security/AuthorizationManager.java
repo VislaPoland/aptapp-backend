@@ -87,19 +87,23 @@ public class AuthorizationManager {
         assert account != null;
 
         switch ( account.getRole() ) {
-            case Tenant:
-                return ((Tenant) account).getApartment().getProperty();
-            case SubTenant:
-                return ((SubTenant) account).getApartment().getProperty();
-            case PropertyManager:
-                return ((PropertyManager) account).getManagedProperty();
             case AssistantPropertyManager:
-                return ((AssistantPropertyManager) account).getManager().getManagedProperty();
+            case PropertyManager:
+            case SubTenant:
+            case Tenant:
+                return account.getProperty();
             case Administrator:
                 return null;
+            case PropertyOwner:
+                Set<Property> ownedProperties = ((PropertyOwner) account).getOwnedProperties();
+                if (ownedProperties.size() == 1) {
+                    return ownedProperties.stream().findFirst().get();
+                } else {
+                    return null;
+                }
             default:
                 if ( account instanceof ManagedEmployee ) {
-                    return ((ManagedEmployee) account).getManager().getManagedProperty();
+                    return account.getProperty();
                 }
                 else {
                     throw new SecurityException("Impossible to extract single linked property.");

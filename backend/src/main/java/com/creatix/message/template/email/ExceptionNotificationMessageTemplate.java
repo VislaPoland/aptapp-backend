@@ -1,6 +1,7 @@
 package com.creatix.message.template.email;
 
 import com.creatix.configuration.ApplicationProperties;
+import com.creatix.domain.enums.EmailTemplateName;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -26,7 +27,7 @@ public class ExceptionNotificationMessageTemplate implements EmailMessageTemplat
 
     @Override
     public String getTemplateName() {
-        return "exception-notification";
+        return EmailTemplateName.EXCEPTION_NOTIFICATION.getValue();
     }
 
     public String getExceptionMessage() {

@@ -1,6 +1,7 @@
 package com.creatix.message.template.push;
 
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 public class MaintenanceNotificationTemplate extends PushMessageTemplate {
     protected final MaintenanceNotification notification;
@@ -35,6 +36,6 @@ public class MaintenanceNotificationTemplate extends PushMessageTemplate {
     // in case of employee sender (we don't have apartment number for employee) send template for employee
     @Override
     public String getTemplateName() {
-        return getUnitNumber() == null ? "maintenance-notification-by-employee" : "maintenance-notification-by-tenant";
+        return getUnitNumber() == null ? PushNotificationTemplateName.MAINTENANCE_NOTIFICATION_EMPLOYEE.getValue() : PushNotificationTemplateName.MAINTENANCE_NOTIFICATION_TENANT.getValue();
     }
 }

@@ -7,5 +7,6 @@ services:
     ports:
     - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: maSterpass78ord
+      POSTGRES_PASSWORD: aptapp
       POSTGRES_DB: aptapp
+      POSTGRES_USER: aptapp

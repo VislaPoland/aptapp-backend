@@ -1,6 +1,7 @@
 package com.creatix.message.template.sms;
 
 import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.enums.SmsTemplateName;
 import com.creatix.message.template.sms.SmsMessageTemplate;
 
 public class NeighborNotificationTemplate implements SmsMessageTemplate {
@@ -18,6 +19,6 @@ public class NeighborNotificationTemplate implements SmsMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "neighbor-notification";
+        return SmsTemplateName.NEIGHBOR_NOTIFICATION.getValue();
     }
 }

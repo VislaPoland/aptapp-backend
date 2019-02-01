@@ -5,11 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -26,5 +24,8 @@ public class SecurityNotification extends Notification {
 
     @Column
     private OffsetDateTime closedAt;
+
+    @OneToMany(mappedBy = "notification")
+    private List<NotificationHistory> history;
 
 }

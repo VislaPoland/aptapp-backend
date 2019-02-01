@@ -5,6 +5,7 @@ import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.entity.store.account.SubTenant;
 import com.creatix.domain.entity.store.account.Tenant;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 
 
 public class MaintenanceDeleteTemplate extends PushMessageTemplate {
@@ -33,6 +34,6 @@ public class MaintenanceDeleteTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "maintenance-delete";
+        return PushNotificationTemplateName.MAINTENANCE_DELETE.getValue();
     }
 }

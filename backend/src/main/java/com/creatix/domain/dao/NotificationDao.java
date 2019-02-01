@@ -24,9 +24,9 @@ import java.util.stream.Stream;
 @Transactional
 public class NotificationDao extends AbstractNotificationDao<Notification> {
 
-    @Autowired
-    private AuthorizationManager authorizationManager;
-
+    public NotificationDao(AuthorizationManager authorizationManager, NotificationGroupDao notificationGroupDao, NotificationHistoryDao notificationHistoryDao) {
+        super(authorizationManager, notificationGroupDao, notificationHistoryDao);
+    }
 
     public List<Notification> findPageByNotificationStatusAndNotificationTypeAndRequestTypeAndAccount(
             @NotNull NotificationRequestType requestType,
@@ -80,9 +80,7 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                     break;
                 case Administrator:
                     if (property != null) {
-                        predicate = predicate.and(
-                                qNotification.property.eq(property)
-                                .or(qNotification.author.eq(account)));
+                        predicate = predicate.and(qNotification.property.eq(property));
                     }
                 default:
                     predicate = predicate.and(qNotification.author.eq(account));
@@ -127,11 +125,10 @@ public class NotificationDao extends AbstractNotificationDao<Notification> {
                 case Administrator:
                     if (property != null) {
                         predicate = predicate.and(
-                            qNotification.property.eq(property)
-                            .or(qNotification.recipient.eq(authorizationManager.getCurrentAccount()))
-                            .or(qSubTenantRecipient.parentTenant.apartment.property.eq(property))
-                            .or(qParentTenantOfSubTenantRecipient.apartment.property.eq(property))
-                        );
+                                        qNotification.property.eq(property)
+                                    ).and(
+                                        qNotification.author.eq(authorizationManager.getCurrentAccount()).not()
+                                    );
                     }
                     break;
                 case Maintenance:

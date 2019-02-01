@@ -44,7 +44,4 @@ public class MaintenanceNotificationDto extends NotificationDto {
     @Size(max = 2048)
     @ApiModelProperty(value = "Pet instructions")
     private String petInstructions;
-
-    @ApiModelProperty(value = "Last update by account")
-    private BasicAccountDto updatedByAccount;
 }

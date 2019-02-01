@@ -2,6 +2,7 @@ package com.creatix.domain.entity.store.notification;
 
 import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.enums.AccountRole;
 import com.creatix.domain.enums.NeighborhoodNotificationResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,9 +13,6 @@ import javax.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(indexes = {
-        @Index(columnList = "target_apartment_id")
-})
 @BatchSize(size = 40)
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -34,6 +32,7 @@ public class NeighborhoodNotification extends Notification {
     /**
      * If recipient of notification returns recipient account as tenant class.
      * Otherwise returns null
+     *
      * @return Recipient account as Tenant or null
      */
     @Nullable
@@ -44,11 +43,10 @@ public class NeighborhoodNotification extends Notification {
             return null;
         }
 
-        switch (this.getRecipient().getRole()) {
-            case Tenant:
-                return (Tenant) this.getRecipient();
-            default:
-                return null;
+        if (AccountRole.Tenant.equals(this.getRecipient().getRole())) {
+            return (Tenant) this.getRecipient();
         }
+
+        return null;
     }
 }

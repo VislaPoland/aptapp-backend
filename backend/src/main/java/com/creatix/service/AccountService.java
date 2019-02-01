@@ -6,6 +6,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dao.*;
 import com.creatix.domain.dto.LoginResponse;
 import com.creatix.domain.dto.account.*;
+import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.*;
 import com.creatix.domain.entity.store.account.device.Device;
@@ -14,9 +15,13 @@ import com.creatix.message.MessageDeliveryException;
 import com.creatix.message.SmsMessageSender;
 import com.creatix.message.template.email.*;
 import com.creatix.message.template.sms.ActivationMessageTemplate;
+import com.creatix.message.template.sms.ActivationWebMessageTemplate;
+import com.creatix.message.template.sms.SmsMessageTemplate;
 import com.creatix.security.*;
 import com.creatix.service.message.BitlyService;
 import com.creatix.service.message.EmailMessageService;
+import com.google.common.collect.ImmutableSet;
+import com.twilio.exception.ApiException;
 import freemarker.template.TemplateException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -88,6 +93,10 @@ public class AccountService {
     @Autowired
     private MaintenanceEmployeeDao maintenanceEmployeeDao;
     @Autowired
+    private TenantDao tenantDao;
+    @Autowired
+    private SubTenantDao subTenantDao;
+    @Autowired
     private HttpSession httpSession;
     @Autowired
     private DeviceProperties deviceProperties;
@@ -97,6 +106,7 @@ public class AccountService {
     private BitlyService bitlyService;
 
     private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
+    private static final ImmutableSet WEB_SMS_ROLES = ImmutableSet.of(AccountRole.Administrator, AccountRole.PropertyOwner);
 
     private <T, ID> T getOrElseThrow(ID id, DaoBase<T, ID> dao, EntityNotFoundException ex) {
         final T item = dao.findById(id);
@@ -158,7 +168,7 @@ public class AccountService {
         if ( account.getActive() == Boolean.TRUE ) {
             throw new IllegalArgumentException(String.format("Account id=%d is already activated", account.getId()));
         }
-        if(account.getActionTokenValidUntil() == null || new Date().after(account.getActionTokenValidUntil())){
+        if ( account.getActionTokenValidUntil() == null || new Date().after(account.getActionTokenValidUntil()) ) {
             setActionToken(account);
         }
 
@@ -458,7 +468,7 @@ public class AccountService {
         setActionToken(account);
 
         sendActivationSms(account);
-        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, managedProperty, applicationProperties));
 
         return account;
     }
@@ -515,6 +525,7 @@ public class AccountService {
         }
 
         final SecurityEmployee account = this.getEntityInstance(request.getPrimaryEmail(), SecurityEmployee.class);
+        final Property managedProperty = manager.getManagedProperty();
         account.setRole(AccountRole.Security);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -525,7 +536,7 @@ public class AccountService {
         setActionToken(account);
 
         sendActivationSms(account);
-        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, managedProperty, applicationProperties));
 
         return account;
     }
@@ -567,6 +578,7 @@ public class AccountService {
         }
 
         final MaintenanceEmployee account = this.getEntityInstance(request.getPrimaryEmail(), MaintenanceEmployee.class);
+        final Property managedProperty = manager.getManagedProperty();
         account.setRole(AccountRole.Maintenance);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -577,7 +589,7 @@ public class AccountService {
         setActionToken(account);
 
         sendActivationSms(account);
-        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, managedProperty, applicationProperties));
 
         return account;
     }
@@ -628,6 +640,7 @@ public class AccountService {
         }
 
         final AssistantPropertyManager account = this.getEntityInstance(request.getPrimaryEmail(), AssistantPropertyManager.class);
+        final Property managedProperty = manager.getManagedProperty();
         account.setRole(AccountRole.AssistantPropertyManager);
         mapper.fillAccount(request, account);
         account.setActive(false);
@@ -638,7 +651,7 @@ public class AccountService {
         setActionToken(account);
 
         sendActivationSms(account);
-        emailMessageService.send(new EmployeeActivationMessageTemplate(account, applicationProperties));
+        emailMessageService.send(new EmployeeActivationMessageTemplate(account, managedProperty, applicationProperties));
 
         return account;
     }
@@ -757,18 +770,30 @@ public class AccountService {
         }
     }
 
-    private void sendActivationSms(Account account) throws MessageDeliveryException, MalformedURLException {
-        final boolean enableSms = account.getPrimaryPhone() != null && !account.getPrimaryPhone().isEmpty();
+    private SmsMessageTemplate getSmsActivationTemplate(@NotNull Account account) throws MalformedURLException, MessageDeliveryException {
+        SmsMessageTemplate activationSmsMessageTemplate = null;
+        final Property property = account.getProperty();
+        final boolean hasPropertyEnabledSms = property != null && property.getEnableSms();
 
-        if ( enableSms ||
-            ( enableSms && AccountRole.Tenant.equals(account.getRole()) && ((Tenant) account).getEnableSms() && authorizationManager.getAccountProperties(account).iterator().next().getEnableSms()) ||
-            ( enableSms && AccountRole.PropertyOwner.equals(account.getRole()) && authorizationManager.getAccountProperties(account).iterator().next().getEnableSms())) {
-
+        if (WEB_SMS_ROLES.contains(account.getRole())) {
             String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", account.getActionToken())).toString());
             logger.info("Generated short url for sms activation account. Url: " + shortUrl);
+            activationSmsMessageTemplate = new ActivationWebMessageTemplate(shortUrl, account.getPrimaryPhone());
+        } else if (hasPropertyEnabledSms) {
+            activationSmsMessageTemplate = new ActivationMessageTemplate(account.getActionToken(), account.getPrimaryPhone());
+        }
+
+        return activationSmsMessageTemplate;
+    }
+
+    private void sendActivationSms(@NotNull Account account) {
+        if (StringUtils.isNotEmpty(account.getPrimaryPhone())) {
             try {
-                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, account.getPrimaryPhone()));
-            } catch (Exception e) {
+                SmsMessageTemplate sms = getSmsActivationTemplate(account);
+                if (sms != null) {
+                    smsMessageSender.send(sms);
+                }
+            } catch (ApiException | IOException | MessageDeliveryException | TemplateException e) {
                 logger.error("There is problem with smsMessageSender.send in accountService", e);
             }
         }
@@ -780,5 +805,29 @@ public class AccountService {
         maintenanceEmployeeDao.findByProperty(property).stream().forEach(maintenanceEmployee -> maintenanceEmployeeDao.delete(maintenanceEmployee));
         securityEmployeeDao.findByProperty(property).stream().forEach(securityEmployee -> securityEmployeeDao.delete(securityEmployee));
         property.getManagers().stream().forEach(propertyManager -> accountDao.delete(propertyManager));
+    }
+
+    @RoleSecured({AccountRole.Administrator, AccountRole.AssistantPropertyManager, AccountRole.PropertyManager})
+    public @Nonnull Tenant switchSubTenantToPrimaryTenant(@Nonnull Long subTenantId) {
+        Objects.requireNonNull(subTenantId);
+
+        final SubTenant subTenant = getOrElseThrow(subTenantId, subTenantDao, new EntityNotFoundException(String.format("Sub-tenant id=%d not found", subTenantId)));
+        final Tenant tenant = subTenant.getParentTenant();
+        final Apartment apartment = subTenant.getApartment();
+
+        if (tenant == null || apartment == null) {
+            throw new SecurityException("Co-resident is not able to be primary resident.");
+        }
+
+        final SubTenant newSubTenant = mapper.switchTenantToSubTenant(tenant);
+        final Tenant newTenant = mapper.switchSubTenantToTenant(subTenant);
+
+        newTenant.addSubTenant(newSubTenant);
+        newSubTenant.setParentTenant(newTenant);
+
+        tenantDao.persistSubTenantToTenant(newTenant, newSubTenant.getId());
+        subTenantDao.persistTenantToSubTenant(newSubTenant);
+
+        return newTenant;
     }
 }

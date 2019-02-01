@@ -17,4 +17,9 @@ public class BasicApartmentDto {
     private String unitNumber;
     @ApiModelProperty(value = "Tenant name", required = true)
     private String tenantName;
+
+    public BasicApartmentDto(Long id, String unitNumber) {
+        setId(id);
+        setUnitNumber(unitNumber);
+    }
 }

@@ -5,6 +5,10 @@ buildscript {
 	ext {
 		springBootVersion = '1.5.6.RELEASE'
 		querydslVersion = '4.2.1'
+		mockito = '2.21.0'
+		mockitoInline = '2.20.0'
+		byteBuddyVersion = '1.9.2'
+
 	}
 	repositories {
 		mavenCentral()
@@ -76,7 +80,6 @@ war {
 
 war.dependsOn createBuildVersionFile
 
-
 dependencies {
 
 	optional('org.springframework.boot:spring-boot-configuration-processor')
@@ -127,10 +130,23 @@ dependencies {
 	runtime('org.liquibase:liquibase-core:3.5.3')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+	testCompile("org.mockito:mockito-core:${mockito}") {
+		exclude module: 'net.buddy'
+	}
+	testCompile("net.bytebuddy:byte-buddy:${byteBuddyVersion}")
+	testCompile("net.bytebuddy:byte-buddy-agent:${byteBuddyVersion}")
+	testCompile("org.mockito:inline:${mockitoInline}")
+
+
 	testCompile('org.springframework.security:spring-security-test')
+	
+	testCompile('io.github.benas:random-beans:3.7.0')
 
 	// ensure that the embedded servlet container does not interfere with the servlet container
 	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+
+	compile("org.springframework.boot:spring-boot-devtools")
 }
 
 compileJava.dependsOn(processResources)

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -94,6 +95,26 @@ public class ApartmentService {
             throw new EntityNotFoundException(String.format("Apartment no=%s not found in property id=%d", unitNumber, property.getId()));
         }
         return apartment;
+    }
+
+    @RoleSecured({AccountRole.Administrator})
+    @ParametersAreNonnullByDefault
+    public Long generateApartment(Long propertyId, String floor, String unitNumber) {
+        Objects.requireNonNull(propertyId);
+        Objects.requireNonNull(floor);
+        Objects.requireNonNull(unitNumber);
+
+        PersistApartmentRequest.NeighborsDto neighbors = new PersistApartmentRequest.NeighborsDto();
+        neighbors.setAbove(null);
+        neighbors.setBelow(null);
+        neighbors.setLeft(null);
+        neighbors.setRight(null);
+        PersistApartmentRequest request = new PersistApartmentRequest();
+        request.setFloor(floor);
+        request.setUnitNumber(unitNumber);
+        request.setNeighbors(neighbors);
+
+        return createApartment(propertyId, request).getId();
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})

@@ -11,6 +11,7 @@ import com.creatix.domain.entity.store.SlotUnit;
 import com.creatix.domain.entity.store.account.MaintenanceEmployee;
 import com.creatix.domain.entity.store.notification.MaintenanceNotification;
 import com.creatix.domain.enums.AccountRole;
+import com.creatix.domain.enums.NotificationHistoryStatus;
 import com.creatix.domain.enums.NotificationStatus;
 import com.creatix.domain.enums.ReservationStatus;
 import com.creatix.message.template.push.MaintenanceRescheduleConfirmTemplate;
@@ -20,8 +21,7 @@ import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.PushNotificationSender;
 import freemarker.template.TemplateException;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,25 +36,25 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MaintenanceReservationService {
 
     private static final int DEFAULT_RESERVATION_CAPACITY = 1;
 
     private static final Object syncLock = new Object();
 
-    @Autowired
-    private AuthorizationManager authorizationManager;
-    @Autowired
-    private ReservationDao reservationDao;
-    @Autowired
-    private SlotUnitDao slotUnitDao;
-    @Autowired
-    private PushNotificationSender pushNotificationSender;
-    @Autowired
-    private MaintenanceNotificationDao maintenanceNotificationDao;
+    private final AuthorizationManager authorizationManager;
+
+    private final ReservationDao reservationDao;
+
+    private final SlotUnitDao slotUnitDao;
+
+    private final PushNotificationSender pushNotificationSender;
+
+    private final MaintenanceNotificationDao maintenanceNotificationDao;
 
     @RoleSecured
-    MaintenanceReservation createMaintenanceReservation(@Nonnull MaintenanceNotification maintenanceNotification, @Nonnull Long slotUnitId) throws IOException, TemplateException {
+    public MaintenanceReservation createMaintenanceReservation(@Nonnull MaintenanceNotification maintenanceNotification, @Nonnull Long slotUnitId) {
         Objects.requireNonNull(maintenanceNotification, "Maintenance notification is null");
         Objects.requireNonNull(slotUnitId, "Slot unit id is null");
 
@@ -107,9 +107,8 @@ public class MaintenanceReservationService {
         }
 
         releaseReservedCapacity(reservation);
-        resolveNotification(reservation);
-
         reservationDao.delete(reservation);
+
         return reservation;
     }
 
@@ -260,6 +259,8 @@ public class MaintenanceReservationService {
         final MaintenanceNotification notification = reservationOld.getNotification();
         notification.setStatus(NotificationStatus.Pending);
         maintenanceNotificationDao.persist(notification);
+        maintenanceNotificationDao.createNotificationHistoryLog(notification, NotificationHistoryStatus.Rescheduled.name());
+
         final MaintenanceSlot slot = (MaintenanceSlot) slotUnit.getSlot();
 
         final MaintenanceReservation reservationNew = new MaintenanceReservation();
@@ -286,12 +287,12 @@ public class MaintenanceReservationService {
     private void resolveNotification(@Nonnull MaintenanceReservation maintenanceReservation) {
         Objects.requireNonNull(maintenanceReservation);
 
-
         final MaintenanceNotification notification = maintenanceReservation.getNotification();
         Objects.requireNonNull(notification, "Maintenance is missing notification");
 
         notification.setStatus(NotificationStatus.Resolved);
         maintenanceNotificationDao.persist(notification);
+        maintenanceNotificationDao.createNotificationHistoryLog(notification, maintenanceReservation.getStatus().name());
     }
 
     private void reserveCapacity(MaintenanceReservation reservation) {

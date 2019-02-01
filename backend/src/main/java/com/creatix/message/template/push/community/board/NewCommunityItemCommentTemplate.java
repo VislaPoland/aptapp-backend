@@ -1,6 +1,7 @@
 package com.creatix.message.template.push.community.board;
 
 import com.creatix.domain.entity.store.community.board.CommunityBoardComment;
+import com.creatix.domain.enums.PushNotificationTemplateName;
 import com.creatix.message.template.push.PushMessageTemplate;
 
 /**
@@ -16,7 +17,7 @@ public class NewCommunityItemCommentTemplate extends PushMessageTemplate {
 
     @Override
     public String getTemplateName() {
-        return "new-community-item-comment";
+        return PushNotificationTemplateName.COMMUNITY_ITEM_COMMENT.getValue();
     }
 
     public CommunityBoardComment getComment() {

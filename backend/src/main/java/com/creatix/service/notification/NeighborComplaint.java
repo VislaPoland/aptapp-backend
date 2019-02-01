@@ -1,9 +1,10 @@
 package com.creatix.service.notification;
 
-import com.creatix.domain.entity.store.account.Account;
-import com.creatix.domain.entity.store.account.Tenant;
+import com.creatix.domain.entity.store.Apartment;
+import com.creatix.domain.entity.store.account.TenantBase;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 /**
  * Created by Tomas Sedlak on 19.10.2017.
@@ -12,12 +13,12 @@ class NeighborComplaint {
 
     private final long complainerAccountId;
 
-    private final String complainerAppartmentUnit;
+    private final String complainerApartmentUnit;
     private final String complainerMessage;
 
-    NeighborComplaint(@Nonnull Tenant complainer, String complainerMessage) {
+    NeighborComplaint(@Nonnull TenantBase complainer, String complainerMessage) {
         this.complainerAccountId = complainer.getId();
-        this.complainerAppartmentUnit = complainer.getApartment().getUnitNumber();
+        this.complainerApartmentUnit = Optional.ofNullable(complainer.getApartment()).map(Apartment::getUnitNumber).orElse(null);
         this.complainerMessage = complainerMessage;
     }
 
@@ -29,8 +30,8 @@ class NeighborComplaint {
         return complainerMessage;
     }
 
-    public String getComplainerAppartmentUnit() {
-        return complainerAppartmentUnit;
+    public String getComplainerApartmentUnit() {
+        return complainerApartmentUnit;
     }
 
 

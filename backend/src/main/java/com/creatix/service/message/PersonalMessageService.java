@@ -151,7 +151,7 @@ public class PersonalMessageService {
 
                 if ( StringUtils.isNotBlank(recipientAccount.getPrimaryPhone()) ) {
                     try {
-                        smsMessageSender.send(new TenantPersonalMessageTemplate(recipientAccount.getPrimaryPhone(), personalMessage));
+                        smsMessageSender.send(new TenantPersonalMessageTemplate(recipientAccount.getPrimaryPhone(), recipientAccount.getProperty().getName()));
                     }
                     catch ( Exception e ) {
                         logger.error(String.format("Failed to send sms for account %d to phone number %s", recipientAccount.getId(), recipientAccount.getPrimaryPhone()), e);
@@ -190,16 +190,17 @@ public class PersonalMessageService {
         personalMessageDao.persist(personalMessage);
     }
 
-
     private Long createPersonalMessageNotification(@NotNull PersonalMessageGroup personalMessageGroup) {
+        final int maxDescriptionLength = 100;
         final PersonalMessage message = personalMessageGroup.getMessages().stream().findFirst().orElseThrow(() -> new IllegalStateException("Message group is empty"));
         final PersonalMessageNotification personalMessageNotification = new PersonalMessageNotification();
         personalMessageNotification.setPersonalMessageGroup(personalMessageGroup);
         personalMessageNotification.setAuthor(authorizationManager.getCurrentAccount());
         personalMessageNotification.setRecipient(message.getToAccount());
-        personalMessageNotification.setDescription(message.getContent());
+        personalMessageNotification.setDescription(StringUtils.abbreviate(message.getContent().trim(), maxDescriptionLength));
         personalMessageNotification.setStatus(NotificationStatus.Pending);
         personalMessageNotification.setTitle(message.getTitle());
+        personalMessageNotification.setProperty(message.getToAccount().getProperty());
         notificationDao.persist(personalMessageNotification);
 
         return personalMessageNotification.getId();

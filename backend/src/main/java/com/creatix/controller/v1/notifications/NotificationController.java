@@ -1,4 +1,4 @@
-package com.creatix.controller.v1;
+package com.creatix.controller.v1.notifications;
 
 import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
@@ -30,9 +30,8 @@ import freemarker.template.TemplateException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -47,23 +46,18 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @Transactional
 @RequestMapping(path = {"/api/notifications", "/api/v1/notifications"})
 @ApiVersion(1.0)
+@RequiredArgsConstructor
 public class NotificationController {
 
-    @Autowired
-    private NotificationService notificationService;
-    @Autowired
-    private NotificationsStatisticsCreator notificationsStatisticsCreator;
-    @Autowired
-    private Mapper mapper;
-    @Autowired
-    private AttachmentService attachmentService;
-
+    private final NotificationService notificationService;
+    private final NotificationsStatisticsCreator notificationsStatisticsCreator;
+    private final Mapper mapper;
+    private final AttachmentService attachmentService;
 
     private Class<? extends NotificationDto> getMappingClass(Class clazz) {
         if (clazz.equals(CommentNotification.class)) {
@@ -126,24 +120,6 @@ public class NotificationController {
     public DataResponse<MaintenanceNotificationDto> saveMaintenanceNotification(@Valid @RequestBody CreateMaintenanceNotificationRequest dto) throws IOException, TemplateException {
         MaintenanceNotification n = mapper.fromMaintenanceNotificationRequest(dto);
         return new DataResponse<>(mapper.toMaintenanceNotificationDto(notificationService.saveMaintenanceNotification(dto.getUnitNumber(), n, dto.getSlotUnitId(), dto.getSlotsUnitId(), dto.getPropertyId())));
-    }
-
-    @ApiOperation(value = "Get all maintenance notifications in date range")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden")
-    })
-    @JsonView(Views.Public.class)
-    @RequestMapping(path = "/maintenance/calendar", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RoleSecured(value = {AccountRole.Administrator, AccountRole.Tenant, AccountRole.SubTenant, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Maintenance}, feature = ApplicationFeatureType.MAINTENANCE)
-    public DataResponse<List<MaintenanceNotificationDto>> getMaintenanceNotificationsInDateRange(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime till) {
-        List<MaintenanceNotificationDto> data = notificationService.getAllMaintenanceNotificationsInDateRange(from, till).stream()
-                .map(n -> mapper.toMaintenanceNotificationDto(n))
-                .collect(Collectors.toList());
-        return new DataResponse<>(data);
     }
 
     @ApiOperation(value = "Get single security notification")

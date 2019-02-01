@@ -23,6 +23,7 @@ import com.creatix.security.AuthorizationManager;
 import com.creatix.security.RoleSecured;
 import com.creatix.service.message.BitlyService;
 import com.creatix.service.message.EmailMessageService;
+import com.twilio.exception.ApiException;
 import freemarker.template.TemplateException;
 
 import org.slf4j.Logger;
@@ -33,14 +34,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Transactional
@@ -65,8 +65,6 @@ public class TenantService {
     private ApplicationProperties applicationProperties;
     @Autowired
     private SmsMessageSender smsMessageSender;
-    @Autowired
-    private BitlyService bitlyService;
 
     private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
@@ -76,6 +74,22 @@ public class TenantService {
             throw ex;
         }
         return item;
+    }
+
+    @RoleSecured({AccountRole.Administrator})
+    @ParametersAreNonnullByDefault
+    public void generateTenant(Long apartmentId, String firstName, String lastName, String email, @Nullable String phoneNumber) throws MessageDeliveryException, TemplateException, IOException, MessagingException {
+        Objects.requireNonNull(firstName);
+        Objects.requireNonNull(lastName);
+        Objects.requireNonNull(email);
+
+        PersistTenantRequest request = new PersistTenantRequest();
+        request.setFirstName(firstName);
+        request.setLastName(lastName);
+        request.setPrimaryEmail(email);
+        request.setPrimaryPhone(phoneNumber);
+        request.setApartmentId(apartmentId);
+        createTenantFromRequest(request);
     }
 
     @RoleSecured({AccountRole.PropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator, AccountRole.AssistantPropertyManager})
@@ -134,11 +148,9 @@ public class TenantService {
         emailMessageService.send(new TenantActivationMessageTemplate(tenant, applicationProperties));
 
         if (apartment.getProperty().getEnableSms()) {
-            String shortUrl = bitlyService.getShortUrl(applicationProperties.buildAdminUrl(String.format("new-user/%s", tenant.getActionToken())).toString());
-            logger.info("Generated short url for sms activation account. Url: " + shortUrl);
             try {
-                smsMessageSender.send(new ActivationMessageTemplate(shortUrl, tenant.getPrimaryPhone()));
-            } catch (Exception e) {
+                smsMessageSender.send(new ActivationMessageTemplate(tenant.getActionToken(), tenant.getPrimaryPhone()));
+            } catch (ApiException | IOException | MessageDeliveryException | TemplateException e) {
                 logger.error("There is problem with smsMessageSender.send in tenantService.", e);
             }
         }

@@ -66,20 +66,24 @@ public class Mapper {
 
     private final Logger logger = LoggerFactory.getLogger(Mapper.class);
 
-    private MapperFactory mapperFactory;
+    private final MapperFactory mapperFactory;
+
+    private final ManagedEmployeeDao managedEmployeeDao;
+
+    private final AssistantPropertyManagerDao assistantPropertyManagerDao;
+
+    private final ApplicationProperties applicationProperties;
+
+    private final AuthorizationManager authorizationManager;
 
     @Autowired
-    private ManagedEmployeeDao managedEmployeeDao;
-    @Autowired
-    private AssistantPropertyManagerDao assistantPropertyManagerDao;
-    @Autowired
-    private ApplicationProperties applicationProperties;
-    @Autowired
-    private AuthorizationManager authorizationManager;
-
-    @Autowired
-    public Mapper(MapperFactory mapperFactory) {
+    public Mapper(MapperFactory mapperFactory, ManagedEmployeeDao managedEmployeeDao, AssistantPropertyManagerDao assistantPropertyManagerDao,
+    ApplicationProperties applicationProperties, AuthorizationManager authorizationManager) {
         this.mapperFactory = mapperFactory;
+        this.managedEmployeeDao = managedEmployeeDao;
+        this.assistantPropertyManagerDao = assistantPropertyManagerDao;
+        this.applicationProperties = applicationProperties;
+        this.authorizationManager = authorizationManager;
         this.configure(mapperFactory);
     }
 
@@ -93,7 +97,7 @@ public class Mapper {
         return applicationProperties.buildBackendUrl(String.format("/api/properties/%d/messages/predefined/%d/photos/%s", photo.getPredefinedMessage().getProperty().getId(), photo.getPredefinedMessage().getId(), photo.getFileName())).toString();
     }
 
-    private void configure(MapperFactory mapperFactory) {
+    protected void configure(MapperFactory mapperFactory) {
 
         mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(OffsetDateTime.class, OffsetDateTime.class));
         mapperFactory.getConverterFactory().registerConverter(new PassThroughConverter(LocalTime.class, LocalTime.class));
@@ -250,8 +254,14 @@ public class Mapper {
                             // only authenticated non-tenant accounts are allowed to see author of the notification
                             notificationDto.setAuthor(null);
                         } else {
-                            if (notification.getAuthor() instanceof Tenant) {
-                                Apartment apartment = ((Tenant)notification.getAuthor()).getApartment();
+                            final Account author = notification.getAuthor();
+                            if (author instanceof Tenant) {
+                                Apartment apartment = ((Tenant)author).getApartment();
+                                if (apartment != null) {
+                                    notificationDto.getAuthor().setUnitNumber(apartment.getUnitNumber());
+                                }
+                            } else if (author instanceof SubTenant) {
+                                Apartment apartment = ((SubTenant) author).getApartment();
                                 if (apartment != null) {
                                     notificationDto.getAuthor().setUnitNumber(apartment.getUnitNumber());
                                 }
@@ -298,25 +308,7 @@ public class Mapper {
                 .customize(new CustomMapper<PersonalMessageNotification, PersonalMessageNotificationDto>() {
                     @Override
                     public void mapAtoB(PersonalMessageNotification a, PersonalMessageNotificationDto b, MappingContext context) {
-                        final Account currentAccount = authorizationManager.getCurrentAccount();
                         final PersonalMessage personalMessage = a.getPersonalMessageGroup().getMessages().stream()
-                                .filter(m -> {
-                                    List<Account> approvedAccounts = new LinkedList<>();
-                                    approvedAccounts.add(currentAccount);
-                                    switch (currentAccount.getRole()) {
-                                        case Tenant:
-                                            // Add sub-tenants accounts
-                                            approvedAccounts.addAll(((Tenant) currentAccount).getSubTenants());
-                                            break;
-                                        case SubTenant:
-                                            // add parent tenant account
-                                            approvedAccounts.add(((SubTenant) currentAccount).getParentTenant());
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    return approvedAccounts.contains(m.getToAccount());
-                                })
                                 .findFirst().orElse(null);
                         if ( personalMessage != null ) {
                             b.setPersonalMessage(toPersonalMessage(personalMessage));
@@ -699,6 +691,42 @@ public class Mapper {
                     }
                 })
                 .register();
+
+        mapperFactory.classMap(SubTenant.class, Tenant.class)
+                .exclude("address")
+                .exclude("enableSms")
+                .exclude("apartment")
+                .exclude("subTenants")
+                .exclude("vehicles")
+                .exclude("parkingStalls")
+                .byDefault()
+                .customize(new CustomMapper<SubTenant, Tenant>() {
+                    @Override
+                    public void mapAtoB(SubTenant a, Tenant b, MappingContext context) {
+                        // because we are using LazyLoad to load proxy entities we must do this
+                        a = (SubTenant) Hibernate.unproxy(a);
+                        Tenant parent = a.getParentTenant();
+                        b.setRole(AccountRole.Tenant);
+                        b.setApartment(parent.getApartment());
+                        b.setEnableSms(parent.getEnableSms());
+                        b.setVehicles(parent.getVehicles());
+                        b.setParkingStalls(parent.getParkingStalls());
+
+                        SubTenant finalA = a;
+                        b.setSubTenants(
+                                parent.getSubTenants()
+                                        .stream()
+                                        .filter(subTenant -> !subTenant.getId()
+                                                .equals(finalA.getId()))
+                                        .collect(Collectors.toSet()));
+                    }
+
+                    @Override
+                    public void mapBtoA(Tenant a, SubTenant b, MappingContext context) {
+                        b.setRole(AccountRole.SubTenant);
+                    }
+                })
+                .register();
     }
 
     public PropertyPhotoDto toPropertyPhotoDto(@NotNull PropertyPhoto propertyPhoto) {
@@ -849,6 +877,18 @@ public class Mapper {
         Objects.requireNonNull(request);
 
         return mapperFactory.getMapperFacade().map(request, SubTenant.class);
+    }
+
+    public SubTenant switchTenantToSubTenant(@NotNull Tenant tenant) {
+        Objects.requireNonNull(tenant);
+
+        return mapperFactory.getMapperFacade().map(tenant, SubTenant.class);
+    }
+
+    public Tenant switchSubTenantToTenant(@NotNull SubTenant subTenant) {
+        Objects.requireNonNull(subTenant);
+
+        return mapperFactory.getMapperFacade().map(subTenant, Tenant.class);
     }
 
     public PredefinedMessageDto toPredefinedMessageDto(@NotNull PredefinedMessage entity) {
