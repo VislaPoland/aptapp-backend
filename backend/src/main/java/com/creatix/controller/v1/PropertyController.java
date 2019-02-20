@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,13 +38,28 @@ import java.util.stream.Collectors;
 @Transactional
 @RequestMapping(path = {"/api/properties", "/api/v1/properties"})
 @ApiVersion(1.0)
+@Slf4j
 public class PropertyController {
+
+    private static final String CSV_MIME_TYPE = "text/csv";
+
     @Autowired
     private Mapper mapper;
     @Autowired
     private PropertyService propertyService;
     @Autowired
     private ApplicationFeatureService applicationFeatureService;
+
+    private void generateFileOutputResponse(String outputString, final HttpServletResponse response, String contentType) {
+        response.setHeader("Content-Disposition", "attachment");
+        response.setContentType(contentType + "; charset=UTF-8");
+        try (final OutputStream out = response.getOutputStream()) {
+            out.write(outputString.getBytes(StandardCharsets.UTF_8));
+            out.flush();
+        } catch (IOException e) {
+            log.error("Unable to write csv data to output stream", e);
+        }
+    }
 
     @ApiOperation(value = "Get all properties")
     @ApiResponses(value = {
@@ -78,14 +95,11 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/{propertyId}/csv", method = RequestMethod.GET, produces = "text/csv")
+    @RequestMapping(value = "/{propertyId}/csv", method = RequestMethod.GET, produces = CSV_MIME_TYPE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
-    public ResponseEntity<String> getPropertyAccounts(final HttpServletResponse response, @PathVariable long propertyId) {
-        response.setHeader("Content-Disposition", "attachment; filename=property_"+propertyId+"_accounts.csv");
-        response.setContentType("text/csv");
+    public void getPropertyAccounts(final HttpServletResponse response, @PathVariable long propertyId) {
         String csvResponse = propertyService.generateCsvResponse(propertyId);
-        return new ResponseEntity<>(csvResponse, HttpStatus.OK);
-
+        generateFileOutputResponse(csvResponse, response, CSV_MIME_TYPE);
     }
 
     @ApiOperation(value = "Get users all properties accounts to csv")
@@ -95,13 +109,11 @@ public class PropertyController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @JsonView(Views.Public.class)
-    @RequestMapping(value = "/all/csv", method = RequestMethod.GET, produces = "text/csv")
+    @RequestMapping(value = "/all/csv", method = RequestMethod.GET, produces = CSV_MIME_TYPE)
     @RoleSecured({AccountRole.Administrator})
-    public ResponseEntity<String> getAllPropertyAccounts(final HttpServletResponse response) {
-        response.setHeader("Content-Disposition", "attachment; filename=all_property_accounts.csv");
-        response.setContentType("text/csv");
+    public void getAllPropertyAccounts(final HttpServletResponse response) {
         String csvResponse = propertyService.generateAllCsvResponse();
-        return new ResponseEntity<>(csvResponse, HttpStatus.OK);
+        generateFileOutputResponse(csvResponse, response, CSV_MIME_TYPE);
     }
 
     @JsonView(Views.Public.class)
