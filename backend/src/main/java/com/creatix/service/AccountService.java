@@ -259,7 +259,7 @@ public class AccountService {
         final Account account = accountDao.findByActionToken(actionToken);
         if ( account == null ) {
             logger.warn("Action token is not valid");
-            throw new IllegalArgumentException("Action token is not valid. Please insert valid Action token.");
+            throw new IllegalArgumentException("Invalid activation code");
         }
         return account;
     }
