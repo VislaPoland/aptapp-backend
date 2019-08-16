@@ -12,7 +12,7 @@ public class TenantActivationMessageTemplate extends ActivationMessageTemplate {
 
     @Override
     public String getSubject() {
-        return "Welcome to Apt. App - Empowered & Enhanced Resident Living";
+        return "Welcome to Apt. App";
     }
 
     public String getPropertyName() {
