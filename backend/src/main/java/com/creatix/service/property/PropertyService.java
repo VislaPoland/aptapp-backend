@@ -134,9 +134,21 @@ public class PropertyService {
                 property.setEnableEmailEscalation(request.getEnableEmailEscalation());
             }
 
-            if (request.getEnableSmsEscalation() != null) {
+			if (request.getEnableSmsEscalation() != null) {
                 property.setEnableSmsEscalation(request.getEnableSmsEscalation());
             }
+            
+			if (request.getMainColor() != null) {
+				 property.setMainColor(request.getMainColor());
+			}
+			 
+			if (request.getBackgroundColor() != null) {
+				property.setBackgroundColor(request.getBackgroundColor());
+			}
+			
+			if (request.getTextColor() != null) {
+				property.setTextColor(request.getTextColor());
+			}
 
             propertyDao.persist(property);
             return property;

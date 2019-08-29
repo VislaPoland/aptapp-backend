@@ -24,7 +24,7 @@ public class PropertyDto {
     @ApiModelProperty(value = "Property address", required = true)
     private AddressDto address;
     @ApiModelProperty(value = "Full address", required = true)
-    private String fullAddress;
+	private String fullAddress;
     @ApiModelProperty(value = "Time zone", required = true)
     private String timeZone;
     @ApiModelProperty
@@ -49,6 +49,12 @@ public class PropertyDto {
     private PropertyStatus status;
     @ApiModelProperty(value = "Pay rent page url")
     private String payRentUrl;
+    @ApiModelProperty(value = "Main color")
+    private String mainColor;
+    @ApiModelProperty(value = "Background color")
+    private String backgroundColor;
+    @ApiModelProperty(value = "Text color")
+    private String textColor;    
     @ApiModelProperty(value = "Lock out hours, lockout after repetition msgs in hours, default set to 24h", required = true, notes = "Lockout after repetition msgs in hours")
     private Integer lockoutHours;
     @ApiModelProperty(value = "Throttle fast, time of locking msg after last one in minutes, default set to 15min", required = true, notes = "Time of locking msg after last one in minutes")

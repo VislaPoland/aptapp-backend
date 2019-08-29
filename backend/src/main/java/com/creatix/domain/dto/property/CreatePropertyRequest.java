@@ -33,6 +33,18 @@ public class CreatePropertyRequest {
     @ApiModelProperty(value = "Pay rent page url")
     @Size(max = 512)
     private String payRentUrl;
+        
+    @ApiModelProperty(value = "Main color")
+    @Size(max = 20)
+    private String mainColor;
+    
+    @ApiModelProperty(value = "Background color")
+    @Size(max = 20)
+    private String backgroundColor;
+    
+    @ApiModelProperty(value = "Text color")
+    @Size(max = 20)
+    private String textColor;
 
     @NotNull
     @ApiModelProperty(value = "Enable/disable sms notifications", required = true, notes = "Indicate that sms message notifications are enabled/disabled")

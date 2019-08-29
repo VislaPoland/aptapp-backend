@@ -99,7 +99,16 @@ public class Property {
     @Nullable
     @Column
     private Integer throttleSlowLimit;
-
+    
+    @Nullable
+    private String mainColor;
+    
+    @Nullable
+    private String backgroundColor;
+    
+    @Nullable
+    private String textColor;
+    
     @OneToMany(mappedBy = "managedProperty")
     @OrderBy("firstName asc, lastName asc")
     private Set<PropertyManager> managers;

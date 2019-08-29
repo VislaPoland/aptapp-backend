@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Andrzej Awramiuk" id="db.changelog-20190828">
+        <comment>Add background_color,  main_color and text_color column to property.</comment>
+        <addColumn tableName="property">
+            <column name="background_color" type="varchar(20)"/>
+            <column name="main_color" type="varchar(20)"/>
+            <column name="text_color" type="varchar(20)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
