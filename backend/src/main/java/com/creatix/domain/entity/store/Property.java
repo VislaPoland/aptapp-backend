@@ -124,6 +124,9 @@ public class Property {
 
     @OneToMany(mappedBy = "property")
     private List<PropertyPhoto> photos = new ArrayList<>(1);
+    
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private PropertyLogo logo;
 
     @OneToMany(mappedBy = "property")
     private List<PredefinedMessage> predefinedMessages;

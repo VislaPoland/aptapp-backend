@@ -332,7 +332,12 @@ public class PropertyService {
         logo.setProperty(property);
         logo.setFileName(fileName);
         logo.setFilePath(logoFilePath.toString());
+        
+        property.setLogo(logo);
+        
         propertyLogoDao.persist(logo);
+        
+        
 
         return property;
     }
