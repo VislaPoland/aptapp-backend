@@ -5,13 +5,15 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <changeSet author="Andrzej Awramiuk" id="db.changelog-20190828">
-        <comment>Add background_color,  main_color and text_color column to property.</comment>
+    <changeSet author="Andrew Awramiuk" id="db.changelog-20190828">
+        <comment>Add background_color,  main_color and text_color and logo_id column to property.</comment>
         <addColumn tableName="property">
             <column name="background_color" type="varchar(20)"/>
             <column name="main_color" type="varchar(20)"/>
             <column name="text_color" type="varchar(20)"/>
+            <column name="logo_id" type="bigint"/>
         </addColumn>
+
     </changeSet>
 
 </databaseChangeLog>

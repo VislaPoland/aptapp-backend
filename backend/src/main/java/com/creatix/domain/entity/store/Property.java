@@ -50,6 +50,11 @@ public class Property {
     @JoinColumn
     @NotNull
     private Address address;
+    
+    @OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn
+    @NotNull
+    private PropertyLogo logo;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column
@@ -124,9 +129,6 @@ public class Property {
 
     @OneToMany(mappedBy = "property")
     private List<PropertyPhoto> photos = new ArrayList<>(1);
-    
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    private PropertyLogo logo;
 
     @OneToMany(mappedBy = "property")
     private List<PredefinedMessage> predefinedMessages;

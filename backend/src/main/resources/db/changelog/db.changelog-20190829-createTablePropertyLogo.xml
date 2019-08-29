@@ -23,13 +23,14 @@
             </column>
         </createTable>
         
-        <createIndex indexName="IDX50htyd20tqsxvx48w1xfakodi" tableName="property_logo">
+        <addPrimaryKey columnNames="id" constraintName="property_logo_pkey" tableName="property_logo"/>
+        
+        <createIndex indexName="IDX50htyd20tqsxvx48w1xfakoda" tableName="property_logo">
             <column name="property_id"/>
         </createIndex>
         
-        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="property_logo" constraintName="FK13rj3lc864h0x5cun88gyv52a" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="property_logo" constraintName="FK13rj3lc864h0x5cun88gee52a" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
         
-
     </changeSet>
 
 </databaseChangeLog>
