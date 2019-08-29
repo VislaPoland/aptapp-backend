@@ -41,5 +41,6 @@
     <include file="classpath:db/changelog/db.changelog-20190111-addColumnsToNotificationHistory.xml"/>
     <include file="classpath:db/changelog/db.changelog-20190117-createTableNotificationStatusFlow.xml"/>
     <include file="classpath:db/changelog/db.changelog-20190828-addColumnsToProperty.xml"/>
+    <include file="classpath:db/changelog/db.changelog-20190829-createTablePropertyLogo.xml"/>
 </databaseChangeLog>
 

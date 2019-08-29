@@ -6,6 +6,7 @@ import com.creatix.domain.dto.ApplicationFeatureDto;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.*;
+import com.creatix.domain.entity.store.PropertyLogo;
 import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.security.RoleSecured;
@@ -231,6 +232,67 @@ public class PropertyController {
         throw new EntityNotFoundException("Unable to locate photo file");
     }
 
+    @ApiOperation(value = "Upload property logo")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{propertyId}/logo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured
+    public DataResponse<PropertyDto> storePropertyLogo(@RequestParam MultipartFile file, @PathVariable long propertyId) throws IOException {
+        return new DataResponse<>(mapper.toPropertyDto(propertyService.storePropertyLogo(file, propertyId)));
+    }
+
+    @ApiOperation(value = "Delete property logo")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{propertyId}/logo", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public DataResponse<PropertyLogoDto> deletePropertyLogo(@PathVariable Long propertyId) throws IOException {
+        return new DataResponse<>(mapper.toPropertyLogoDto(propertyService.deletePropertyLogo(propertyId)));
+    }
+
+    @ApiOperation(value = "Download property logo")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    @JsonView(Views.Public.class)
+    @RequestMapping(value = "/{propertyId}/logo", method = RequestMethod.GET)
+    @ResponseBody
+    public HttpEntity<byte[]> getFile(@PathVariable Long propertyId) throws IOException {
+        final PropertyLogo logo = propertyService.getPropertyLogo(propertyId);
+        final File logoFile = new File(logo.getFilePath());
+        if (logoFile.exists()) {
+            try {
+                final byte[] logoFileData = FileUtils.readFileToByteArray(logoFile);
+
+                final HttpHeaders headers = new HttpHeaders();
+
+                if (logoFile.toPath().toString().toUpperCase().endsWith(".JPEG")) {
+                    headers.setContentType(MediaType.IMAGE_JPEG);
+                } else if (logoFile.toPath().toString().toUpperCase().endsWith(".GIF")) {
+                    headers.setContentType(MediaType.IMAGE_GIF);
+                } else {
+                    headers.setContentType(MediaType.IMAGE_PNG);
+                }
+                headers.setContentLength(logoFileData.length);
+
+                return new HttpEntity<>(logoFileData, headers);
+            } catch (IOException exception) {
+                throw new EntityNotFoundException("Unable to locate logo file");
+            }
+        }
+
+        throw new EntityNotFoundException("Unable to locate logo file");
+    } 
 
     @ApiOperation(value = "Get application features configuration for property")
     @ApiResponses(value = {

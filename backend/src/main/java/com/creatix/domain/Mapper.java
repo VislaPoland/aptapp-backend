@@ -733,6 +733,11 @@ public class Mapper {
         Objects.requireNonNull(propertyPhoto, "Property photo is null");
         return mapperFactory.getMapperFacade().map(propertyPhoto, PropertyPhotoDto.class);
     }
+    
+    public PropertyLogoDto toPropertyLogoDto(@NotNull PropertyLogo propertyLogo) {
+        Objects.requireNonNull(propertyLogo, "Property logo is null");
+        return mapperFactory.getMapperFacade().map(propertyLogo, PropertyLogoDto.class);
+    }
 
     public void fillApartment(@NotNull PersistApartmentRequest req, @NotNull Apartment ap) {
         Objects.requireNonNull(req);

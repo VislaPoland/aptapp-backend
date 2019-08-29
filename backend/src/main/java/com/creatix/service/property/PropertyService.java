@@ -7,6 +7,7 @@ import com.creatix.domain.dto.property.CreatePropertyRequest;
 import com.creatix.domain.dto.property.PropertyStatsDto;
 import com.creatix.domain.dto.property.UpdatePropertyRequest;
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.PropertyLogo;
 import com.creatix.domain.entity.store.PropertyPhoto;
 import com.creatix.domain.entity.store.account.PropertyOwner;
 import com.creatix.domain.entity.store.account.SubTenant;
@@ -63,6 +64,8 @@ public class PropertyService {
     private TenantService tenantService;
     @Autowired
     AccountService accountService;
+    @Autowired
+    private PropertyLogoDao propertyLogoDao;
 
     private static String[] columns = { "First Name", "Last Name", "Primary phone", "Primary email", "Created date", "Token valid until" };
 
@@ -299,7 +302,7 @@ public class PropertyService {
 
         return photo;
     }
-
+    
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public PropertyPhoto deletePropertyPhoto(Long propertyPhotoId) throws IOException {
         final PropertyPhoto photo = propertyPhotoDao.findById(propertyPhotoId);
@@ -313,6 +316,52 @@ public class PropertyService {
 
         return photo;
     }
+    
+    @RoleSecured
+    public Property storePropertyLogo(MultipartFile file, long propertyId) throws IOException {
+
+        final Property property = getProperty(propertyId);
+
+        // move uploaded file to file repository
+        final String fileName = String.format("%d-%s", property.getId(), file.getOriginalFilename());
+        final Path logoFilePath = Paths.get(uploadProperties.getRepositoryPath(), fileName);
+        Files.createDirectories(logoFilePath.getParent());
+        file.transferTo(logoFilePath.toFile());
+
+        final PropertyLogo logo = new PropertyLogo();
+        logo.setProperty(property);
+        logo.setFileName(fileName);
+        logo.setFilePath(logoFilePath.toString());
+        propertyLogoDao.persist(logo);
+
+        return property;
+    }
+    
+    public PropertyLogo getPropertyLogo(@NotNull Long propertyId) {
+        Objects.requireNonNull(propertyId, "Property id is null");
+
+        final PropertyLogo logo = propertyLogoDao.findByPropertyId(propertyId);
+        if ( logo == null ) {
+            throw new EntityNotFoundException(String.format("Logo of property=%s not found", propertyId));
+        }
+
+        return logo;
+    }
+    
+    @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
+    public PropertyLogo deletePropertyLogo(@NotNull Long propertyId) throws IOException {
+        final PropertyLogo logo = propertyLogoDao.findById(propertyId);
+        if ( logo == null ) {
+            throw new EntityNotFoundException(String.format("Logo of property=%d not found", propertyId));
+        }
+
+        propertyLogoDao.delete(logo);
+
+        Files.deleteIfExists(new File(logo.getFilePath()).toPath());
+
+        return logo;
+    }
+
 
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager})
     public @NotNull PropertyStatsDto getPropertyStats(@NotNull Long propertyId) {

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Andrew Awramiuk" id="db.changelog-20190829">
+        <comment>create table property logo</comment>
+
+        <createTable tableName="property_logo">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_path" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <createIndex indexName="IDX50htyd20tqsxvx48w1xfakodi" tableName="property_logo">
+            <column name="property_id"/>
+        </createIndex>
+        
+        <addForeignKeyConstraint baseColumnNames="property_id" baseTableName="property_logo" constraintName="FK13rj3lc864h0x5cun88gyv52a" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="property"/>
+        
+
+    </changeSet>
+
+</databaseChangeLog>

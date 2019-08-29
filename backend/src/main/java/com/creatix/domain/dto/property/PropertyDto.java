@@ -43,6 +43,8 @@ public class PropertyDto {
     private MaintenanceSlotScheduleDto schedule;
     @ApiModelProperty(value = "Notification photo")
     private List<PropertyPhotoDto> photos;
+    @ApiModelProperty(value = "Property logo")
+    private PropertyLogoDto logo;
     @ApiModelProperty(value = "Enable/disable sms notifications", required = true, notes = "Indicate that sms message notifications are enabled/disabled")
     private Boolean enableSms;
     @ApiModelProperty(value = "Property status")
