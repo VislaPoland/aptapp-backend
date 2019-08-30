@@ -51,7 +51,7 @@ public class Property {
     @NotNull
     private Address address;
     
-    @OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(optional = true, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
     @Nullable
     private PropertyLogo logo;
