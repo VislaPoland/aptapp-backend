@@ -53,7 +53,7 @@ public class Property {
     
     @OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
-    @NotNull
+    @Nullable
     private PropertyLogo logo;
 
     @Temporal(TemporalType.TIMESTAMP)
