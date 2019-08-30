@@ -355,7 +355,7 @@ public class PropertyService {
     
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public PropertyLogo deletePropertyLogo(@NotNull Long propertyId) throws IOException {
-        final PropertyLogo logo = propertyLogoDao.findById(propertyId);
+        final PropertyLogo logo = propertyLogoDao.findByPropertyId(propertyId);
         if ( logo == null ) {
             throw new EntityNotFoundException(String.format("Logo of property=%d not found", propertyId));
         }
