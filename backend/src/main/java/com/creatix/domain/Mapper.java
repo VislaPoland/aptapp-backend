@@ -94,7 +94,7 @@ public class Mapper {
         return applicationProperties.buildBackendUrl(String.format("api/properties/%d/photos/%s", photo.getProperty().getId(), photo.getFileName())).toString();
     }
     private String createPropertyLogoDownloadUrl(PropertyLogo logo) throws MalformedURLException, URISyntaxException {
-        return applicationProperties.buildBackendUrl(String.format("api/properties/%d/photos/%s", logo.getProperty().getId(), logo.getFileName())).toString();
+        return applicationProperties.buildBackendUrl(String.format("api/properties/%d/logo", logo.getProperty().getId())).toString();
     }    
     private String createPredefinedMessagePhotoDownloadUrl(PredefinedMessagePhoto photo) throws MalformedURLException, URISyntaxException {
         return applicationProperties.buildBackendUrl(String.format("/api/properties/%d/messages/predefined/%d/photos/%s", photo.getPredefinedMessage().getProperty().getId(), photo.getPredefinedMessage().getId(), photo.getFileName())).toString();
