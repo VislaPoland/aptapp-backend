@@ -93,6 +93,9 @@ public class Mapper {
     private String createPropertyPhotoDownloadUrl(PropertyPhoto photo) throws MalformedURLException, URISyntaxException {
         return applicationProperties.buildBackendUrl(String.format("api/properties/%d/photos/%s", photo.getProperty().getId(), photo.getFileName())).toString();
     }
+    private String createPropertyLogoDownloadUrl(PropertyLogo logo) throws MalformedURLException, URISyntaxException {
+        return applicationProperties.buildBackendUrl(String.format("api/properties/%d/photos/%s", logo.getProperty().getId(), logo.getFileName())).toString();
+    }    
     private String createPredefinedMessagePhotoDownloadUrl(PredefinedMessagePhoto photo) throws MalformedURLException, URISyntaxException {
         return applicationProperties.buildBackendUrl(String.format("/api/properties/%d/messages/predefined/%d/photos/%s", photo.getPredefinedMessage().getProperty().getId(), photo.getPredefinedMessage().getId(), photo.getFileName())).toString();
     }
@@ -194,6 +197,20 @@ public class Mapper {
                     }
                 })
                 .register();
+        mapperFactory.classMap(PropertyLogo.class, PropertyLogoDto.class)
+        .byDefault()
+        .customize(new CustomMapper<PropertyLogo, PropertyLogoDto>() {
+            @Override
+            public void mapAtoB(PropertyLogo a, PropertyLogoDto b, MappingContext context) {
+                try {
+                    b.setFileUrl(createPropertyLogoDownloadUrl(a));
+                }
+                catch ( MalformedURLException | URISyntaxException e ) {
+                    throw new IllegalStateException("Failed to create logo download URL", e);
+                }
+            }
+        })
+        .register();        
         mapperFactory.classMap(Property.class, PropertyDto.class)
                 .exclude("managers")
                 .byDefault()
