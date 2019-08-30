@@ -78,11 +78,18 @@ public class PropertyService {
         return item;
     }
 
+    //https://www.baeldung.com/rest-api-pagination-in-spring
     @RoleSecured
-    public List<Property> getAllProperties() {
-        return propertyDao.findAll().stream()
-                .filter(p -> authorizationManager.canRead(p))
-                .collect(Collectors.toList());
+    public List<Property> getAllProperties(Integer page, Integer size, String keywords) {
+    	if (keywords != null && page != null && size != null){
+	        return propertyDao.findAll(page, size, keywords).stream()
+	                .filter(p -> authorizationManager.canRead(p))
+	                .collect(Collectors.toList());
+    	}else{
+	        return propertyDao.findAll().stream()
+	                .filter(p -> authorizationManager.canRead(p))
+	                .collect(Collectors.toList());    		
+    	}
     }
 
     @RoleSecured(AccountRole.Administrator)
@@ -363,7 +370,7 @@ public class PropertyService {
         propertyLogoDao.delete(logo);
 
         Files.deleteIfExists(new File(logo.getFilePath()).toPath());
-
+        
         return logo;
     }
 

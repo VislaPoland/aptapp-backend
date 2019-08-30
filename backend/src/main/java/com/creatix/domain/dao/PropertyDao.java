@@ -17,5 +17,22 @@ public class PropertyDao extends DaoBase<Property, Long> {
                 .orderBy(QProperty.property.name.lower().asc())
                 .fetch();
     }
+    
+    public List<Property> findAll(Integer page, Integer size, String keywords) {
+        return queryFactory.selectFrom(QProperty.property)
+                .where(
+                		(QProperty.property.deleteDate.isNull()).and(
+                				(QProperty.property.name.toLowerCase().contains(keywords)).or
+                				(QProperty.property.address.houseNumber.toLowerCase().contains(keywords)).or
+                				(QProperty.property.address.streetName.toLowerCase().contains(keywords)).or
+                				(QProperty.property.address.town.toLowerCase().contains(keywords)).or
+                				(QProperty.property.address.state.toLowerCase().contains(keywords)).or
+                				(QProperty.property.address.zipCode.toLowerCase().contains(keywords)).or
+                				(QProperty.property.name.toLowerCase().contains(keywords))
+                	   )
+                )
+                .orderBy(QProperty.property.name.lower().asc())
+                .fetch();
+    }
 
 }

@@ -69,9 +69,11 @@ public class PropertyController {
     })
     @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(params = { "page", "size" })
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
-    public DataResponse<List<PropertyDto>> getAllProperties() {
-        return new DataResponse<>(propertyService.getAllProperties().stream()
+    public DataResponse<List<PropertyDto>> getAllProperties(@RequestParam(value="page",required=false) Integer page, 
+    		  @RequestParam(value="size",required=false) Integer size, @RequestParam(value="keywords",required=false) String keywords) {
+        return new DataResponse<>(propertyService.getAllProperties(page, size, keywords).stream()
                 .map(p -> mapper.toPropertyDto(p))
                 .collect(Collectors.toList()));
     }
