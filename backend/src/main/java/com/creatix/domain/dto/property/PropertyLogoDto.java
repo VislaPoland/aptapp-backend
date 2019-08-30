@@ -15,7 +15,7 @@ public class PropertyLogoDto {
     private Long id;
     @ApiModelProperty(value = "Logo file name", required = true)
     private String fileName;
-    @ApiModelProperty(value = "Logo Path", required = true)
-    private String filePath;
+    @ApiModelProperty(value = "Logo Url", required = true)
+    private String fileUrl;
 
 }
