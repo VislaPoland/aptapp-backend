@@ -32,6 +32,7 @@ public class PropertyDao extends DaoBase<Property, Long> {
                 	   )
                 )
                 .orderBy(QProperty.property.name.lower().asc())
+                .limit(size).offset(page*size)
                 .fetch();
     }
 
