@@ -39,7 +39,7 @@ public class AccountDao extends DaoBase<Account, Long> {
         					account.firstName.toLowerCase().contains(keywords))
         				.or(account.lastName.toLowerCase().contains(keywords))
         				//.or(account.role.toLowerCase().contains(keywords))        				
-        				//.or(account.getProperty().apartment.unitNumber.toLowerCase().contains(keywords))
+        				///.or(account.apartment.unitNumber.toLowerCase().contains(keywords))
         				//.or(account.fullName.toLowerCase().contains(keywords))
         				.or(account.primaryEmail.toLowerCase().contains(keywords))
         				//.or(account.stringStatus.toLowerCase().contains(keywords))
@@ -116,7 +116,7 @@ public class AccountDao extends DaoBase<Account, Long> {
         accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
         
         if (page != null && size != null){
-        	accountsReturn = accounts.subList(page*size, page*size+size);
+        	accountsReturn = accounts.subList(page*size, Math.min(page*size+size,accounts.size()-1));
         }else{
         	accountsReturn = accounts;
         }
