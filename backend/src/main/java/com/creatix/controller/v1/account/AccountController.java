@@ -51,8 +51,14 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
-    public DataResponse<List<AccountDto>> getAccounts(@RequestParam(required = false) AccountRole[] roles, @RequestParam(required = false) Long propertyId) {
-        return new DataResponse<>(accountService.getAccounts(roles, propertyId).stream()
+    public DataResponse<List<AccountDto>> getAccounts(@RequestParam(required = false) AccountRole[] roles, 
+    		@RequestParam(required = false) Long propertyId,
+    		@RequestParam(value="page",required=false) Integer page, 
+    		@RequestParam(value="size",required=false) Integer size, 
+    		@RequestParam(value="keywords",required=false) String keywords,
+    		@RequestParam(value="sortColumn",required=false) String sortColumn, 
+    		@RequestParam(value="sortOrder",required=false) String sortOrder) {
+        return new DataResponse<>(accountService.getAccounts(roles, propertyId, page, size, keywords, sortColumn, sortOrder).stream()
                 .map(a -> mapper.toAccountDto(a))
                 .collect(Collectors.toList()));
     }

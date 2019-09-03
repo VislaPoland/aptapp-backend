@@ -1,7 +1,9 @@
 package com.creatix.domain.dao;
 
+import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.core.BooleanBuilder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +24,32 @@ import static com.creatix.domain.entity.store.account.QTenant.tenant;
 @Transactional
 public class AccountDao extends DaoBase<Account, Long> {
 
-    public List<Account> findByRolesAndPropertyIdList(@NotNull AccountRole[] roles, Collection<Long> propertyIdList) {
+    public List<Account> findByRolesAndPropertyIdList(@NotNull AccountRole[] roles, Collection<Long> propertyIdList,
+    		Integer page, Integer size, String keywords, String sortColumn, String sortOrder) {
         Objects.requireNonNull(roles, "Account roles array is null");
 
         final List<Account> accounts;
+        final List<Account> accountsReturn;
         if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
-            accounts = queryFactory.selectFrom(account)
-                    .where(account.role.in(roles).and(account.deletedAt.isNull()))
-                    .orderBy(account.firstName.lower().asc())
-                    .orderBy(account.lastName.lower().asc())
-                    .fetch();
+        	JPQLQuery<Account> query = queryFactory.selectFrom(account);
+        	
+        	if (keywords != null){
+        		query.where(account.role.in(roles).and(account.deletedAt.isNull())
+        				.and(
+        					account.firstName.toLowerCase().contains(keywords))
+        				.or(account.lastName.toLowerCase().contains(keywords))
+        				//.or(account.role.toLowerCase().contains(keywords))        				
+        				//.or(account.getProperty().apartment.unitNumber.toLowerCase().contains(keywords))
+        				//.or(account.fullName.toLowerCase().contains(keywords))
+        				.or(account.primaryEmail.toLowerCase().contains(keywords))
+        				//.or(account.stringStatus.toLowerCase().contains(keywords))
+        		);
+        	}else{
+        		query.where(account.role.in(roles).and(account.deletedAt.isNull()));
+        	}
+            
+            query.orderBy(account.firstName.lower().asc()).orderBy(account.lastName.lower().asc());
+            accounts = query.fetch();
         }
         else {
             accounts = new ArrayList<>();
@@ -96,8 +114,14 @@ public class AccountDao extends DaoBase<Account, Long> {
         }
 
         accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
-
-        return accounts;
+        
+        if (page != null && size != null){
+        	accountsReturn = accounts.subList(page*size, page*size+size);
+        }else{
+        	accountsReturn = accounts;
+        }
+        
+        return accountsReturn;
     }
 
     /**

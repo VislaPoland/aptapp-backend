@@ -40,6 +40,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Nonnull;
 import javax.mail.MessagingException;
@@ -214,8 +215,14 @@ public class AccountService {
 
         accountDeviceService.assignDeviceToAccount(account);
     }
-
     public List<Account> getAccounts(AccountRole[] roles, Long propertyId) {
+    	return getAccounts(roles, propertyId,
+        		null, null, null,
+        		null, null);
+    }
+    public List<Account> getAccounts(AccountRole[] roles, Long propertyId,
+    		Integer page, Integer size, String keywords,
+    		String sortColumn, String sortOrder) {
         List<Long> propertyIdForcedList = new ArrayList<>();
         if ( propertyId != null ) {
             propertyIdForcedList.add(propertyId);
@@ -240,7 +247,7 @@ public class AccountService {
             }
         }
 
-        return accountDao.findByRolesAndPropertyIdList(roles, propertyIdForcedList);
+        return accountDao.findByRolesAndPropertyIdList(roles, propertyIdForcedList, page, size, keywords, sortColumn, sortOrder);
     }
 
     private Account getAccount(String email) {
