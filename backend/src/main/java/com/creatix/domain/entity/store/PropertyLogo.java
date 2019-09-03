@@ -26,6 +26,6 @@ public class PropertyLogo {
     @Column(nullable = false, length = 2048)
     private String filePath;
 
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     private Property property;
 }

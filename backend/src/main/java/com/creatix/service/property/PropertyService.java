@@ -64,8 +64,7 @@ public class PropertyService {
     private TenantService tenantService;
     @Autowired
     AccountService accountService;
-    @Autowired
-    private PropertyLogoDao propertyLogoDao;
+
 
     private static String[] columns = { "First Name", "Last Name", "Primary phone", "Primary email", "Created date", "Token valid until" };
 
@@ -339,22 +338,19 @@ public class PropertyService {
         logo.setProperty(property);
         logo.setFileName(fileName);
         logo.setFilePath(logoFilePath.toString());
-        
         property.setLogo(logo);
         
-        propertyLogoDao.persist(logo);
-        
-        
-
         return property;
     }
     
     public PropertyLogo getPropertyLogo(@NotNull Long propertyId) {
         Objects.requireNonNull(propertyId, "Property id is null");
 
-        final PropertyLogo logo = propertyLogoDao.findByPropertyId(propertyId);
+        final Property property = getOrElseThrow(propertyId, propertyDao, new EntityNotFoundException(String.format("Property %d not found", propertyId)));
+        
+        final PropertyLogo logo = property.getLogo();
         if ( logo == null ) {
-            throw new EntityNotFoundException(String.format("Logo of property=%s not found", propertyId));
+            throw new EntityNotFoundException(String.format("Logo of property=%d not found", propertyId));
         }
 
         return logo;
@@ -362,13 +358,17 @@ public class PropertyService {
     
     @RoleSecured({AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.PropertyOwner, AccountRole.Administrator})
     public PropertyLogo deletePropertyLogo(@NotNull Long propertyId) throws IOException {
-        final PropertyLogo logo = propertyLogoDao.findByPropertyId(propertyId);
+
+        final Property property = getOrElseThrow(propertyId, propertyDao, new EntityNotFoundException(String.format("Property %d not found", propertyId)));
+        
+        final PropertyLogo logo = property.getLogo();
         if ( logo == null ) {
             throw new EntityNotFoundException(String.format("Logo of property=%d not found", propertyId));
         }
-
-        propertyLogoDao.delete(logo);
-
+        property.setLogo(null);
+        
+        propertyDao.persist(property);
+        
         Files.deleteIfExists(new File(logo.getFilePath()).toPath());
         
         return logo;
