@@ -116,7 +116,7 @@ public class AccountDao extends DaoBase<Account, Long> {
         accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
         
         if (page != null && size != null){
-        	accountsReturn = accounts.subList(page*size, Math.min(page*size+size,accounts.size()-1));
+        	accountsReturn = accounts.subList(Math.min(page*size,accounts.size()-1), Math.min(page*size+size,accounts.size()-1));
         }else{
         	accountsReturn = accounts;
         }
