@@ -76,7 +76,7 @@ public class PropertyController {
     		  @RequestParam(value="size",required=false) Integer size, @RequestParam(value="keywords",required=false) String keywords) {
     	PageableWithTotalCountDataResponse<List<PropertyDto>> ret;
     	ret = new PageableWithTotalCountDataResponse<List<PropertyDto>>(propertyService.getAllProperties(page, size, keywords).stream()
-                .map(p -> mapper.toPropertyDto(p)).collect(Collectors.toList()),size,page,propertyService.getAllPropertiesCount(keywords),10);
+                .map(p -> mapper.toPropertyDto(p)).collect(Collectors.toList()),size,page,(propertyService.getAllPropertiesCount(keywords)).intValue(),10);
     	return ret;
     }
 

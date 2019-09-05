@@ -215,15 +215,25 @@ public class AccountService {
 
         accountDeviceService.assignDeviceToAccount(account);
     }
+    public List<Account> getAccountsPage(List<Account> accounts, Integer size, Integer page){
+    	List<Account> accountsReturn;
+        if (page != null && size != null){
+            accountsReturn = accounts.subList(Math.min(page*size,accounts.size()-1), Math.min(page*size+size,accounts.size()-1));
+        }else{
+            accountsReturn = accounts;
+        }
+        
+        return accountsReturn;
+    }
+    
     public List<Account> getAccounts(AccountRole[] roles, Long propertyId) {
     	return getAccounts(roles, propertyId,
-        		null, null, null,
-        		null, null);
+        		null, null, null);
     }
-    public List<Account> getAccounts(AccountRole[] roles, Long propertyId,
-    		Integer page, Integer size, String keywords,
+    public List<Account> getAccounts(AccountRole[] roles, Long propertyId, String keywords,
     		String sortColumn, String sortOrder) {
         List<Long> propertyIdForcedList = new ArrayList<>();
+        List<Account> accounts;
         if ( propertyId != null ) {
             propertyIdForcedList.add(propertyId);
         }
@@ -247,7 +257,13 @@ public class AccountService {
             }
         }
 
-        return accountDao.findByRolesAndPropertyIdList(roles, propertyIdForcedList, page, size, keywords, sortColumn, sortOrder);
+        accounts = accountDao.findByRolesAndPropertyIdList(roles, propertyIdForcedList, keywords, sortColumn, sortOrder);
+        
+        return accounts;
+    }
+    
+    public Long getAccountsCount(String keywords) {
+    	return 10L;
     }
 
     private Account getAccount(String email) {

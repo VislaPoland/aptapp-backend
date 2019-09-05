@@ -5,6 +5,7 @@ import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.DataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.account.*;
+import com.creatix.domain.dto.PageableWithTotalCountDataResponse;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.creatix.message.MessageDeliveryException;
@@ -51,16 +52,19 @@ public class AccountController {
     @JsonView(Views.Public.class)
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
-    public DataResponse<List<AccountDto>> getAccounts(@RequestParam(required = false) AccountRole[] roles, 
+    public PageableWithTotalCountDataResponse<List<AccountDto>> getAccounts(@RequestParam(required = false) AccountRole[] roles, 
     		@RequestParam(required = false) Long propertyId,
     		@RequestParam(value="page",required=false) Integer page, 
     		@RequestParam(value="size",required=false) Integer size, 
     		@RequestParam(value="keywords",required=false) String keywords,
     		@RequestParam(value="sortColumn",required=false) String sortColumn, 
     		@RequestParam(value="sortOrder",required=false) String sortOrder) {
-        return new DataResponse<>(accountService.getAccounts(roles, propertyId, page, size, keywords, sortColumn, sortOrder).stream()
+    	
+    	List<Account> accountsAll = accountService.getAccounts(roles, propertyId, keywords, sortColumn, sortOrder);
+    	
+        return new PageableWithTotalCountDataResponse<List<AccountDto>>(accountService.getAccountsPage(accountsAll, size, page).stream()
                 .map(a -> mapper.toAccountDto(a))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()), size, page, accountsAll.size(), 10);
     }
 
     @ApiOperation(value = "Get self profile information")
