@@ -90,6 +90,16 @@ public class PropertyService {
 	                .collect(Collectors.toList());    		
     	}
     }
+    
+    @RoleSecured
+    public Long getAllPropertiesCount(String keywords) {
+    	Long ret = 0L;
+    	if (keywords != null){
+	        ret = propertyDao.findAllGetTotalRows(keywords);  		
+    	}
+    	
+    	return ret;
+    }
 
     @RoleSecured(AccountRole.Administrator)
     public Property createFromRequest(@NotNull CreatePropertyRequest request) {

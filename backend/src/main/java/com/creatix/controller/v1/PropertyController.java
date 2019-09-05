@@ -4,6 +4,7 @@ import com.creatix.configuration.versioning.ApiVersion;
 import com.creatix.domain.Mapper;
 import com.creatix.domain.dto.ApplicationFeatureDto;
 import com.creatix.domain.dto.DataResponse;
+import com.creatix.domain.dto.PageableWithTotalCountDataResponse;
 import com.creatix.domain.dto.Views;
 import com.creatix.domain.dto.property.*;
 import com.creatix.domain.entity.store.PropertyLogo;
@@ -71,11 +72,12 @@ public class PropertyController {
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(params = { "page", "size" })
     @RoleSecured({AccountRole.Administrator, AccountRole.PropertyOwner, AccountRole.PropertyManager, AccountRole.AssistantPropertyManager, AccountRole.Security, AccountRole.Maintenance})
-    public DataResponse<List<PropertyDto>> getAllProperties(@RequestParam(value="page",required=false) Integer page, 
+    public PageableWithTotalCountDataResponse<List<PropertyDto>> getAllProperties(@RequestParam(value="page",required=false) Integer page, 
     		  @RequestParam(value="size",required=false) Integer size, @RequestParam(value="keywords",required=false) String keywords) {
-        return new DataResponse<>(propertyService.getAllProperties(page, size, keywords).stream()
-                .map(p -> mapper.toPropertyDto(p))
-                .collect(Collectors.toList()));
+    	PageableWithTotalCountDataResponse<List<PropertyDto>> ret;
+    	ret = new PageableWithTotalCountDataResponse<List<PropertyDto>>(propertyService.getAllProperties(page, size, keywords).stream()
+                .map(p -> mapper.toPropertyDto(p)).collect(Collectors.toList()),size,page,propertyService.getAllPropertiesCount(keywords),10);
+    	return ret;
     }
 
     @ApiOperation(value = "Get property detail")
