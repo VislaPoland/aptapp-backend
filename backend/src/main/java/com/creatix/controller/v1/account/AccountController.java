@@ -64,7 +64,7 @@ public class AccountController {
     	
         return new PageableWithTotalCountDataResponse<List<AccountDto>>(accountService.getAccountsPage(accountsAll, size, page).stream()
                 .map(a -> mapper.toAccountDto(a))
-                .collect(Collectors.toList()), size, page, accountsAll.size(), 10);
+                .collect(Collectors.toList()), size, page, accountsAll.size());
     }
 
     @ApiOperation(value = "Get self profile information")
