@@ -10,12 +10,11 @@ import lombok.Setter;
 @Setter
 public class PageableWithTotalCountDataResponse<T> extends DataResponse<T> {
 
-    public PageableWithTotalCountDataResponse(T data, Integer pageSize, Integer pageNumber, Integer totalRows, Integer maxNumberLinksToShow) {
+    public PageableWithTotalCountDataResponse(T data, Integer pageSize, Integer pageNumber, Integer totalRows) {
         super(data);
         this.pageSize = pageSize;
         this.pageNumber = pageNumber;
         this.totalRows = totalRows;
-        this.maxNumberLinksToShow = maxNumberLinksToShow;
     }
 
     @ApiModelProperty(value = "Size of the page")
@@ -24,6 +23,5 @@ public class PageableWithTotalCountDataResponse<T> extends DataResponse<T> {
     private Integer pageNumber;
     @ApiModelProperty(value = "Total rows count")
     private Integer totalRows;
-    @ApiModelProperty(value = "Max links number to show")
-    private Integer maxNumberLinksToShow;
+
 }
