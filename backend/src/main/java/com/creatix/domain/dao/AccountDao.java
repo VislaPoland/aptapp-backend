@@ -39,8 +39,7 @@ public class AccountDao extends DaoBase<Account, Long> {
         				.or(account.lastName.toLowerCase().contains(keywordsLowercase))
         				//.or(account.role.toLowerCase().contains(keywordsLowercase))        				
         				///.or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase))
-//        				.or(keywordsLowercase.contains(account.firstName.toLowerCase()))
-//        				.or(keywordsLowercase.contains(account.lastName.toLowerCase()))
+        				.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
         				.or(account.primaryEmail.toLowerCase().contains(keywordsLowercase))
         				//.or(account.stringStatus.toLowerCase().contains(keywordsLowercase))
         		);

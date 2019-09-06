@@ -218,7 +218,7 @@ public class AccountService {
     public List<Account> getAccountsPage(List<Account> accounts, Integer size, Integer page){
     	List<Account> accountsReturn;
         if (page != null && size != null && accounts != null && accounts.size()>0){
-            accountsReturn = accounts.subList(Math.min(page*size,accounts.size()-1), Math.min(page*size+size,accounts.size()-1));
+            accountsReturn = accounts.subList(Math.min(page*size,accounts.size()), Math.min(page*size+size,accounts.size()));
         }else{
             accountsReturn = accounts;
         }
