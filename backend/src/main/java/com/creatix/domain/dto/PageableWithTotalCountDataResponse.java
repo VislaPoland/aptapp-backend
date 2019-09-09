@@ -16,6 +16,14 @@ public class PageableWithTotalCountDataResponse<T> extends DataResponse<T> {
         this.pageNumber = pageNumber;
         this.totalRows = totalRows;
     }
+    
+    public PageableWithTotalCountDataResponse(T data, Integer pageSize, Integer pageNumber, Integer totalRows, String keywords) {
+        super(data);
+        this.pageSize = pageSize;
+        this.pageNumber = pageNumber;
+        this.totalRows = totalRows;
+        this.keywords = keywords;
+    }
 
     @ApiModelProperty(value = "Size of the page")
     private Integer pageSize;
@@ -23,5 +31,7 @@ public class PageableWithTotalCountDataResponse<T> extends DataResponse<T> {
     private Integer pageNumber;
     @ApiModelProperty(value = "Total rows count")
     private Integer totalRows;
+    @ApiModelProperty(value = "Search keyword")
+    private String keywords;
 
 }

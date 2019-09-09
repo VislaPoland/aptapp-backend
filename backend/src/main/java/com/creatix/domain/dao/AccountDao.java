@@ -4,6 +4,8 @@ import com.creatix.domain.entity.store.Property;
 import com.creatix.domain.entity.store.account.Account;
 import com.creatix.domain.enums.AccountRole;
 import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.BooleanBuilder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,18 +33,20 @@ public class AccountDao extends DaoBase<Account, Long> {
         String keywordsLowercase = keywords.toLowerCase();
         if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
         	JPQLQuery<Account> query = queryFactory.selectFrom(account);
-        	
+        	BooleanExpression predicate = account.role.in(roles).and(account.deletedAt.isNull());
         	if (keywordsLowercase != null){
-        		query.where(account.role.in(roles).and(account.deletedAt.isNull())
-        				.and(
-        					account.firstName.toLowerCase().contains(keywordsLowercase))
-        				.or(account.lastName.toLowerCase().contains(keywordsLowercase))
-        				//.or(account.role.toLowerCase().contains(keywordsLowercase))        				
-        				///.or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase))
-        				.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
-        				.or(account.primaryEmail.toLowerCase().contains(keywordsLowercase))
-        				//.or(account.stringStatus.toLowerCase().contains(keywordsLowercase))
-        		);
+        		predicate = predicate.and(account.firstName.toLowerCase().contains(keywordsLowercase))
+            		.or(account.lastName.toLowerCase().contains(keywordsLowercase))
+            	  //.or(account.role.toLowerCase().contains(keywordsLowercase))        				
+            	 ///.or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase))
+            		.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
+            		.or(account.primaryEmail.toLowerCase().contains(keywordsLowercase));
+        		if (keywordsLowercase.contains("inactive")){
+        			predicate = predicate.or(account.active.isFalse());
+        		}else if (keywordsLowercase.contains("active")){
+        			predicate = predicate.or(account.active.isTrue());
+        		}
+        		query.where(predicate);
         	}else{
         		query.where(account.role.in(roles).and(account.deletedAt.isNull()));
         	}
