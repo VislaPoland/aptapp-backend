@@ -1,7 +1,9 @@
 package com.creatix.domain.dao;
 
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.QProperty;
 import com.creatix.domain.entity.store.account.Account;
+import com.creatix.domain.entity.store.account.QAccount;
 import com.creatix.domain.enums.AccountRole;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.core.types.Predicate;
@@ -30,22 +32,53 @@ public class AccountDao extends DaoBase<Account, Long> {
         Objects.requireNonNull(roles, "Account roles array is null");
 
         final List<Account> accounts;
-        String keywordsLowercase = keywords.toLowerCase();
+        String keywordsLowercase = keywords.toLowerCase().trim();
+        BooleanExpression predicate = account.role.in(roles).and(account.deletedAt.isNull());
+        predicate = predicate.and(account.firstName.toLowerCase().contains(keywordsLowercase))
+        	.or(account.lastName.toLowerCase().contains(keywordsLowercase))   
+        //	.or(QAccount.account.role.contains(keywordsLowercase))
+        /// .or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase))
+        	.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
+        	.or(account.primaryEmail.toLowerCase().contains(keywordsLowercase));
+    	if (keywordsLowercase.contains("inactive")){
+    		predicate = predicate.or(account.active.isFalse());
+    	}else if (keywordsLowercase.contains("active")){
+    		predicate = predicate.or(account.active.isTrue());
+    	}
+    	switch (keywordsLowercase){
+    	 	case "administrator":
+    	 		predicate = predicate.or(account.role.eq(AccountRole.Administrator));
+    	 		break;
+    	 	case "propertyowner":
+    	 		predicate = predicate.or(account.role.eq(AccountRole.PropertyOwner));
+    	 		break;
+    	 	case "propertymanager":
+    	 		predicate = predicate.or(account.role.eq(AccountRole.PropertyManager));
+    	 		break;
+    	 	case "assistantpropertymanager":
+    	 		predicate = predicate.or(account.role.eq(AccountRole.AssistantPropertyManager));
+    	 		break;
+    	 	case "maintenance":
+    	 		predicate = predicate.or(account.role.eq(AccountRole.Maintenance));
+    	 		break;
+    	 	case "security":
+    	 		predicate = predicate.or(account.role.eq(AccountRole.Security));
+    	 		break;
+    	 	case "tenant":
+    	 		predicate = predicate.or(account.role.eq(AccountRole.Tenant));
+    	 		break;
+    	 	case "subtenant":
+    	 		predicate = predicate.or(account.role.eq(AccountRole.SubTenant));
+    	 		break;
+    	};
+
+    	//predicate = predicate.or(account.role.contains(keywordsLowercase));   
+    	
         if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
         	JPQLQuery<Account> query = queryFactory.selectFrom(account);
-        	BooleanExpression predicate = account.role.in(roles).and(account.deletedAt.isNull());
+        	
         	if (keywordsLowercase != null){
-        		predicate = predicate.and(account.firstName.toLowerCase().contains(keywordsLowercase))
-            		.or(account.lastName.toLowerCase().contains(keywordsLowercase))
-            	  //.or(account.role.toLowerCase().contains(keywordsLowercase))        				
-            	 ///.or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase))
-            		.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
-            		.or(account.primaryEmail.toLowerCase().contains(keywordsLowercase));
-        		if (keywordsLowercase.contains("inactive")){
-        			predicate = predicate.or(account.active.isFalse());
-        		}else if (keywordsLowercase.contains("active")){
-        			predicate = predicate.or(account.active.isTrue());
-        		}
+
         		query.where(predicate);
         	}else{
         		query.where(account.role.in(roles).and(account.deletedAt.isNull()));
