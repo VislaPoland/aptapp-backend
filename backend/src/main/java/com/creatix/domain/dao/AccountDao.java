@@ -76,16 +76,36 @@ public class AccountDao extends DaoBase<Account, Long> {
     	
     	if (sortColumn != null){
 			if (sortColumn.equals("active")){
-				orderSpecifier = account.active.asc();
+				if (sortOrder.equals("descend")){
+					orderSpecifier = account.active.desc();
+				}else{
+					orderSpecifier = account.active.asc();
+				}
 			}else if (sortColumn.equals("apartment")){
-				orderSpecifier = account.apartment.unitNumber.lower().asc();
+				if (sortOrder.equals("descend")){
+					orderSpecifier = account.apartment.unitNumber.lower().desc();
+				}else{
+					orderSpecifier = account.apartment.unitNumber.lower().asc();
+				}
 			}else if (sortColumn.equals("primaryEmail")){
-				orderSpecifier = account.primaryEmail.lower().asc();
+				if (sortOrder.equals("descend")){
+					orderSpecifier = account.primaryEmail.lower().desc();
+				}else{
+					orderSpecifier = account.primaryEmail.lower().asc();
+				}
 			}else{
-				orderSpecifier = account.firstName.lower().asc();
+				if (sortOrder.equals("descend")){
+					orderSpecifier = account.firstName.lower().desc();
+				}else{
+					orderSpecifier = account.firstName.lower().asc();
+				}
 			}
     	}else{
-    		orderSpecifier = account.firstName.lower().asc();
+    		if (sortOrder.equals("descend")){
+    			orderSpecifier = account.firstName.lower().desc();
+    		}else{
+    			orderSpecifier = account.firstName.lower().asc();
+    		}
     	}
     	
         if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
@@ -163,17 +183,37 @@ public class AccountDao extends DaoBase<Account, Long> {
         }
         if (sortColumn != null){
         	if (sortColumn.equals("active")){
-        		accounts.sort(Account.COMPARE_BY_STATUS);
+        		if (sortOrder.equals("descend")){
+        			accounts.sort(Account.COMPARE_BY_STATUS_DESC);
+        		}else{
+        			accounts.sort(Account.COMPARE_BY_STATUS);
+        		}
         	}else if (sortColumn.equals("apartment")){
-        		accounts.sort(Account.COMPARE_BY_UNIT);
+        		if (sortOrder.equals("descend")){
+        			accounts.sort(Account.COMPARE_BY_UNIT_DESC);
+        		}else{
+        			accounts.sort(Account.COMPARE_BY_UNIT);
+        		}
         	}else if (sortColumn.equals("primaryEmail")){
-        		accounts.sort(Account.COMPARE_BY_EMAIL);
+        		if (sortOrder.equals("descend")){
+        			accounts.sort(Account.COMPARE_BY_EMAIL_DESC);
+        		}else{
+        			accounts.sort(Account.COMPARE_BY_EMAIL);
+        		}
         	}else{
-        		accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        		if (sortOrder.equals("descend")){
+        			accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME_DESC);
+        		}else{
+        			accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        		}
         	}
         	
         }else{
-        	accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        	if (sortOrder.equals("descend")){
+        		accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        	}else{
+        		accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME_DESC);
+        	}
         }
         
         

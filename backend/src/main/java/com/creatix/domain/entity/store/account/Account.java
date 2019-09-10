@@ -124,4 +124,22 @@ public class Account {
     public static Comparator<Account> COMPARE_BY_STATUS = (a, b) -> new CompareToBuilder()
             .append(a.getActive(), b.getActive())
             .toComparison();
+    
+    
+    public static Comparator<Account> COMPARE_BY_FIRST_LAST_NAME_DESC = (a, b) -> new CompareToBuilder()
+            .append(StringUtils.lowerCase(b.getFirstName()), StringUtils.lowerCase(a.getFirstName()))
+            .append(StringUtils.lowerCase(b.getLastName()), StringUtils.lowerCase(a.getLastName()))
+            .toComparison();
+    
+    public static Comparator<Account> COMPARE_BY_EMAIL_DESC = (a, b) -> new CompareToBuilder()
+            .append(StringUtils.lowerCase(b.getPrimaryEmail()), StringUtils.lowerCase(a.getPrimaryEmail()))
+            .toComparison();
+    
+    public static Comparator<Account> COMPARE_BY_UNIT_DESC = (a, b) -> new CompareToBuilder()
+            .append(StringUtils.lowerCase(b.apartment.getUnitNumber()), StringUtils.lowerCase(a.apartment.getUnitNumber()))
+            .toComparison();
+    
+    public static Comparator<Account> COMPARE_BY_STATUS_DESC = (a, b) -> new CompareToBuilder()
+            .append(b.getActive(), a.getActive())
+            .toComparison();
 }
