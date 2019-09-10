@@ -118,7 +118,7 @@ public class Account {
             .toComparison();
     
     public static Comparator<Account> COMPARE_BY_UNIT = (a, b) -> new CompareToBuilder()
-            .append(StringUtils.lowerCase(a.apartment.getUnitNumber()), StringUtils.lowerCase(b.apartment.getUnitNumber()))
+            .append(StringUtils.lowerCase(a.apartment == null?"":a.apartment.getUnitNumber()), StringUtils.lowerCase(b.apartment == null?"":b.apartment.getUnitNumber()))
             .toComparison();
     
     public static Comparator<Account> COMPARE_BY_STATUS = (a, b) -> new CompareToBuilder()
@@ -136,7 +136,8 @@ public class Account {
             .toComparison();
     
     public static Comparator<Account> COMPARE_BY_UNIT_DESC = (a, b) -> new CompareToBuilder()
-            .append(StringUtils.lowerCase(b.apartment.getUnitNumber()), StringUtils.lowerCase(a.apartment.getUnitNumber()))
+            .append(StringUtils.lowerCase(b.apartment == null?"":b.apartment.getUnitNumber()),
+            		StringUtils.lowerCase(a.apartment == null?"":a.apartment.getUnitNumber()))
             .toComparison();
     
     public static Comparator<Account> COMPARE_BY_STATUS_DESC = (a, b) -> new CompareToBuilder()
