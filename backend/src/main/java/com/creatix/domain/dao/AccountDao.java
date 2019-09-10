@@ -8,6 +8,7 @@ import com.creatix.domain.enums.AccountRole;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.BooleanBuilder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +33,11 @@ public class AccountDao extends DaoBase<Account, Long> {
         Objects.requireNonNull(roles, "Account roles array is null");
 
         final List<Account> accounts;
+        OrderSpecifier orderSpecifier;
         String keywordsLowercase = keywords.toLowerCase().trim();
         BooleanExpression predicate = account.role.in(roles).and(account.deletedAt.isNull());
         predicate = predicate.and(account.firstName.toLowerCase().contains(keywordsLowercase))
-        	.or(account.lastName.toLowerCase().contains(keywordsLowercase))   
-        //	.or(QAccount.account.role.contains(keywordsLowercase))
-        /// .or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase))
+        	.or(account.lastName.toLowerCase().contains(keywordsLowercase))
         	.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
         	.or(account.primaryEmail.toLowerCase().contains(keywordsLowercase));
     	if (keywordsLowercase.contains("inactive")){
@@ -71,20 +71,33 @@ public class AccountDao extends DaoBase<Account, Long> {
     	 		predicate = predicate.or(account.role.eq(AccountRole.SubTenant));
     	 		break;
     	};
-
-    	//predicate = predicate.or(account.role.contains(keywordsLowercase));   
+    	
+    	predicate = predicate.or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
+    	
+    	if (sortColumn != null){
+			if (sortColumn.equals("active")){
+				orderSpecifier = account.active.asc();
+			}else if (sortColumn.equals("apartment")){
+				orderSpecifier = account.apartment.unitNumber.lower().asc();
+			}else if (sortColumn.equals("primaryEmail")){
+				orderSpecifier = account.primaryEmail.lower().asc();
+			}else{
+				orderSpecifier = account.firstName.lower().asc();
+			}
+    	}else{
+    		orderSpecifier = account.firstName.lower().asc();
+    	}
     	
         if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
         	JPQLQuery<Account> query = queryFactory.selectFrom(account);
         	
         	if (keywordsLowercase != null){
-
         		query.where(predicate);
         	}else{
         		query.where(account.role.in(roles).and(account.deletedAt.isNull()));
         	}
             
-            query.orderBy(account.firstName.lower().asc()).orderBy(account.lastName.lower().asc());
+            query.orderBy(orderSpecifier);
             accounts = query.fetch();
         }
         else {
@@ -148,8 +161,21 @@ public class AccountDao extends DaoBase<Account, Long> {
                 }
             }
         }
-
-        accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        if (sortColumn != null){
+        	if (sortColumn.equals("active")){
+        		accounts.sort(Account.COMPARE_BY_STATUS);
+        	}else if (sortColumn.equals("apartment")){
+        		accounts.sort(Account.COMPARE_BY_UNIT);
+        	}else if (sortColumn.equals("primaryEmail")){
+        		accounts.sort(Account.COMPARE_BY_EMAIL);
+        	}else{
+        		accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        	}
+        	
+        }else{
+        	accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        }
+        
         
         return accounts;
     }

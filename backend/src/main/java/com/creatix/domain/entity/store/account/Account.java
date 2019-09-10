@@ -1,6 +1,7 @@
 package com.creatix.domain.entity.store.account;
 
 import com.creatix.domain.entity.store.Property;
+import com.creatix.domain.entity.store.Apartment;
 import com.creatix.domain.entity.store.account.device.Device;
 import com.creatix.domain.enums.AccountRole;
 import lombok.Data;
@@ -93,6 +94,9 @@ public class Account {
     public boolean isDeleted() {
         return this.deletedAt != null;
     }
+    
+    @ManyToOne
+    public Apartment apartment;
 
     @Transient
     public String getFullName() {
@@ -107,5 +111,17 @@ public class Account {
     public static Comparator<Account> COMPARE_BY_FIRST_LAST_NAME = (a, b) -> new CompareToBuilder()
             .append(StringUtils.lowerCase(a.getFirstName()), StringUtils.lowerCase(b.getFirstName()))
             .append(StringUtils.lowerCase(a.getLastName()), StringUtils.lowerCase(b.getLastName()))
+            .toComparison();
+    
+    public static Comparator<Account> COMPARE_BY_EMAIL = (a, b) -> new CompareToBuilder()
+            .append(StringUtils.lowerCase(a.getPrimaryEmail()), StringUtils.lowerCase(b.getPrimaryEmail()))
+            .toComparison();
+    
+    public static Comparator<Account> COMPARE_BY_UNIT = (a, b) -> new CompareToBuilder()
+            .append(StringUtils.lowerCase(a.apartment.getUnitNumber()), StringUtils.lowerCase(b.apartment.getUnitNumber()))
+            .toComparison();
+    
+    public static Comparator<Account> COMPARE_BY_STATUS = (a, b) -> new CompareToBuilder()
+            .append(a.getActive(), b.getActive())
             .toComparison();
 }

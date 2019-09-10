@@ -57,8 +57,8 @@ public class AccountController {
     		@RequestParam(value="page",required=false) Integer page, 
     		@RequestParam(value="size",required=false) Integer size, 
     		@RequestParam(value="keywords",required=false) String keywords,
-    		@RequestParam(value="sortColumn",required=false) String sortColumn, 
-    		@RequestParam(value="sortOrder",required=false) String sortOrder) {
+    		@RequestParam(value="sortBy",required=false) String sortColumn, 
+    		@RequestParam(value="sort",required=false) String sortOrder) {
     	
     	List<Account> accountsAll = accountService.getAccounts(roles, propertyId, keywords, sortColumn, sortOrder);
     	
