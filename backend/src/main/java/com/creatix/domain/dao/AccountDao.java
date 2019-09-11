@@ -34,6 +34,7 @@ public class AccountDao extends DaoBase<Account, Long> {
 
         final List<Account> accounts;
         OrderSpecifier orderSpecifier;
+        OrderSpecifier orderSpecifierSecond = null;
         String keywordsLowercase = keywords.toLowerCase().trim();
         BooleanExpression predicate = account.role.in(roles).and(account.deletedAt.isNull());
         predicate = predicate.and(account.firstName.toLowerCase().contains(keywordsLowercase))
@@ -96,16 +97,20 @@ public class AccountDao extends DaoBase<Account, Long> {
 			}else{
 				if (sortOrder.equals("descend")){
 					orderSpecifier = account.firstName.lower().desc();
+					orderSpecifierSecond = account.lastName.lower().desc();
 				}else{
 					orderSpecifier = account.firstName.lower().asc();
+					orderSpecifierSecond = account.lastName.lower().asc();
 				}
 			}
     	}else{
-    		if (sortOrder.equals("descend")){
-    			orderSpecifier = account.firstName.lower().desc();
-    		}else{
-    			orderSpecifier = account.firstName.lower().asc();
-    		}
+			if (sortOrder.equals("descend")){
+				orderSpecifier = account.firstName.lower().desc();
+				orderSpecifierSecond = account.lastName.lower().desc();
+			}else{
+				orderSpecifier = account.firstName.lower().asc();
+				orderSpecifierSecond = account.lastName.lower().asc();
+			}
     	}
     	
         if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
@@ -118,6 +123,9 @@ public class AccountDao extends DaoBase<Account, Long> {
         	}
             
             query.orderBy(orderSpecifier);
+            if (orderSpecifierSecond != null){
+            	query.orderBy(orderSpecifierSecond);
+            }
             accounts = query.fetch();
         }
         else {
@@ -125,7 +133,7 @@ public class AccountDao extends DaoBase<Account, Long> {
             for ( AccountRole role : roles ) {
                 if ( role == AccountRole.Tenant ) {
                     accounts.addAll(queryFactory.selectFrom(tenant)
-                            .where(tenant.apartment.property.id.in(propertyIdList)
+                            .where(predicate.and(tenant.apartment.property.id.in(propertyIdList))
                                     .and(tenant.deletedAt.isNull()))
                             .orderBy(tenant.firstName.lower().asc())
                             .orderBy(tenant.lastName.lower().asc())
@@ -173,7 +181,7 @@ public class AccountDao extends DaoBase<Account, Long> {
                 }
                 else if ( role == AccountRole.SubTenant ) {
                     accounts.addAll(queryFactory.selectFrom(subTenant)
-                            .where(subTenant.parentTenant.apartment.property.id.in(propertyIdList)
+                            .where(predicate.and(subTenant.parentTenant.apartment.property.id.in(propertyIdList))
                                     .and(subTenant.deletedAt.isNull()))
                             .orderBy(subTenant.firstName.lower().asc())
                             .orderBy(subTenant.lastName.lower().asc())
