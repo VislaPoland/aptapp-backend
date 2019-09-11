@@ -243,13 +243,8 @@ public class AccountDao extends DaoBase<Account, Long> {
         	}
         	
         }else{
-        	if (sortOrder.equals("descend")){
-        		accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME_DESC);
-        	}else{
-        		accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
-        	}
+        	accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
         }
-        
         
         return accounts;
     }
