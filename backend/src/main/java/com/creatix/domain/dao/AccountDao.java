@@ -37,6 +37,9 @@ public class AccountDao extends DaoBase<Account, Long> {
         OrderSpecifier orderSpecifierSecond = null;
         String keywordsLowercase = keywords.toLowerCase().trim();
         BooleanExpression predicate = account.role.in(roles).and(account.deletedAt.isNull());
+        BooleanExpression predicateTenant = tenant.deletedAt.isNull();
+        BooleanExpression predicateSubTenant = subTenant.deletedAt.isNull();
+        
         predicate = predicate.and(account.firstName.toLowerCase().contains(keywordsLowercase))
         	.or(account.lastName.toLowerCase().contains(keywordsLowercase))
         	.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
@@ -46,6 +49,28 @@ public class AccountDao extends DaoBase<Account, Long> {
     	}else if (keywordsLowercase.contains("active")){
     		predicate = predicate.or(account.active.isTrue());
     	}
+    	
+    	predicateTenant = predicateTenant.and(tenant.firstName.toLowerCase().contains(keywordsLowercase))
+            	.or(tenant.lastName.toLowerCase().contains(keywordsLowercase))
+            	.or ((tenant.firstName.concat(" ").concat(tenant.lastName)).toLowerCase().contains(keywordsLowercase))
+            	.or(tenant.primaryEmail.toLowerCase().contains(keywordsLowercase));
+        if (keywordsLowercase.contains("inactive")){
+        	predicateTenant = predicateTenant.or(tenant.active.isFalse());
+        }else if (keywordsLowercase.contains("active")){
+        	predicateTenant = predicateTenant.or(tenant.active.isTrue());
+        }
+        
+    	predicateSubTenant = predicateSubTenant.and(subTenant.firstName.toLowerCase().contains(keywordsLowercase))
+            	.or(subTenant.lastName.toLowerCase().contains(keywordsLowercase))
+            	.or ((subTenant.firstName.concat(" ").concat(subTenant.lastName)).toLowerCase().contains(keywordsLowercase))
+            	.or(subTenant.primaryEmail.toLowerCase().contains(keywordsLowercase));
+        if (keywordsLowercase.contains("inactive")){
+        	predicateSubTenant = predicateSubTenant.or(subTenant.active.isFalse());
+        }else if (keywordsLowercase.contains("active")){
+        	predicateSubTenant = predicateSubTenant.or(subTenant.active.isTrue());
+        }
+    	
+    	
     	switch (keywordsLowercase){
     	 	case "administrator":
     	 		predicate = predicate.or(account.role.eq(AccountRole.Administrator));
@@ -74,6 +99,8 @@ public class AccountDao extends DaoBase<Account, Long> {
     	};
     	
     	predicate = predicate.or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
+    	predicateTenant = predicateTenant.or(tenant.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
+    	predicateSubTenant = predicateSubTenant.or(subTenant.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
     	
     	if (sortColumn != null){
 			if (sortColumn.equals("active")){
@@ -133,8 +160,7 @@ public class AccountDao extends DaoBase<Account, Long> {
             for ( AccountRole role : roles ) {
                 if ( role == AccountRole.Tenant ) {
                     accounts.addAll(queryFactory.selectFrom(tenant)
-                            .where(predicate.and(tenant.apartment.property.id.in(propertyIdList))
-                                    .and(tenant.deletedAt.isNull()))
+                            .where(predicateTenant.and(tenant.apartment.property.id.in(propertyIdList)))
                             .orderBy(tenant.firstName.lower().asc())
                             .orderBy(tenant.lastName.lower().asc())
                             .fetch());
@@ -181,8 +207,7 @@ public class AccountDao extends DaoBase<Account, Long> {
                 }
                 else if ( role == AccountRole.SubTenant ) {
                     accounts.addAll(queryFactory.selectFrom(subTenant)
-                            .where(predicate.and(subTenant.parentTenant.apartment.property.id.in(propertyIdList))
-                                    .and(subTenant.deletedAt.isNull()))
+                            .where(predicateSubTenant.and(subTenant.parentTenant.apartment.property.id.in(propertyIdList)))
                             .orderBy(subTenant.firstName.lower().asc())
                             .orderBy(subTenant.lastName.lower().asc())
                             .fetch());
