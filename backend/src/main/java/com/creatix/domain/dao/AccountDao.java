@@ -35,72 +35,78 @@ public class AccountDao extends DaoBase<Account, Long> {
         final List<Account> accounts;
         OrderSpecifier orderSpecifier;
         OrderSpecifier orderSpecifierSecond = null;
-        String keywordsLowercase = keywords.toLowerCase().trim();
+        String keywordsLowercase = null; 
         BooleanExpression predicate = account.role.in(roles).and(account.deletedAt.isNull());
         BooleanExpression predicateTenant = tenant.deletedAt.isNull();
         BooleanExpression predicateSubTenant = subTenant.deletedAt.isNull();
         
-        predicate = predicate.and(account.firstName.toLowerCase().contains(keywordsLowercase))
-        	.or(account.lastName.toLowerCase().contains(keywordsLowercase))
-        	.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
-        	.or(account.primaryEmail.toLowerCase().contains(keywordsLowercase));
-    	if (keywordsLowercase.contains("inactive")){
-    		predicate = predicate.or(account.active.isFalse());
-    	}else if (keywordsLowercase.contains("active")){
-    		predicate = predicate.or(account.active.isTrue());
-    	}
-    	
-    	predicateTenant = predicateTenant.and(tenant.firstName.toLowerCase().contains(keywordsLowercase))
-            	.or(tenant.lastName.toLowerCase().contains(keywordsLowercase))
-            	.or ((tenant.firstName.concat(" ").concat(tenant.lastName)).toLowerCase().contains(keywordsLowercase))
-            	.or(tenant.primaryEmail.toLowerCase().contains(keywordsLowercase));
-        if (keywordsLowercase.contains("inactive")){
-        	predicateTenant = predicateTenant.or(tenant.active.isFalse());
-        }else if (keywordsLowercase.contains("active")){
-        	predicateTenant = predicateTenant.or(tenant.active.isTrue());
+        if (keywords != null){
+        	keywordsLowercase = keywords.toLowerCase().trim();
         }
         
-    	predicateSubTenant = predicateSubTenant.and(subTenant.firstName.toLowerCase().contains(keywordsLowercase))
-            	.or(subTenant.lastName.toLowerCase().contains(keywordsLowercase))
-            	.or ((subTenant.firstName.concat(" ").concat(subTenant.lastName)).toLowerCase().contains(keywordsLowercase))
-            	.or(subTenant.primaryEmail.toLowerCase().contains(keywordsLowercase));
-        if (keywordsLowercase.contains("inactive")){
-        	predicateSubTenant = predicateSubTenant.or(subTenant.active.isFalse());
-        }else if (keywordsLowercase.contains("active")){
-        	predicateSubTenant = predicateSubTenant.or(subTenant.active.isTrue());
-        }
-    	
-    	
-    	switch (keywordsLowercase){
-    	 	case "administrator":
-    	 		predicate = predicate.or(account.role.eq(AccountRole.Administrator));
-    	 		break;
-    	 	case "propertyowner":
-    	 		predicate = predicate.or(account.role.eq(AccountRole.PropertyOwner));
-    	 		break;
-    	 	case "propertymanager":
-    	 		predicate = predicate.or(account.role.eq(AccountRole.PropertyManager));
-    	 		break;
-    	 	case "assistantpropertymanager":
-    	 		predicate = predicate.or(account.role.eq(AccountRole.AssistantPropertyManager));
-    	 		break;
-    	 	case "maintenance":
-    	 		predicate = predicate.or(account.role.eq(AccountRole.Maintenance));
-    	 		break;
-    	 	case "security":
-    	 		predicate = predicate.or(account.role.eq(AccountRole.Security));
-    	 		break;
-    	 	case "tenant":
-    	 		predicate = predicate.or(account.role.eq(AccountRole.Tenant));
-    	 		break;
-    	 	case "subtenant":
-    	 		predicate = predicate.or(account.role.eq(AccountRole.SubTenant));
-    	 		break;
-    	};
-    	
-    	predicate = predicate.or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
-    	predicateTenant = predicateTenant.or(tenant.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
-    	predicateSubTenant = predicateSubTenant.or(subTenant.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
+        if (keywordsLowercase != null){
+	        predicate = predicate.and(account.firstName.toLowerCase().contains(keywordsLowercase))
+	        	.or(account.lastName.toLowerCase().contains(keywordsLowercase))
+	        	.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
+	        	.or(account.primaryEmail.toLowerCase().contains(keywordsLowercase));
+	    	if (keywordsLowercase.contains("inactive")){
+	    		predicate = predicate.or(account.active.isFalse());
+	    	}else if (keywordsLowercase.contains("active")){
+	    		predicate = predicate.or(account.active.isTrue());
+	    	}
+
+	    	predicateTenant = predicateTenant.and(tenant.firstName.toLowerCase().contains(keywordsLowercase))
+	            	.or(tenant.lastName.toLowerCase().contains(keywordsLowercase))
+	            	.or ((tenant.firstName.concat(" ").concat(tenant.lastName)).toLowerCase().contains(keywordsLowercase))
+	            	.or(tenant.primaryEmail.toLowerCase().contains(keywordsLowercase));
+	        if (keywordsLowercase.contains("inactive")){
+	        	predicateTenant = predicateTenant.or(tenant.active.isFalse());
+	        }else if (keywordsLowercase.contains("active")){
+	        	predicateTenant = predicateTenant.or(tenant.active.isTrue());
+	        }
+	        
+	    	predicateSubTenant = predicateSubTenant.and(subTenant.firstName.toLowerCase().contains(keywordsLowercase))
+	            	.or(subTenant.lastName.toLowerCase().contains(keywordsLowercase))
+	            	.or ((subTenant.firstName.concat(" ").concat(subTenant.lastName)).toLowerCase().contains(keywordsLowercase))
+	            	.or(subTenant.primaryEmail.toLowerCase().contains(keywordsLowercase));
+	        if (keywordsLowercase.contains("inactive")){
+	        	predicateSubTenant = predicateSubTenant.or(subTenant.active.isFalse());
+	        }else if (keywordsLowercase.contains("active")){
+	        	predicateSubTenant = predicateSubTenant.or(subTenant.active.isTrue());
+	        }
+
+	    	switch (keywordsLowercase){
+	    	 	case "administrator":
+	    	 		predicate = predicate.or(account.role.eq(AccountRole.Administrator));
+	    	 		break;
+	    	 	case "propertyowner":
+	    	 		predicate = predicate.or(account.role.eq(AccountRole.PropertyOwner));
+	    	 		break;
+	    	 	case "propertymanager":
+	    	 		predicate = predicate.or(account.role.eq(AccountRole.PropertyManager));
+	    	 		break;
+	    	 	case "assistantpropertymanager":
+	    	 		predicate = predicate.or(account.role.eq(AccountRole.AssistantPropertyManager));
+	    	 		break;
+	    	 	case "maintenance":
+	    	 		predicate = predicate.or(account.role.eq(AccountRole.Maintenance));
+	    	 		break;
+	    	 	case "security":
+	    	 		predicate = predicate.or(account.role.eq(AccountRole.Security));
+	    	 		break;
+	    	 	case "tenant":
+	    	 		predicate = predicate.or(account.role.eq(AccountRole.Tenant));
+	    	 		break;
+	    	 	case "subtenant":
+	    	 		predicate = predicate.or(account.role.eq(AccountRole.SubTenant));
+	    	 		break;
+	    	};
+	    	
+	    	predicate = predicate.or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
+	    	predicateTenant = predicateTenant.or(tenant.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
+	    	predicateSubTenant = predicateSubTenant.or(subTenant.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
+	    	
+        }    	    	
     	
     	if (sortColumn != null){
 			if (sortColumn.equals("active")){
@@ -131,13 +137,8 @@ public class AccountDao extends DaoBase<Account, Long> {
 				}
 			}
     	}else{
-			if (sortOrder.equals("descend")){
-				orderSpecifier = account.firstName.lower().desc();
-				orderSpecifierSecond = account.lastName.lower().desc();
-			}else{
-				orderSpecifier = account.firstName.lower().asc();
-				orderSpecifierSecond = account.lastName.lower().asc();
-			}
+			orderSpecifier = account.firstName.lower().asc();
+			orderSpecifierSecond = account.lastName.lower().asc();
     	}
     	
         if ( (propertyIdList == null) || propertyIdList.isEmpty() ) {
