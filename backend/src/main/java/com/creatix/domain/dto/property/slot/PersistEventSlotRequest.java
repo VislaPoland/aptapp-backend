@@ -31,4 +31,11 @@ public class PersistEventSlotRequest {
     @NotNull
     @ApiModelProperty(value = "Audience", required = true)
     private AudienceType audience;
+    
+    @ApiModelProperty(value = "Send Notifications")
+    private Boolean enableNotification;
+    
+    public Boolean getEnableNotification(){
+    	return enableNotification;
+    }
 }

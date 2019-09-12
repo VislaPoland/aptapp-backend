@@ -173,13 +173,17 @@ public class SlotService {
 
         eventSlotDao.persist(eventSlot);
 
+        boolean enableNotification = data.getEnableNotification();
 
         final NotificationGroup notificationGroup = new NotificationGroup();
         notificationGroupDao.persist(notificationGroup);
 
         for ( final Account attendant : getEventAttendants(eventSlot) ) {
             // notify attendant by push notification
-            pushNotificationSender.sendNotification(new EventNotificationAdjustTemplate(eventSlot), attendant);
+        	
+        	if (enableNotification){
+        		pushNotificationSender.sendNotification(new EventNotificationAdjustTemplate(eventSlot), attendant);
+        	}
         }
 
         return eventSlot;
@@ -194,6 +198,8 @@ public class SlotService {
         mapper.fillEventSlot(request, slot);
         slot.setEndTime(slot.getBeginTime().plusMinutes(request.getUnitDurationMinutes()));
         slot.setProperty(property);
+        
+        boolean enableNotification = request.getEnableNotification();
 
         final SlotUnit unit = new SlotUnit();
         unit.setCapacity(request.getInitialCapacity());
@@ -207,10 +213,14 @@ public class SlotService {
         notificationGroupDao.persist(notificationGroup);
 
         for ( final Account attendant : getEventAttendants(slot) ) {
-            // notify attendant by push notification
-            pushNotificationSender.sendNotification(new EventNotificationTemplate(slot), attendant);
-            // invite attendant to event
-            slot.addEventInvite(createEventInvite(slot, attendant, notificationGroup));
+            
+        	if (enableNotification){
+        		// notify attendant by push notification
+        		pushNotificationSender.sendNotification(new EventNotificationTemplate(slot), attendant);
+                // invite attendant to event
+                slot.addEventInvite(createEventInvite(slot, attendant, notificationGroup));
+        	}
+
         }
 
         return slot;

@@ -28,4 +28,11 @@ public class UpdateEventSlotRequest {
     private OffsetDateTime beginTime;
     @ApiModelProperty(value = "Slot duration in minutes")
     private Integer unitDurationMinutes;
+    
+    @ApiModelProperty(value = "Send Notifications")
+    private Boolean enableNotification;
+    
+    public Boolean getEnableNotification(){
+    	return enableNotification;
+    }
 }
