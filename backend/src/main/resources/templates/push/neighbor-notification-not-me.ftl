@@ -1,1 +1,1 @@
-Please make sure you are trying to contact the right neighbor
+Your neighbor responded "Sorry not me" Please be sure you are trying to notify the right neighbor
