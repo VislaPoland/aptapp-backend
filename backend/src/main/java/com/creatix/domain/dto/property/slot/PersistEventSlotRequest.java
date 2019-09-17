@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 
@@ -32,7 +33,8 @@ public class PersistEventSlotRequest {
     @ApiModelProperty(value = "Audience", required = true)
     private AudienceType audience;
     
-    @ApiModelProperty(value = "Send Notifications")
+    @Nullable
+    @ApiModelProperty(value = "Send Notifications", required = false)
     private Boolean enableNotification;
     
     public Boolean getEnableNotification(){

@@ -172,8 +172,11 @@ public class SlotService {
         eventSlot.setEndTime(eventSlot.getBeginTime().plusMinutes(eventSlot.getUnitDurationMinutes()));
 
         eventSlotDao.persist(eventSlot);
-
-        boolean enableNotification = data.getEnableNotification();
+        
+        boolean enableNotification = true;
+        if (data.getEnableNotification() != null){
+        	enableNotification = data.getEnableNotification();
+        }
 
         final NotificationGroup notificationGroup = new NotificationGroup();
         notificationGroupDao.persist(notificationGroup);
@@ -199,7 +202,10 @@ public class SlotService {
         slot.setEndTime(slot.getBeginTime().plusMinutes(request.getUnitDurationMinutes()));
         slot.setProperty(property);
         
-        boolean enableNotification = request.getEnableNotification();
+        boolean enableNotification = true;
+        if (request.getEnableNotification() != null){
+        	enableNotification = request.getEnableNotification();
+        }
 
         final SlotUnit unit = new SlotUnit();
         unit.setCapacity(request.getInitialCapacity());
