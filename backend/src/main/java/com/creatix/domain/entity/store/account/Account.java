@@ -9,7 +9,11 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.hibernate.FetchMode;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.validator.constraints.Email;
 
 import javax.persistence.*;
@@ -95,7 +99,8 @@ public class Account {
         return this.deletedAt != null;
     }
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(columnDefinition="integer", name="apartment_id")
     public Apartment apartment;
 
     @Transient
@@ -118,7 +123,7 @@ public class Account {
             .toComparison();
     
     public static Comparator<Account> COMPARE_BY_UNIT = (a, b) -> new CompareToBuilder()
-            .append(StringUtils.lowerCase(a.apartment == null?"":a.apartment.getUnitNumber()), StringUtils.lowerCase(b.apartment == null?"":b.apartment.getUnitNumber()))
+            .append(StringUtils.lowerCase(a.getApartment() == null?"":a.getApartment().getUnitNumber()), StringUtils.lowerCase(b.getApartment() == null?"":b.getApartment().getUnitNumber()))
             .toComparison();
     
     public static Comparator<Account> COMPARE_BY_STATUS = (a, b) -> new CompareToBuilder()
@@ -136,8 +141,8 @@ public class Account {
             .toComparison();
     
     public static Comparator<Account> COMPARE_BY_UNIT_DESC = (a, b) -> new CompareToBuilder()
-            .append(StringUtils.lowerCase(b.apartment == null?"":b.apartment.getUnitNumber()),
-            		StringUtils.lowerCase(a.apartment == null?"":a.apartment.getUnitNumber()))
+            .append(StringUtils.lowerCase(b.getApartment() == null?"":b.getApartment().getUnitNumber()),
+            		StringUtils.lowerCase(a.getApartment() == null?"":a.getApartment().getUnitNumber()))
             .toComparison();
     
     public static Comparator<Account> COMPARE_BY_STATUS_DESC = (a, b) -> new CompareToBuilder()

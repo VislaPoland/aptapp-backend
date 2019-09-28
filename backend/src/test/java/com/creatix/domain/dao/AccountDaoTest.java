@@ -42,11 +42,11 @@ public class AccountDaoTest {
         List<Long> propertyIdList = new ArrayList<>();
         propertyIdList.add(1L);
 
-        final List<Account> accounts = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), propertyIdList);
+        final List<Account> accounts = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), propertyIdList, null ,null, null);
         assertNotNull(accounts);
         assertEquals(9, accounts.size());
 
-        final List<Account> accountsAll = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), Collections.emptyList());
+        final List<Account> accountsAll = accountDao.findByRolesAndPropertyIdList(AccountRole.values(), Collections.emptyList(), null, null, null);
         assertNotNull(accountsAll);
         assertEquals(10, accountsAll.size());
     }

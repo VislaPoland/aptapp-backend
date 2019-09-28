@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.creatix.domain.entity.store.account.QAccount.account;
 import static com.creatix.domain.entity.store.account.QAssistantPropertyManager.assistantPropertyManager;
@@ -32,18 +34,23 @@ public class AccountDao extends DaoBase<Account, Long> {
     public List<Account> findByRolesAndPropertyIdList(@NotNull AccountRole[] roles, Collection<Long> propertyIdList, String keywords, String sortColumn, String sortOrder) {
         Objects.requireNonNull(roles, "Account roles array is null");
 
-        final List<Account> accounts;
+        List<Account> accounts;
+        List<Account> accountsFiltered = null;
         OrderSpecifier orderSpecifier;
         OrderSpecifier orderSpecifierSecond = null;
         String keywordsLowercase = null; 
-        BooleanExpression predicate = account.role.in(roles).and(account.deletedAt.isNull());
+        BooleanExpression predicate = null;
+        boolean keywordsContainNumber = false;	
         
-        if (keywords != null){
-        	keywordsLowercase = keywords.toLowerCase().trim();
+        if (keywords != null && keywords.length()>0){
+        	keywordsLowercase = keywords.toLowerCase().trim();	    	
+	    	Pattern p = Pattern.compile("[0-9]");
+	    	Matcher m = p.matcher( keywordsLowercase );
+	    	keywordsContainNumber = m.find();
         }
         
         if (keywordsLowercase != null){
-	        predicate = predicate.and(account.firstName.toLowerCase().contains(keywordsLowercase))
+	        predicate = account.firstName.toLowerCase().contains(keywordsLowercase)
 	        	.or(account.lastName.toLowerCase().contains(keywordsLowercase))
 	        	.or ((account.firstName.concat(" ").concat(account.lastName)).toLowerCase().contains(keywordsLowercase))
 	        	.or(account.primaryEmail.toLowerCase().contains(keywordsLowercase));
@@ -78,10 +85,7 @@ public class AccountDao extends DaoBase<Account, Long> {
 	    	 	case "subtenant":
 	    	 		predicate = predicate.or(account.role.eq(AccountRole.SubTenant));
 	    	 		break;
-	    	};
-	    	
-	    	predicate = predicate.or(account.apartment.unitNumber.toLowerCase().contains(keywordsLowercase));
-	    	
+	    	};	
         }    	    	
     	
     	if (sortColumn != null){
@@ -117,15 +121,13 @@ public class AccountDao extends DaoBase<Account, Long> {
 			orderSpecifierSecond = account.lastName.lower().asc();
     	}
     	
-        if (sortColumn != null || (propertyIdList == null) || propertyIdList.isEmpty() ) {
+        if (((propertyIdList == null) || propertyIdList.isEmpty())) {
         	JPQLQuery<Account> query = queryFactory.selectFrom(account);
         	
-        	if (propertyIdList != null && !propertyIdList.isEmpty()){
-        		predicate = predicate.and(account.apartment.property.id.in(propertyIdList));
-        	}
-        	if (keywordsLowercase != null){
-        		query.where(predicate);
+        	if (keywordsLowercase != null && keywordsLowercase.length() > 0 && !keywordsContainNumber){
+        		query.where(predicate.and(account.role.in(roles)).and(account.deletedAt.isNull()));
         	}else{
+        		// will filter out later
         		query.where(account.role.in(roles).and(account.deletedAt.isNull()));
         	}
             
@@ -196,11 +198,74 @@ public class AccountDao extends DaoBase<Account, Long> {
                 }
             }
         }
-        if (sortColumn == null){
-        	accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        
+        if ((keywordsLowercase != null && keywordsLowercase.length()>0)){
+        	accountsFiltered = new ArrayList<>();
+            for (Account account : accounts) {
+            	
+               if (account.getFullName().toLowerCase().contains(keywordsLowercase) ||
+            	account.getPrimaryEmail().toLowerCase().contains(keywordsLowercase)) {
+            	   accountsFiltered.add(account);
+               }else{
+	       	    	if (keywordsLowercase.contains("inactive") ){
+	       	    		if (!account.getActive()){
+	       	    			accountsFiltered.add(account);
+	       	    		}
+	    	    	}else if (keywordsLowercase.contains("active") ){
+	    	    		if (account.getActive()){
+	    	    			accountsFiltered.add(account);
+	    	    		}
+	    	    	}else{
+	    	    		if (account.getApartment() != null){
+	    	    			if (account.getApartment().getUnitNumber().contains(keywordsLowercase)){
+	    	    				accountsFiltered.add(account);
+	    	    			}
+	    	    		}
+	    	    		
+	    	    	}
+	       	    	
+               }
+               
+            }
         }
         
+        if (accountsFiltered != null){
+        	accounts = accountsFiltered;
+        }
+        
+        if (sortColumn == null){
+        	accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        }else{
+        	if (sortColumn.equals("active")){
+        		if (sortOrder.equals("descend")){
+        			accounts.sort(Account.COMPARE_BY_STATUS_DESC);
+        		}else{
+        			accounts.sort(Account.COMPARE_BY_STATUS);
+        		}
+        	}else if (sortColumn.equals("apartment")){
+        		if (sortOrder.equals("descend")){
+        			accounts.sort(Account.COMPARE_BY_UNIT_DESC);
+        		}else{
+        			accounts.sort(Account.COMPARE_BY_UNIT);
+        		}
+        	}else if (sortColumn.equals("primaryEmail")){
+        		if (sortOrder.equals("descend")){
+        			accounts.sort(Account.COMPARE_BY_EMAIL_DESC);
+        		}else{
+        			accounts.sort(Account.COMPARE_BY_EMAIL);
+        		}
+        	}else{
+        		if (sortOrder.equals("descend")){
+        			accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME_DESC);
+        		}else{
+        			accounts.sort(Account.COMPARE_BY_FIRST_LAST_NAME);
+        		}
+        	}
+
+        }
+
         return accounts;
+
     }
 
     /**
