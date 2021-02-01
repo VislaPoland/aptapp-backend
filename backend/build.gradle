@@ -62,6 +62,7 @@ pmd {
 
 repositories {
 	mavenCentral()
+	jcenter()
 	maven { url 'http://repo.spring.io/plugins-release' }
 }
 
