@@ -71,7 +71,7 @@ public class EmailMessageService {
         request.setEndpoint("mail/send");
         request.setBody(mail.build());
         Response response = sendGridAPI.api(request);
-        sendGridAPI.api(request);
+
 
     }
 
