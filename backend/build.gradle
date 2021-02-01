@@ -77,12 +77,14 @@ war {
 			into('classes/')
 		}
 	}
+	enabled=true
 }
 
 war.dependsOn createBuildVersionFile
 
-dependencies {
 
+dependencies {
+	compile ('com.sendgrid:sendgrid-java:4.6.1')
 	optional('org.springframework.boot:spring-boot-configuration-processor')
 
 	// spring
@@ -148,6 +150,9 @@ dependencies {
 	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 
 	compile("org.springframework.boot:spring-boot-devtools")
+
+
+
 }
 
 compileJava.dependsOn(processResources)
